@@ -65,10 +65,19 @@ func SupabaseAuthMiddleware(next http.Handler) http.Handler {
 
 // validateSupabaseJWT valida un JWT token de Supabase usando JWT Signing Keys
 func validateSupabaseJWT(tokenString string) (string, error) {
-	// Con los nuevos JWT Signing Keys, necesitamos hacer validación más robusta
-	// Por ahora, para desarrollo, seguimos soportando el JWT secret legacy
-	
-	// Primero intentar con JWT secret (legacy/desarrollo)
+	// Usar JWKS (JSON Web Key Set) validation como método principal
+	supabaseURL := os.Getenv("SUPABASE_URL")
+	if supabaseURL == "" {
+		return "", fmt.Errorf("SUPABASE_URL no configurado")
+	}
+
+	// Intentar validación con JWKS primero
+	userID, err := validateWithJWKS(tokenString, supabaseURL)
+	if err == nil {
+		return userID, nil
+	}
+
+	// Solo como fallback para desarrollo local, intentar con JWT secret
 	jwtSecret := os.Getenv("SUPABASE_JWT_SECRET")
 	if jwtSecret != "" {
 		userID, err := validateWithSecret(tokenString, jwtSecret)
@@ -77,9 +86,70 @@ func validateSupabaseJWT(tokenString string) (string, error) {
 		}
 	}
 
-	// En producción, deberías implementar JWKS (JSON Web Key Set) validation
-	// Para ahora, retornamos un error explicativo
-	return "", fmt.Errorf("JWT validation failed - considera configurar JWKS para producción")
+	return "", fmt.Errorf("JWT validation failed: %v", err)
+}
+
+// validateWithJWKS valida JWT usando JWKS de Supabase
+func validateWithJWKS(tokenString, supabaseURL string) (string, error) {
+	// Obtener las claves JWKS de Supabase
+	jwksURL := supabaseURL + "/auth/v1/.well-known/jwks.json"
+	jwks, err := FetchJWKS(jwksURL)
+	if err != nil {
+		return "", fmt.Errorf("error fetching JWKS: %v", err)
+	}
+
+	// Parsear el token sin validar primero para obtener el kid
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Verificar que el algoritmo sea compatible (RSA o ECDSA)
+		switch token.Method.(type) {
+		case *jwt.SigningMethodRSA, *jwt.SigningMethodECDSA:
+			// Algoritmos soportados
+		default:
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		// Obtener el kid del header
+		kid, ok := token.Header["kid"].(string)
+		if !ok {
+			return nil, fmt.Errorf("kid not found in token header")
+		}
+
+		// Buscar la clave correspondiente en JWKS
+		for _, key := range jwks.Keys {
+			if key.Kid == kid {
+				// Convertir JWK a clave pública (RSA o ECDSA)
+				publicKey, err := JWKToPublicKey(key)
+				if err != nil {
+					return nil, fmt.Errorf("error converting JWK to public key: %v", err)
+				}
+				return publicKey, nil
+			}
+		}
+
+		return nil, fmt.Errorf("key with kid %s not found in JWKS", kid)
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("error parsing token: %v", err)
+	}
+
+	if !token.Valid {
+		return "", fmt.Errorf("token is not valid")
+	}
+
+	// Extraer el user ID de los claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", fmt.Errorf("invalid token claims")
+	}
+
+	// El user ID en Supabase JWT está en el claim "sub"
+	userID, ok := claims["sub"].(string)
+	if !ok || userID == "" {
+		return "", fmt.Errorf("user ID not found in token claims")
+	}
+
+	return userID, nil
 }
 
 // validateWithSecret valida JWT con secret (legacy/desarrollo)
