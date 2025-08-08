@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Box, IconButton, AppBar, Toolbar, Typography } from '@mui/material'
-import LogoutIcon from '@mui/icons-material/Logout'
+import { Box } from '@mui/material'
 import Navigation from '../navigation/Navigation'
 import WorkoutForm from '../workout/WorkoutForm'
 import ExerciseList from '../exercises/ExerciseList'
@@ -22,23 +21,7 @@ export default function AuthenticatedApp() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
-        <Toolbar sx={{ minHeight: '56px' }}>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontSize: '18px' }}>
-            Gym App
-          </Typography>
-          <IconButton 
-            color="inherit" 
-            onClick={handleLogout}
-            aria-label="cerrar sesión"
-            size="large"
-          >
-            <LogoutIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      
-      <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
+      <Navigation activeTab={activeTab} onTabChange={handleTabChange} onLogout={handleLogout} />
       
       <Box sx={{ flexGrow: 1, py: 2, overflow: 'auto' }}>
         {/* Pestaña Entrenamiento */}
