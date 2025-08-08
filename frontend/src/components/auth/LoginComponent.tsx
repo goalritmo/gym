@@ -23,15 +23,18 @@ export default function LoginComponent() {
       display: 'flex', 
       justifyContent: 'center', 
       alignItems: 'center', 
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      flexGrow: 1,
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      borderRadius: 1,
+      mx: 1,
+      my: 1
     }}>
       <Box sx={{ 
         bgcolor: 'white', 
-        p: 4, 
+        p: 3, 
         borderRadius: 2, 
         boxShadow: 3,
-        maxWidth: 400,
+        maxWidth: '90%',
         width: '100%'
       }}>
         <Typography variant="h4" component="h1" gutterBottom textAlign="center">

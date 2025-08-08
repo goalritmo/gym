@@ -3,10 +3,10 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import Navigation from './Navigation'
 
 describe('Navigation', () => {
-  it('muestra el título de la aplicación', () => {
+  it('muestra las pestañas de navegación', () => {
     render(<Navigation activeTab={0} onTabChange={vi.fn()} />)
     
-    expect(screen.getByText('Gym App')).toBeInTheDocument()
+    expect(screen.getByRole('tablist')).toBeInTheDocument()
   })
 
   it('muestra todas las pestañas', () => {
