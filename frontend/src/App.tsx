@@ -5,7 +5,7 @@ import Navigation from './components/navigation/Navigation.tsx'
 import LoginComponent from './components/auth/LoginComponent.tsx'
 import WorkoutForm from './components/workout/WorkoutForm.tsx'
 import ExerciseList from './components/exercises/ExerciseList.tsx'
-import EquipmentDetail from './components/equipment/EquipmentDetail.tsx'
+import EquipmentList from './components/equipment/EquipmentList.tsx'
 import WorkoutHistory from './components/workout/WorkoutHistory.tsx'
 
 const theme = createTheme({
@@ -21,7 +21,6 @@ const theme = createTheme({
 
 function App() {
   const [activeTab, setActiveTab] = useState(0)
-  const [showEquipmentDetail, setShowEquipmentDetail] = useState(false)
 
   const handleTabChange = (newValue: number) => {
     setActiveTab(newValue)
@@ -70,22 +69,34 @@ function App() {
           {/* Pestaña Equipamiento */}
           {activeTab === 3 && (
             <Box>
-              <button onClick={() => setShowEquipmentDetail(true)}>
-                Ver Detalle de Equipo
-              </button>
-              {showEquipmentDetail && (
-                <EquipmentDetail 
-                  equipment={{
+              <EquipmentList 
+                equipment={[
+                  {
                     id: 1,
                     name: 'Barra Olímpica',
                     category: 'BARRA',
                     observations: 'Barra estándar de 20kg',
                     image_url: 'https://example.com/barra.jpg',
                     created_at: '2024-01-01T00:00:00Z'
-                  }}
-                  onClose={() => setShowEquipmentDetail(false)}
-                />
-              )}
+                  },
+                  {
+                    id: 2,
+                    name: 'Mancuernas',
+                    category: 'MANCUERNAS',
+                    observations: 'Par de mancuernas de 10kg',
+                    image_url: null,
+                    created_at: '2024-01-02T00:00:00Z'
+                  },
+                  {
+                    id: 3,
+                    name: 'Rack de Sentadillas',
+                    category: 'RACK',
+                    observations: null,
+                    image_url: 'https://example.com/rack.jpg',
+                    created_at: '2024-01-03T00:00:00Z'
+                  }
+                ]}
+              />
             </Box>
           )}
 
