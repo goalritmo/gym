@@ -193,6 +193,7 @@ export default function Navigation({ activeTab, onTabChange, onLogout }: Navigat
               sx={{ 
                 flexGrow: 1, 
                 textAlign: 'center',
+                fontWeight: 'bold',
                 transform: 'translateY(0)',
                 transition: 'all 0.3s ease-in-out',
                 animation: 'slideInFromTop 0.3s ease-out'

@@ -47,8 +47,8 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto' }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
-        Historial de Entrenamientos
+      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main', fontWeight: 'bold' }}>
+        Entrenamientos
       </Typography>
       
       <Stack spacing={3}>

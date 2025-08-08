@@ -78,7 +78,7 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main', fontWeight: 'bold' }}>
         Hacer consulta
       </Typography>
       

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   Card,
   CardContent,
@@ -12,6 +12,10 @@ import {
   DialogActions,
   Button,
   IconButton,
+  TextField,
+  FormControl,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
 
@@ -31,6 +35,24 @@ type EquipmentListProps = {
 export default function EquipmentList({ equipment }: EquipmentListProps) {
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null)
   const [openDialog, setOpenDialog] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+
+  // Obtener categorías únicas para el filtro
+  const categories = useMemo(() => {
+    const cats = equipment.map(item => item.category)
+    return [...new Set(cats)].sort()
+  }, [equipment])
+
+  // Filtrar equipamiento
+  const filteredEquipment = useMemo(() => {
+    return equipment.filter(item => {
+      const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesCategory = !categoryFilter || item.category === categoryFilter
+      
+      return matchesSearch && matchesCategory
+    })
+  }, [equipment, searchTerm, categoryFilter])
 
   const handleEquipmentClick = (equipment: Equipment) => {
     setSelectedEquipment(equipment)
@@ -47,6 +69,10 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
     return date.toLocaleDateString('es-ES')
   }
 
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
+  }
+
   if (equipment.length === 0) {
     return (
       <Box textAlign="center" py={4}>
@@ -59,65 +85,172 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
-        Equipamiento Disponible
+      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main', fontWeight: 'bold' }}>
+        Hacer consulta
       </Typography>
       
-      <Stack direction="row" spacing={3} sx={{ flexWrap: 'wrap', gap: 3, mt: 3 }}>
-        {equipment.map((item) => (
-          <Box key={item.id} sx={{ flex: '1 1 300px', minWidth: 300 }}>
+      <Stack spacing={3}>
+        {/* Filtros */}
+        <Box sx={{ 
+          p: 4, 
+          bgcolor: 'primary.main', 
+          borderRadius: 3, 
+          boxShadow: 3,
+          background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+          color: 'white'
+        }}>
+          <Stack spacing={3}>
+            <TextField
+              placeholder="Buscar equipamiento..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{ 
+                width: '100%',
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'rgba(255, 255, 255, 0.95)',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 1)'
+                  },
+                  '&.Mui-focused': {
+                    bgcolor: 'white'
+                  }
+                },
+                '& .MuiInputBase-input': {
+                  color: '#333',
+                  fontSize: '1rem'
+                },
+                '& .MuiInputBase-input::placeholder': {
+                  color: '#666',
+                  opacity: 1
+                }
+              }}
+            />
+            <FormControl>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'white', 
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  mb: 1
+                }}
+              >
+                Categoría
+              </Typography>
+              <Select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                displayEmpty
+                sx={{
+                  bgcolor: 'rgba(255, 255, 255, 0.95)',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 1)'
+                  },
+                  '&.Mui-focused': {
+                    bgcolor: 'white'
+                  },
+                  '& .MuiSelect-select': {
+                    color: '#333',
+                    fontSize: '1rem'
+                  }
+                }}
+              >
+                <MenuItem value="">Elegir</MenuItem>
+                {categories.map(category => (
+                  <MenuItem key={category} value={category}>
+                    {capitalizeFirstLetter(category)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+        </Box>
+
+        {/* Equipamiento */}
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: 2
+        }}>
+          {filteredEquipment.map((item) => (
             <Card 
+              key={item.id}
               sx={{ 
                 cursor: 'pointer', 
+                height: '100%',
                 '&:hover': { 
                   boxShadow: 4,
                   transform: 'translateY(-2px)',
                   transition: 'all 0.2s ease'
                 },
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
                 borderRadius: 2,
                 border: '1px solid',
                 borderColor: 'divider'
               }}
               onClick={() => handleEquipmentClick(item)}
             >
-              <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                <Stack spacing={2}>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                      {item.name}
-                    </Typography>
-                    <IconButton size="small" color="primary" sx={{ color: 'primary.main' }}>
-                      <InfoIcon />
-                    </IconButton>
-                  </Box>
-                  
-                  <Stack direction="row" spacing={1}>
-                    <Chip label={item.category} color="primary" size="small" />
+              <CardContent sx={{ 
+                p: 3, 
+                height: '100%', 
+                display: 'flex', 
+                flexDirection: 'column',
+                textAlign: 'center'
+              }}>
+                <Box display="flex" justifyContent="center" alignItems="center" sx={{ mb: 2 }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 'bold', 
+                      color: 'primary.main',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {item.name}
+                  </Typography>
+                  <IconButton 
+                    size="small" 
+                    color="primary" 
+                    sx={{ 
+                      color: 'primary.main',
+                      ml: 0.5
+                    }}
+                  >
+                    <InfoIcon />
+                  </IconButton>
+                </Box>
+                
+                <Box sx={{ mt: 'auto', textAlign: 'center' }}>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ mb: 2, justifyContent: 'center' }}>
+                    <Chip 
+                      label={capitalizeFirstLetter(item.category)} 
+                      color="primary" 
+                      size="small"
+                      sx={{ fontWeight: 'bold' }}
+                    />
                   </Stack>
                   
                   {item.observations && (
-                    <Typography variant="body2" color="text.secondary" sx={{ 
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                    }}>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary" 
+                      sx={{ 
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        mb: 1,
+                        textAlign: 'center'
+                      }}
+                    >
                       {item.observations}
                     </Typography>
                   )}
-                  
-                  <Typography variant="caption" color="text.secondary">
-                    {formatDate(item.created_at)}
-                  </Typography>
-                </Stack>
+                </Box>
               </CardContent>
             </Card>
-          </Box>
-        ))}
+          ))}
+        </Box>
       </Stack>
 
       {/* Dialog para mostrar detalles completos */}
@@ -155,7 +288,7 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
                     <Typography variant="subtitle2" color="text.secondary">
                       Categoría:
                     </Typography>
-                    <Chip label={selectedEquipment.category} color="primary" />
+                    <Chip label={capitalizeFirstLetter(selectedEquipment.category)} color="primary" />
                   </Box>
                   
                   <Box>
