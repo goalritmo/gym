@@ -1,33 +1,40 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import WorkoutForm from './WorkoutForm.tsx'
 
 const exercises = [{ id: 1, name: 'Press de Banca' }]
 
 describe('WorkoutForm', () => {
-  it('envía datos válidos', () => {
+  it('envía datos válidos', async () => {
+    const user = userEvent.setup()
     const onSubmit = vi.fn()
     render(<WorkoutForm exercises={exercises} onSubmit={onSubmit} />)
 
-    // Seleccionar ejercicio (combobox de MUI)
-    fireEvent.change(screen.getByRole('combobox', { name: 'Ejercicio' }), { target: { value: '1' } })
+    // Seleccionar ejercicio (select nativo de MUI)
+    const selectElement = screen.getByRole('combobox', { name: 'Ejercicio' })
+    fireEvent.change(selectElement, { target: { value: '1' } })
+
     // Campos requeridos
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Peso (kg)' }), { target: { value: '80' } })
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Repeticiones' }), { target: { value: '8' } })
+    await user.type(screen.getByRole('spinbutton', { name: 'Peso (kg)' }), '80')
+    await user.type(screen.getByRole('spinbutton', { name: 'Repeticiones' }), '8')
+
     // Opcionales
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Serie' }), { target: { value: '1' } })
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Segundos' }), { target: { value: '45' } })
-    fireEvent.change(screen.getByRole('textbox', { name: 'Observaciones' }), { target: { value: 'Buena técnica' } })
+    await user.type(screen.getByRole('spinbutton', { name: 'Serie' }), '1')
+    await user.type(screen.getByRole('spinbutton', { name: 'Segundos' }), '45')
+    await user.type(screen.getByRole('textbox', { name: 'Observaciones' }), 'Buena técnica')
 
     fireEvent.click(screen.getByRole('button', { name: 'Guardar' }))
 
-    expect(onSubmit).toHaveBeenCalledWith({
-      exerciseId: 1,
-      weight: 80,
-      reps: 8,
-      serie: 1,
-      seconds: 45,
-      observations: 'Buena técnica',
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        exerciseId: 1,
+        weight: 80,
+        reps: 8,
+        serie: 1,
+        seconds: 45,
+        observations: 'Buena técnica',
+      })
     })
   })
 
