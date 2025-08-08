@@ -90,8 +90,8 @@ export default function Navigation({ activeTab, onTabChange, onLogout }: Navigat
 
   const menuItems = [
     { label: 'Entrenatiempo', icon: <AllInclusiveIcon />, value: 0 },
-    { label: 'Ejercicios', icon: <ListAltIcon />, value: 1 },
-    { label: 'Equipamiento', icon: <FitnessCenterIcon />, value: 2 },
+    { label: 'Todos los Ejercicios', icon: <ListAltIcon />, value: 1 },
+    { label: 'Todo el Equipamiento', icon: <FitnessCenterIcon />, value: 2 },
     { label: 'Historial', icon: <HistoryIcon />, value: 3 },
   ]
 

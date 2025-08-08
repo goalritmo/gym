@@ -79,105 +79,178 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
       <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
-        Biblioteca de Ejercicios
+        Hacer consulta
       </Typography>
       
       <Stack spacing={3}>
         {/* Filtros */}
         <Box sx={{ 
-          p: 3, 
-          bgcolor: 'background.paper', 
-          borderRadius: 2, 
-          boxShadow: 1,
-          border: '1px solid',
-          borderColor: 'divider'
+          p: 4, 
+          bgcolor: 'primary.main', 
+          borderRadius: 3, 
+          boxShadow: 3,
+          background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+          color: 'white'
         }}>
-          <Typography variant="h6" gutterBottom sx={{ mb: 2, color: 'text.secondary' }}>
-            Filtros
-          </Typography>
-          <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2 }}>
-        <TextField
-          placeholder="Buscar ejercicios..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ minWidth: 200 }}
-        />
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>Filtrar por grupo muscular</InputLabel>
-          <Select
-            value={muscleGroupFilter}
-            label="Filtrar por grupo muscular"
-            onChange={(e) => setMuscleGroupFilter(e.target.value)}
-          >
-            <MenuItem value="">Todos</MenuItem>
-            {muscleGroups.map(group => (
-              <MenuItem key={group} value={group}>
-                {group}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>Filtrar por equipo</InputLabel>
-          <Select
-            value={equipmentFilter}
-            label="Filtrar por equipo"
-            onChange={(e) => setEquipmentFilter(e.target.value)}
-          >
-            <MenuItem value="">Todos</MenuItem>
-            {equipmentTypes.map(equipment => (
-              <MenuItem key={equipment} value={equipment}>
-                {equipment}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
+          <Stack spacing={3}>
+            <TextField
+              placeholder="Buscar ejercicios..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{ 
+                width: '100%',
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'rgba(255, 255, 255, 0.95)',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 1)'
+                  },
+                  '&.Mui-focused': {
+                    bgcolor: 'white'
+                  }
+                },
+                '& .MuiInputBase-input': {
+                  color: '#333',
+                  fontSize: '1rem'
+                },
+                '& .MuiInputBase-input::placeholder': {
+                  color: '#666',
+                  opacity: 1
+                }
+              }}
+            />
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: 3
+            }}>
+              <FormControl sx={{ flex: 1 }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: 'white', 
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    mb: 1
+                  }}
+                >
+                  Grupo muscular
+                </Typography>
+                <Select
+                  value={muscleGroupFilter}
+                  onChange={(e) => setMuscleGroupFilter(e.target.value)}
+                  displayEmpty
+                  sx={{
+                    bgcolor: 'rgba(255, 255, 255, 0.95)',
+                    '&:hover': {
+                      bgcolor: 'rgba(255, 255, 255, 1)'
+                    },
+                    '&.Mui-focused': {
+                      bgcolor: 'white'
+                    },
+                    '& .MuiSelect-select': {
+                      color: '#333',
+                      fontSize: '1rem'
+                    }
+                  }}
+                >
+                  <MenuItem value="">Elegir</MenuItem>
+                  {muscleGroups.map(group => (
+                    <MenuItem key={group} value={group}>
+                      {group}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl sx={{ flex: 1 }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: 'white', 
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    mb: 1
+                  }}
+                >
+                  Equipamiento
+                </Typography>
+                <Select
+                  value={equipmentFilter}
+                  onChange={(e) => setEquipmentFilter(e.target.value)}
+                  displayEmpty
+                  sx={{
+                    bgcolor: 'rgba(255, 255, 255, 0.95)',
+                    '&:hover': {
+                      bgcolor: 'rgba(255, 255, 255, 1)'
+                    },
+                    '&.Mui-focused': {
+                      bgcolor: 'white'
+                    },
+                    '& .MuiSelect-select': {
+                      color: '#333',
+                      fontSize: '1rem'
+                    }
+                  }}
+                >
+                  <MenuItem value="">Elegir</MenuItem>
+                  {equipmentTypes.map(equipment => (
+                    <MenuItem key={equipment} value={equipment}>
+                      {equipment}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          </Stack>
         </Box>
 
-      {/* Lista de ejercicios */}
-      <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2 }}>
-        {filteredExercises.map((exercise) => (
-          <Card 
-            key={exercise.id}
-            sx={{ 
-              cursor: 'pointer', 
-              '&:hover': { 
-                boxShadow: 4,
-                transform: 'translateY(-2px)',
-                transition: 'all 0.2s ease'
-              },
-              minWidth: 250,
-              flex: '1 1 300px',
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: 'divider'
-            }}
-            onClick={() => handleExerciseClick(exercise)}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                {exercise.name}
-              </Typography>
-              <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                <Chip 
-                  label={exercise.muscle_group} 
-                  size="small" 
-                  color="primary" 
-                  sx={{ fontWeight: 'bold' }}
-                />
-                <Chip 
-                  label={exercise.equipment} 
-                  size="small" 
-                  variant="outlined" 
-                  sx={{ borderColor: 'primary.main' }}
-                />
-              </Stack>
-            </CardContent>
-          </Card>
-        ))}
+        {/* Todos los ejercicios */}
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: 2
+        }}>
+          {filteredExercises.map((exercise) => (
+            <Card 
+              key={exercise.id}
+              sx={{ 
+                cursor: 'pointer', 
+                height: '100%',
+                '&:hover': { 
+                  boxShadow: 4,
+                  transform: 'translateY(-2px)',
+                  transition: 'all 0.2s ease'
+                },
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: 'divider'
+              }}
+              onClick={() => handleExerciseClick(exercise)}
+            >
+              <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                  {exercise.name}
+                </Typography>
+                <Box sx={{ mt: 'auto' }}>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                    <Chip 
+                      label={exercise.muscle_group} 
+                      size="small" 
+                      color="primary" 
+                      sx={{ fontWeight: 'bold' }}
+                    />
+                    <Chip 
+                      label={exercise.equipment} 
+                      size="small" 
+                      variant="outlined" 
+                      sx={{ borderColor: 'primary.main' }}
+                    />
+                  </Stack>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
       </Stack>
-        </Stack>
-      </Box>
+    </Box>
   )
 }
