@@ -40,3 +40,26 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Ocultar barras de scroll horizontales en toda la aplicación */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Ocultar específicamente scrollbars horizontales */
+*::-webkit-scrollbar:horizontal {
+  display: none;
+}
+
+*::-webkit-scrollbar-thumb:horizontal {
+  display: none;
+}
+
+*::-webkit-scrollbar-track:horizontal {
+  display: none;
+}

@@ -230,7 +230,6 @@ export default function Navigation({ activeTab, onTabChange, onLogout }: Navigat
           sx={{ 
             backgroundColor: '#1976d2',
             color: 'white',
-            borderTop: '1px solid #1565c0',
             width: '100%',
             position: 'absolute',
             top: '100%',

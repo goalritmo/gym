@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Box } from '@mui/material'
 import Navigation from '../navigation/Navigation'
 import WorkoutForm from '../workout/WorkoutForm'
@@ -6,9 +5,10 @@ import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
 import WorkoutHistory from '../workout/WorkoutHistory'
 import { useAuth } from '../../contexts/AuthContext'
+import { useTab } from '../../contexts/TabContext'
 
 export default function AuthenticatedApp() {
-  const [activeTab, setActiveTab] = useState(0)
+  const { activeTab, setActiveTab } = useTab()
   const { logout } = useAuth()
 
   const handleTabChange = (newValue: number) => {
@@ -23,7 +23,19 @@ export default function AuthenticatedApp() {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Navigation activeTab={activeTab} onTabChange={handleTabChange} onLogout={handleLogout} />
       
-      <Box sx={{ flexGrow: 1, py: 2, overflow: 'auto' }}>
+      <Box sx={{ 
+        flexGrow: 1, 
+        py: 2, 
+        overflow: 'auto',
+        '&::-webkit-scrollbar': {
+          display: 'none'
+        },
+        '&::-moz-scrollbar': {
+          display: 'none'
+        },
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none'
+      }}>
         {/* Pestaña Entrenamiento */}
         {activeTab === 0 && (
           <Box>
