@@ -110,17 +110,46 @@ Authorization: Bearer salud
 
 ## 🧪 Testing
 
+### Setup Inicial
 ```bash
-# Ejecutar tests
-go test ./...
-
-# Ejecutar tests con verbose
-go test -v ./...
-
-# Ejecutar tests con coverage
-go test -coverprofile=coverage.out ./...
-go tool cover -html=coverage.out
+# Configurar testing con Supabase
+make test-setup
 ```
+
+### Tests Unitarios (Sin DB)
+```bash
+# Tests rápidos para desarrollo
+make test-unit
+
+# Con coverage
+make test-coverage
+```
+
+### Tests de Integración (Con Supabase)
+```bash
+# Tests completos con base de datos real
+make test-supabase
+
+# Verificar solo la conexión
+make test-db-connection
+
+# Todos los tests
+make test
+```
+
+### Tests Específicos
+```bash
+# Test específico
+go test -v -run="TestSupabaseIntegration" ./handlers
+
+# Con timeout extendido
+go test -timeout 60s -v ./handlers
+
+# Benchmarks
+make benchmark
+```
+
+Ver [SUPABASE_TESTING.md](SUPABASE_TESTING.md) para guía completa de testing.
 
 ## 🏗️ Arquitectura
 
