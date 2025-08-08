@@ -23,40 +23,11 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { es } from 'date-fns/locale';
+import type { Workout, WorkoutSession, WorkoutDay, ExerciseGroup, WorkoutHistoryProps } from '../../types/workout';
 
-type Workout = {
-  id: number
-  exercise_name: string
-  weight: number
-  reps: number
-  serie: number | null
-  seconds: number | null
-  observations: string | null
-  created_at: string
-}
-
-type WorkoutDay = {
-  date: string
-  workouts: Workout[]
-  totalExercises: number
-  effort: number
-  mood: number
-}
-
-type ExerciseGroup = {
-  exerciseName: string;
-  workouts: Workout[];
-};
-
-type WorkoutHistoryProps = {
-  workouts: Workout[]
-  onDelete: (id: number) => void
-}
-
-export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryProps) {
+export default function WorkoutHistory({ workoutSessions, workouts, onDelete, onUpdateSession }: WorkoutHistoryProps) {
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
   const [selectedExercise, setSelectedExercise] = useState<Workout[] | null>(null);
-  const [workoutDays, setWorkoutDays] = useState<WorkoutDay[]>([])
   const [dateFilter, setDateFilter] = useState<Date | null>(null)
 
   const formatDate = (dateString: string) => {
@@ -78,57 +49,44 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
     return date.toLocaleDateString('es-ES', options)
   }
 
-  // Agrupar ejercicios por día
-  const groupedWorkoutDays = workoutDays.map(day => {
-    const exerciseGroups: ExerciseGroup[] = [];
-    const exerciseMap = new Map<string, Workout[]>();
+  // Agrupar workouts por sesión y crear días
+  const workoutDays = useMemo(() => {
+    const days: WorkoutDay[] = [];
+    
+    workoutSessions.forEach(session => {
+      const sessionWorkouts = workouts.filter(w => 
+        new Date(w.created_at).toDateString() === new Date(session.session_date).toDateString()
+      );
+      
+      // Agrupar ejercicios por nombre
+      const exerciseGroups: ExerciseGroup[] = [];
+      const exerciseMap = new Map<string, Workout[]>();
 
-    day.workouts.forEach(workout => {
-      const exerciseName = workout.exercise_name;
-      if (!exerciseMap.has(exerciseName)) {
-        exerciseMap.set(exerciseName, []);
-      }
-      exerciseMap.get(exerciseName)!.push(workout);
-    });
+      sessionWorkouts.forEach(workout => {
+        const exerciseName = workout.exercise_name;
+        if (!exerciseMap.has(exerciseName)) {
+          exerciseMap.set(exerciseName, []);
+        }
+        exerciseMap.get(exerciseName)!.push(workout);
+      });
 
-    exerciseMap.forEach((workouts, exerciseName) => {
-      exerciseGroups.push({
-        exerciseName,
-        workouts
+      exerciseMap.forEach((workouts, exerciseName) => {
+        exerciseGroups.push({
+          exerciseName,
+          workouts
+        });
+      });
+
+      days.push({
+        date: session.session_date,
+        session,
+        workouts: sessionWorkouts,
+        exerciseGroups
       });
     });
 
-    return {
-      ...day,
-      exerciseGroups
-    };
-  });
-
-  // Inicializar estado cuando cambien los workouts
-  React.useEffect(() => {
-    // Agrupar workouts por día
-    const groupedDays = workouts.reduce((days: WorkoutDay[], workout) => {
-      const date = new Date(workout.created_at).toDateString()
-      const existingDay = days.find(day => day.date === date)
-      
-      if (existingDay) {
-        existingDay.workouts.push(workout)
-        existingDay.totalExercises += 1
-      } else {
-        days.push({
-          date,
-          workouts: [workout],
-          totalExercises: 1,
-          effort: 0, // Valor por defecto
-          mood: 0    // Valor por defecto
-        })
-      }
-      
-      return days
-    }, []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-
-    setWorkoutDays(groupedDays)
-  }, [workouts])
+    return days.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [workoutSessions, workouts]);
 
   const toggleDayExpansion = (date: string) => {
     const newExpanded = new Set(expandedDays)
@@ -140,16 +98,12 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
     setExpandedDays(newExpanded)
   }
 
-  const handleEffortChange = (date: string, newValue: number) => {
-    setWorkoutDays(prev => prev.map(day => 
-      day.date === date ? { ...day, effort: newValue === day.effort ? 0 : newValue } : day
-    ))
+  const handleEffortChange = (sessionId: number, newValue: number) => {
+    onUpdateSession(sessionId, { effort: newValue });
   }
 
-  const handleMoodChange = (date: string, newValue: number) => {
-    setWorkoutDays(prev => prev.map(day => 
-      day.date === date ? { ...day, mood: newValue === day.mood ? 0 : newValue } : day
-    ))
+  const handleMoodChange = (sessionId: number, newValue: number) => {
+    onUpdateSession(sessionId, { mood: newValue });
   }
 
   const handleExerciseClick = (exerciseGroup: ExerciseGroup) => {
@@ -161,7 +115,7 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
   };
 
   // Filtrar días por fecha
-  const filteredWorkoutDays = groupedWorkoutDays.filter(day => {
+  const filteredWorkoutDays = workoutDays.filter(day => {
     if (!dateFilter) return true;
     const dayDate = new Date(day.date);
     return dayDate.toDateString() === dateFilter.toDateString();
@@ -169,25 +123,17 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
 
   // Obtener fechas con ejercicios para el calendario
   const datesWithWorkouts = useMemo(() => {
-    return workoutDays.map(day => new Date(day.date));
-  }, [workoutDays]);
+    return workoutSessions.map(session => new Date(session.session_date));
+  }, [workoutSessions]);
 
   // Función para verificar si una fecha tiene ejercicios
   const shouldDisableDate = (date: Date) => {
-    return !datesWithWorkouts.some(workoutDate => 
-      workoutDate.toDateString() === date.toDateString()
+    return !datesWithWorkouts.some(sessionDate => 
+      sessionDate.toDateString() === date.toDateString()
     );
   };
 
-  // Función para obtener el número de ejercicios de una fecha
-  const getWorkoutCount = (date: Date) => {
-    const day = workoutDays.find(day => 
-      new Date(day.date).toDateString() === date.toDateString()
-    );
-    return day ? day.totalExercises : 0;
-  };
-
-  if (workouts.length === 0) {
+  if (workoutSessions.length === 0) {
     return (
       <Box textAlign="center" py={4}>
         <Typography variant="h6" color="text.secondary">
@@ -306,7 +252,7 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
                     {formatDate(day.date)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, ml: 2 }}>
-                    Rutina de Fullbody • {day.totalExercises} ejercicios
+                    {day.session.session_name} • {day.workouts.length} {day.workouts.length === 1 ? 'ejercicio' : 'ejercicios'}
                   </Typography>
                 </Box>
                 
@@ -328,8 +274,8 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
                     Esfuerzo
                   </Typography>
                   <Rating 
-                    value={day.effort} 
-                    onChange={(_, newValue) => handleEffortChange(day.date, newValue || 0)}
+                    value={day.session.effort} 
+                    onChange={(_, newValue) => handleEffortChange(day.session.id, newValue || 0)}
                     size="small"
                     max={3}
                     sx={{ '& .MuiRating-iconFilled': { color: '#ffc107' } }}
@@ -340,8 +286,8 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
                     Ánimo
                   </Typography>
                   <Rating 
-                    value={day.mood} 
-                    onChange={(_, newValue) => handleMoodChange(day.date, newValue || 0)}
+                    value={day.session.mood} 
+                    onChange={(_, newValue) => handleMoodChange(day.session.id, newValue || 0)}
                     size="small"
                     max={3}
                     sx={{ '& .MuiRating-iconFilled': { color: '#ff9800' } }}

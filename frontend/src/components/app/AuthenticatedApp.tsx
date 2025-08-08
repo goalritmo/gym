@@ -109,6 +109,24 @@ export default function AuthenticatedApp() {
         {activeTab === 3 && (
           <Box>
             <WorkoutHistory 
+              workoutSessions={[
+                {
+                  id: 1,
+                  session_date: '2024-01-15T00:00:00Z',
+                  session_name: 'Rutina de Fullbody',
+                  effort: 2,
+                  mood: 3,
+                  created_at: '2024-01-15T10:00:00Z'
+                },
+                {
+                  id: 2,
+                  session_date: '2024-01-14T00:00:00Z',
+                  session_name: 'Rutina de Fullbody',
+                  effort: 3,
+                  mood: 2,
+                  created_at: '2024-01-14T09:00:00Z'
+                }
+              ]}
               workouts={[
                 {
                   id: 1,
@@ -118,7 +136,8 @@ export default function AuthenticatedApp() {
                   serie: 1,
                   seconds: 45,
                   observations: 'Buena técnica',
-                  created_at: '2024-01-15T10:30:00Z'
+                  created_at: '2024-01-15T10:30:00Z',
+                  exercise_session_id: 1
                 },
                 {
                   id: 2,
@@ -128,7 +147,8 @@ export default function AuthenticatedApp() {
                   serie: 2,
                   seconds: null,
                   observations: null,
-                  created_at: '2024-01-15T10:45:00Z'
+                  created_at: '2024-01-15T10:45:00Z',
+                  exercise_session_id: 1
                 },
                 {
                   id: 3,
@@ -138,10 +158,12 @@ export default function AuthenticatedApp() {
                   serie: 3,
                   seconds: 60,
                   observations: 'Peso máximo',
-                  created_at: '2024-01-14T09:15:00Z'
+                  created_at: '2024-01-14T09:15:00Z',
+                  exercise_session_id: 2
                 }
               ]}
               onDelete={(id) => console.log('Eliminar entrenamiento:', id)}
+              onUpdateSession={(sessionId, updates) => console.log('Actualizar sesión:', sessionId, updates)}
             />
           </Box>
         )}
