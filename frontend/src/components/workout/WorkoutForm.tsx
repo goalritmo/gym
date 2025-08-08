@@ -1,8 +1,9 @@
 import { z } from 'zod'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { TextField, Button, Stack } from '@mui/material'
+import { TextField, Button, Stack, Box, Typography } from '@mui/material'
 import type { Resolver } from 'react-hook-form'
+import TimerComponent from '../timer/TimerComponent.tsx'
 
 type Exercise = { id: number; name: string }
 
@@ -37,7 +38,7 @@ export default function WorkoutForm({
     observations?: string
   }) => void
 }) {
-  const { handleSubmit, control, formState: { errors } } = useForm<FormValues>({
+  const { handleSubmit, control, formState: { errors }, setValue } = useForm<FormValues>({
     resolver: zodResolver(schema) as unknown as Resolver<FormValues>,
     defaultValues: {
       exerciseId: undefined as unknown as number,
@@ -50,6 +51,11 @@ export default function WorkoutForm({
   })
 
   const submit = handleSubmit((data) => onSubmit(data))
+  
+  // Función para capturar el tiempo del cronómetro
+  const handleTimerComplete = (seconds: number) => {
+    setValue('seconds', seconds)
+  }
 
   return (
     <form role="form" onSubmit={submit}>
@@ -125,19 +131,26 @@ export default function WorkoutForm({
           )}
         />
 
-        <Controller
-          control={control}
-          name="seconds"
-          render={({ field }) => (
-            <TextField
-              label="Segundos"
-              aria-label="Segundos"
-              type="number"
-              value={field.value ?? ''}
-              onChange={(e) => field.onChange((e.target as HTMLInputElement).value)}
-            />
-          )}
-        />
+        <Box>
+          <Typography variant="h6" gutterBottom>
+            Cronómetro
+          </Typography>
+          <TimerComponent onTimeComplete={handleTimerComplete} />
+          <Controller
+            control={control}
+            name="seconds"
+            render={({ field }) => (
+              <TextField
+                label="Segundos (capturados del cronómetro)"
+                aria-label="Segundos"
+                type="number"
+                value={field.value ?? ''}
+                onChange={(e) => field.onChange((e.target as HTMLInputElement).value)}
+                sx={{ mt: 2 }}
+              />
+            )}
+          />
+        </Box>
 
         <Controller
           control={control}

@@ -21,7 +21,7 @@ describe('WorkoutForm', () => {
 
     // Opcionales
     await user.type(screen.getByRole('spinbutton', { name: 'Serie' }), '1')
-    await user.type(screen.getByRole('spinbutton', { name: 'Segundos' }), '45')
+    await user.type(screen.getByRole('spinbutton', { name: 'Segundos (capturados del cronómetro)' }), '45')
     await user.type(screen.getByRole('textbox', { name: 'Observaciones' }), 'Buena técnica')
 
     fireEvent.click(screen.getByRole('button', { name: 'Guardar' }))

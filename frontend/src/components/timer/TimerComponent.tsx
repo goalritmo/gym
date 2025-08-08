@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { Button, Stack, Typography } from '@mui/material'
 
-export default function TimerComponent() {
+type TimerComponentProps = {
+  onTimeComplete?: (seconds: number) => void
+}
+
+export default function TimerComponent({ onTimeComplete }: TimerComponentProps) {
   const [time, setTime] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
   const intervalRef = useRef<number | null>(null)
@@ -37,6 +41,10 @@ export default function TimerComponent() {
 
   const handlePause = () => {
     setIsRunning(false)
+    // Capturar el tiempo cuando se pausa
+    if (onTimeComplete) {
+      onTimeComplete(time)
+    }
   }
 
   const handleReset = () => {
