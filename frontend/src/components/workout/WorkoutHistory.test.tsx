@@ -12,7 +12,8 @@ const mockWorkouts = [
     serie: 1,
     seconds: 45,
     observations: 'Buena técnica',
-    created_at: '2024-01-15T10:30:00Z'
+    created_at: '2024-01-15T10:30:00Z',
+    exercise_session_id: 1
   },
   {
     id: 2,
@@ -22,7 +23,8 @@ const mockWorkouts = [
     serie: 2,
     seconds: null,
     observations: null,
-    created_at: '2024-01-15T10:45:00Z'
+    created_at: '2024-01-15T10:45:00Z',
+    exercise_session_id: 1
   },
   {
     id: 3,
@@ -32,13 +34,38 @@ const mockWorkouts = [
     serie: 3,
     seconds: 60,
     observations: 'Peso máximo',
-    created_at: '2024-01-14T09:15:00Z'
+    created_at: '2024-01-14T09:15:00Z',
+    exercise_session_id: 2
+  }
+]
+
+const mockWorkoutSessions = [
+  {
+    id: 1,
+    session_date: '2024-01-15T00:00:00Z',
+    session_name: 'Rutina de Fullbody',
+    effort: 2,
+    mood: 3,
+    created_at: '2024-01-15T10:00:00Z'
+  },
+  {
+    id: 2,
+    session_date: '2024-01-14T00:00:00Z',
+    session_name: 'Rutina de Fullbody',
+    effort: 3,
+    mood: 2,
+    created_at: '2024-01-14T09:00:00Z'
   }
 ]
 
 describe('WorkoutHistory', () => {
   it('muestra lista de entrenamientos', () => {
-    render(<WorkoutHistory workouts={mockWorkouts} onDelete={vi.fn()} />)
+    render(<WorkoutHistory 
+      workoutSessions={mockWorkoutSessions}
+      workouts={mockWorkouts} 
+      onDelete={vi.fn()} 
+      onUpdateSession={vi.fn()}
+    />)
     
     expect(screen.getByText('Press de Banca')).toBeInTheDocument()
     expect(screen.getByText('Sentadilla')).toBeInTheDocument()
@@ -46,7 +73,12 @@ describe('WorkoutHistory', () => {
   })
 
   it('muestra información detallada de cada entrenamiento', () => {
-    render(<WorkoutHistory workouts={mockWorkouts} onDelete={vi.fn()} />)
+    render(<WorkoutHistory 
+      workoutSessions={mockWorkoutSessions}
+      workouts={mockWorkouts} 
+      onDelete={vi.fn()} 
+      onUpdateSession={vi.fn()}
+    />)
     
     // Verificar peso y repeticiones
     expect(screen.getByText('80 kg')).toBeInTheDocument()
@@ -61,28 +93,48 @@ describe('WorkoutHistory', () => {
   })
 
   it('muestra tiempo cuando está disponible', () => {
-    render(<WorkoutHistory workouts={mockWorkouts} onDelete={vi.fn()} />)
+    render(<WorkoutHistory 
+      workoutSessions={mockWorkoutSessions}
+      workouts={mockWorkouts} 
+      onDelete={vi.fn()} 
+      onUpdateSession={vi.fn()}
+    />)
     
     expect(screen.getByText('45s')).toBeInTheDocument()
     expect(screen.getByText('60s')).toBeInTheDocument()
   })
 
   it('no muestra tiempo cuando no está disponible', () => {
-    render(<WorkoutHistory workouts={mockWorkouts} onDelete={vi.fn()} />)
+    render(<WorkoutHistory 
+      workoutSessions={mockWorkoutSessions}
+      workouts={mockWorkouts} 
+      onDelete={vi.fn()} 
+      onUpdateSession={vi.fn()}
+    />)
     
     // El segundo workout no tiene seconds, no debería aparecer
     expect(screen.queryByText('nulls')).not.toBeInTheDocument()
   })
 
   it('muestra observaciones cuando están disponibles', () => {
-    render(<WorkoutHistory workouts={mockWorkouts} onDelete={vi.fn()} />)
+    render(<WorkoutHistory 
+      workoutSessions={mockWorkoutSessions}
+      workouts={mockWorkouts} 
+      onDelete={vi.fn()} 
+      onUpdateSession={vi.fn()}
+    />)
     
     expect(screen.getByText('Buena técnica')).toBeInTheDocument()
     expect(screen.getByText('Peso máximo')).toBeInTheDocument()
   })
 
   it('no muestra observaciones cuando no están disponibles', () => {
-    render(<WorkoutHistory workouts={mockWorkouts} onDelete={vi.fn()} />)
+    render(<WorkoutHistory 
+      workoutSessions={mockWorkoutSessions}
+      workouts={mockWorkouts} 
+      onDelete={vi.fn()} 
+      onUpdateSession={vi.fn()}
+    />)
     
     // El segundo workout no tiene observaciones
     expect(screen.queryByText('null')).not.toBeInTheDocument()
@@ -91,7 +143,12 @@ describe('WorkoutHistory', () => {
   it('llama a onDelete cuando se hace click en eliminar', async () => {
     const onDelete = vi.fn()
     const user = userEvent.setup()
-    render(<WorkoutHistory workouts={mockWorkouts} onDelete={onDelete} />)
+    render(<WorkoutHistory 
+      workoutSessions={mockWorkoutSessions}
+      workouts={mockWorkouts} 
+      onDelete={onDelete} 
+      onUpdateSession={vi.fn()}
+    />)
     
     const deleteButtons = screen.getAllByRole('button', { name: /eliminar/i })
     await user.click(deleteButtons[0])
@@ -101,7 +158,12 @@ describe('WorkoutHistory', () => {
   })
 
   it('muestra fecha formateada para cada entrenamiento', () => {
-    render(<WorkoutHistory workouts={mockWorkouts} onDelete={vi.fn()} />)
+    render(<WorkoutHistory 
+      workoutSessions={mockWorkoutSessions}
+      workouts={mockWorkouts} 
+      onDelete={vi.fn()} 
+      onUpdateSession={vi.fn()}
+    />)
     
     // Debería mostrar las fechas en formato legible
     expect(screen.getAllByText(/15\/1\/2024/)).toHaveLength(2) // 2 workouts del 15/1
@@ -109,13 +171,23 @@ describe('WorkoutHistory', () => {
   })
 
   it('muestra mensaje cuando no hay entrenamientos', () => {
-    render(<WorkoutHistory workouts={[]} onDelete={vi.fn()} />)
+    render(<WorkoutHistory 
+      workoutSessions={[]}
+      workouts={[]} 
+      onDelete={vi.fn()} 
+      onUpdateSession={vi.fn()}
+    />)
     
     expect(screen.getByText('No hay entrenamientos registrados')).toBeInTheDocument()
   })
 
   it('ordena los entrenamientos por fecha más reciente', () => {
-    render(<WorkoutHistory workouts={mockWorkouts} onDelete={vi.fn()} />)
+    render(<WorkoutHistory 
+      workoutSessions={mockWorkoutSessions}
+      workouts={mockWorkouts} 
+      onDelete={vi.fn()} 
+      onUpdateSession={vi.fn()}
+    />)
     
     // Los entrenamientos deberían estar ordenados por fecha (más reciente primero)
     const workoutCards = screen.getAllByText(/kg/)

@@ -4,11 +4,51 @@ import userEvent from '@testing-library/user-event'
 import ExerciseList from './ExerciseList'
 
 const mockExercises = [
-  { id: 1, name: 'Press de Banca', muscle_group: 'Pecho', equipment: 'Barra' },
-  { id: 2, name: 'Sentadilla', muscle_group: 'Piernas', equipment: 'Barra' },
-  { id: 3, name: 'Peso Muerto', muscle_group: 'Espalda', equipment: 'Barra' },
-  { id: 4, name: 'Press Militar', muscle_group: 'Hombros', equipment: 'Barra' },
-  { id: 5, name: 'Curl de Bíceps', muscle_group: 'Brazos', equipment: 'Mancuernas' },
+  { 
+    id: 1, 
+    name: 'Press de Banca', 
+    muscle_group: 'Pecho', 
+    equipment: 'Barra',
+    primary_muscles: ['Pectoral Mayor', 'Tríceps'],
+    secondary_muscles: ['Deltoides Anterior', 'Serrato Anterior'],
+    video_url: 'https://www.youtube.com/watch?v=rT7DgCr-3pg'
+  },
+  { 
+    id: 2, 
+    name: 'Sentadilla', 
+    muscle_group: 'Piernas', 
+    equipment: 'Barra',
+    primary_muscles: ['Cuádriceps', 'Glúteos'],
+    secondary_muscles: ['Isquiotibiales', 'Gastrocnemio', 'Core'],
+    video_url: 'https://www.youtube.com/watch?v=aclHkVaku9U'
+  },
+  { 
+    id: 3, 
+    name: 'Peso Muerto', 
+    muscle_group: 'Espalda', 
+    equipment: 'Barra',
+    primary_muscles: ['Erector Espinal', 'Glúteos', 'Isquiotibiales'],
+    secondary_muscles: ['Trapecio', 'Romboides', 'Core'],
+    video_url: 'https://www.youtube.com/watch?v=op9kVnSso6Q'
+  },
+  { 
+    id: 4, 
+    name: 'Press Militar', 
+    muscle_group: 'Hombros', 
+    equipment: 'Barra',
+    primary_muscles: ['Deltoides Anterior', 'Deltoides Medio'],
+    secondary_muscles: ['Tríceps', 'Trapecio Superior'],
+    video_url: 'https://www.youtube.com/watch?v=2yjwXTZQDDI'
+  },
+  { 
+    id: 5, 
+    name: 'Curl de Bíceps', 
+    muscle_group: 'Brazos', 
+    equipment: 'Mancuernas',
+    primary_muscles: ['Bíceps Braquial'],
+    secondary_muscles: ['Braquiorradial', 'Braquial'],
+    video_url: 'https://www.youtube.com/watch?v=ykJmrZ5v0Oa'
+  },
 ]
 
 describe('ExerciseList', () => {

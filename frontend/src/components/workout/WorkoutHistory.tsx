@@ -1,29 +1,27 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Card, 
-  CardContent, 
-  Chip, 
-  Stack, 
-  Collapse, 
-  Rating, 
+import { useState, useMemo } from 'react'
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Stack,
+  Chip,
   IconButton,
+  Collapse,
+  Rating,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
-  TextField
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete'
+} from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { es } from 'date-fns/locale';
-import type { Workout, WorkoutSession, WorkoutDay, ExerciseGroup, WorkoutHistoryProps } from '../../types/workout';
+import DeleteIcon from '@mui/icons-material/Delete'
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { es } from 'date-fns/locale'
+import type { Workout, WorkoutDay, ExerciseGroup, WorkoutHistoryProps } from '../../types/workout'
 
 export default function WorkoutHistory({ workoutSessions, workouts, onDelete, onUpdateSession }: WorkoutHistoryProps) {
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())

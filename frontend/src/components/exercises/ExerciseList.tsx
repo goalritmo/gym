@@ -5,7 +5,6 @@ import {
   Typography,
   TextField,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Chip,
@@ -37,7 +36,7 @@ type ExerciseListProps = {
   onSelectExercise: (exercise: Exercise) => void
 }
 
-export default function ExerciseList({ exercises, onSelectExercise }: ExerciseListProps) {
+export default function ExerciseList({ exercises }: ExerciseListProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [muscleGroupFilter, setMuscleGroupFilter] = useState('')
   const [equipmentFilter, setEquipmentFilter] = useState('')
@@ -67,12 +66,6 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
   }, [exercises, searchTerm, muscleGroupFilter, equipmentFilter])
 
   const handleExerciseClick = (exercise: Exercise) => {
-    setSelectedExercise(exercise)
-    setOpenDialog(true)
-  }
-
-  const handleInfoClick = (exercise: Exercise, event: React.MouseEvent) => {
-    event.stopPropagation()
     setSelectedExercise(exercise)
     setOpenDialog(true)
   }

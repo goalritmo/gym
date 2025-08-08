@@ -1,63 +1,41 @@
-import { z } from 'zod'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { TextField, Button, Stack, Box, Typography, Chip } from '@mui/material'
-import type { Resolver } from 'react-hook-form'
-import TimerComponent from '../timer/TimerComponent.tsx'
+import { useForm } from 'react-hook-form'
+import { TextField, Button, Stack, Box, Typography } from '@mui/material'
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 
-type Exercise = { id: number; name: string }
+type Exercise = {
+  id: number
+  name: string
+}
 
-const emptyToUndefined = (v: unknown) => (v === '' || v === null ? undefined : v)
+type WorkoutFormData = {
+  exerciseId: number
+  weight: number
+  reps: number
+  serie?: number
+  seconds?: number
+  observations?: string
+}
 
-const schema = z.object({
-  exerciseId: z.coerce.number().int().gt(0, 'Seleccioná un ejercicio'),
-  weight: z.coerce.number().gt(0, 'Ingresá un peso válido'),
-  reps: z.coerce.number().int().gt(0, 'Ingresá repeticiones válidas'),
-  serie: z
-    .preprocess(emptyToUndefined, z.coerce.number().int().gt(0))
-    .optional(),
-  seconds: z
-    .preprocess(emptyToUndefined, z.coerce.number().int().gt(0))
-    .optional(),
-  observations: z.string().optional(),
-})
-
-type FormValues = z.infer<typeof schema>
-
-export default function WorkoutForm({
-  exercises,
-  onSubmit,
-}: {
+type WorkoutFormProps = {
   exercises: Exercise[]
-  onSubmit: (values: {
-    exerciseId: number
-    weight: number
-    reps: number
-    serie?: number
-    seconds?: number
-    observations?: string
-  }) => void
-}) {
-  const { handleSubmit, control, formState: { errors }, setValue, watch } = useForm<FormValues>({
-    resolver: zodResolver(schema) as unknown as Resolver<FormValues>,
+  onSubmit: (data: WorkoutFormData) => void
+}
+
+export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<WorkoutFormData>({
     defaultValues: {
-      exerciseId: undefined as unknown as number,
-      weight: '',
-      reps: '',
-      serie: '',
-      seconds: '',
-      observations: '',
-    },
+      exerciseId: 0,
+      weight: 0,
+      reps: 0,
+      serie: 0,
+      seconds: 0,
+      observations: ''
+    }
   })
 
-  const submit = handleSubmit((data) => onSubmit(data))
   const selectedExerciseId = watch('exerciseId')
-  const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId)
-  
-  // Función para capturar el tiempo del cronómetro
-  const handleTimerComplete = (seconds: number) => {
-    setValue('seconds', seconds)
-  }
+
+  const submit = handleSubmit((data) => onSubmit(data))
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', position: 'relative', zIndex: 1 }}>
@@ -69,203 +47,146 @@ export default function WorkoutForm({
       
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
-        <Controller
-          control={control}
-          name="exerciseId"
-          render={({ field }) => (
-            <TextField
-              select
-              label="Ejercicio"
-              aria-label="Ejercicio"
-              SelectProps={{ 
-                native: true,
-                MenuProps: {
-                  PaperProps: {
-                    sx: {
-                      maxHeight: 200,
-                      zIndex: 9999
-                    }
-                  }
-                }
-              }}
-              error={Boolean(errors.exerciseId)}
-              helperText={errors.exerciseId?.message}
-              value={field.value ?? ''}
-              onChange={(e) => field.onChange(Number((e.target as HTMLInputElement).value))}
-              fullWidth
-              sx={{ 
-                '& .MuiInputLabel-root': {
-                  transform: 'translate(14px, -9px) scale(0.75)',
-                  backgroundColor: 'white',
-                  px: 1,
-                  color: 'primary.main'
-                },
-                '& .MuiInputLabel-shrink': {
-                  transform: 'translate(14px, -9px) scale(0.75)',
-                  backgroundColor: 'white',
-                  px: 1,
-                  color: 'primary.main'
-                }
-              }}
-            >
-                <option value="">Seleccionar ejercicio...</option>
-                {exercises.map((ex) => (
-                  <option key={ex.id} value={ex.id}>
-                    {ex.name}
-                  </option>
-                ))}
-              </TextField>
-            )}
-          />
+        <FormControl fullWidth error={Boolean(errors.exerciseId)}>
+          <InputLabel id="exercise-select-label">Ejercicio</InputLabel>
+          <Select
+            labelId="exercise-select-label"
+            label="Ejercicio"
+            value={selectedExerciseId}
+            {...register('exerciseId', { valueAsNumber: true })}
+            sx={{
+              '& .MuiInputLabel-root': {
+                transform: 'translate(14px, -9px) scale(0.75)',
+                backgroundColor: 'white',
+                px: 1,
+                color: 'primary.main'
+              },
+              '& .MuiInputLabel-shrink': {
+                transform: 'translate(14px, -9px) scale(0.75)',
+                backgroundColor: 'white',
+                px: 1,
+                color: 'primary.main'
+              }
+            }}
+          >
+            <MenuItem value="">Seleccionar ejercicio...</MenuItem>
+            {exercises.map((ex) => (
+              <MenuItem key={ex.id} value={ex.id}>
+                {ex.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-        <Controller
-          control={control}
-          name="weight"
-          render={({ field }) => (
-            <TextField
-              label="Peso (kg)"
-              aria-label="Peso (kg)"
-              type="number"
-              error={Boolean(errors.weight)}
-              helperText={errors.weight?.message}
-              inputProps={{ 
-                step: 'any',
-                inputMode: 'decimal',
-                pattern: '[0-9]*',
-                min: '0'
-              }}
-              value={field.value ?? ''}
-              onChange={(e) => field.onChange((e.target as HTMLInputElement).value)}
-              sx={{
-                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                  display: 'none'
-                },
-                '& input[type=number]': {
-                  MozAppearance: 'textfield'
-                }
-              }}
-            />
-          )}
+        <TextField
+          label="Peso (kg)"
+          type="number"
+          error={Boolean(errors.weight)}
+          helperText={errors.weight?.message}
+          inputProps={{ 
+            step: 'any',
+            inputMode: 'decimal',
+            pattern: '[0-9]*',
+            min: '0'
+          }}
+          {...register('weight', { valueAsNumber: true })}
+          sx={{
+            '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+              display: 'none'
+            },
+            '& input[type=number]': {
+              MozAppearance: 'textfield'
+            }
+          }}
         />
 
-        <Controller
-          control={control}
-          name="reps"
-          render={({ field }) => (
-            <TextField
-              label="Repeticiones"
-              aria-label="Repeticiones"
-              type="number"
-              error={Boolean(errors.reps)}
-              helperText={errors.reps?.message}
-              inputProps={{ 
-                inputMode: 'numeric',
-                pattern: '[0-9]*',
-                min: '0'
-              }}
-              value={field.value ?? ''}
-              onChange={(e) => field.onChange((e.target as HTMLInputElement).value)}
-              sx={{
-                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                  display: 'none'
-                },
-                '& input[type=number]': {
-                  MozAppearance: 'textfield'
-                }
-              }}
-            />
-          )}
+        <TextField
+          label="Repeticiones"
+          type="number"
+          error={Boolean(errors.reps)}
+          helperText={errors.reps?.message}
+          inputProps={{ 
+            inputMode: 'numeric',
+            pattern: '[0-9]*',
+            min: '0'
+          }}
+          {...register('reps', { valueAsNumber: true })}
+          sx={{
+            '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+              display: 'none'
+            },
+            '& input[type=number]': {
+              MozAppearance: 'textfield'
+            }
+          }}
         />
 
-        <Controller
-          control={control}
-          name="serie"
-          render={({ field }) => (
-            <TextField
-              label="Serie"
-              aria-label="Serie"
-              type="number"
-              inputProps={{ 
-                inputMode: 'numeric',
-                pattern: '[0-9]*',
-                min: '0'
-              }}
-              value={field.value ?? ''}
-              onChange={(e) => field.onChange((e.target as HTMLInputElement).value)}
-              sx={{
-                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                  display: 'none'
-                },
-                '& input[type=number]': {
-                  MozAppearance: 'textfield'
-                }
-              }}
-            />
-          )}
+        <TextField
+          label="Serie"
+          type="number"
+          inputProps={{ 
+            inputMode: 'numeric',
+            pattern: '[0-9]*',
+            min: '0'
+          }}
+          {...register('serie', { valueAsNumber: true })}
+          sx={{
+            '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+              display: 'none'
+            },
+            '& input[type=number]': {
+              MozAppearance: 'textfield'
+            }
+          }}
         />
 
         <Box>
           <Typography variant="h6" gutterBottom>
             Cronómetro
           </Typography>
-          <TimerComponent onTimeComplete={handleTimerComplete} />
-          <Controller
-            control={control}
-            name="seconds"
-            render={({ field }) => (
-              <TextField
-                label="Segundos"
-                aria-label="Segundos"
-                type="number"
-                inputProps={{ 
-                  inputMode: 'numeric',
-                  pattern: '[0-9]*'
-                }}
-                value={field.value ?? ''}
-                onChange={(e) => field.onChange((e.target as HTMLInputElement).value)}
-                sx={{ 
-                  mt: 2,
-                  width: '120px',
-                  '& .MuiInputBase-root': {
-                    minWidth: '120px'
-                  },
-                  '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                    display: 'none'
-                  },
-                  '& input[type=number]': {
-                    MozAppearance: 'textfield'
-                  }
-                }}
-              />
-            )}
+          {/* TimerComponent is removed as per the new_code, so this section is also removed. */}
+          {/* <TimerComponent onTimeComplete={handleTimerComplete} /> */}
+          <TextField
+            label="Segundos"
+            type="number"
+            inputProps={{ 
+              inputMode: 'numeric',
+              pattern: '[0-9]*'
+            }}
+            {...register('seconds', { valueAsNumber: true })}
+            sx={{ 
+              mt: 2,
+              width: '120px',
+              '& .MuiInputBase-root': {
+                minWidth: '120px'
+              },
+              '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                display: 'none'
+              },
+              '& input[type=number]': {
+                MozAppearance: 'textfield'
+              }
+            }}
           />
         </Box>
 
-        <Controller
-          control={control}
-          name="observations"
-          render={({ field }) => (
-            <TextField
-              label="Observaciones"
-              aria-label="Observaciones"
-              multiline
-              minRows={2}
-              value={field.value ?? ''}
-              onChange={field.onChange}
-              sx={{
-                '& .MuiInputLabel-root': {
-                  backgroundColor: 'white',
-                  px: 1,
-                  zIndex: 1
-                },
-                '& .MuiInputLabel-shrink': {
-                  backgroundColor: 'white',
-                  px: 1,
-                  zIndex: 1
-                }
-              }}
-            />
-          )}
+        <TextField
+          label="Observaciones"
+          multiline
+          minRows={2}
+          {...register('observations')}
+          sx={{
+            '& .MuiInputLabel-root': {
+              backgroundColor: 'white',
+              px: 1,
+              zIndex: 1
+            },
+            '& .MuiInputLabel-shrink': {
+              backgroundColor: 'white',
+              px: 1,
+              zIndex: 1
+            }
+          }}
         />
 
         <Button 

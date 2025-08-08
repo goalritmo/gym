@@ -66,11 +66,6 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
     setSelectedEquipment(null)
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('es-ES')
-  }
-
   const capitalizeFirstLetter = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
   }
