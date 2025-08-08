@@ -1,6 +1,7 @@
 import './App.css'
-import LoginComponent from './components/auth/LoginComponent'
-import WorkoutForm from './components/workout/WorkoutForm'
+import LoginComponent from './components/auth/LoginComponent.tsx'
+import WorkoutForm from './components/workout/WorkoutForm.tsx'
+import TimerComponent from './components/timer/TimerComponent.tsx'
 
 function App() {
   return (
@@ -9,6 +10,8 @@ function App() {
       <LoginComponent />
       <hr />
       <WorkoutForm exercises={[{ id: 1, name: 'Press de Banca' }]} onSubmit={() => {}} />
+      <hr />
+      <TimerComponent />
     </div>
   )
 }
