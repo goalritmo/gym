@@ -37,11 +37,8 @@ export default function LoginComponent() {
         maxWidth: '90%',
         width: '100%'
       }}>
-        <Typography variant="h4" component="h1" gutterBottom textAlign="center">
+        <Typography sx={{ mb: 3 }} variant="h4" component="h1" gutterBottom textAlign="center">
           Gym App
-        </Typography>
-        <Typography variant="body1" color="text.secondary" textAlign="center" mb={3}>
-          Ingresa el código de acceso
         </Typography>
         
         <form role="form" onSubmit={onSubmit}>

@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { TextField, Button, Stack, Box, Typography } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import TimerComponent from '../timer/TimerComponent'
 
 type Exercise = {
   id: number
@@ -22,7 +23,7 @@ type WorkoutFormProps = {
 }
 
 export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<WorkoutFormData>({
+  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<WorkoutFormData>({
     defaultValues: {
       exerciseId: 0,
       weight: 0,
@@ -36,6 +37,11 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
   const selectedExerciseId = watch('exerciseId')
 
   const submit = handleSubmit((data) => onSubmit(data))
+
+  // Función para capturar el tiempo del cronómetro
+  const handleTimerComplete = (seconds: number) => {
+    setValue('seconds', seconds)
+  }
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', position: 'relative', zIndex: 1 }}>
@@ -144,8 +150,7 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
           <Typography variant="h6" gutterBottom>
             Cronómetro
           </Typography>
-          {/* TimerComponent is removed as per the new_code, so this section is also removed. */}
-          {/* <TimerComponent onTimeComplete={handleTimerComplete} /> */}
+          <TimerComponent onTimeComplete={handleTimerComplete} />
           <TextField
             label="Segundos"
             type="number"
