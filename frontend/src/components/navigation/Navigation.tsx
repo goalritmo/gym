@@ -22,20 +22,19 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
             Gym App
           </Typography>
         </Toolbar>
-        <Tabs 
-          value={activeTab} 
-          onChange={handleChange} 
-          centered
-          sx={{ backgroundColor: '#1565c0' }}
-          textColor="inherit"
-          indicatorColor="secondary"
-        >
-          <Tab label="Login" />
-          <Tab label="Entrenamiento" />
-          <Tab label="Ejercicios" />
-          <Tab label="Equipamiento" />
-          <Tab label="Historial" />
-        </Tabs>
+                        <Tabs 
+                  value={activeTab} 
+                  onChange={handleChange} 
+                  centered
+                  sx={{ backgroundColor: '#1565c0' }}
+                  textColor="inherit"
+                  indicatorColor="secondary"
+                >
+                  <Tab label="Entrenamiento" />
+                  <Tab label="Ejercicios" />
+                  <Tab label="Equipamiento" />
+                  <Tab label="Historial" />
+                </Tabs>
       </AppBar>
     </Box>
   )

@@ -12,7 +12,6 @@ describe('Navigation', () => {
   it('muestra todas las pestañas', () => {
     render(<Navigation activeTab={0} onTabChange={vi.fn()} />)
     
-    expect(screen.getByText('Login')).toBeInTheDocument()
     expect(screen.getByText('Entrenamiento')).toBeInTheDocument()
     expect(screen.getByText('Ejercicios')).toBeInTheDocument()
     expect(screen.getByText('Equipamiento')).toBeInTheDocument()
@@ -23,16 +22,16 @@ describe('Navigation', () => {
     const onTabChange = vi.fn()
     render(<Navigation activeTab={0} onTabChange={onTabChange} />)
     
-    const entrenamientoTab = screen.getByText('Entrenamiento')
-    fireEvent.click(entrenamientoTab)
+    const ejerciciosTab = screen.getByText('Ejercicios')
+    fireEvent.click(ejerciciosTab)
     
     expect(onTabChange).toHaveBeenCalledWith(1)
   })
 
   it('resalta la pestaña activa', () => {
-    render(<Navigation activeTab={2} onTabChange={vi.fn()} />)
+    render(<Navigation activeTab={1} onTabChange={vi.fn()} />)
     
-    // La pestaña "Ejercicios" (índice 2) debería estar activa
+    // La pestaña "Ejercicios" (índice 1) debería estar activa
     const ejerciciosTab = screen.getByText('Ejercicios')
     expect(ejerciciosTab).toBeInTheDocument()
   })

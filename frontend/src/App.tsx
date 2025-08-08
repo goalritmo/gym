@@ -1,148 +1,23 @@
-import { useState } from 'react'
-import { Box, Container, CssBaseline, ThemeProvider, createTheme } from '@mui/material'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
+import LoginComponent from './components/auth/LoginComponent'
+import AuthenticatedApp from './components/app/AuthenticatedApp'
 import './App.css'
-import Navigation from './components/navigation/Navigation.tsx'
-import LoginComponent from './components/auth/LoginComponent.tsx'
-import WorkoutForm from './components/workout/WorkoutForm.tsx'
-import ExerciseList from './components/exercises/ExerciseList.tsx'
-import EquipmentList from './components/equipment/EquipmentList.tsx'
-import WorkoutHistory from './components/workout/WorkoutHistory.tsx'
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-})
+function AppContent() {
+  const { isAuthenticated } = useAuth()
 
-function App() {
-  const [activeTab, setActiveTab] = useState(0)
-
-  const handleTabChange = (newValue: number) => {
-    setActiveTab(newValue)
+  if (!isAuthenticated) {
+    return <LoginComponent />
   }
 
+  return <AuthenticatedApp />
+}
+
+function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
-        
-        <Container maxWidth="lg" sx={{ flexGrow: 1, py: 3 }}>
-          {/* Pestaña Login */}
-          {activeTab === 0 && (
-            <Box>
-              <LoginComponent />
-            </Box>
-          )}
-
-          {/* Pestaña Entrenamiento */}
-          {activeTab === 1 && (
-            <Box>
-              <WorkoutForm 
-                exercises={[{ id: 1, name: 'Press de Banca' }]} 
-                onSubmit={(data) => console.log('Entrenamiento guardado:', data)} 
-              />
-            </Box>
-          )}
-
-          {/* Pestaña Ejercicios */}
-          {activeTab === 2 && (
-            <Box>
-              <ExerciseList 
-                exercises={[
-                  { id: 1, name: 'Press de Banca', muscle_group: 'Pecho', equipment: 'Barra' },
-                  { id: 2, name: 'Sentadilla', muscle_group: 'Piernas', equipment: 'Barra' },
-                  { id: 3, name: 'Peso Muerto', muscle_group: 'Espalda', equipment: 'Barra' },
-                  { id: 4, name: 'Press Militar', muscle_group: 'Hombros', equipment: 'Barra' },
-                  { id: 5, name: 'Curl de Bíceps', muscle_group: 'Brazos', equipment: 'Mancuernas' },
-                ]} 
-                onSelectExercise={(exercise) => console.log('Ejercicio seleccionado:', exercise)} 
-              />
-            </Box>
-          )}
-
-          {/* Pestaña Equipamiento */}
-          {activeTab === 3 && (
-            <Box>
-              <EquipmentList 
-                equipment={[
-                  {
-                    id: 1,
-                    name: 'Barra Olímpica',
-                    category: 'BARRA',
-                    observations: 'Barra estándar de 20kg',
-                    image_url: 'https://example.com/barra.jpg',
-                    created_at: '2024-01-01T00:00:00Z'
-                  },
-                  {
-                    id: 2,
-                    name: 'Mancuernas',
-                    category: 'MANCUERNAS',
-                    observations: 'Par de mancuernas de 10kg',
-                    image_url: null,
-                    created_at: '2024-01-02T00:00:00Z'
-                  },
-                  {
-                    id: 3,
-                    name: 'Rack de Sentadillas',
-                    category: 'RACK',
-                    observations: null,
-                    image_url: 'https://example.com/rack.jpg',
-                    created_at: '2024-01-03T00:00:00Z'
-                  }
-                ]}
-              />
-            </Box>
-          )}
-
-          {/* Pestaña Historial */}
-          {activeTab === 4 && (
-            <Box>
-              <WorkoutHistory 
-                workouts={[
-                  {
-                    id: 1,
-                    exercise_name: 'Press de Banca',
-                    weight: 80,
-                    reps: 8,
-                    serie: 1,
-                    seconds: 45,
-                    observations: 'Buena técnica',
-                    created_at: '2024-01-15T10:30:00Z'
-                  },
-                  {
-                    id: 2,
-                    exercise_name: 'Sentadilla',
-                    weight: 100,
-                    reps: 6,
-                    serie: 2,
-                    seconds: null,
-                    observations: null,
-                    created_at: '2024-01-15T10:45:00Z'
-                  },
-                  {
-                    id: 3,
-                    exercise_name: 'Peso Muerto',
-                    weight: 120,
-                    reps: 5,
-                    serie: 3,
-                    seconds: 60,
-                    observations: 'Peso máximo',
-                    created_at: '2024-01-14T09:15:00Z'
-                  }
-                ]}
-                onDelete={(id) => console.log('Eliminar entrenamiento:', id)}
-              />
-            </Box>
-          )}
-        </Container>
-      </Box>
-    </ThemeProvider>
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }
 
