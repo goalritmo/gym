@@ -135,7 +135,7 @@ export default function AppLayout({ children, activeTab = 0, isAuthenticated = f
           maxWidth={false}
           sx={{ 
             flexGrow: 1, 
-            py: 2,
+            py: 1,
             px: 2,
             display: 'flex',
             flexDirection: 'column',
