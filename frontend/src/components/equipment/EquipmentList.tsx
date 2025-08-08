@@ -20,6 +20,8 @@ import {
 import InfoIcon from '@mui/icons-material/Info'
 import ImageIcon from '@mui/icons-material/Image'
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
+import SearchOffIcon from '@mui/icons-material/SearchOff'
+import BuildIcon from '@mui/icons-material/Build'
 
 type Equipment = {
   id: number
@@ -70,12 +72,43 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
   }
 
+  // Función para renderizar el estado vacío con mejor estilo
+  const renderEmptyState = (isInitialEmpty: boolean = false) => (
+    <Box 
+      sx={{ 
+        textAlign: 'center', 
+        py: 8,
+        px: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 2
+      }}
+    >
+      {isInitialEmpty ? (
+        <BuildIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+      ) : (
+        <SearchOffIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+      )}
+      <Typography variant="h5" color="text.secondary" sx={{ fontWeight: 'bold' }}>
+        {isInitialEmpty ? 'No hay equipos disponibles' : 'Sin resultados'}
+      </Typography>
+      <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
+        {isInitialEmpty 
+          ? 'Aún no se han cargado equipos en el sistema.'
+          : 'No se encontraron equipos que coincidan con tu búsqueda. Intenta modificar los filtros.'
+        }
+      </Typography>
+    </Box>
+  )
+
   if (equipment.length === 0) {
     return (
-      <Box textAlign="center" py={4}>
-        <Typography variant="h6" color="text.secondary">
-          No hay equipos disponibles
+      <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+        <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main', fontWeight: 'bold' }}>
+          Hacer consulta
         </Typography>
+        {renderEmptyState(true)}
       </Box>
     )
   }
@@ -163,13 +196,14 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
           </Stack>
         </Box>
 
-        {/* Equipamiento */}
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: 2
-        }}>
-          {filteredEquipment.map((item) => (
+        {/* Equipamiento o estado vacío */}
+        {filteredEquipment.length > 0 ? (
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: 2
+          }}>
+            {filteredEquipment.map((item) => (
             <Card 
               key={item.id}
               sx={{ 
@@ -248,7 +282,10 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
               </CardContent>
             </Card>
           ))}
-        </Box>
+          </Box>
+        ) : (
+          renderEmptyState()
+        )}
       </Stack>
 
       {/* Dialog para mostrar detalles completos */}

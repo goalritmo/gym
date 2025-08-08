@@ -20,6 +20,8 @@ import {
 import InfoIcon from '@mui/icons-material/Info'
 import PlayCircleIcon from '@mui/icons-material/PlayCircle'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
+import SearchOffIcon from '@mui/icons-material/SearchOff'
+import FitnessCenter from '@mui/icons-material/FitnessCenter'
 
 type Exercise = {
   id: number
@@ -89,22 +91,43 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
     return url
   }
 
+  // Función para renderizar el estado vacío con mejor estilo
+  const renderEmptyState = (isInitialEmpty: boolean = false) => (
+    <Box 
+      sx={{ 
+        textAlign: 'center', 
+        py: 8,
+        px: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 2
+      }}
+    >
+      {isInitialEmpty ? (
+        <FitnessCenter sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+      ) : (
+        <SearchOffIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+      )}
+      <Typography variant="h5" color="text.secondary" sx={{ fontWeight: 'bold' }}>
+        {isInitialEmpty ? 'No hay ejercicios disponibles' : 'Sin resultados'}
+      </Typography>
+      <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
+        {isInitialEmpty 
+          ? 'Aún no se han cargado ejercicios en el sistema.'
+          : 'No se encontraron ejercicios que coincidan con tu búsqueda. Intenta modificar los filtros.'
+        }
+      </Typography>
+    </Box>
+  )
+
   if (exercises.length === 0) {
     return (
-      <Box textAlign="center" py={4}>
-        <Typography variant="h6" color="text.secondary">
-          No se encontraron ejercicios
+      <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+        <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main', fontWeight: 'bold' }}>
+          Hacer consulta
         </Typography>
-      </Box>
-    )
-  }
-
-  if (filteredExercises.length === 0) {
-    return (
-      <Box textAlign="center" py={4}>
-        <Typography variant="h6" color="text.secondary">
-          No se encontraron ejercicios que coincidan con la búsqueda
-        </Typography>
+        {renderEmptyState(true)}
       </Box>
     )
   }
@@ -236,13 +259,14 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
           </Stack>
         </Box>
 
-        {/* Todos los ejercicios */}
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: 2
-        }}>
-          {filteredExercises.map((exercise) => (
+        {/* Ejercicios o estado vacío */}
+        {filteredExercises.length > 0 ? (
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: 2
+          }}>
+            {filteredExercises.map((exercise) => (
             <Card 
               key={exercise.id}
               sx={{ 
@@ -308,7 +332,10 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
               </CardContent>
             </Card>
           ))}
-        </Box>
+          </Box>
+        ) : (
+          renderEmptyState()
+        )}
       </Stack>
 
       {/* Modal informativo mejorado */}
