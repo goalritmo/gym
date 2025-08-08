@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import './App.css'
 import LoginComponent from './components/auth/LoginComponent.tsx'
 import WorkoutForm from './components/workout/WorkoutForm.tsx'
 import TimerComponent from './components/timer/TimerComponent.tsx'
 import ExerciseList from './components/exercises/ExerciseList.tsx'
+import EquipmentDetail from './components/equipment/EquipmentDetail.tsx'
 
 function App() {
+  const [showEquipmentDetail, setShowEquipmentDetail] = useState(false)
   return (
     <div style={{ padding: 16 }}>
       <h1>Gym</h1>
@@ -24,6 +27,23 @@ function App() {
         ]} 
         onSelectExercise={(exercise) => console.log('Ejercicio seleccionado:', exercise)} 
       />
+      <hr />
+      <button onClick={() => setShowEquipmentDetail(true)}>
+        Ver Detalle de Equipo
+      </button>
+      {showEquipmentDetail && (
+        <EquipmentDetail 
+          equipment={{
+            id: 1,
+            name: 'Barra Olímpica',
+            category: 'BARRA',
+            observations: 'Barra estándar de 20kg',
+            image_url: 'https://example.com/barra.jpg',
+            created_at: '2024-01-01T00:00:00Z'
+          }}
+          onClose={() => setShowEquipmentDetail(false)}
+        />
+      )}
     </div>
   )
 }
