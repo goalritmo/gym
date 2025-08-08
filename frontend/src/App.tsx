@@ -5,6 +5,7 @@ import WorkoutForm from './components/workout/WorkoutForm.tsx'
 import TimerComponent from './components/timer/TimerComponent.tsx'
 import ExerciseList from './components/exercises/ExerciseList.tsx'
 import EquipmentDetail from './components/equipment/EquipmentDetail.tsx'
+import WorkoutHistory from './components/workout/WorkoutHistory.tsx'
 
 function App() {
   const [showEquipmentDetail, setShowEquipmentDetail] = useState(false)
@@ -44,6 +45,42 @@ function App() {
           onClose={() => setShowEquipmentDetail(false)}
         />
       )}
+      <hr />
+      <WorkoutHistory 
+        workouts={[
+          {
+            id: 1,
+            exercise_name: 'Press de Banca',
+            weight: 80,
+            reps: 8,
+            serie: 1,
+            seconds: 45,
+            observations: 'Buena técnica',
+            created_at: '2024-01-15T10:30:00Z'
+          },
+          {
+            id: 2,
+            exercise_name: 'Sentadilla',
+            weight: 100,
+            reps: 6,
+            serie: 2,
+            seconds: null,
+            observations: null,
+            created_at: '2024-01-15T10:45:00Z'
+          },
+          {
+            id: 3,
+            exercise_name: 'Peso Muerto',
+            weight: 120,
+            reps: 5,
+            serie: 3,
+            seconds: 60,
+            observations: 'Peso máximo',
+            created_at: '2024-01-14T09:15:00Z'
+          }
+        ]}
+        onDelete={(id) => console.log('Eliminar entrenamiento:', id)}
+      />
     </div>
   )
 }
