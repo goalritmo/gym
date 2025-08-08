@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import React from 'react'
-import LoginComponent from './LoginComponent'
+import LoginComponent from './LoginComponent.tsx'
 
 describe('LoginComponent', () => {
   it('permite acceso con código correcto', () => {
