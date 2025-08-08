@@ -38,9 +38,18 @@ export default function AuthenticatedApp() {
       }}>
         {/* Pestaña Entrenamiento */}
         {activeTab === 0 && (
-          <Box>
+          <Box sx={{ position: 'relative', zIndex: 1 }}>
             <WorkoutForm 
-              exercises={[{ id: 1, name: 'Press de Banca' }]} 
+              exercises={[
+                { id: 1, name: 'Press de Banca' },
+                { id: 2, name: 'Sentadilla' },
+                { id: 3, name: 'Peso Muerto' },
+                { id: 4, name: 'Press Militar' },
+                { id: 5, name: 'Curl de Bíceps' },
+                { id: 6, name: 'Extensiones de Tríceps' },
+                { id: 7, name: 'Remo con Barra' },
+                { id: 8, name: 'Pull-ups' }
+              ]} 
               onSubmit={(data) => console.log('Entrenamiento guardado:', data)} 
             />
           </Box>

@@ -58,31 +58,38 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
   }
 
   return (
-    <Box>
-      <Typography variant="h5" gutterBottom>
+    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
         Equipamiento Disponible
       </Typography>
       
-      <Stack direction="row" spacing={3} sx={{ flexWrap: 'wrap', gap: 3 }}>
+      <Stack direction="row" spacing={3} sx={{ flexWrap: 'wrap', gap: 3, mt: 3 }}>
         {equipment.map((item) => (
           <Box key={item.id} sx={{ flex: '1 1 300px', minWidth: 300 }}>
             <Card 
               sx={{ 
                 cursor: 'pointer', 
-                '&:hover': { boxShadow: 3 },
+                '&:hover': { 
+                  boxShadow: 4,
+                  transform: 'translateY(-2px)',
+                  transition: 'all 0.2s ease'
+                },
                 height: '100%',
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: 'divider'
               }}
               onClick={() => handleEquipmentClick(item)}
             >
-              <CardContent sx={{ flexGrow: 1 }}>
+              <CardContent sx={{ flexGrow: 1, p: 3 }}>
                 <Stack spacing={2}>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6" component="div">
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                       {item.name}
                     </Typography>
-                    <IconButton size="small" color="primary">
+                    <IconButton size="small" color="primary" sx={{ color: 'primary.main' }}>
                       <InfoIcon />
                     </IconButton>
                   </Box>

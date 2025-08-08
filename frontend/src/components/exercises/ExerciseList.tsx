@@ -77,9 +77,25 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
   }
 
   return (
-    <Stack spacing={3}>
-      {/* Filtros */}
-      <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2 }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
+        Biblioteca de Ejercicios
+      </Typography>
+      
+      <Stack spacing={3}>
+        {/* Filtros */}
+        <Box sx={{ 
+          p: 3, 
+          bgcolor: 'background.paper', 
+          borderRadius: 2, 
+          boxShadow: 1,
+          border: '1px solid',
+          borderColor: 'divider'
+        }}>
+          <Typography variant="h6" gutterBottom sx={{ mb: 2, color: 'text.secondary' }}>
+            Filtros
+          </Typography>
+          <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2 }}>
         <TextField
           placeholder="Buscar ejercicios..."
           value={searchTerm}
@@ -117,6 +133,7 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
           </Select>
         </FormControl>
       </Stack>
+        </Box>
 
       {/* Lista de ejercicios */}
       <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2 }}>
@@ -125,24 +142,42 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
             key={exercise.id}
             sx={{ 
               cursor: 'pointer', 
-              '&:hover': { boxShadow: 3 },
+              '&:hover': { 
+                boxShadow: 4,
+                transform: 'translateY(-2px)',
+                transition: 'all 0.2s ease'
+              },
               minWidth: 250,
-              flex: '1 1 300px'
+              flex: '1 1 300px',
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: 'divider'
             }}
             onClick={() => handleExerciseClick(exercise)}
           >
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                 {exercise.name}
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                <Chip label={exercise.muscle_group} size="small" color="primary" />
-                <Chip label={exercise.equipment} size="small" variant="outlined" />
+                <Chip 
+                  label={exercise.muscle_group} 
+                  size="small" 
+                  color="primary" 
+                  sx={{ fontWeight: 'bold' }}
+                />
+                <Chip 
+                  label={exercise.equipment} 
+                  size="small" 
+                  variant="outlined" 
+                  sx={{ borderColor: 'primary.main' }}
+                />
               </Stack>
             </CardContent>
           </Card>
         ))}
       </Stack>
-    </Stack>
+        </Stack>
+      </Box>
   )
 }

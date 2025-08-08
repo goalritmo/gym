@@ -35,21 +35,19 @@ export default function TimerComponent({ onTimeComplete }: TimerComponentProps) 
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
-  const handleStart = () => {
-    setIsRunning(true)
-  }
-
-  const handlePause = () => {
-    setIsRunning(false)
-    // Capturar el tiempo cuando se pausa
-    if (onTimeComplete) {
-      onTimeComplete(time)
+  const handleToggleTimer = () => {
+    if (!isRunning) {
+      // Iniciar el cronómetro
+      setIsRunning(true)
+    } else {
+      // Pausar y registrar los segundos
+      setIsRunning(false)
+      if (onTimeComplete) {
+        onTimeComplete(time)
+      }
+      // Resetear automáticamente
+      setTime(0)
     }
-  }
-
-  const handleReset = () => {
-    setIsRunning(false)
-    setTime(0)
   }
 
   return (
@@ -58,21 +56,19 @@ export default function TimerComponent({ onTimeComplete }: TimerComponentProps) 
         {formatTime(time)}
       </Typography>
       
-      <Stack direction="row" spacing={2}>
-        {!isRunning ? (
-          <Button variant="contained" onClick={handleStart}>
-            Iniciar
-          </Button>
-        ) : (
-          <Button variant="contained" onClick={handlePause}>
-            Pausar
-          </Button>
-        )}
-        
-        <Button variant="outlined" onClick={handleReset}>
-          Resetear
-        </Button>
-      </Stack>
+      <Button 
+        variant="contained" 
+        onClick={handleToggleTimer}
+        size="large"
+        sx={{ 
+          minWidth: 120,
+          py: 1.5,
+          fontSize: '1.1rem',
+          fontWeight: 'bold'
+        }}
+      >
+        {!isRunning ? 'Iniciar' : 'Capturar'}
+      </Button>
     </Stack>
   )
 }

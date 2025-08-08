@@ -46,17 +46,28 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
   }
 
   return (
-    <Stack spacing={2}>
-      <Typography variant="h5" gutterBottom>
+    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
         Historial de Entrenamientos
       </Typography>
       
+      <Stack spacing={3}>
+      
       {sortedWorkouts.map((workout) => (
-        <Card key={workout.id} sx={{ position: 'relative' }}>
-          <CardContent>
+        <Card key={workout.id} sx={{ 
+          position: 'relative',
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: 'divider',
+          '&:hover': { 
+            boxShadow: 2,
+            transition: 'all 0.2s ease'
+          }
+        }}>
+          <CardContent sx={{ p: 3 }}>
             <Stack spacing={1}>
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="h6">
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                   {workout.exercise_name}
                 </Typography>
                 <IconButton
@@ -64,6 +75,12 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
                   color="error"
                   size="small"
                   aria-label="eliminar"
+                  sx={{ 
+                    '&:hover': { 
+                      backgroundColor: 'error.light',
+                      color: 'white'
+                    }
+                  }}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -93,6 +110,7 @@ export default function WorkoutHistory({ workouts, onDelete }: WorkoutHistoryPro
           </CardContent>
         </Card>
       ))}
-    </Stack>
+        </Stack>
+      </Box>
   )
 }

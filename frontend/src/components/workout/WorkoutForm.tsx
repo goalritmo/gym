@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { TextField, Button, Stack, Box, Typography } from '@mui/material'
+import { TextField, Button, Stack, Box, Typography, Chip } from '@mui/material'
 import type { Resolver } from 'react-hook-form'
 import TimerComponent from '../timer/TimerComponent.tsx'
 
@@ -38,19 +38,21 @@ export default function WorkoutForm({
     observations?: string
   }) => void
 }) {
-  const { handleSubmit, control, formState: { errors }, setValue } = useForm<FormValues>({
+  const { handleSubmit, control, formState: { errors }, setValue, watch } = useForm<FormValues>({
     resolver: zodResolver(schema) as unknown as Resolver<FormValues>,
     defaultValues: {
       exerciseId: undefined as unknown as number,
-      weight: undefined as unknown as number,
-      reps: undefined as unknown as number,
-      serie: undefined,
-      seconds: undefined,
+      weight: '',
+      reps: '',
+      serie: '',
+      seconds: '',
       observations: '',
     },
   })
 
   const submit = handleSubmit((data) => onSubmit(data))
+  const selectedExerciseId = watch('exerciseId')
+  const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId)
   
   // Función para capturar el tiempo del cronómetro
   const handleTimerComplete = (seconds: number) => {
@@ -58,8 +60,15 @@ export default function WorkoutForm({
   }
 
   return (
-    <form role="form" onSubmit={submit}>
-      <Stack spacing={2}>
+    <Box sx={{ maxWidth: 600, mx: 'auto', position: 'relative', zIndex: 1 }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
+        Registrar
+      </Typography>
+      
+
+      
+      <form role="form" onSubmit={submit}>
+        <Stack spacing={3}>
         <Controller
           control={control}
           name="exerciseId"
@@ -68,21 +77,46 @@ export default function WorkoutForm({
               select
               label="Ejercicio"
               aria-label="Ejercicio"
-              SelectProps={{ native: true }}
+              SelectProps={{ 
+                native: true,
+                MenuProps: {
+                  PaperProps: {
+                    sx: {
+                      maxHeight: 200,
+                      zIndex: 9999
+                    }
+                  }
+                }
+              }}
               error={Boolean(errors.exerciseId)}
               helperText={errors.exerciseId?.message}
               value={field.value ?? ''}
               onChange={(e) => field.onChange(Number((e.target as HTMLInputElement).value))}
+              fullWidth
+              sx={{ 
+                '& .MuiInputLabel-root': {
+                  transform: 'translate(14px, -9px) scale(0.75)',
+                  backgroundColor: 'white',
+                  px: 1,
+                  color: 'primary.main'
+                },
+                '& .MuiInputLabel-shrink': {
+                  transform: 'translate(14px, -9px) scale(0.75)',
+                  backgroundColor: 'white',
+                  px: 1,
+                  color: 'primary.main'
+                }
+              }}
             >
-              <option value="">Seleccionar...</option>
-              {exercises.map((ex) => (
-                <option key={ex.id} value={ex.id}>
-                  {ex.name}
-                </option>
-              ))}
-            </TextField>
-          )}
-        />
+                <option value="">Seleccionar ejercicio...</option>
+                {exercises.map((ex) => (
+                  <option key={ex.id} value={ex.id}>
+                    {ex.name}
+                  </option>
+                ))}
+              </TextField>
+            )}
+          />
 
         <Controller
           control={control}
@@ -94,9 +128,22 @@ export default function WorkoutForm({
               type="number"
               error={Boolean(errors.weight)}
               helperText={errors.weight?.message}
-              inputProps={{ step: 'any' }}
+              inputProps={{ 
+                step: 'any',
+                inputMode: 'decimal',
+                pattern: '[0-9]*',
+                min: '0'
+              }}
               value={field.value ?? ''}
               onChange={(e) => field.onChange((e.target as HTMLInputElement).value)}
+              sx={{
+                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                  display: 'none'
+                },
+                '& input[type=number]': {
+                  MozAppearance: 'textfield'
+                }
+              }}
             />
           )}
         />
@@ -111,8 +158,21 @@ export default function WorkoutForm({
               type="number"
               error={Boolean(errors.reps)}
               helperText={errors.reps?.message}
+              inputProps={{ 
+                inputMode: 'numeric',
+                pattern: '[0-9]*',
+                min: '0'
+              }}
               value={field.value ?? ''}
               onChange={(e) => field.onChange((e.target as HTMLInputElement).value)}
+              sx={{
+                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                  display: 'none'
+                },
+                '& input[type=number]': {
+                  MozAppearance: 'textfield'
+                }
+              }}
             />
           )}
         />
@@ -125,8 +185,21 @@ export default function WorkoutForm({
               label="Serie"
               aria-label="Serie"
               type="number"
+              inputProps={{ 
+                inputMode: 'numeric',
+                pattern: '[0-9]*',
+                min: '0'
+              }}
               value={field.value ?? ''}
               onChange={(e) => field.onChange((e.target as HTMLInputElement).value)}
+              sx={{
+                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                  display: 'none'
+                },
+                '& input[type=number]': {
+                  MozAppearance: 'textfield'
+                }
+              }}
             />
           )}
         />
@@ -141,12 +214,28 @@ export default function WorkoutForm({
             name="seconds"
             render={({ field }) => (
               <TextField
-                label="Segundos (capturados del cronómetro)"
+                label="Segundos"
                 aria-label="Segundos"
                 type="number"
+                inputProps={{ 
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*'
+                }}
                 value={field.value ?? ''}
                 onChange={(e) => field.onChange((e.target as HTMLInputElement).value)}
-                sx={{ mt: 2 }}
+                sx={{ 
+                  mt: 2,
+                  width: '120px',
+                  '& .MuiInputBase-root': {
+                    minWidth: '120px'
+                  },
+                  '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                    display: 'none'
+                  },
+                  '& input[type=number]': {
+                    MozAppearance: 'textfield'
+                  }
+                }}
               />
             )}
           />
@@ -163,15 +252,38 @@ export default function WorkoutForm({
               minRows={2}
               value={field.value ?? ''}
               onChange={field.onChange}
+              sx={{
+                '& .MuiInputLabel-root': {
+                  backgroundColor: 'white',
+                  px: 1,
+                  zIndex: 1
+                },
+                '& .MuiInputLabel-shrink': {
+                  backgroundColor: 'white',
+                  px: 1,
+                  zIndex: 1
+                }
+              }}
             />
           )}
         />
 
-        <Button type="submit" variant="contained">
+        <Button 
+          type="submit" 
+          variant="contained" 
+          size="large"
+          sx={{ 
+            mt: 2, 
+            py: 1.5,
+            fontSize: '1.1rem',
+            fontWeight: 'bold'
+          }}
+        >
           Guardar
         </Button>
       </Stack>
     </form>
+    </Box>
   )
 }
 
