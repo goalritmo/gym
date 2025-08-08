@@ -17,7 +17,11 @@ import (
 func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userID := r.Context().Value("user_id").(string)
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
 
 	// Obtener parámetros de query
 	date := r.URL.Query().Get("date")
@@ -85,7 +89,11 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userID := r.Context().Value("user_id").(string)
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
 
 	var req models.CreateWorkoutRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -153,7 +161,11 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := r.Context().Value("user_id").(string)
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
 
 	var req models.CreateWorkoutRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -203,7 +215,11 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := r.Context().Value("user_id").(string)
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
 
 	result, err := database.DB.Exec("DELETE FROM workouts WHERE id = $1 AND user_id = $2", id, userID)
 	if err != nil {
@@ -224,7 +240,11 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 func GetWorkoutSessionsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userID := r.Context().Value("user_id").(string)
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
 
 	query := `
 		SELECT id, user_id, session_date, session_name, total_exercises, 
@@ -270,7 +290,11 @@ func GetWorkoutSessionsHandler(w http.ResponseWriter, r *http.Request) {
 func CreateWorkoutSessionHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userID := r.Context().Value("user_id").(string)
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
 
 	var req models.CreateWorkoutSessionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -320,7 +344,11 @@ func UpdateWorkoutSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := r.Context().Value("user_id").(string)
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
 
 	var req models.UpdateWorkoutSessionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

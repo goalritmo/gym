@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
@@ -16,11 +17,11 @@ func TestSupabaseIntegration(t *testing.T) {
 
 	// Crear usuario único para este test
 	testUserID := testutils.GetTestUserID(t)
-	testutils.CreateTestUser(t, testUserID)
+	testutils.CreateTestUserInDB(t, testUserID)
 
 	// Limpiar datos al final del test
 	t.Cleanup(func() {
-		testutils.CleanupTestData(t, testUserID)
+		testutils.CleanupTestUser(t, testUserID)
 	})
 
 	// Crear suite de testing
@@ -124,7 +125,7 @@ func TestSupabaseIntegration(t *testing.T) {
 
 		rr := suite.MakeRequest(testutils.TestRequest{
 			Method: "PUT",
-			URL:    "/api/workouts/" + string(rune(createdWorkoutID)),
+			URL:    "/api/workouts/" + strconv.Itoa(createdWorkoutID),
 			Body:   updateData,
 			UserID: testUserID,
 		})
@@ -149,7 +150,7 @@ func TestSupabaseIntegration(t *testing.T) {
 
 		rr := suite.MakeRequest(testutils.TestRequest{
 			Method: "DELETE",
-			URL:    "/api/workouts/" + string(rune(createdWorkoutID)),
+			URL:    "/api/workouts/" + strconv.Itoa(createdWorkoutID),
 			UserID: testUserID,
 		})
 
@@ -187,8 +188,9 @@ func TestSupabaseWorkoutSessions(t *testing.T) {
 	testutils.VerifyDatabaseSchema(t)
 
 	testUserID := testutils.GetTestUserID(t)
+	testutils.CreateTestUserInDB(t, testUserID)
 	t.Cleanup(func() {
-		testutils.CleanupTestData(t, testUserID)
+		testutils.CleanupTestUser(t, testUserID)
 	})
 
 	suite := testutils.NewAPITestSuite(t)
@@ -238,7 +240,7 @@ func TestSupabaseWorkoutSessions(t *testing.T) {
 
 		rr := suite.MakeRequest(testutils.TestRequest{
 			Method: "PUT",
-			URL:    "/api/workout-sessions/" + string(rune(createdSessionID)),
+			URL:    "/api/workout-sessions/" + strconv.Itoa(createdSessionID),
 			Body:   updateData,
 			UserID: testUserID,
 		})

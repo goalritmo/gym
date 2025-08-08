@@ -42,9 +42,9 @@ func TestCreateWorkoutHandler_ValidInput(t *testing.T) {
 		ExerciseID:   1,
 		Weight:       80.5,
 		Reps:         10,
-		Serie:        intPtr(1),
-		Seconds:      intPtr(45),
-		Observations: stringPtr("Buena ejecución"),
+		Serie:        &[]int{1}[0],
+		Seconds:      &[]int{45}[0],
+		Observations: &[]string{"Buena ejecución"}[0],
 	}
 
 	req, err := mockRequest("POST", "/api/workouts", workoutData)
@@ -235,13 +235,4 @@ func TestDeleteWorkoutHandler_InvalidID(t *testing.T) {
 	if rr.Code != http.StatusBadRequest {
 		t.Errorf("Expected status 400 for invalid ID, got %d", rr.Code)
 	}
-}
-
-// Helpers para punteros
-func intPtr(i int) *int {
-	return &i
-}
-
-func stringPtr(s string) *string {
-	return &s
 }

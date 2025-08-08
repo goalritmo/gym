@@ -33,7 +33,7 @@ func main() {
 
 	// Middleware
 	r.Use(middleware.LoggingMiddleware)
-	r.Use(middleware.AuthMiddleware)
+	r.Use(middleware.SupabaseAuthMiddleware)
 
 	// API routes
 	api := r.PathPrefix("/api").Subrouter()
@@ -59,6 +59,10 @@ func main() {
 	// Equipment endpoints
 	api.HandleFunc("/equipment", handlers.GetEquipmentHandler).Methods("GET")
 	api.HandleFunc("/equipment/{id}", handlers.GetEquipmentByIdHandler).Methods("GET")
+
+	// Users endpoints (usando Supabase Auth)
+	api.HandleFunc("/me", handlers.GetCurrentUserHandler).Methods("GET")
+	api.HandleFunc("/me/stats", handlers.GetUserStatsHandler).Methods("GET")
 
 	// Configurar CORS
 	c := cors.New(cors.Options{

@@ -66,12 +66,25 @@ GET    /api/equipment                # Listar equipos
 GET    /api/equipment/{id}           # Obtener equipo
 ```
 
+### Users (Supabase Auth)
+```
+GET    /api/me                       # Usuario actual
+GET    /api/me/stats                 # Estadísticas del usuario
+```
+
 ## 🔐 Autenticación
 
-Todos los endpoints (excepto `/health`) requieren el header de autorización:
+### Producción (Google OAuth via Supabase)
+```
+Authorization: Bearer <jwt_token_from_supabase>
+```
+
+### Desarrollo/Testing
 ```
 Authorization: Bearer salud
 ```
+
+Ver [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) para configuración completa.
 
 ## 📊 Estructura de Datos
 
@@ -155,12 +168,24 @@ Ver [SUPABASE_TESTING.md](SUPABASE_TESTING.md) para guía completa de testing.
 
 ```
 backend/
-├── main.go              # Punto de entrada
-├── database/            # Conexión con BD
-├── handlers/            # Controladores HTTP
-├── middleware/          # Middleware personalizado
-├── models/              # Modelos de datos
-└── tests/               # Tests unitarios
+├── main.go                              # Punto de entrada
+├── database/
+│   ├── connection.go                    # Conexión con Supabase
+│   └── supabase_auth_migrations.sql    # Migraciones para Auth
+├── handlers/
+│   ├── health.go                        # Health check
+│   ├── workouts.go                      # CRUD workouts + sessions
+│   ├── exercises.go                     # Endpoints ejercicios
+│   ├── equipment.go                     # Endpoints equipos
+│   └── users.go                         # Usuario actual (desde JWT)
+├── middleware/
+│   ├── logging.go                       # Logging de requests
+│   └── supabase_auth.go                 # JWT validation
+├── testutils/
+│   ├── testing_helpers.go               # Utilities para tests
+│   └── database.go                      # Setup DB para tests
+└── scripts/
+    └── test-setup.sh                    # Script de configuración
 ```
 
 ## 🔄 Filtros y Parámetros
