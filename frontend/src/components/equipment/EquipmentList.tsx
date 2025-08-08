@@ -255,57 +255,88 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
 
       {/* Dialog para mostrar detalles completos */}
       {selectedEquipment && (
-        <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-          <DialogTitle>
-            {selectedEquipment.name}
-            <Button
-              onClick={handleCloseDialog}
-              sx={{ position: 'absolute', right: 8, top: 8 }}
-            >
-              Cerrar
-            </Button>
+        <Dialog 
+          open={openDialog} 
+          onClose={handleCloseDialog} 
+          maxWidth="sm" 
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              maxWidth: { xs: '100vw', sm: '90vw', md: '500px' },
+              maxHeight: { xs: '100vh', sm: '80vh', md: '70vh' },
+              m: { xs: 0, sm: 2 },
+              width: { xs: '100vw', sm: '90vw', md: '500px' },
+              height: { xs: '100vh', sm: 'auto', md: 'auto' }
+            }
+          }}
+        >
+          <DialogTitle sx={{ 
+            background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+            color: 'white',
+            borderRadius: '12px 12px 0 0',
+            pb: 2,
+            px: { xs: 2, sm: 3 }
+          }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="h5" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
+                {selectedEquipment.name}
+              </Typography>
+              <IconButton 
+                onClick={handleCloseDialog}
+                sx={{ 
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+              >
+                <InfoIcon />
+              </IconButton>
+            </Box>
           </DialogTitle>
           
-          <DialogContent>
+          <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
             <Stack spacing={2}>
               {selectedEquipment.image_url && (
-                <Box>
+                <Box sx={{ pt: 3.5 }}>
                   <img
                     src={selectedEquipment.image_url}
                     alt={selectedEquipment.name}
-                    style={{ width: '100%', height: 'auto', maxHeight: 300, objectFit: 'cover' }}
+                    style={{ 
+                      width: '100%', 
+                      height: 'auto', 
+                      maxHeight: 300, 
+                      objectFit: 'cover',
+                      borderRadius: 8
+                    }}
                   />
                 </Box>
               )}
               
-              <Box>
-                <Typography variant="h6" gutterBottom>
+              <Box sx={{ pt: 0 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.125rem' } }}>
                   Información del Equipo
                 </Typography>
                 
-                <Stack spacing={1}>
+                <Stack spacing={2}>
                   <Box>
-                    <Typography variant="subtitle2" color="text.secondary">
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                       Categoría:
                     </Typography>
-                    <Chip label={capitalizeFirstLetter(selectedEquipment.category)} color="primary" />
+                    <Chip 
+                      label={capitalizeFirstLetter(selectedEquipment.category)} 
+                      color="primary" 
+                      sx={{ fontWeight: 'bold' }}
+                    />
                   </Box>
                   
                   <Box>
-                    <Typography variant="subtitle2" color="text.secondary">
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                       Observaciones:
                     </Typography>
                     <Typography>
                       {selectedEquipment.observations || 'Sin observaciones'}
-                    </Typography>
-                  </Box>
-                  
-                  <Box>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Fecha de creación:
-                    </Typography>
-                    <Typography>
-                      {formatDate(selectedEquipment.created_at)}
                     </Typography>
                   </Box>
                 </Stack>
@@ -313,8 +344,16 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
             </Stack>
           </DialogContent>
           
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>
+          <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 0 }}>
+            <Button 
+              onClick={handleCloseDialog}
+              variant="contained"
+              sx={{ 
+                borderRadius: 2,
+                px: { xs: 2, sm: 3 },
+                py: { xs: 0.5, sm: 1 }
+              }}
+            >
               Cerrar
             </Button>
           </DialogActions>

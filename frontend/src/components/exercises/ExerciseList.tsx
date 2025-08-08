@@ -11,7 +11,14 @@ import {
   Chip,
   Box,
   Stack,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from '@mui/material'
+import InfoIcon from '@mui/icons-material/Info'
 
 type Exercise = {
   id: number
@@ -29,6 +36,8 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
   const [searchTerm, setSearchTerm] = useState('')
   const [muscleGroupFilter, setMuscleGroupFilter] = useState('')
   const [equipmentFilter, setEquipmentFilter] = useState('')
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null)
+  const [openDialog, setOpenDialog] = useState(false)
 
   // Obtener valores únicos para los filtros
   const muscleGroups = useMemo(() => {
@@ -54,6 +63,21 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
 
   const handleExerciseClick = (exercise: Exercise) => {
     onSelectExercise(exercise)
+  }
+
+  const handleInfoClick = (exercise: Exercise, event: React.MouseEvent) => {
+    event.stopPropagation()
+    setSelectedExercise(exercise)
+    setOpenDialog(true)
+  }
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false)
+    setSelectedExercise(null)
+  }
+
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
   }
 
   if (exercises.length === 0) {
@@ -156,7 +180,7 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
                   <MenuItem value="">Elegir</MenuItem>
                   {muscleGroups.map(group => (
                     <MenuItem key={group} value={group}>
-                      {group}
+                      {capitalizeFirstLetter(group)}
                     </MenuItem>
                   ))}
                 </Select>
@@ -194,7 +218,7 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
                   <MenuItem value="">Elegir</MenuItem>
                   {equipmentTypes.map(equipment => (
                     <MenuItem key={equipment} value={equipment}>
-                      {equipment}
+                      {capitalizeFirstLetter(equipment)}
                     </MenuItem>
                   ))}
                 </Select>
@@ -226,20 +250,46 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
               }}
               onClick={() => handleExerciseClick(exercise)}
             >
-              <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                  {exercise.name}
-                </Typography>
-                <Box sx={{ mt: 'auto' }}>
-                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+              <CardContent sx={{ 
+                p: 3, 
+                height: '100%', 
+                display: 'flex', 
+                flexDirection: 'column',
+                textAlign: 'center'
+              }}>
+                <Box display="flex" justifyContent="center" alignItems="center" sx={{ mb: 2 }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 'bold', 
+                      color: 'primary.main',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {exercise.name}
+                  </Typography>
+                  <IconButton 
+                    size="small" 
+                    color="primary" 
+                    onClick={(e) => handleInfoClick(exercise, e)}
+                    sx={{ 
+                      color: 'primary.main',
+                      ml: 0.5
+                    }}
+                  >
+                    <InfoIcon />
+                  </IconButton>
+                </Box>
+                <Box sx={{ mt: 'auto', textAlign: 'center' }}>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ justifyContent: 'center' }}>
                     <Chip 
-                      label={exercise.muscle_group} 
+                      label={capitalizeFirstLetter(exercise.muscle_group)} 
                       size="small" 
                       color="primary" 
                       sx={{ fontWeight: 'bold' }}
                     />
                     <Chip 
-                      label={exercise.equipment} 
+                      label={capitalizeFirstLetter(exercise.equipment)} 
                       size="small" 
                       variant="outlined" 
                       sx={{ borderColor: 'primary.main' }}
@@ -251,6 +301,99 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
           ))}
         </Box>
       </Stack>
+
+      {/* Modal informativo mejorado */}
+      {selectedExercise && (
+        <Dialog 
+          open={openDialog} 
+          onClose={handleCloseDialog} 
+          maxWidth="sm" 
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              maxWidth: { xs: '100vw', sm: '90vw', md: '500px' },
+              maxHeight: { xs: '100vh', sm: '80vh', md: '70vh' },
+              m: { xs: 0, sm: 2 },
+              width: { xs: '100vw', sm: '90vw', md: '500px' },
+              height: { xs: '100vh', sm: 'auto', md: 'auto' }
+            }
+          }}
+        >
+          <DialogTitle sx={{ 
+            background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+            color: 'white',
+            borderRadius: '12px 12px 0 0',
+            pb: 2,
+            px: { xs: 2, sm: 3 }
+          }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="h5" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
+                {selectedExercise.name}
+              </Typography>
+              <IconButton 
+                onClick={handleCloseDialog}
+                sx={{ 
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+              >
+                <InfoIcon />
+              </IconButton>
+            </Box>
+          </DialogTitle>
+          
+          <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <Stack spacing={3}>
+              <Box sx={{ pt: 2 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.125rem' } }}>
+                  Información del Ejercicio
+                </Typography>
+                
+                <Stack spacing={2}>
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                      Grupo Muscular:
+                    </Typography>
+                    <Chip 
+                      label={capitalizeFirstLetter(selectedExercise.muscle_group)} 
+                      color="primary" 
+                      sx={{ fontWeight: 'bold' }}
+                    />
+                  </Box>
+                  
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                      Equipamiento:
+                    </Typography>
+                    <Chip 
+                      label={capitalizeFirstLetter(selectedExercise.equipment)} 
+                      variant="outlined" 
+                      sx={{ borderColor: 'primary.main' }}
+                    />
+                  </Box>
+                </Stack>
+              </Box>
+            </Stack>
+          </DialogContent>
+          
+          <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 0 }}>
+            <Button 
+              onClick={handleCloseDialog}
+              variant="contained"
+              sx={{ 
+                borderRadius: 2,
+                px: { xs: 2, sm: 3 },
+                py: { xs: 0.5, sm: 1 }
+              }}
+            >
+              Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Box>
   )
 }
