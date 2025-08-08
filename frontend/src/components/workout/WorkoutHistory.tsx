@@ -29,6 +29,10 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
   const [selectedExercise, setSelectedExercise] = useState<Workout[] | null>(null);
   const [dateFilter, setDateFilter] = useState<Date | null>(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; workoutId: number | null }>({
+    show: false,
+    workoutId: null
+  })
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -113,6 +117,21 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const handleCloseModal = () => {
     setSelectedExercise(null);
   };
+
+  const handleDeleteClick = (workoutId: number) => {
+    setDeleteConfirmation({ show: true, workoutId })
+  }
+
+  const handleConfirmDelete = () => {
+    if (deleteConfirmation.workoutId) {
+      onDelete(deleteConfirmation.workoutId)
+      setDeleteConfirmation({ show: false, workoutId: null })
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmation({ show: false, workoutId: null })
+  }
 
   // Filtrar días por fecha
   const filteredWorkoutDays = workoutDays.filter(day => {
@@ -378,7 +397,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                           {formatDateShort(workout.created_at)}
                         </Typography>
                         <IconButton
-                          onClick={() => onDelete(workout.id)}
+                          onClick={() => handleDeleteClick(workout.id)}
                           color="error"
                           size="small"
                           aria-label="eliminar serie"
@@ -456,6 +475,29 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         <DialogActions sx={{ p: { xs: 2, sm: 4 }, pt: 0 }}>
           <Button onClick={handleCloseModal} variant="contained" color="primary">
             Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirmación de eliminación */}
+      <Dialog
+        open={deleteConfirmation.show}
+        onClose={handleCancelDelete}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Confirmar eliminación</DialogTitle>
+        <DialogContent>
+          <Typography id="delete-dialog-description">
+            ¿Estás seguro de que quieres eliminar esta serie? Esta acción no se puede deshacer.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: { xs: 2, sm: 4 }, pt: 0 }}>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+            Eliminar
           </Button>
         </DialogActions>
       </Dialog>

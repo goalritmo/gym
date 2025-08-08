@@ -60,11 +60,51 @@ export default function AuthenticatedApp() {
           <Box>
             <ExerciseList 
               exercises={[
-                { id: 1, name: 'Press de Banca', muscle_group: 'Pecho', equipment: 'Barra' },
-                { id: 2, name: 'Sentadilla', muscle_group: 'Piernas', equipment: 'Barra' },
-                { id: 3, name: 'Peso Muerto', muscle_group: 'Espalda', equipment: 'Barra' },
-                { id: 4, name: 'Press Militar', muscle_group: 'Hombros', equipment: 'Barra' },
-                { id: 5, name: 'Curl de Bíceps', muscle_group: 'Brazos', equipment: 'Mancuernas' },
+                { 
+                  id: 1, 
+                  name: 'Press de Banca', 
+                  muscle_group: 'Pecho', 
+                  primary_muscles: ['Pectoral Mayor', 'Tríceps'],
+                  secondary_muscles: ['Deltoides Anterior', 'Serrato Anterior'],
+                  equipment: 'Barra',
+                  video_url: 'https://www.youtube.com/watch?v=rT7DgCr-3pg'
+                },
+                { 
+                  id: 2, 
+                  name: 'Sentadilla', 
+                  muscle_group: 'Piernas', 
+                  primary_muscles: ['Cuádriceps', 'Glúteos'],
+                  secondary_muscles: ['Isquiotibiales', 'Gastrocnemio', 'Core'],
+                  equipment: 'Barra',
+                  video_url: 'https://www.youtube.com/watch?v=aclHkVaku9U'
+                },
+                { 
+                  id: 3, 
+                  name: 'Peso Muerto', 
+                  muscle_group: 'Espalda', 
+                  primary_muscles: ['Erector Espinal', 'Glúteos', 'Isquiotibiales'],
+                  secondary_muscles: ['Trapecio', 'Romboides', 'Core'],
+                  equipment: 'Barra',
+                  video_url: 'https://www.youtube.com/watch?v=op9kVnSso6Q'
+                },
+                { 
+                  id: 4, 
+                  name: 'Press Militar', 
+                  muscle_group: 'Hombros', 
+                  primary_muscles: ['Deltoides Anterior', 'Deltoides Medio'],
+                  secondary_muscles: ['Tríceps', 'Trapecio Superior'],
+                  equipment: 'Barra',
+                  video_url: 'https://www.youtube.com/watch?v=2yjwXTZQDDI'
+                },
+                { 
+                  id: 5, 
+                  name: 'Curl de Bíceps', 
+                  muscle_group: 'Brazos', 
+                  primary_muscles: ['Bíceps Braquial'],
+                  secondary_muscles: ['Braquiorradial', 'Braquial'],
+                  equipment: 'Mancuernas',
+                  video_url: 'https://www.youtube.com/watch?v=ykJmrZ5v0Oa'
+                },
               ]} 
               onSelectExercise={(exercise) => console.log('Ejercicio seleccionado:', exercise)} 
             />
@@ -80,25 +120,41 @@ export default function AuthenticatedApp() {
                   id: 1,
                   name: 'Barra Olímpica',
                   category: 'BARRA',
-                  observations: 'Barra estándar de 20kg',
-                  image_url: 'https://example.com/barra.jpg',
+                  observations: 'Barra estándar de 20kg con roscas para discos',
+                  image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
                   created_at: '2024-01-01T00:00:00Z'
                 },
                 {
                   id: 2,
-                  name: 'Mancuernas',
+                  name: 'Mancuernas Ajustables',
                   category: 'MANCUERNAS',
-                  observations: 'Par de mancuernas de 10kg',
-                  image_url: null,
+                  observations: 'Par de mancuernas ajustables de 5-25kg',
+                  image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&q=80',
                   created_at: '2024-01-02T00:00:00Z'
                 },
                 {
                   id: 3,
                   name: 'Rack de Sentadillas',
                   category: 'RACK',
-                  observations: null,
-                  image_url: 'https://example.com/rack.jpg',
+                  observations: 'Rack de potencia con soporte para sentadillas y press de banca',
+                  image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&q=80',
                   created_at: '2024-01-03T00:00:00Z'
+                },
+                {
+                  id: 4,
+                  name: 'Banco de Ejercicios',
+                  category: 'BANCO',
+                  observations: 'Banco ajustable para press de banca y ejercicios variados',
+                  image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&q=80',
+                  created_at: '2024-01-04T00:00:00Z'
+                },
+                {
+                  id: 5,
+                  name: 'Cinta de Correr',
+                  category: 'CARDIO',
+                  observations: 'Cinta de correr profesional con inclinación ajustable',
+                  image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&q=80',
+                  created_at: '2024-01-05T00:00:00Z'
                 }
               ]}
             />

@@ -18,6 +18,8 @@ import {
   MenuItem,
 } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
+import ImageIcon from '@mui/icons-material/Image'
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
 
 type Equipment = {
   id: number
@@ -211,11 +213,12 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
                     size="small" 
                     color="primary" 
                     sx={{ 
-                      color: 'primary.main',
-                      ml: 0.5
+                      color: item.image_url ? 'primary.main' : 'text.secondary',
+                      ml: 0.5,
+                      p: 0.5
                     }}
                   >
-                    <InfoIcon />
+                    {item.image_url ? <ImageIcon /> : <ImageNotSupportedIcon />}
                   </IconButton>
                 </Box>
                 
@@ -262,12 +265,23 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
           fullWidth
           PaperProps={{
             sx: {
-              borderRadius: 3,
-              maxWidth: { xs: '100vw', sm: '90vw', md: '500px' },
-              maxHeight: { xs: '100vh', sm: '80vh', md: '70vh' },
-              m: { xs: 0, sm: 2 },
-              width: { xs: '100vw', sm: '90vw', md: '500px' },
-              height: { xs: '100vh', sm: 'auto', md: 'auto' }
+              borderRadius: { xs: '12px', sm: 3 },
+              maxWidth: { xs: '85vw', sm: '90vw', md: '500px' },
+              maxHeight: { xs: '75vh', sm: '80vh', md: '70vh' },
+              m: { xs: '22vh 3vw'},
+              width: { xs: '85vw', sm: '90vw', md: '500px' },
+              height: { xs: '70vh', sm: 'auto', md: 'auto' },
+              position: { xs: 'fixed', sm: 'relative' },
+              bottom: { xs: '2.5vh', sm: 'auto' },
+              left: { xs: '5vw', sm: 'auto' },
+              right: { xs: '5vw', sm: 'auto' },
+              boxShadow: { xs: '0 -4px 20px rgba(0,0,0,0.3)', sm: 3 },
+              pb: {xs: 2}
+            }
+          }}
+          BackdropProps={{
+            sx: {
+              backgroundColor: { xs: 'rgba(0,0,0,0.8)', sm: 'rgba(0,0,0,0.5)' }
             }
           }}
         >
@@ -276,9 +290,22 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
             color: 'white',
             borderRadius: '12px 12px 0 0',
             pb: 2,
-            px: { xs: 2, sm: 3 }
+            px: { xs: 2, sm: 3 },
+            position: 'relative'
           }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
+            {/* Handle para móviles */}
+            <Box sx={{ 
+              position: 'absolute', 
+              top: { xs: 8, sm: 12 }, 
+              left: '50%', 
+              transform: 'translateX(-50%)',
+              width: 40,
+              height: 4,
+              backgroundColor: 'rgba(255,255,255,0.3)',
+              borderRadius: 2,
+              display: { xs: 'block', sm: 'none' }
+            }} />
+            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: { xs: 2, sm: 0 } }}>
               <Typography variant="h5" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
                 {selectedEquipment.name}
               </Typography>
@@ -296,10 +323,10 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
             </Box>
           </DialogTitle>
           
-          <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
-            <Stack spacing={2}>
+          <DialogContent sx={{ p: { xs: 2 }, maxHeight: { xs: '60vh', sm: '70vh' }, overflow: 'auto' }}>
+            <Stack spacing={0.5}>
               {selectedEquipment.image_url && (
-                <Box sx={{ pt: 3.5 }}>
+                <Box sx={{ pt: 3 }}>
                   <img
                     src={selectedEquipment.image_url}
                     alt={selectedEquipment.name}
@@ -314,12 +341,12 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
                 </Box>
               )}
               
-              <Box sx={{ pt: 0 }}>
+              <Box sx={{ pt: 1, mt: 0.5 }}>
                 <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.125rem' } }}>
                   Información del Equipo
                 </Typography>
                 
-                <Stack spacing={2}>
+                <Stack spacing={0.5}>
                   <Box>
                     <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                       Categoría:
@@ -344,14 +371,20 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
             </Stack>
           </DialogContent>
           
-          <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 0 }}>
+          <DialogActions sx={{ 
+            p: { xs: 1, sm: 3 }, 
+            pt: { xs: 0.5, sm: 0 },
+            pb: { xs: 0.5, sm: 1 },
+            justifyContent: 'center'
+          }}>
             <Button 
               onClick={handleCloseDialog}
               variant="contained"
               sx={{ 
                 borderRadius: 2,
-                px: { xs: 2, sm: 3 },
-                py: { xs: 0.5, sm: 1 }
+                px: { xs: 3, sm: 4 },
+                py: { xs: 1, sm: 1.5 },
+                minWidth: { xs: 120, sm: 140 }
               }}
             >
               Cerrar

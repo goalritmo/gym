@@ -19,12 +19,17 @@ import {
   Button,
 } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
+import PlayCircleIcon from '@mui/icons-material/PlayCircle'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 
 type Exercise = {
   id: number
   name: string
   muscle_group: string
+  primary_muscles: string[]
+  secondary_muscles: string[]
   equipment: string
+  video_url?: string
 }
 
 type ExerciseListProps = {
@@ -62,7 +67,8 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
   }, [exercises, searchTerm, muscleGroupFilter, equipmentFilter])
 
   const handleExerciseClick = (exercise: Exercise) => {
-    onSelectExercise(exercise)
+    setSelectedExercise(exercise)
+    setOpenDialog(true)
   }
 
   const handleInfoClick = (exercise: Exercise, event: React.MouseEvent) => {
@@ -78,6 +84,16 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
 
   const capitalizeFirstLetter = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
+  }
+
+  const getYouTubeEmbedUrl = (url: string): string => {
+    // Extraer el ID del video de YouTube
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+    const match = url.match(regExp)
+    if (match && match[2].length === 11) {
+      return `https://www.youtube.com/embed/${match[2]}`
+    }
+    return url
   }
 
   if (exercises.length === 0) {
@@ -271,13 +287,13 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
                   <IconButton 
                     size="small" 
                     color="primary" 
-                    onClick={(e) => handleInfoClick(exercise, e)}
                     sx={{ 
-                      color: 'primary.main',
-                      ml: 0.5
+                      color: exercise.video_url ? 'primary.main' : 'text.secondary',
+                      ml: 0.5,
+                      p: 0.5
                     }}
                   >
-                    <InfoIcon />
+                    {exercise.video_url ? <PlayCircleIcon /> : <PlayCircleOutlineIcon />}
                   </IconButton>
                 </Box>
                 <Box sx={{ mt: 'auto', textAlign: 'center' }}>
@@ -311,12 +327,23 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
           fullWidth
           PaperProps={{
             sx: {
-              borderRadius: 3,
-              maxWidth: { xs: '100vw', sm: '90vw', md: '500px' },
-              maxHeight: { xs: '100vh', sm: '80vh', md: '70vh' },
-              m: { xs: 0, sm: 2 },
-              width: { xs: '100vw', sm: '90vw', md: '500px' },
-              height: { xs: '100vh', sm: 'auto', md: 'auto' }
+              borderRadius: { xs: '12px', sm: 3 },
+              maxWidth: { xs: '85vw', sm: '90vw', md: '500px' },
+              maxHeight: { xs: '75vh', sm: '80vh', md: '70vh' },
+              m: { xs: '22vh 3vw'},
+              width: { xs: '85vw', sm: '90vw', md: '500px' },
+              height: { xs: '70vh', sm: 'auto', md: 'auto' },
+              position: { xs: 'fixed', sm: 'relative' },
+              bottom: { xs: '2.5vh', sm: 'auto' },
+              left: { xs: '5vw', sm: 'auto' },
+              right: { xs: '5vw', sm: 'auto' },
+              boxShadow: { xs: '0 -4px 20px rgba(0,0,0,0.3)', sm: 3 },
+              pb: {xs: 2}
+            }
+          }}
+          BackdropProps={{
+            sx: {
+              backgroundColor: { xs: 'rgba(0,0,0,0.8)', sm: 'rgba(0,0,0,0.5)' }
             }
           }}
         >
@@ -325,9 +352,22 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
             color: 'white',
             borderRadius: '12px 12px 0 0',
             pb: 2,
-            px: { xs: 2, sm: 3 }
+            px: { xs: 2, sm: 3 },
+            position: 'relative'
           }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
+            {/* Handle para móviles */}
+            <Box sx={{ 
+              position: 'absolute', 
+              top: { xs: 8, sm: 12 }, 
+              left: '50%', 
+              transform: 'translateX(-50%)',
+              width: 40,
+              height: 4,
+              backgroundColor: 'rgba(255,255,255,0.3)',
+              borderRadius: 2,
+              display: { xs: 'block', sm: 'none' }
+            }} />
+            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: { xs: 2, sm: 0 } }}>
               <Typography variant="h5" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
                 {selectedExercise.name}
               </Typography>
@@ -345,17 +385,50 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
             </Box>
           </DialogTitle>
           
-          <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
-            <Stack spacing={3}>
-              <Box sx={{ pt: 2 }}>
+          <DialogContent sx={{ p: { xs: 2 }, maxHeight: { xs: '60vh', sm: '70vh' }, overflow: 'auto' }}>
+            <Stack spacing={1}>
+              {/* Video del ejercicio */}
+              {selectedExercise.video_url && (
+                <Box sx={{ pt: 1 }}>
+                  <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.125rem' }, mb: 1 }}>
+                    Video del Ejercicio
+                  </Typography>
+                  <Box sx={{ 
+                    position: 'relative', 
+                    width: '100%', 
+                    height: 0, 
+                    paddingBottom: '56.25%', // Aspect ratio 16:9
+                    borderRadius: 2,
+                    overflow: 'hidden'
+                  }}>
+                    <iframe
+                      src={getYouTubeEmbedUrl(selectedExercise.video_url)}
+                      title={`Video de ${selectedExercise.name}`}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                        borderRadius: '8px'
+                      }}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </Box>
+                </Box>
+              )}
+
+              <Box sx={{ pt: 0, mt: 0.5 }}>
                 <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.125rem' } }}>
                   Información del Ejercicio
                 </Typography>
                 
-                <Stack spacing={2}>
+                <Stack spacing={0.5}>
                   <Box>
                     <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                      Grupo Muscular:
+                      Grupo Muscular Principal:
                     </Typography>
                     <Chip 
                       label={capitalizeFirstLetter(selectedExercise.muscle_group)} 
@@ -363,6 +436,44 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
                       sx={{ fontWeight: 'bold' }}
                     />
                   </Box>
+                  
+                  {selectedExercise.primary_muscles && selectedExercise.primary_muscles.length > 0 && (
+                    <Box>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Músculos Primarios:
+                      </Typography>
+                      <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                        {selectedExercise.primary_muscles.map((muscle, index) => (
+                          <Chip 
+                            key={index}
+                            label={capitalizeFirstLetter(muscle)} 
+                            color="primary" 
+                            size="small"
+                            sx={{ fontWeight: 'bold' }}
+                          />
+                        ))}
+                      </Stack>
+                    </Box>
+                  )}
+                  
+                  {selectedExercise.secondary_muscles && selectedExercise.secondary_muscles.length > 0 && (
+                    <Box>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Músculos Secundarios:
+                      </Typography>
+                      <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                        {selectedExercise.secondary_muscles.map((muscle, index) => (
+                          <Chip 
+                            key={index}
+                            label={capitalizeFirstLetter(muscle)} 
+                            variant="outlined" 
+                            size="small"
+                            sx={{ borderColor: 'primary.main' }}
+                          />
+                        ))}
+                      </Stack>
+                    </Box>
+                  )}
                   
                   <Box>
                     <Typography variant="subtitle2" color="text.secondary" gutterBottom>
@@ -379,14 +490,20 @@ export default function ExerciseList({ exercises, onSelectExercise }: ExerciseLi
             </Stack>
           </DialogContent>
           
-          <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 0 }}>
+          <DialogActions sx={{ 
+            p: { xs: 1, sm: 3 }, 
+            pt: { xs: 0.5, sm: 0 },
+            pb: { xs: 0.5, sm: 1 },
+            justifyContent: 'center'
+          }}>
             <Button 
               onClick={handleCloseDialog}
               variant="contained"
               sx={{ 
                 borderRadius: 2,
-                px: { xs: 2, sm: 3 },
-                py: { xs: 0.5, sm: 1 }
+                px: { xs: 3, sm: 4 },
+                py: { xs: 1, sm: 1.5 },
+                minWidth: { xs: 120, sm: 140 }
               }}
             >
               Cerrar

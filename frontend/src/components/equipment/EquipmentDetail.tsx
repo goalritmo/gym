@@ -55,7 +55,7 @@ export default function EquipmentDetail({ equipment, onClose }: EquipmentDetailP
             </Box>
           )}
           
-          <Box>
+          <Box sx={{ pt: 2 }}>
             <Typography variant="h6" gutterBottom>
               Información del Equipo
             </Typography>
