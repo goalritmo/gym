@@ -141,12 +141,14 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
       <Stack spacing={3}>
         {/* Filtros */}
         <Box sx={{ 
-          p: 4, 
+          p: 3, 
+          mx: 2,
           bgcolor: 'primary.main', 
           borderRadius: 3, 
           boxShadow: 3,
           background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-          color: 'white'
+          color: 'white',
+          mb: 3
         }}>
           <Stack spacing={3}>
             <TextField
@@ -264,7 +266,8 @@ export default function ExerciseList({ exercises }: ExerciseListProps) {
           <Box sx={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: 2
+            gap: 2,
+            mx: 2
           }}>
             {filteredExercises.map((exercise) => (
             <Card 

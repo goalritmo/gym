@@ -213,22 +213,22 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   }
 
   return (
-    <Box sx={{ pt: 2 }}>
-      <Typography variant="h5" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', px: 2 }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+      <Typography variant="h5" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
         Mis Entrenamientos
       </Typography>
-
-      {/* Filtro de fecha */}
-      <Box sx={{ 
-        p: 3, 
-        mx: 2,
-        bgcolor: 'primary.main', 
-        borderRadius: 3, 
-        boxShadow: 3,
-        background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-        color: 'white',
-        mb: 3
-      }}>
+      
+      <Stack spacing={3}>
+        {/* Filtro de fecha */}
+        <Box sx={{ 
+          p: 3, 
+          mx: 2,
+          bgcolor: 'primary.main', 
+          borderRadius: 3, 
+          boxShadow: 3,
+          background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+          color: 'white'
+        }}>
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
           <DatePicker
             label="Filtrar por fecha"
@@ -398,6 +398,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           </Card>
         ))}
       </Box>
+      </Stack>
 
       {/* Modal para mostrar series del ejercicio */}
       <Dialog 
