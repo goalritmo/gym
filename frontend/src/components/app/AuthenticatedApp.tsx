@@ -111,7 +111,7 @@ export default function AuthenticatedApp() {
       // Crear el nuevo workout en el backend
       console.log('Creando workout en el backend...')
       const workoutData = {
-        exercise_name: exercises.find(e => e.id === data.exerciseId)?.name || 'Ejercicio desconocido',
+        exercise_id: data.exercise_id,
         weight: data.weight || 0,
         reps: data.reps || 0,
         serie: data.serie || null,
