@@ -66,7 +66,11 @@ func main() {
 
 	// Configurar CORS
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000"}, // Vite y Create React App
+		AllowedOrigins: []string{
+			"http://localhost:3210",      // Vite desarrollo
+			"http://localhost:8000",      // Create React App
+			"https://gym.goalritmo.com", // Reemplaza con tu dominio de Vercel
+		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,

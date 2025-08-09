@@ -1,10 +1,16 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
+import { supabase, auth } from '../lib/supabase'
+import type { User, Session } from '@supabase/supabase-js'
 
 type AuthContextType = {
+  user: User | null
+  session: Session | null
   isAuthenticated: boolean
-  login: (code: string) => boolean
-  logout: () => void
+  isLoading: boolean
+  login: (code: string) => boolean // Legacy method for backwards compatibility
+  signInWithGoogle: () => Promise<{ error?: any }>
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -14,23 +20,81 @@ type AuthProviderProps = {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
+  useEffect(() => {
+    // Get initial session
+    auth.getSession().then(({ session, error }) => {
+      if (error) {
+        console.error('Error getting session:', error)
+      } else {
+        setSession(session)
+        setUser(session?.user ?? null)
+      }
+      setIsLoading(false)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session)
+        setSession(session)
+        setUser(session?.user ?? null)
+        setIsLoading(false)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // Legacy login method for backwards compatibility
   const login = (code: string): boolean => {
-    // Código de acceso simple - en producción esto debería ser más seguro
+    // Keep simple code access for development
     if (code === 'salud') {
-      setIsAuthenticated(true)
+      // Create a mock session for development
+      const mockUser = { id: 'dev-user', email: 'dev@example.com' } as User
+      const mockSession = { user: mockUser, access_token: 'dev-token' } as Session
+      setUser(mockUser)
+      setSession(mockSession)
       return true
     }
     return false
   }
 
-  const logout = () => {
-    setIsAuthenticated(false)
+  const signInWithGoogle = async () => {
+    try {
+      const { data, error } = await auth.signInWithGoogle()
+      return { error }
+    } catch (error) {
+      console.error('Google sign in error:', error)
+      return { error }
+    }
   }
 
+  const logout = async () => {
+    try {
+      await auth.signOut()
+      setUser(null)
+      setSession(null)
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
+
+  const isAuthenticated = !!user
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      isAuthenticated, 
+      isLoading, 
+      login, 
+      signInWithGoogle, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   )

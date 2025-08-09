@@ -1,0 +1,21 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+
+[[services]]
+name = "gym-backend"
+source = "backend"
+
+[services.variables]
+PORT = "3210"
+GO_VERSION = "1.21"
+
+# Healthcheck
+[services.healthcheck]
+path = "/api/health"
+port = 3210
+intervalSeconds = 30
+timeoutSeconds = 10

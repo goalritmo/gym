@@ -55,7 +55,7 @@ SUPABASE_ANON_KEY=tu_anon_key_aqui
 1. Ve a **Supabase Dashboard** → **Settings** → **API**
 2. Copia:
    - **Project URL** → `SUPABASE_URL`
-   - **anon public** → `SUPABASE_ANON_KEY`  
+   - **Publishable key** (antes "anon public") → `SUPABASE_ANON_KEY`  
    - **JWT Secret** → `SUPABASE_JWT_SECRET` (legacy, para desarrollo)
 
 ### JWT Signing Keys (Nuevo Sistema)
@@ -210,14 +210,14 @@ GET /api/me/stats        # Estadísticas del usuario
 **Configuración para producción:**
 ```env
 SUPABASE_URL=https://tu-proyecto.supabase.co
-SUPABASE_ANON_KEY=tu_anon_key_aqui
+SUPABASE_ANON_KEY=tu_publishable_key_aqui
 # No necesitas SUPABASE_JWT_SECRET
 ```
 
 **Configuración para desarrollo:**
 ```env
 SUPABASE_URL=https://tu-proyecto.supabase.co  
-SUPABASE_ANON_KEY=tu_anon_key_aqui
+SUPABASE_ANON_KEY=tu_publishable_key_aqui
 SUPABASE_JWT_SECRET=tu_jwt_secret_aqui  # Fallback opcional
 ```
 
