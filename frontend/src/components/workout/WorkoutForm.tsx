@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { TextField, Button, Stack, Box, Typography, Alert, Snackbar, CircularProgress } from '@mui/material'
+import { TextField, Button, Stack, Box, Typography, Alert, Snackbar, CircularProgress, Backdrop } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import { AccessTime } from '@mui/icons-material'
 import { useState } from 'react'
@@ -44,6 +44,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   })
   
   const [showSuccess, setShowSuccess] = useState(false)
+  
+  // Estado para detectar si los ejercicios están cargando
+  const isLoadingExercises = exercises.length === 0
 
   const selectedExerciseId = watch('exerciseId')
 
@@ -358,6 +361,40 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       message="✅ Entrenamiento guardado exitosamente"
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
     />
+
+    {/* Loader para cuando están cargando los ejercicios */}
+    <Backdrop
+      sx={{
+        color: 'primary.main',
+        zIndex: (theme) => theme.zIndex.modal + 1,
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(4px)',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        borderRadius: 2
+      }}
+      open={isLoadingExercises}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2
+        }}
+      >
+        <CircularProgress size={48} thickness={4} />
+        <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+          Cargando ejercicios...
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', maxWidth: 300 }}>
+          Conectando con la base de datos para obtener los ejercicios disponibles
+        </Typography>
+      </Box>
+    </Backdrop>
     </Box>
   )
 }
