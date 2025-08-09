@@ -47,7 +47,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     currentName: ''
   })
   const [newSessionName, setNewSessionName] = useState('')
-  const [showUpdateSuccess, setShowUpdateSuccess] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [loadingSessionId, setLoadingSessionId] = useState<number | null>(null)
 
@@ -135,7 +135,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     try {
       const result = await onUpdateSession(sessionId, { effort: newValue });
       console.log('✅ Resultado actualización esfuerzo:', result);
-      setShowUpdateSuccess(true);
+      setSuccessMessage('Esfuerzo actualizado exitosamente');
     } catch (error) {
       console.error('❌ Error actualizando esfuerzo:', error);
       setErrorMessage('Error al actualizar el esfuerzo');
@@ -149,7 +149,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     try {
       const result = await onUpdateSession(sessionId, { mood: newValue });
       console.log('✅ Resultado actualización ánimo:', result);
-      setShowUpdateSuccess(true);
+      setSuccessMessage('Ánimo actualizado exitosamente');
     } catch (error) {
       console.error('❌ Error actualizando ánimo:', error);
       setErrorMessage('Error al actualizar el ánimo');
@@ -171,7 +171,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         console.log('✅ Resultado actualización nombre:', result);
         setEditSessionModal({ show: false, sessionId: null, currentName: '' })
         setNewSessionName('')
-        setShowUpdateSuccess(true)
+        setSuccessMessage('Nombre actualizado exitosamente')
       } catch (error) {
         console.error('❌ Error actualizando nombre de sesión:', error);
         setErrorMessage('Error al actualizar el nombre');
@@ -338,7 +338,16 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                     }
                   },
                   '& .MuiPickersLayout-toolbar': {
-                    display: 'none'
+                    display: 'none !important'
+                  },
+                  '& .MuiDateCalendar-header': {
+                    display: 'none !important'
+                  },
+                  '& .MuiPickersCalendarHeader-label': {
+                    display: 'none !important'
+                  },
+                  '& .MuiPickersCalendarHeader-labelContainer': {
+                    display: 'none !important'
                   },
                   '& .MuiPickersLayout-actionBar': {
                     display: 'flex',
@@ -401,17 +410,17 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                    backgroundColor: 'transparent !important'
                  },
                                    '& .MuiInputBase-input': {
-                   color: '#1976d2 !important',
+                   color: 'white !important',
                    fontSize: '1rem',
                    fontWeight: 500,
                    backgroundColor: 'transparent !important'
                  },
                  '& .MuiInputAdornment-root': {
-                   color: '#1976d2 !important',
+                   color: 'white !important',
                    backgroundColor: 'transparent !important'
                  },
                  '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-                   color: '#1976d2 !important',
+                   color: 'white !important',
                    fontSize: '1.4rem',
                    backgroundColor: 'transparent !important'
                  },
@@ -419,7 +428,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                     backgroundColor: 'transparent !important'
                   },
                                    '& .MuiInputLabel-root': {
-                   color: '#1976d2 !important',
+                   color: 'white !important',
                    fontWeight: 600,
                    fontSize: '1rem',
                    backgroundColor: 'transparent !important',
@@ -435,7 +444,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                    }
                  },
                  '& .MuiFormLabel-root': {
-                   color: '#1976d2 !important',
+                   color: 'white !important',
                    backgroundColor: 'transparent !important',
                    px: 1,
                    borderRadius: 1
@@ -930,9 +939,9 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
       {/* Notificación de éxito para edición de sesión */}
       <Snackbar
-        open={showUpdateSuccess}
+        open={!!successMessage}
         autoHideDuration={3000}
-        onClose={() => setShowUpdateSuccess(false)}
+        onClose={() => setSuccessMessage('')}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         sx={{ 
           mt: 6,
@@ -947,10 +956,15 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             width: '100%',
             minWidth: '300px',
             fontSize: '0.95rem',
-            fontWeight: 500
+            fontWeight: 500,
+            backgroundColor: '#4caf50',
+            color: 'white',
+            '& .MuiAlert-icon': {
+              color: 'white'
+            }
           }}
         >
-          ✅ Sesión actualizada exitosamente
+          ✅ {successMessage}
         </Alert>
       </Snackbar>
       

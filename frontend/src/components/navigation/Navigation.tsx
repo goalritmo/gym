@@ -33,6 +33,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
   const [visibleItems, setVisibleItems] = useState<number[]>([])
   const [showToolbarElements, setShowToolbarElements] = useState(false)
   const timeoutsRef = useRef<number[]>([])
+  const menuRef = useRef<HTMLDivElement>(null)
 
   // Limpiar timeouts cuando el componente se desmonte
   useEffect(() => {
@@ -40,6 +41,23 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
       timeoutsRef.current.forEach(clearTimeout)
     }
   }, [])
+
+  // Cerrar menú al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (drawerOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setDrawerOpen(false)
+        setVisibleItems([])
+      }
+    }
+
+    if (drawerOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
+    }
+  }, [drawerOpen])
 
   // Mostrar elementos de la barra al cargar
   useEffect(() => {
@@ -217,6 +235,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
 
       <Collapse in={drawerOpen} timeout="auto" unmountOnExit>
         <Box 
+          ref={menuRef}
           sx={{ 
             backgroundColor: '#1976d2',
             color: 'white',
@@ -228,8 +247,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
             zIndex: 1000,
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
           }} 
-          role="presentation" 
-          onClick={handleDrawerToggle}
+          role="presentation"
         >
           <List>
             {menuItems.map((item, index) => (
