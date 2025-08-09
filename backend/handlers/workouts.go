@@ -126,13 +126,14 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Buscar o crear workout_session para hoy
-	now := time.Now()
+	// Buscar o crear workout_session para hoy (en timezone de Argentina)
+	argentinaLocation, _ := time.LoadLocation("America/Argentina/Buenos_Aires")
+	now := time.Now().In(argentinaLocation)
 	today := now.Format("2006-01-02")
 	todayTimestamp := now.Format("2006-01-02T15:04:05Z07:00")
 	var sessionID int
 	
-	fmt.Printf("🕐 Fecha actual: %s, timestamp: %s\n", today, todayTimestamp)
+	fmt.Printf("🕐 Fecha actual (Argentina): %s, timestamp: %s\n", today, todayTimestamp)
 	
 	// Debug: ver todas las sesiones del usuario
 	debugQuery := `SELECT id, session_date, DATE(session_date) FROM workout_sessions WHERE user_id = $1 ORDER BY session_date DESC LIMIT 5`
