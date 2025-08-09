@@ -126,10 +126,33 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Insertar workout
+	// Buscar o crear workout_session para hoy
+	today := time.Now().Format("2006-01-02")
+	var sessionID string
+	
+	// Verificar si ya existe una sesión para hoy
+	sessionQuery := `SELECT id FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 LIMIT 1`
+	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&sessionID)
+	
+	if err != nil {
+		// No existe sesión para hoy, crear una nueva
+		createSessionQuery := `
+			INSERT INTO workout_sessions (user_id, session_date, session_name, total_exercises, effort, mood) 
+			VALUES ($1, $2, $3, 0, 0, 0) 
+			RETURNING id
+		`
+		sessionName := "Entrenamiento del día"
+		err = database.DB.QueryRow(createSessionQuery, userID, today, sessionName).Scan(&sessionID)
+		if err != nil {
+			http.Error(w, "Error creando sesión de entrenamiento", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Insertar workout asociado a la sesión
 	query := `
 		INSERT INTO workouts (user_id, exercise_id, weight, reps, serie, seconds, observations, exercise_session_id)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, gen_random_uuid())
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id, exercise_session_id, created_at
 	`
 
@@ -156,7 +179,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	err = database.DB.QueryRow(
 		query,
 		userID, req.ExerciseID, req.Weight, req.Reps,
-		serieValue, secondsValue, req.Observations,
+		serieValue, secondsValue, req.Observations, sessionID,
 	).Scan(&workout.ID, &workout.ExerciseSessionID, &workout.CreatedAt)
 
 	if err != nil {
