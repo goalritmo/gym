@@ -136,6 +136,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	
 	if err != nil {
 		// No existe sesión para hoy, crear una nueva
+		fmt.Printf("🔄 Creando nueva sesión para usuario %s, fecha %s\n", userID, today)
 		createSessionQuery := `
 			INSERT INTO workout_sessions (user_id, session_date, session_name, total_exercises, effort, mood) 
 			VALUES ($1, $2, $3, 0, 0, 0) 
@@ -144,9 +145,13 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		sessionName := "Entrenamiento del día"
 		err = database.DB.QueryRow(createSessionQuery, userID, today, sessionName).Scan(&sessionID)
 		if err != nil {
+			fmt.Printf("❌ Error creando sesión: %v\n", err)
 			http.Error(w, "Error creando sesión de entrenamiento", http.StatusInternalServerError)
 			return
 		}
+		fmt.Printf("✅ Sesión creada con ID: %s\n", sessionID)
+	} else {
+		fmt.Printf("✅ Sesión existente encontrada con ID: %s\n", sessionID)
 	}
 
 	// Insertar workout asociado a la sesión
@@ -183,9 +188,13 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	).Scan(&workout.ID, &workout.ExerciseSessionID, &workout.CreatedAt)
 
 	if err != nil {
+		fmt.Printf("❌ Error creando workout: %v\n", err)
+		fmt.Printf("📋 Datos del workout: userID=%s, exerciseID=%d, sessionID=%s\n", userID, req.ExerciseID, sessionID)
 		http.Error(w, "Error creando workout", http.StatusInternalServerError)
 		return
 	}
+	
+	fmt.Printf("✅ Workout creado exitosamente con ID: %d\n", workout.ID)
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(workout)
