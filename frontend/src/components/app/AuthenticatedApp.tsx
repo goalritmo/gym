@@ -1,9 +1,10 @@
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import Navigation from '../navigation/Navigation'
 import WorkoutForm from '../workout/WorkoutForm'
 import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
 import WorkoutHistory from '../workout/WorkoutHistory'
+import ApiTest from '../debug/ApiTest'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTab } from '../../contexts/TabContext'
 
@@ -164,13 +165,7 @@ export default function AuthenticatedApp() {
         {/* Pestaña API Test */}
         {activeTab === 3 && (
           <Box>
-            <Typography variant="h4" sx={{ p: 3 }}>
-              🧪 API Test (Temporalmente deshabilitado)
-            </Typography>
-            <Typography sx={{ p: 3 }}>
-              El componente de prueba está temporalmente comentado para permitir el build.
-              Backend funcionando en: https://gym.goalritmo.com/api/health
-            </Typography>
+            <ApiTest />
           </Box>
         )}
 
