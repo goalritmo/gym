@@ -119,9 +119,7 @@ export default function AuthenticatedApp() {
     console.log('Workout submitted:', values);
   };
 
-  const handleLogout = () => {
-    console.log('Logout');
-  };
+
 
   const renderContent = () => {
     switch (activeTab) {
@@ -147,7 +145,7 @@ export default function AuthenticatedApp() {
 
   return (
     <Container maxWidth="sm" sx={{ py: 1 }}>
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} />
+      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       <Box sx={{ mt: 2 }}>
         {renderContent()}
       </Box>

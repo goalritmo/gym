@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form'
-import { TextField, Button, Stack, Box, Typography } from '@mui/material'
+import { TextField, Button, Stack, Box, Typography, Alert } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import { AccessTime, TrendingUp } from '@mui/icons-material'
 import TimerComponent from '../timer/TimerComponent'
 
 type Exercise = {
@@ -147,32 +148,55 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
         />
 
         <Box>
-          <Typography variant="h6" gutterBottom>
-            Cronómetro
+          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <AccessTime color="primary" />
+            Tiempo de Descanso
           </Typography>
-          <TimerComponent onTimeComplete={handleTimerComplete} />
-          <TextField
-            label="Segundos"
-            type="number"
-            inputProps={{ 
-              inputMode: 'numeric',
-              pattern: '[0-9]*'
-            }}
-            {...register('seconds', { valueAsNumber: true })}
-            sx={{ 
-              mt: 2,
-              width: '120px',
-              '& .MuiInputBase-root': {
-                minWidth: '120px'
-              },
-              '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                display: 'none'
-              },
-              '& input[type=number]': {
-                MozAppearance: 'textfield'
-              }
-            }}
-          />
+          
+          {/* Mensaje educativo */}
+          <Alert 
+            severity="info" 
+            icon={<TrendingUp />}
+            sx={{ mb: 3, borderRadius: 2 }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
+              ⏱️ <strong>¿Por qué medir el tiempo de descanso?</strong>
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              • <strong>Consistencia:</strong> Mantener tiempos similares entre series mejora la comparabilidad del entrenamiento<br/>
+              • <strong>Progreso:</strong> Reducir gradualmente el descanso aumenta la intensidad y resistencia<br/>
+              • <strong>Objetivos:</strong> 30-60s (resistencia), 1-3min (hipertrofia), 3-5min (fuerza máxima)
+            </Typography>
+          </Alert>
+
+          {/* Cronómetro y campo de segundos en la misma fila */}
+          <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ flex: '1 1 auto', minWidth: '200px' }}>
+              <TimerComponent onTimeComplete={handleTimerComplete} />
+            </Box>
+            <TextField
+              label="Segundos"
+              type="number"
+              inputProps={{ 
+                inputMode: 'numeric',
+                pattern: '[0-9]*',
+                min: 0
+              }}
+              {...register('seconds', { valueAsNumber: true })}
+              sx={{ 
+                width: '120px',
+                '& .MuiInputBase-root': {
+                  minWidth: '120px'
+                },
+                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                  display: 'none'
+                },
+                '& input[type=number]': {
+                  MozAppearance: 'textfield'
+                }
+              }}
+            />
+          </Box>
         </Box>
 
         <TextField

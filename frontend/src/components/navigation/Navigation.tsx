@@ -14,12 +14,12 @@ import {
   Fade
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
-import LogoutIcon from '@mui/icons-material/Logout'
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
 import ListAltIcon from '@mui/icons-material/ListAlt'
 
 import HistoryIcon from '@mui/icons-material/History'
-import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
+import UserAvatar from '../user/UserAvatar'
 
 type NavigationProps = {
   activeTab: number
@@ -27,7 +27,7 @@ type NavigationProps = {
   onLogout: () => void
 }
 
-export default function Navigation({ activeTab, onTabChange, onLogout }: NavigationProps) {
+export default function Navigation({ activeTab, onTabChange }: Omit<NavigationProps, 'onLogout'>) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [visibleItems, setVisibleItems] = useState<number[]>([])
   const [showToolbarElements, setShowToolbarElements] = useState(false)
@@ -209,18 +209,7 @@ export default function Navigation({ activeTab, onTabChange, onLogout }: Navigat
               transition: 'all 0.3s ease-in-out',
               animation: 'slideInFromRight 0.3s ease-out'
             }}>
-              <IconButton 
-                color="inherit" 
-                onClick={onLogout}
-                aria-label="cerrar sesión"
-                sx={{ 
-                  '& .MuiSvgIcon-root': {
-                    fontSize: '1.2rem'
-                  }
-                }}
-              >
-                <LogoutIcon />
-              </IconButton>
+              <UserAvatar />
             </Box>
           )}
         </Toolbar>

@@ -12,7 +12,7 @@ describe('Navigation', () => {
   })
 
   it('renderiza el menú hamburguesa y el título', async () => {
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange} onLogout={mockOnLogout} />)
+    render(<Navigation activeTab={0} onTabChange={mockOnTabChange}  />)
     
     // Esperar a que aparezcan los elementos
     await screen.findByLabelText('abrir menú')
@@ -26,7 +26,7 @@ describe('Navigation', () => {
 
   it('abre el drawer al hacer clic en el menú', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange} onLogout={mockOnLogout} />)
+    render(<Navigation activeTab={0} onTabChange={mockOnTabChange}  />)
     
     const menuButton = await screen.findByLabelText('abrir menú')
     
@@ -43,7 +43,7 @@ describe('Navigation', () => {
 
   it('cambia de tab al hacer clic en un elemento del menú', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange} onLogout={mockOnLogout} />)
+    render(<Navigation activeTab={0} onTabChange={mockOnTabChange}  />)
     
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
@@ -56,7 +56,7 @@ describe('Navigation', () => {
 
   it('cambia de tab y cierra el drawer después de seleccionar una opción', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange} onLogout={mockOnLogout} />)
+    render(<Navigation activeTab={0} onTabChange={mockOnTabChange}  />)
     
     const menuButton = await screen.findByLabelText('abrir menú')
     await user.click(menuButton)
@@ -69,7 +69,7 @@ describe('Navigation', () => {
 
   it('ejecuta logout al hacer clic en el botón de cerrar sesión', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={0} onTabChange={mockOnTabChange} onLogout={mockOnLogout} />)
+    render(<Navigation activeTab={0} onTabChange={mockOnTabChange}  />)
     
     const logoutButton = await screen.findByLabelText('cerrar sesión')
     await user.click(logoutButton)
@@ -79,7 +79,7 @@ describe('Navigation', () => {
 
   it('muestra la opción activa en el menú', async () => {
     const user = userEvent.setup()
-    render(<Navigation activeTab={1} onTabChange={mockOnTabChange} onLogout={mockOnLogout} />)
+    render(<Navigation activeTab={1} onTabChange={mockOnTabChange}  />)
     
     const menuButton = screen.getByLabelText('abrir menú')
     await user.click(menuButton)

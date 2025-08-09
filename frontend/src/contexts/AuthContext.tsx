@@ -8,7 +8,6 @@ type AuthContextType = {
   session: Session | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (code: string) => boolean // Legacy method for backwards compatibility
   signInWithGoogle: () => Promise<{ error?: any }>
   logout: () => Promise<void>
 }
@@ -49,19 +48,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Legacy login method for backwards compatibility
-  const login = (code: string): boolean => {
-    // Keep simple code access for development
-    if (code === 'salud') {
-      // Create a mock session for development
-      const mockUser = { id: 'dev-user', email: 'dev@example.com' } as User
-      const mockSession = { user: mockUser, access_token: 'dev-token' } as Session
-      setUser(mockUser)
-      setSession(mockSession)
-      return true
-    }
-    return false
-  }
+
 
   const signInWithGoogle = async () => {
     try {
@@ -91,7 +78,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       session, 
       isAuthenticated, 
       isLoading, 
-      login, 
       signInWithGoogle, 
       logout 
     }}>

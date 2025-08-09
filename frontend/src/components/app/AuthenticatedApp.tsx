@@ -5,24 +5,20 @@ import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
 import WorkoutHistory from '../workout/WorkoutHistory'
 import ApiTest from '../debug/ApiTest'
-import { useAuth } from '../../contexts/AuthContext'
 import { useTab } from '../../contexts/TabContext'
 
 export default function AuthenticatedApp() {
   const { activeTab, setActiveTab } = useTab()
-  const { logout } = useAuth()
 
   const handleTabChange = (newValue: number) => {
     setActiveTab(newValue)
   }
 
-  const handleLogout = () => {
-    logout()
-  }
+
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Navigation activeTab={activeTab} onTabChange={handleTabChange} onLogout={handleLogout} />
+      <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
       
       <Box sx={{ 
         flexGrow: 1, 

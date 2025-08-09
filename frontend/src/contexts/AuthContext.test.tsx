@@ -4,19 +4,13 @@ import { AuthProvider, useAuth } from './AuthContext'
 
 // Componente de prueba para usar el contexto
 function TestComponent() {
-  const { isAuthenticated, login, logout } = useAuth()
+  const { isAuthenticated, logout } = useAuth()
   
   return (
     <div>
       <div data-testid="auth-status">
         {isAuthenticated ? 'Autenticado' : 'No autenticado'}
       </div>
-      <button onClick={() => login('salud')} data-testid="login-correct">
-        Login Correcto
-      </button>
-      <button onClick={() => login('0000')} data-testid="login-incorrect">
-        Login Incorrecto
-      </button>
       <button onClick={logout} data-testid="logout">
         Logout
       </button>
@@ -35,32 +29,6 @@ describe('AuthContext', () => {
     expect(screen.getByTestId('auth-status')).toHaveTextContent('No autenticado')
   })
 
-  it('permite login con código correcto', () => {
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
-    
-    const loginButton = screen.getByTestId('login-correct')
-    fireEvent.click(loginButton)
-    
-    expect(screen.getByTestId('auth-status')).toHaveTextContent('Autenticado')
-  })
-
-  it('rechaza login con código incorrecto', () => {
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
-    
-    const loginButton = screen.getByTestId('login-incorrect')
-    fireEvent.click(loginButton)
-    
-    expect(screen.getByTestId('auth-status')).toHaveTextContent('No autenticado')
-  })
-
   it('permite logout', () => {
     render(
       <AuthProvider>
@@ -68,12 +36,7 @@ describe('AuthContext', () => {
       </AuthProvider>
     )
     
-    // Primero hacer login
-    const loginButton = screen.getByTestId('login-correct')
-    fireEvent.click(loginButton)
-    expect(screen.getByTestId('auth-status')).toHaveTextContent('Autenticado')
-    
-    // Luego hacer logout
+    // Test logout functionality
     const logoutButton = screen.getByTestId('logout')
     fireEvent.click(logoutButton)
     
