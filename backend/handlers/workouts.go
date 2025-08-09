@@ -126,33 +126,17 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Buscar o crear workout_session para hoy
-	today := time.Now().Format("2006-01-02")
-	var sessionID int
-	
-	// Verificar si ya existe una sesión para hoy
-	sessionQuery := `SELECT id FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 LIMIT 1`
-	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&sessionID)
-	
+	// Generar un UUID único para este workout
+	var sessionUUID string
+	uuidQuery := `SELECT gen_random_uuid()`
+	err = database.DB.QueryRow(uuidQuery).Scan(&sessionUUID)
 	if err != nil {
-		// No existe sesión para hoy, crear una nueva
-		fmt.Printf("🔄 Creando nueva sesión para usuario %s, fecha %s\n", userID, today)
-		createSessionQuery := `
-			INSERT INTO workout_sessions (user_id, session_date, session_name, total_exercises, effort, mood) 
-			VALUES ($1, $2, $3, 0, 0, 0) 
-			RETURNING id
-		`
-		sessionName := "Entrenamiento del día"
-		err = database.DB.QueryRow(createSessionQuery, userID, today, sessionName).Scan(&sessionID)
-		if err != nil {
-			fmt.Printf("❌ Error creando sesión: %v\n", err)
-			http.Error(w, "Error creando sesión de entrenamiento", http.StatusInternalServerError)
-			return
-		}
-		fmt.Printf("✅ Sesión creada con ID: %d\n", sessionID)
-	} else {
-		fmt.Printf("✅ Sesión existente encontrada con ID: %d\n", sessionID)
+		fmt.Printf("❌ Error generando UUID: %v\n", err)
+		http.Error(w, "Error generando identificador único", http.StatusInternalServerError)
+		return
 	}
+	
+	fmt.Printf("✅ UUID generado para workout: %s\n", sessionUUID)
 
 	// Insertar workout asociado a la sesión
 	query := `
@@ -184,12 +168,12 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	err = database.DB.QueryRow(
 		query,
 		userID, req.ExerciseID, req.Weight, req.Reps,
-		serieValue, secondsValue, req.Observations, strconv.Itoa(sessionID),
+		serieValue, secondsValue, req.Observations, sessionUUID,
 	).Scan(&workout.ID, &workout.ExerciseSessionID, &workout.CreatedAt)
 
 	if err != nil {
 		fmt.Printf("❌ Error creando workout: %v\n", err)
-		fmt.Printf("📋 Datos del workout: userID=%s, exerciseID=%d, sessionID=%d\n", userID, req.ExerciseID, sessionID)
+		fmt.Printf("📋 Datos del workout: userID=%s, exerciseID=%d, sessionUUID=%s\n", userID, req.ExerciseID, sessionUUID)
 		http.Error(w, "Error creando workout", http.StatusInternalServerError)
 		return
 	}
