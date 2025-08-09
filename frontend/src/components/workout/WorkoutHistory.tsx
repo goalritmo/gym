@@ -160,8 +160,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         justifyContent: 'center', 
         alignItems: 'center', 
         minHeight: '60vh',
-        px: 3,
-        pt: 2
+        px: 3
       }}>
         <Paper sx={{ 
           p: 6, 
@@ -214,7 +213,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', pt: 2 }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
       <Typography variant="h5" component="h1" gutterBottom sx={{ mb: 1, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
         Mis Entrenamientos
       </Typography>
@@ -318,7 +317,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               {/* Header del día */}
                               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                 <Box sx={{ pl: 0, ml: 0 }}>
-                  <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left' }}>
                     {formatDate(day.date)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, ml: 2 }}>

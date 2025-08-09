@@ -98,7 +98,6 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
 
   return (
     <Box sx={{ 
-      flexGrow: 1, 
       position: 'relative',
       '@keyframes slideInFromLeft': {
         '0%': {
