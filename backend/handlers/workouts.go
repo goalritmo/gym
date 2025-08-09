@@ -127,8 +127,12 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Buscar o crear workout_session para hoy
-	today := time.Now().Format("2006-01-02")
+	now := time.Now()
+	today := now.Format("2006-01-02")
+	todayTimestamp := now.Format("2006-01-02T15:04:05Z07:00")
 	var sessionID int
+	
+	fmt.Printf("🕐 Fecha actual: %s, timestamp: %s\n", today, todayTimestamp)
 	
 	// Verificar si ya existe una sesión para hoy
 	sessionQuery := `SELECT id FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 LIMIT 1`
@@ -143,7 +147,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 			RETURNING id
 		`
 		sessionName := "Entrenamiento del día"
-		err = database.DB.QueryRow(createSessionQuery, userID, today, sessionName).Scan(&sessionID)
+		err = database.DB.QueryRow(createSessionQuery, userID, todayTimestamp, sessionName).Scan(&sessionID)
 		if err != nil {
 			fmt.Printf("❌ Error creando sesión: %v\n", err)
 			http.Error(w, "Error creando sesión de entrenamiento", http.StatusInternalServerError)
