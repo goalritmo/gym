@@ -26,7 +26,7 @@ type WorkoutFormData = z.infer<typeof workoutFormSchema>
 
 type WorkoutFormProps = {
   exercises: Exercise[]
-  onSubmit: (data: WorkoutFormData) => void
+  onSubmit: (data: WorkoutFormData) => Promise<void>
   isLoading?: boolean
 }
 
@@ -47,11 +47,16 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
 
   const selectedExerciseId = watch('exerciseId')
 
-  const submit = handleSubmit((data: WorkoutFormData) => {
+  const submit = handleSubmit(async (data: WorkoutFormData) => {
     console.log('Form submitted with data:', data)
-    onSubmit(data)
-    setShowSuccess(true)
-    reset() // Limpiar el formulario después de guardar
+    try {
+      await onSubmit(data)
+      setShowSuccess(true)
+      reset() // Limpiar el formulario después de guardar exitosamente
+    } catch (error) {
+      console.error('Error submitting workout:', error)
+      alert('Error al guardar el entrenamiento. Revisa la consola para más detalles.')
+    }
   }, (errors) => {
     console.log('Form validation errors:', errors)
   })
@@ -239,9 +244,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           {/* Cronómetro y campo de segundos */}
           <Box sx={{ 
             display: 'flex', 
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: { xs: 'center', sm: 'flex-end' }, 
-            gap: 3,
+            flexDirection: 'row',
+            alignItems: 'flex-end', 
+            gap: 2,
             justifyContent: 'space-between'
           }}>
             {/* Cronómetro */}

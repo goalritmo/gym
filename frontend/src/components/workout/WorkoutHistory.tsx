@@ -214,21 +214,21 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-      <Typography variant="h5" component="h1" gutterBottom sx={{ mb: 1, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
+      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
         Mis Entrenamientos
       </Typography>
       
-      {/* Filtro de fecha */}
-      <Box sx={{ 
-        p: 3, 
-        mx: 2,
-        bgcolor: 'primary.main', 
-        borderRadius: 3, 
-        boxShadow: 3,
-        background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-        color: 'white',
-        mb: 3
-      }}>
+      <Stack spacing={3}>
+        {/* Filtro de fecha */}
+        <Box sx={{ 
+          p: 3, 
+          mx: 2,
+          bgcolor: 'primary.main', 
+          borderRadius: 3, 
+          boxShadow: 3,
+          background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+          color: 'white'
+        }}>
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
           <DatePicker
             label="Filtrar por fecha"
@@ -290,13 +290,9 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         </LocalizationProvider>
       </Box>
 
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center',
-        mx: 2
-      }}>
-        {filteredWorkoutDays.map((day) => (
+        {/* Cards de entrenamientos */}
+        <Box sx={{ mx: 2 }}>
+          {filteredWorkoutDays.map((day) => (
           <Card key={day.date} sx={{ 
             mb: 2, 
             boxShadow: 2, 
@@ -315,12 +311,12 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           >
             <CardContent>
               {/* Header del día */}
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <Box sx={{ pl: 0, ml: 0 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                <Box sx={{ pl: 0, ml: 2 }}>
                   <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left' }}>
                     {formatDate(day.date)}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, ml: 2 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                     {day.session.session_name} • {day.workouts.length} {day.workouts.length === 1 ? 'ejercicio' : 'ejercicios'}
                   </Typography>
                 </Box>
@@ -402,8 +398,9 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               </Collapse>
             </CardContent>
           </Card>
-        ))}
-      </Box>
+                  ))}
+        </Box>
+      </Stack>
 
       {/* Modal para mostrar series del ejercicio */}
       <Dialog 

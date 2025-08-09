@@ -85,7 +85,7 @@ export default function AuthenticatedApp() {
   }
 
   // Función para manejar el envío del formulario de workout
-  const handleWorkoutSubmit = async (data: any) => {
+  const handleWorkoutSubmit = async (data: any): Promise<void> => {
     setIsSubmittingWorkout(true)
     try {
       const today = new Date().toISOString()
