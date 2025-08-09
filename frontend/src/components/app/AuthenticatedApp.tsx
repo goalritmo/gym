@@ -184,7 +184,9 @@ export default function AuthenticatedApp() {
       
       <Box sx={{ 
         flexGrow: 1, 
-        p: 2, // Mantener padding uniforme
+        px: 2, // Solo padding horizontal
+        pb: 2, // Solo padding bottom
+        pt: 0, // Sin padding top para evitar espacio con menú
         overflow: 'auto',
         '&::-webkit-scrollbar': {
           display: 'none'

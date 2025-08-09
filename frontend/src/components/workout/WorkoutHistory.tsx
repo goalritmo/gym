@@ -160,7 +160,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         justifyContent: 'center', 
         alignItems: 'center', 
         minHeight: '60vh',
-        px: 3
+        px: 3,
+        pt: 2
       }}>
         <Paper sx={{ 
           p: 6, 
@@ -213,22 +214,22 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-      <Typography variant="h5" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', pt: 2 }}>
+      <Typography variant="h5" component="h1" gutterBottom sx={{ mb: 1, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
         Mis Entrenamientos
       </Typography>
       
-      <Stack spacing={3}>
-        {/* Filtro de fecha */}
-        <Box sx={{ 
-          p: 3, 
-          mx: 2,
-          bgcolor: 'primary.main', 
-          borderRadius: 3, 
-          boxShadow: 3,
-          background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-          color: 'white'
-        }}>
+      {/* Filtro de fecha */}
+      <Box sx={{ 
+        p: 3, 
+        mx: 2,
+        bgcolor: 'primary.main', 
+        borderRadius: 3, 
+        boxShadow: 3,
+        background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+        color: 'white',
+        mb: 3
+      }}>
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
           <DatePicker
             label="Filtrar por fecha"
@@ -315,7 +316,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           >
             <CardContent>
               {/* Header del día */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-left', mb: 2 }}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                 <Box sx={{ pl: 0, ml: 0 }}>
                   <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                     {formatDate(day.date)}
@@ -337,7 +338,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               </Box>
 
               {/* Esfuerzo y Estado de Ánimo */}
-              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', ml: 2  }}>
                 <Box onClick={(e) => e.stopPropagation()}>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
                     Esfuerzo
@@ -404,7 +405,6 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           </Card>
         ))}
       </Box>
-      </Stack>
 
       {/* Modal para mostrar series del ejercicio */}
       <Dialog 
