@@ -125,14 +125,22 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     setExpandedDays(newExpanded)
   }
 
-  const handleEffortChange = (sessionId: number, newValue: number) => {
-    onUpdateSession(sessionId, { effort: newValue });
-    setShowUpdateSuccess(true);
+  const handleEffortChange = async (sessionId: number, newValue: number) => {
+    try {
+      await onUpdateSession(sessionId, { effort: newValue });
+      setShowUpdateSuccess(true);
+    } catch (error) {
+      console.error('Error actualizando esfuerzo:', error);
+    }
   }
 
-  const handleMoodChange = (sessionId: number, newValue: number) => {
-    onUpdateSession(sessionId, { mood: newValue });
-    setShowUpdateSuccess(true);
+  const handleMoodChange = async (sessionId: number, newValue: number) => {
+    try {
+      await onUpdateSession(sessionId, { mood: newValue });
+      setShowUpdateSuccess(true);
+    } catch (error) {
+      console.error('Error actualizando ánimo:', error);
+    }
   }
 
   const handleEditSessionName = (sessionId: number, currentName: string) => {
@@ -140,12 +148,16 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     setNewSessionName(currentName)
   }
 
-  const handleSaveSessionName = () => {
+  const handleSaveSessionName = async () => {
     if (editSessionModal.sessionId && newSessionName.trim()) {
-      onUpdateSession(editSessionModal.sessionId, { session_name: newSessionName.trim() });
-      setEditSessionModal({ show: false, sessionId: null, currentName: '' })
-      setNewSessionName('')
-      setShowUpdateSuccess(true)
+      try {
+        await onUpdateSession(editSessionModal.sessionId, { session_name: newSessionName.trim() });
+        setEditSessionModal({ show: false, sessionId: null, currentName: '' })
+        setNewSessionName('')
+        setShowUpdateSuccess(true)
+      } catch (error) {
+        console.error('Error actualizando nombre de sesión:', error);
+      }
     }
   }
 
