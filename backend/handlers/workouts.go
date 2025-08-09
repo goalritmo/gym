@@ -113,11 +113,19 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Verificar que el ejercicio existe
 	var exerciseExists bool
+	fmt.Printf("🔍 Verificando ejercicio con ID: %d\n", req.ExerciseID)
 	err := database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM exercises WHERE id = $1)", req.ExerciseID).Scan(&exerciseExists)
-	if err != nil || !exerciseExists {
+	if err != nil {
+		fmt.Printf("❌ Error en query de verificación: %v\n", err)
+		http.Error(w, "Error verificando ejercicio", http.StatusInternalServerError)
+		return
+	}
+	if !exerciseExists {
+		fmt.Printf("❌ Ejercicio con ID %d no existe en la tabla\n", req.ExerciseID)
 		http.Error(w, "Ejercicio no encontrado", http.StatusBadRequest)
 		return
 	}
+	fmt.Printf("✅ Ejercicio con ID %d encontrado\n", req.ExerciseID)
 
 	// Insertar workout
 	query := `
