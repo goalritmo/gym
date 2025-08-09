@@ -433,6 +433,8 @@ func UpdateWorkoutSessionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Printf("🔍 Intentando actualizar sesión ID: %d, usuario: %s\n", id, userID)
+
 	var req models.UpdateWorkoutSessionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
@@ -486,6 +488,9 @@ func UpdateWorkoutSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	args = append(args, id, userID)
 
+	fmt.Printf("🔍 Query de actualización: %s\n", query)
+	fmt.Printf("🔍 Args: %v\n", args)
+
 	var session models.WorkoutSession
 	err = database.DB.QueryRow(query, args...).Scan(
 		&session.ID, &session.SessionDate, &session.SessionName,
@@ -494,9 +499,21 @@ func UpdateWorkoutSessionHandler(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
+		fmt.Printf("❌ Error actualizando sesión: %v\n", err)
+		fmt.Printf("🔍 Verificando si la sesión existe: SELECT * FROM workout_sessions WHERE id = %d AND user_id = '%s'\n", id, userID)
+		
+		// Verificar si la sesión existe
+		var count int
+		countErr := database.DB.QueryRow("SELECT COUNT(*) FROM workout_sessions WHERE id = $1 AND user_id = $2", id, userID).Scan(&count)
+		if countErr == nil {
+			fmt.Printf("🔍 Sesiones encontradas: %d\n", count)
+		}
+		
 		http.Error(w, "Sesión no encontrada o error actualizando", http.StatusNotFound)
 		return
 	}
+
+	fmt.Printf("✅ Sesión actualizada exitosamente: ID %d\n", session.ID)
 
 	session.UserID = userID
 	json.NewEncoder(w).Encode(session)
