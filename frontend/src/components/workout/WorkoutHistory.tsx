@@ -15,12 +15,14 @@ import {
   DialogActions,
   Button,
   Paper,
+  TextField,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import DeleteIcon from '@mui/icons-material/Delete'
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
+import ModeEditIcon from '@mui/icons-material/ModeEdit'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { es } from 'date-fns/locale'
@@ -35,6 +37,12 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     show: false,
     workoutId: null
   })
+  const [editSessionModal, setEditSessionModal] = useState<{ show: boolean; sessionId: number | null; currentName: string }>({
+    show: false,
+    sessionId: null,
+    currentName: ''
+  })
+  const [newSessionName, setNewSessionName] = useState('')
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -110,6 +118,24 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   const handleMoodChange = (sessionId: number, newValue: number) => {
     onUpdateSession(sessionId, { mood: newValue });
+  }
+
+  const handleEditSessionName = (sessionId: number, currentName: string) => {
+    setEditSessionModal({ show: true, sessionId, currentName })
+    setNewSessionName(currentName)
+  }
+
+  const handleSaveSessionName = () => {
+    if (editSessionModal.sessionId && newSessionName.trim()) {
+      onUpdateSession(editSessionModal.sessionId, { session_name: newSessionName.trim() });
+      setEditSessionModal({ show: false, sessionId: null, currentName: '' })
+      setNewSessionName('')
+    }
+  }
+
+  const handleCancelEditSession = () => {
+    setEditSessionModal({ show: false, sessionId: null, currentName: '' })
+    setNewSessionName('')
   }
 
   const handleExerciseClick = (exerciseGroup: ExerciseGroup) => {
@@ -245,7 +271,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         }}>
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
           <DatePicker
-            label="Filtrar por fecha"
+            label="📅 Filtrar por fecha"
             value={dateFilter}
             onChange={(newValue: Date | null) => setDateFilter(newValue)}
             shouldDisableDate={shouldDisableDate}
@@ -254,12 +280,16 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 sx: {
                   width: '100%',
                   '& .MuiOutlinedInput-root': {
-                    bgcolor: 'rgba(255, 255, 255, 0.95)',
+                    bgcolor: 'white',
+                    border: '2px solid rgba(255, 255, 255, 0.3)',
+                    borderRadius: 2,
                     '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 1)'
+                      bgcolor: 'white',
+                      border: '2px solid rgba(255, 255, 255, 0.5)',
                     },
                     '&.Mui-focused': {
-                      bgcolor: 'white'
+                      bgcolor: 'white',
+                      border: '2px solid white',
                     }
                   },
                   '& .MuiInputBase-input': {
@@ -268,15 +298,19 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                     fontWeight: 500
                   },
                   '& .MuiInputAdornment-root': {
-                    color: 'white'
+                    color: '#1976d2'
                   },
                   '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-                    color: 'white',
-                    fontSize: '1.25rem'
+                    color: '#1976d2',
+                    fontSize: '1.4rem'
                   }
                 },
                 InputLabelProps: {
-                  style: { color: 'white' }
+                  style: { 
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '1rem'
+                  }
                 }
               },
               day: {
@@ -325,13 +359,44 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           >
             <CardContent sx={{ pl: 2, pr: 2, pt: 2, pb: 2 }}>
               {/* Header del día */}
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Box sx={{ pl: 0, ml: 0 }}>
                     <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left' }}>
                       {formatDate(day.date)}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, textAlign: 'left' }}>
-                      {day.session.session_name} • {day.workouts.length} {day.workouts.length === 1 ? 'ejercicio' : 'ejercicios'}
+                    <Box 
+                      sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        mt: 0.5,
+                        cursor: 'pointer',
+                        borderRadius: 1,
+                        p: 0.5,
+                        mx: -0.5,
+                        transition: 'background-color 0.2s',
+                        '&:hover': { 
+                          backgroundColor: 'rgba(0, 0, 0, 0.04)' 
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditSessionName(day.session.id, day.session.session_name);
+                      }}
+                    >
+                      <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
+                        {day.session.session_name}
+                      </Typography>
+                      <ModeEditIcon 
+                        sx={{ 
+                          ml: 1, 
+                          fontSize: '1rem',
+                          color: 'text.secondary',
+                          opacity: 0.6,
+                        }}
+                      />
+                    </Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
+                      {day.workouts.length} {day.workouts.length === 1 ? 'ejercicio' : 'ejercicios'}
                     </Typography>
                   </Box>
                 
@@ -567,6 +632,46 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           </Button>
           <Button onClick={handleConfirmDelete} color="error" variant="contained">
             Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modal de edición del nombre de sesión */}
+      <Dialog
+        open={editSessionModal.show}
+        onClose={handleCancelEditSession}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Editar nombre de sesión</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Nombre de la sesión"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={newSessionName}
+            onChange={(e) => setNewSessionName(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSaveSessionName();
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelEditSession} color="primary">
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleSaveSessionName} 
+            color="primary" 
+            variant="contained"
+            disabled={!newSessionName.trim()}
+          >
+            Guardar
           </Button>
         </DialogActions>
       </Dialog>
