@@ -167,35 +167,48 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main', mb: 1.5 }}>
               ⏱️ Controla el tiempo para maximizar resultados
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, width: '100%' }}>
               <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Controla la velocidad para mejorar técnica y comparar progreso.
             </Typography>
             <Box sx={{ 
               display: 'flex', 
               gap: 2, 
               mt: 1.5, 
-              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              width: '100%',
               '& > div': {
                 bgcolor: 'rgba(255,255,255,0.8)',
                 px: 1.5,
-                py: 0.5,
+                py: 1,
                 borderRadius: 1,
-                border: '1px solid rgba(33, 150, 243, 0.1)'
+                border: '1px solid rgba(33, 150, 243, 0.1)',
+                textAlign: 'center',
+                flex: 1,
+                minWidth: 0
               }
             }}>
               <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: 'error.main' }}>
-                  Fuerza: 20-40s
+                <Typography variant="caption" sx={{ fontWeight: 600, color: 'error.main', display: 'block' }}>
+                  Fuerza:
+                </Typography>
+                <Typography variant="caption" sx={{ fontWeight: 500, color: 'error.main', display: 'block', mt: 0.5 }}>
+                  20-40s
                 </Typography>
               </Box>
               <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main' }}>
-                  Hipertrofia: 40-60s
+                <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block' }}>
+                  Hipertrofia:
+                </Typography>
+                <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.5 }}>
+                  40-60s
                 </Typography>
               </Box>
               <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: 'success.main' }}>
-                  Resistencia: 60s+
+                <Typography variant="caption" sx={{ fontWeight: 600, color: 'success.main', display: 'block' }}>
+                  Resistencia:
+                </Typography>
+                <Typography variant="caption" sx={{ fontWeight: 500, color: 'success.main', display: 'block', mt: 0.5 }}>
+                  60s+
                 </Typography>
               </Box>
             </Box>

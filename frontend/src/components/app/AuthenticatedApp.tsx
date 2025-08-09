@@ -5,7 +5,6 @@ import WorkoutForm from '../workout/WorkoutForm'
 import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
 import WorkoutHistory from '../workout/WorkoutHistory'
-import ApiTest from '../debug/ApiTest'
 import type { Workout, WorkoutSession } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
 
@@ -251,15 +250,8 @@ export default function AuthenticatedApp() {
           </Box>
         )}
 
-        {/* Pestaña API Test */}
-        {activeTab === 3 && (
-          <Box>
-            <ApiTest />
-          </Box>
-        )}
-
         {/* Pestaña Historial */}
-        {activeTab === 4 && (
+        {activeTab === 3 && (
           <Box>
             <WorkoutHistory 
               workoutSessions={workoutSessions}
