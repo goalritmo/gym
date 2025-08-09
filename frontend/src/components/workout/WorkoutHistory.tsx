@@ -19,6 +19,7 @@ import {
   Snackbar,
   Backdrop,
   CircularProgress,
+  Alert,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
@@ -47,6 +48,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   })
   const [newSessionName, setNewSessionName] = useState('')
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false)
+  const [showUpdateError, setShowUpdateError] = useState(false)
   const [loadingSessionId, setLoadingSessionId] = useState<number | null>(null)
 
   const formatDate = (dateString: string) => {
@@ -131,10 +133,12 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const handleEffortChange = async (sessionId: number, newValue: number) => {
     setLoadingSessionId(sessionId);
     try {
-      await onUpdateSession(sessionId, { effort: newValue });
+      const result = await onUpdateSession(sessionId, { effort: newValue });
+      console.log('✅ Resultado actualización esfuerzo:', result);
       setShowUpdateSuccess(true);
     } catch (error) {
-      console.error('Error actualizando esfuerzo:', error);
+      console.error('❌ Error actualizando esfuerzo:', error);
+      setShowUpdateError(true);
     } finally {
       setLoadingSessionId(null);
     }
@@ -143,10 +147,12 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const handleMoodChange = async (sessionId: number, newValue: number) => {
     setLoadingSessionId(sessionId);
     try {
-      await onUpdateSession(sessionId, { mood: newValue });
+      const result = await onUpdateSession(sessionId, { mood: newValue });
+      console.log('✅ Resultado actualización ánimo:', result);
       setShowUpdateSuccess(true);
     } catch (error) {
-      console.error('Error actualizando ánimo:', error);
+      console.error('❌ Error actualizando ánimo:', error);
+      setShowUpdateError(true);
     } finally {
       setLoadingSessionId(null);
     }
@@ -161,12 +167,15 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     if (editSessionModal.sessionId && newSessionName.trim()) {
       setLoadingSessionId(editSessionModal.sessionId);
       try {
-        await onUpdateSession(editSessionModal.sessionId, { session_name: newSessionName.trim() });
+        const result = await onUpdateSession(editSessionModal.sessionId, { session_name: newSessionName.trim() });
+        console.log('✅ Resultado actualización nombre:', result);
         setEditSessionModal({ show: false, sessionId: null, currentName: '' })
         setNewSessionName('')
         setShowUpdateSuccess(true)
       } catch (error) {
-        console.error('Error actualizando nombre de sesión:', error);
+        console.error('❌ Error actualizando nombre de sesión:', error);
+        setShowUpdateError(true);
+        // No cerrar modal ni mostrar éxito si hay error
       } finally {
         setLoadingSessionId(null);
       }
@@ -796,6 +805,18 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         sx={{ mt: 8 }}
       />
+      
+      <Snackbar
+        open={showUpdateError}
+        autoHideDuration={4000}
+        onClose={() => setShowUpdateError(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{ mt: 8 }}
+      >
+        <Alert severity="error" sx={{ width: '100%' }}>
+          ❌ Error al actualizar la sesión
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

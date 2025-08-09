@@ -154,9 +154,10 @@ export default function AuthenticatedApp() {
   const handleUpdateSession = async (sessionId: number, updates: Partial<WorkoutSession>) => {
     try {
       console.log('Actualizando sesión en el backend...', sessionId, updates)
-      await apiClient.updateWorkoutSession(sessionId, updates)
+      const result = await apiClient.updateWorkoutSession(sessionId, updates)
+      console.log('🔍 Respuesta del backend:', result)
       
-      // Actualizar estado local
+      // Solo actualizar estado local si el backend confirma éxito
       setWorkoutSessions(prev => 
         prev.map(session => 
           session.id === sessionId 
@@ -165,9 +166,10 @@ export default function AuthenticatedApp() {
         )
       )
       console.log('✅ Sesión actualizada exitosamente')
+      return result
     } catch (error) {
       console.error('❌ Error actualizando sesión:', error)
-      alert('Error al actualizar la sesión. Revisa la consola para más detalles.')
+      throw error // Propagar el error para que el frontend lo maneje
     }
   }
 
