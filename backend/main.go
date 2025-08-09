@@ -60,6 +60,9 @@ func main() {
 	api.HandleFunc("/equipment", handlers.GetEquipmentHandler).Methods("GET")
 	api.HandleFunc("/equipment/{id}", handlers.GetEquipmentByIdHandler).Methods("GET")
 
+	// Cleanup endpoint (temporal)
+	api.HandleFunc("/cleanup", handlers.CleanupHandler).Methods("DELETE")
+
 	// Users endpoints (usando Supabase Auth)
 	api.HandleFunc("/me", handlers.GetCurrentUserHandler).Methods("GET")
 	api.HandleFunc("/me/stats", handlers.GetUserStatsHandler).Methods("GET")

@@ -134,9 +134,25 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	
 	fmt.Printf("🕐 Fecha actual: %s, timestamp: %s\n", today, todayTimestamp)
 	
+	// Debug: ver todas las sesiones del usuario
+	debugQuery := `SELECT id, session_date, DATE(session_date) FROM workout_sessions WHERE user_id = $1 ORDER BY session_date DESC LIMIT 5`
+	rows, debugErr := database.DB.Query(debugQuery, userID)
+	if debugErr == nil {
+		fmt.Printf("🔍 Sesiones del usuario:\n")
+		for rows.Next() {
+			var id int
+			var sessionDate, dateOnly string
+			if rows.Scan(&id, &sessionDate, &dateOnly) == nil {
+				fmt.Printf("  - ID: %d, session_date: %s, DATE(): %s\n", id, sessionDate, dateOnly)
+			}
+		}
+		rows.Close()
+	}
+	
 	// Verificar si ya existe una sesión para hoy
-	sessionQuery := `SELECT id FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 LIMIT 1`
-	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&sessionID)
+	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 LIMIT 1`
+	var sessionDate string
+	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&sessionID, &sessionDate)
 	
 	if err != nil {
 		// No existe sesión para hoy, crear una nueva
@@ -155,7 +171,8 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Printf("✅ Sesión creada con ID: %d\n", sessionID)
 	} else {
-		fmt.Printf("✅ Sesión existente encontrada con ID: %d\n", sessionID)
+		fmt.Printf("✅ Sesión existente encontrada con ID: %d, fecha: %s\n", sessionID, sessionDate)
+		fmt.Printf("🔍 Buscando sesiones para fecha: %s\n", today)
 	}
 
 	// Generar un UUID único para este workout
@@ -214,6 +231,37 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(workout)
+}
+
+// CleanupHandler limpia todos los datos (temporal)
+func CleanupHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Obtener userID del contexto
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Limpiar workouts del usuario
+	_, err := database.DB.Exec("DELETE FROM workouts WHERE user_id = $1", userID)
+	if err != nil {
+		fmt.Printf("❌ Error limpiando workouts: %v\n", err)
+	} else {
+		fmt.Printf("✅ Workouts limpiados para usuario: %s\n", userID)
+	}
+
+	// Limpiar workout_sessions del usuario
+	_, err = database.DB.Exec("DELETE FROM workout_sessions WHERE user_id = $1", userID)
+	if err != nil {
+		fmt.Printf("❌ Error limpiando sesiones: %v\n", err)
+	} else {
+		fmt.Printf("✅ Sesiones limpiadas para usuario: %s\n", userID)
+	}
+
+	response := map[string]string{"message": "Datos limpiados exitosamente"}
+	json.NewEncoder(w).Encode(response)
 }
 
 // UpdateWorkoutHandler actualiza un workout existente
