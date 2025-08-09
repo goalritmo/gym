@@ -55,7 +55,7 @@ export default function LoginComponent() {
           sx={{ 
             mb: 3, 
             fontWeight: 'bold', 
-            color: 'primary.main' 
+            color: '#000' 
           }}
         >
           Gym App
@@ -71,6 +71,7 @@ export default function LoginComponent() {
           startIcon={<GoogleIcon />}
           sx={{
             borderColor: '#4285f4',
+            fontWeight: 'bold',
             color: '#4285f4',
             '&:hover': {
               borderColor: '#3367d6',

@@ -204,7 +204,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             boxShadow: 3,
             background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
           }}>
-          <Box sx={{ mb: 3 }}>
+          <Box sx={{ mb: 1 }}>
             <FitnessCenterIcon sx={{ 
               fontSize: 80, 
               color: 'primary.main',
@@ -218,11 +218,11 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             color: 'text.primary',
             mb: 2
           }}>
-            ¡Arranca tu entrenamiento!
+            ¡Comienza tu entrenamiento!
           </Typography>
           
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
-            No hay entrenamientos registrados aún. Ve al menú y selecciona <strong>Registrar</strong> para comenzar.
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 1, lineHeight: 1.6 }}>
+            No hay entrenamientos registrados aún. Ve al menú y selecciona:
           </Typography>
           
           <Box 
@@ -233,6 +233,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               justifyContent: 'center',
               gap: 1,
               p: 2,
+              mb: 1,
               bgcolor: 'rgba(25, 118, 210, 0.1)',
               borderRadius: 2,
               border: '1px solid rgba(25, 118, 210, 0.2)',
