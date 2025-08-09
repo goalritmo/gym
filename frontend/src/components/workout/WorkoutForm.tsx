@@ -379,7 +379,8 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       autoHideDuration={3000}
       onClose={() => setShowSuccess(false)}
       message="✅ Entrenamiento guardado exitosamente"
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      sx={{ mt: 8 }}
     />
 
     </Box>

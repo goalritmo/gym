@@ -68,9 +68,17 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     const days: WorkoutDay[] = [];
     
     workoutSessions.forEach(session => {
-      const sessionWorkouts = workouts.filter(w => 
-        new Date(w.created_at).toDateString() === new Date(session.session_date).toDateString()
-      );
+      console.log('🔍 Procesando sesión:', session.session_date, 'ID:', session.id)
+      console.log('🔍 Workouts disponibles:', workouts.map(w => ({ id: w.id, created_at: w.created_at, exercise_name: w.exercise_name })))
+      
+      const sessionWorkouts = workouts.filter(w => {
+        const workoutDate = new Date(w.created_at).toDateString()
+        const sessionDate = new Date(session.session_date).toDateString()
+        console.log(`🔍 Comparando workout ${w.id}: ${workoutDate} vs sesión ${session.id}: ${sessionDate}`)
+        return workoutDate === sessionDate
+      })
+      
+      console.log('🔍 Workouts filtrados para sesión:', sessionWorkouts.length)
       
       // Agrupar ejercicios por nombre
       const exerciseGroups: ExerciseGroup[] = [];
