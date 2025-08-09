@@ -10,22 +10,11 @@ import { useTab } from '../../contexts/TabContext'
 import { apiClient } from '../../lib/api'
 import { TABS, type TabType } from '../../constants/tabs'
 
-// Lista de ejercicios disponibles
-const exercises = [
-  { id: 1, name: 'Press de Banca' },
-  { id: 2, name: 'Sentadilla' },
-  { id: 3, name: 'Peso Muerto' },
-  { id: 4, name: 'Press Militar' },
-  { id: 5, name: 'Curl de Bíceps' },
-  { id: 6, name: 'Extensiones de Tríceps' },
-  { id: 7, name: 'Remo con Barra' },
-  { id: 8, name: 'Pull-ups' }
-]
-
 export default function AuthenticatedApp() {
   const { activeTab, setActiveTab } = useTab()
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
+  const [exercises, setExercises] = useState<any[]>([])
   const [isSubmittingWorkout, setIsSubmittingWorkout] = useState(false)
 
   // Cargar datos desde el backend al montar el componente
@@ -34,17 +23,20 @@ export default function AuthenticatedApp() {
       try {
         console.log('Cargando datos desde el backend...')
         
-        // Cargar workouts y sesiones en paralelo
-        const [workoutsData, sessionsData] = await Promise.all([
+        // Cargar workouts, sesiones y ejercicios en paralelo
+        const [workoutsData, sessionsData, exercisesData] = await Promise.all([
           apiClient.getWorkouts(),
-          apiClient.getWorkoutSessions()
+          apiClient.getWorkoutSessions(),
+          apiClient.getExercises()
         ])
         
         console.log('Workouts cargados:', workoutsData)
         console.log('Sesiones cargadas:', sessionsData)
+        console.log('Ejercicios cargados:', exercisesData)
         
         setWorkouts(Array.isArray(workoutsData) ? workoutsData : [])
         setWorkoutSessions(Array.isArray(sessionsData) ? sessionsData : [])
+        setExercises(Array.isArray(exercisesData) ? exercisesData : [])
       } catch (error) {
         console.error('Error cargando datos del backend:', error)
         
@@ -60,6 +52,18 @@ export default function AuthenticatedApp() {
         if (savedSessions) {
           setWorkoutSessions(JSON.parse(savedSessions))
         }
+        
+        // Ejercicios por defecto si no se pueden cargar del backend
+        setExercises([
+          { id: 1, name: 'Press de Banca' },
+          { id: 2, name: 'Sentadilla' },
+          { id: 3, name: 'Peso Muerto' },
+          { id: 4, name: 'Press Militar' },
+          { id: 5, name: 'Curl de Bíceps' },
+          { id: 6, name: 'Extensiones de Tríceps' },
+          { id: 7, name: 'Remo con Barra' },
+          { id: 8, name: 'Pull-ups' }
+        ])
       }
     }
     

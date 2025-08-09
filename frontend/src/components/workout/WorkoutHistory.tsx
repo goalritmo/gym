@@ -165,8 +165,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center', 
-          minHeight: '60vh',
-          mx: 2
+          minHeight: '60vh'
         }}>
           <Paper sx={{ 
             p: 4, 
@@ -331,7 +330,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                     <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left' }}>
                       {formatDate(day.date)}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, textAlign: 'left' }}>
                       {day.session.session_name} • {day.workouts.length} {day.workouts.length === 1 ? 'ejercicio' : 'ejercicios'}
                     </Typography>
                   </Box>
