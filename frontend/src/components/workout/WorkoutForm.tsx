@@ -132,7 +132,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         <Box sx={{ 
           display: 'flex', 
           gap: 2, 
-          flexDirection: { xs: 'column', sm: 'row' }
+          flexDirection: { xs: 'row' }
         }}>
           <TextField
             label="Peso (kg)"
