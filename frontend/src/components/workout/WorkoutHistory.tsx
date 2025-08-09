@@ -218,15 +218,15 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             color: 'text.primary',
             mb: 2
           }}>
-            ¡Comienza tu entrenamiento!
+            ¡Arranca tu entrenamiento!
           </Typography>
           
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
-            No hay entrenamientos registrados aún. Ve al menú y selecciona <strong>Entrenatiempo</strong> para comenzar a registrar tus ejercicios.
+            No hay entrenamientos registrados aún. Ve al menú y selecciona <strong>Registrar</strong> para comenzar.
           </Typography>
           
           <Box 
-            onClick={() => onTabChange?.(TABS.WORKOUT)} // Cambiar a tab Entrenatiempo
+            onClick={() => onTabChange?.(TABS.WORKOUT)} // Cambiar a tab Registrar
             sx={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -246,7 +246,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             }}>
             <AllInclusiveIcon sx={{ color: 'primary.main' }} />
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-              Entrenatiempo
+              Registrar
             </Typography>
           </Box>
         </Paper>
@@ -293,19 +293,31 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                     '&.Mui-focused': {
                       bgcolor: 'white !important',
                       borderColor: '#1976d2 !important',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      backgroundColor: 'white !important'
                     }
+                  },
+                  '& .MuiInputBase-root': {
+                    backgroundColor: 'white !important'
                   },
                   '& .MuiInputBase-input': {
                     color: '#000 !important',
                     fontSize: '1rem',
-                    fontWeight: 500
+                    fontWeight: 500,
+                    backgroundColor: 'white !important'
                   },
                   '& .MuiInputAdornment-root': {
-                    color: '#000 !important'
+                    color: '#000 !important',
+                    backgroundColor: 'white !important'
                   },
                   '& .MuiInputAdornment-root .MuiSvgIcon-root': {
                     color: '#000 !important',
-                    fontSize: '1.4rem'
+                    fontSize: '1.4rem',
+                    backgroundColor: 'transparent !important'
+                  },
+                  '& .MuiInputBase-inputAdornedEnd': {
+                    backgroundColor: 'white !important'
                   },
                   '& .MuiInputLabel-root': {
                     color: '#333 !important',

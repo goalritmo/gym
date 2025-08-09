@@ -31,11 +31,11 @@ describe('Navigation', () => {
     const menuButton = await screen.findByLabelText('abrir menú')
     
     // El drawer no debería estar visible inicialmente
-    expect(screen.queryByText('Entrenatiempo')).not.toBeInTheDocument()
+    expect(screen.queryByText('Registrar')).not.toBeInTheDocument()
     
     // Abrir el drawer
     await user.click(menuButton)
-    expect(screen.getByText('Entrenatiempo')).toBeInTheDocument()
+    expect(screen.getByText('Registrar')).toBeInTheDocument()
     expect(screen.getByText('Ejercicios')).toBeInTheDocument()
     expect(screen.getByText('Equipamiento')).toBeInTheDocument()
     expect(screen.getByText('Historial')).toBeInTheDocument()

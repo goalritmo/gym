@@ -47,7 +47,17 @@ export default function LoginComponent() {
         maxWidth: '90%',
         width: '100%'
       }}>
-        <Typography sx={{ mb: 3 }} variant="h4" component="h1" gutterBottom textAlign="center">
+        <Typography 
+          variant="h4" 
+          component="h1" 
+          gutterBottom 
+          textAlign="center"
+          sx={{ 
+            mb: 3, 
+            fontWeight: 'bold', 
+            color: 'primary.main' 
+          }}
+        >
           Gym App
         </Typography>
         
@@ -68,7 +78,7 @@ export default function LoginComponent() {
             }
           }}
         >
-          {isGoogleLoading ? 'Iniciando sesión...' : 'Continuar con Google'}
+          {isGoogleLoading ? 'Iniciando...' : 'Continuar'}
         </Button>
 
         {error && (

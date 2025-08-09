@@ -90,7 +90,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
   }
 
   const menuItems = [
-    { label: 'Entrenatiempo', icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
+    { label: 'Registrar', icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
     { label: 'Todos los Ejercicios', icon: <ListAltIcon />, value: TABS.EXERCISES },
     { label: 'Todo el Equipamiento', icon: <FitnessCenterIcon />, value: TABS.EQUIPMENT },
     { label: 'Mis Entrenamientos', icon: <HistoryIcon />, value: TABS.HISTORY },
