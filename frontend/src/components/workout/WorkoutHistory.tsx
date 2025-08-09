@@ -215,7 +215,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
-        Mis Entrenamientos
+        Entrenamientos
       </Typography>
       
       <Stack spacing={3}>
@@ -309,7 +309,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           }}
           onClick={() => toggleDayExpansion(day.date)}
           >
-            <CardContent>
+            <CardContent sx={{ pl: 2, pr: 2, pt: 2, pb: 2 }}>
               {/* Header del día */}
                               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Box sx={{ pl: 0, ml: 0 }}>
@@ -332,8 +332,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 </IconButton>
               </Box>
 
-                              {/* Esfuerzo y Estado de Ánimo */}
-                <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+              {/* Esfuerzo y Estado de Ánimo */}
+              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 2 }}>
                 <Box onClick={(e) => e.stopPropagation()}>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
                     Esfuerzo

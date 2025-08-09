@@ -1,6 +1,12 @@
 import { supabase } from './supabase'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3210/api'
+const getApiBaseUrl = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3210'
+  // Asegurar que siempre termine con /api
+  return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 interface ApiRequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
