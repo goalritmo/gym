@@ -34,7 +34,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
-      exerciseId: '',
+      exerciseId: 0,
       weight: '',
       reps: '',
       serie: 1,
@@ -51,17 +51,32 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   const selectedExerciseId = watch('exerciseId')
 
   const submit = handleSubmit(async (data: WorkoutFormData) => {
-    console.log('Form submitted with data:', data)
+    console.log('🔥 Form submitted with data:', data)
+    console.log('🔍 Current form values:', {
+      exerciseId: watch('exerciseId'),
+      weight: watch('weight'),
+      reps: watch('reps'),
+      serie: watch('serie'),
+      seconds: watch('seconds'),
+      observations: watch('observations')
+    })
     try {
       await onSubmit(data)
       setShowSuccess(true)
-      reset() // Limpiar el formulario después de guardar exitosamente
+      reset({
+        exerciseId: 0,
+        weight: '',
+        reps: '',
+        serie: 1,
+        seconds: '',
+        observations: ''
+      }) // Limpiar el formulario después de guardar exitosamente
     } catch (error) {
       console.error('Error submitting workout:', error)
       alert('Error al guardar el entrenamiento. Revisa la consola para más detalles.')
     }
   }, (errors) => {
-    console.log('Form validation errors:', errors)
+    console.log('❌ Form validation errors:', errors)
   })
 
   // Función para capturar el tiempo del cronómetro
@@ -102,7 +117,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
               }
             }}
           >
-            <MenuItem value="" disabled={exercises.length === 0}>
+            <MenuItem value={0} disabled={exercises.length === 0}>
               {exercises.length === 0 ? 'Cargando ejercicios...' : 'Seleccionar ejercicio...'}
             </MenuItem>
             {exercises.map((ex) => (
