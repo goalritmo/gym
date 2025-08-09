@@ -70,6 +70,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   }
 
   return (
+    <>
     <Box sx={{ maxWidth: 600, mx: 'auto', position: 'relative', zIndex: 1 }}>
       <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main', fontWeight: 'bold' }}>
         Registrar
@@ -362,6 +363,8 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
     />
 
+    </Box>
+
     {/* Loader para cuando están cargando los ejercicios */}
     <Backdrop
       sx={{
@@ -369,12 +372,14 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         zIndex: (theme) => theme.zIndex.modal + 1,
         backgroundColor: 'rgba(255, 255, 255, 0.8)',
         backdropFilter: 'blur(4px)',
-        position: 'absolute',
+        position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        borderRadius: 2
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}
       open={isLoadingExercises}
     >
@@ -388,14 +393,11 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       >
         <CircularProgress size={48} thickness={4} />
         <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
-          Cargando ejercicios...
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', maxWidth: 300 }}>
-          Conectando con la base de datos para obtener los ejercicios disponibles
+          Cargando...
         </Typography>
       </Box>
     </Backdrop>
-    </Box>
+    </>
   )
 }
 

@@ -91,12 +91,15 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         });
       });
 
-      days.push({
-        date: session.session_date,
-        session,
-        workouts: sessionWorkouts,
-        exerciseGroups
-      });
+      // Solo agregar días que tengan workouts
+      if (sessionWorkouts.length > 0) {
+        days.push({
+          date: session.session_date,
+          session,
+          workouts: sessionWorkouts,
+          exerciseGroups
+        });
+      }
     });
 
     return days.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -180,7 +183,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     );
   };
 
-  if (workoutSessions.length === 0) {
+  if (workoutDays.length === 0) {
     return (
       <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
         <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
