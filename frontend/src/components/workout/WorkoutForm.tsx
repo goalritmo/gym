@@ -44,6 +44,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   })
   
   const [showSuccess, setShowSuccess] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = exercises.length === 0
@@ -62,7 +63,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       })
     } catch (error) {
       console.error('Error submitting workout:', error)
-      alert('Error al guardar el entrenamiento. Revisa la consola para más detalles.')
+      setErrorMessage('Error al registrar el entrenamiento')
     }
   })
 
@@ -378,10 +379,51 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       open={showSuccess}
       autoHideDuration={3000}
       onClose={() => setShowSuccess(false)}
-      message="✅ Entrenamiento guardado exitosamente"
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      sx={{ mt: 8 }}
-    />
+      sx={{ 
+        mt: 6,
+        width: { xs: '95%', sm: '90%', md: '70%' },
+        left: '50%',
+        transform: 'translateX(-50%)'
+      }}
+    >
+      <Alert 
+        severity="success" 
+        sx={{ 
+          width: '100%',
+          minWidth: '300px',
+          fontSize: '0.95rem',
+          fontWeight: 500
+        }}
+      >
+        ✅ Entrenamiento guardado exitosamente
+      </Alert>
+    </Snackbar>
+
+    <Snackbar
+      open={!!errorMessage}
+      autoHideDuration={4000}
+      onClose={() => setErrorMessage('')}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      sx={{ 
+        mt: 6,
+        width: { xs: '95%', sm: '90%', md: '70%' },
+        left: '50%',
+        transform: 'translateX(-50%)'
+      }}
+    >
+      <Alert 
+        severity="error" 
+        sx={{ 
+          width: '100%',
+          minWidth: '300px',
+          fontSize: '0.95rem',
+          fontWeight: 500
+        }}
+      >
+        ❌ {errorMessage}
+      </Alert>
+    </Snackbar>
 
     </Box>
 

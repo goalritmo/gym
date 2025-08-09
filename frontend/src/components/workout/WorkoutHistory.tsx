@@ -48,7 +48,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   })
   const [newSessionName, setNewSessionName] = useState('')
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false)
-  const [showUpdateError, setShowUpdateError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [loadingSessionId, setLoadingSessionId] = useState<number | null>(null)
 
   const formatDate = (dateString: string) => {
@@ -138,7 +138,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
       setShowUpdateSuccess(true);
     } catch (error) {
       console.error('❌ Error actualizando esfuerzo:', error);
-      setShowUpdateError(true);
+      setErrorMessage('Error al actualizar el esfuerzo');
     } finally {
       setLoadingSessionId(null);
     }
@@ -152,7 +152,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
       setShowUpdateSuccess(true);
     } catch (error) {
       console.error('❌ Error actualizando ánimo:', error);
-      setShowUpdateError(true);
+      setErrorMessage('Error al actualizar el ánimo');
     } finally {
       setLoadingSessionId(null);
     }
@@ -174,7 +174,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         setShowUpdateSuccess(true)
       } catch (error) {
         console.error('❌ Error actualizando nombre de sesión:', error);
-        setShowUpdateError(true);
+        setErrorMessage('Error al actualizar el nombre');
         // No cerrar modal ni mostrar éxito si hay error
       } finally {
         setLoadingSessionId(null);
@@ -801,20 +801,49 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         open={showUpdateSuccess}
         autoHideDuration={3000}
         onClose={() => setShowUpdateSuccess(false)}
-        message="✅ Sesión actualizada exitosamente"
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{ mt: 8 }}
-      />
+        sx={{ 
+          mt: 6,
+          width: { xs: '95%', sm: '90%', md: '70%' },
+          left: '50%',
+          transform: 'translateX(-50%)'
+        }}
+      >
+        <Alert 
+          severity="success" 
+          sx={{ 
+            width: '100%',
+            minWidth: '300px',
+            fontSize: '0.95rem',
+            fontWeight: 500
+          }}
+        >
+          ✅ Sesión actualizada exitosamente
+        </Alert>
+      </Snackbar>
       
       <Snackbar
-        open={showUpdateError}
+        open={!!errorMessage}
         autoHideDuration={4000}
-        onClose={() => setShowUpdateError(false)}
+        onClose={() => setErrorMessage('')}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{ mt: 8 }}
+        sx={{ 
+          mt: 6,
+          width: { xs: '95%', sm: '90%', md: '70%' },
+          left: '50%',
+          transform: 'translateX(-50%)'
+        }}
       >
-        <Alert severity="error" sx={{ width: '100%' }}>
-          ❌ Error al actualizar la sesión
+        <Alert 
+          severity="error" 
+          sx={{ 
+            width: '100%',
+            minWidth: '300px',
+            fontSize: '0.95rem',
+            fontWeight: 500
+          }}
+        >
+          ❌ {errorMessage}
         </Alert>
       </Snackbar>
     </Box>
