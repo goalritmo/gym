@@ -296,47 +296,48 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 sx: {
                   width: '100%',
                   '& .MuiOutlinedInput-root': {
-                    bgcolor: 'white !important',
-                    border: '1px solid rgba(0, 0, 0, 0.23) !important',
+                    bgcolor: '#1976d2 !important',
+                    border: '1px solid #1976d2 !important',
                     borderRadius: 2,
                     '&:hover': {
-                      bgcolor: 'white !important',
-                      borderColor: 'rgba(0, 0, 0, 0.87) !important',
+                      bgcolor: '#1565c0 !important',
+                      borderColor: '#1565c0 !important',
                     },
                     '&.Mui-focused': {
-                      bgcolor: 'white !important',
+                      bgcolor: '#1976d2 !important',
                       borderColor: '#1976d2 !important',
                     },
                     '& .MuiOutlinedInput-notchedOutline': {
-                      backgroundColor: 'white !important'
+                      backgroundColor: '#1976d2 !important',
+                      borderColor: '#1976d2 !important'
                     }
                   },
                   '& .MuiInputBase-root': {
-                    backgroundColor: 'white !important'
+                    backgroundColor: '#1976d2 !important'
                   },
                   '& .MuiInputBase-input': {
-                    color: '#000 !important',
+                    color: 'white !important',
                     fontSize: '1rem',
                     fontWeight: 500,
-                    backgroundColor: 'white !important'
+                    backgroundColor: 'transparent !important'
                   },
                   '& .MuiInputAdornment-root': {
-                    color: '#000 !important',
-                    backgroundColor: 'white !important'
+                    color: 'white !important',
+                    backgroundColor: 'transparent !important'
                   },
                   '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-                    color: '#000 !important',
+                    color: 'white !important',
                     fontSize: '1.4rem',
                     backgroundColor: 'transparent !important'
                   },
                   '& .MuiInputBase-inputAdornedEnd': {
-                    backgroundColor: 'white !important'
+                    backgroundColor: 'transparent !important'
                   },
                   '& .MuiInputLabel-root': {
-                    color: '#333 !important',
+                    color: 'white !important',
                     fontWeight: 600,
                     fontSize: '1rem',
-                    backgroundColor: 'white !important',
+                    backgroundColor: '#1976d2 !important',
                     px: 1,
                     borderRadius: 1,
                     '&.Mui-focused': {
@@ -349,8 +350,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                     }
                   },
                   '& .MuiFormLabel-root': {
-                    color: '#333 !important',
-                    backgroundColor: 'white !important',
+                    color: 'white !important',
+                    backgroundColor: '#1976d2 !important',
                     px: 1,
                     borderRadius: 1
                   }
