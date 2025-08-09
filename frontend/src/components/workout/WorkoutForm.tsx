@@ -188,25 +188,44 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
               mb: 3, 
               borderRadius: 2,
               bgcolor: 'rgba(33, 150, 243, 0.04)',
-              border: '1px solid rgba(33, 150, 243, 0.2)'
+              border: '1px solid rgba(33, 150, 243, 0.2)',
+              p: 2, // Reducir padding del contenedor
+              '& .MuiAlert-message': {
+                width: '100%',
+                textAlign: 'left'
+              }
             }}
           >
-            <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main', mb: 1.5, textAlign: 'left', fontSize: '0.8rem' }}>
+            <Typography variant="caption" sx={{ 
+              fontWeight: 600, 
+              color: 'primary.main', 
+              mb: 1, 
+              textAlign: 'left', 
+              fontSize: '0.8rem',
+              display: 'block'
+            }}>
               💡 Controlalo para maximizar resultados
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6, width: '100%', textAlign: 'left', fontSize: '0.75rem' }}>
+            <Typography variant="caption" color="text.secondary" sx={{ 
+              lineHeight: 1.6, 
+              width: '100%', 
+              textAlign: 'left', 
+              fontSize: '0.75rem',
+              display: 'block',
+              mb: 1
+            }}>
               <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Este registro te va a permitir mejorar la técnica y comparar tu progreso.
             </Typography>
             <Box sx={{ 
               display: 'flex', 
-              gap: 1, 
-              mt: 1.5, 
+              gap: 0.8, 
+              mt: 1, 
               justifyContent: 'space-between',
               width: '100%',
               '& > div': {
                 bgcolor: 'rgba(255,255,255,0.8)',
-                px: 1,
-                py: 0.8,
+                px: 0.8,
+                py: 0.6,
                 borderRadius: 1,
                 border: '1px solid rgba(33, 150, 243, 0.1)',
                 textAlign: 'center',

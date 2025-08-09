@@ -155,22 +155,27 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   if (workoutSessions.length === 0) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '60vh',
-        px: 3
-      }}>
-        <Paper sx={{ 
-          p: 6, 
-          textAlign: 'center',
-          width: '100%',
-          maxWidth: 500,
-          borderRadius: 3,
-          boxShadow: 3,
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
+          Entrenamientos
+        </Typography>
+        
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          minHeight: '60vh',
+          mx: 2
         }}>
+          <Paper sx={{ 
+            p: 6, 
+            textAlign: 'center',
+            width: '100%',
+            maxWidth: 500,
+            borderRadius: 3,
+            boxShadow: 3,
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+          }}>
           <Box sx={{ mb: 3 }}>
             <FitnessCenterIcon sx={{ 
               fontSize: 80, 
@@ -208,6 +213,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             </Typography>
           </Box>
         </Paper>
+        </Box>
       </Box>
     )
   }
