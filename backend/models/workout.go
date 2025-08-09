@@ -53,7 +53,7 @@ type CreateWorkoutSessionRequest struct {
 // UpdateWorkoutSessionRequest representa la estructura para actualizar una sesión
 type UpdateWorkoutSessionRequest struct {
 	SessionName *string `json:"session_name"`
-	Effort      *int    `json:"effort" validate:"omitempty,gte=0,lte=3"`
-	Mood        *int    `json:"mood" validate:"omitempty,gte=0,lte=3"`
+	Effort      *int    `json:"effort" validate:"omitempty,gte=0,lte=5"`
+	Mood        *int    `json:"mood" validate:"omitempty,gte=0,lte=5"`
 	Notes       *string `json:"notes"`
 }
