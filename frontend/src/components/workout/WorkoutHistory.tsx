@@ -186,7 +186,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   if (workoutDays.length === 0) {
     return (
       <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 2, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
           Entrenamientos
         </Typography>
         
@@ -197,7 +197,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           minHeight: '60vh'
         }}>
           <Paper sx={{ 
-            p: 4, 
+            p: 5, 
             textAlign: 'center',
             width: '100%',
             borderRadius: 3,
@@ -209,7 +209,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               fontSize: 80, 
               color: 'primary.main',
               opacity: 0.7,
-              mb: 2
+              mb: 1
             }} />
           </Box>
           
@@ -222,7 +222,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           </Typography>
           
           <Typography variant="body1" color="text.secondary" sx={{ mb: 1, lineHeight: 1.6 }}>
-            No hay entrenamientos registrados aún. Ve al menú y selecciona:
+            No hay entrenamientos registrados aún.
           </Typography>
           
           <Box 
@@ -233,7 +233,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               justifyContent: 'center',
               gap: 1,
               p: 2,
-              mb: 1,
+              mb: 2,
               bgcolor: 'rgba(25, 118, 210, 0.1)',
               borderRadius: 2,
               border: '1px solid rgba(25, 118, 210, 0.2)',

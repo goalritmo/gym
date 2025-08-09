@@ -55,7 +55,7 @@ export default function LoginComponent() {
           sx={{ 
             mb: 3, 
             fontWeight: 'bold', 
-            color: '#000' 
+            color: 'warning.main' 
           }}
         >
           Gym App
