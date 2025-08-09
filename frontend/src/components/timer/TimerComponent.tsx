@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Button, Stack, Typography } from '@mui/material'
+import { Button, Box, Typography } from '@mui/material'
 
 type TimerComponentProps = {
   onTimeComplete?: (seconds: number) => void
@@ -51,24 +51,37 @@ export default function TimerComponent({ onTimeComplete }: TimerComponentProps) 
   }
 
   return (
-    <Stack spacing={2} alignItems="center">
-      <Typography variant="h2" component="div">
+    <Box>
+      {/* Display del tiempo */}
+      <Typography 
+        variant="h4" 
+        component="div" 
+        sx={{ 
+          textAlign: 'center', 
+          mb: 2, 
+          fontFamily: 'monospace',
+          color: isRunning ? 'primary.main' : 'text.primary'
+        }}
+      >
         {formatTime(time)}
       </Typography>
       
-      <Button 
-        variant="contained" 
-        onClick={handleToggleTimer}
-        size="large"
-        sx={{ 
-          minWidth: 120,
-          py: 1.5,
-          fontSize: '1.1rem',
-          fontWeight: 'bold'
-        }}
-      >
-        {!isRunning ? 'Iniciar' : 'Capturar'}
-      </Button>
-    </Stack>
+      {/* Botón centrado */}
+      <Box sx={{ textAlign: 'center' }}>
+        <Button 
+          variant="contained" 
+          onClick={handleToggleTimer}
+          size="large"
+          sx={{ 
+            minWidth: 140,
+            py: 1.5,
+            fontSize: '1.1rem',
+            fontWeight: 'bold'
+          }}
+        >
+          {!isRunning ? 'Iniciar' : 'Capturar'}
+        </Button>
+      </Box>
+    </Box>
   )
 }

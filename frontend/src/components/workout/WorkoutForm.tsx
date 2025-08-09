@@ -150,7 +150,7 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
         <Box>
           <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <AccessTime color="primary" />
-            Tiempo de Descanso
+            Tiempo de Serie
           </Typography>
           
           {/* Mensaje educativo */}
@@ -160,42 +160,62 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
             sx={{ mb: 3, borderRadius: 2 }}
           >
             <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
-              ⏱️ <strong>¿Por qué medir el tiempo de descanso?</strong>
+              ⏱️ <strong>¿Por qué medir el tiempo de cada serie?</strong>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              • <strong>Consistencia:</strong> Mantener tiempos similares entre series mejora la comparabilidad del entrenamiento<br/>
-              • <strong>Progreso:</strong> Reducir gradualmente el descanso aumenta la intensidad y resistencia<br/>
-              • <strong>Objetivos:</strong> 30-60s (resistencia), 1-3min (hipertrofia), 3-5min (fuerza máxima)
+              • <strong>Control de intensidad:</strong> Series más lentas = mayor tiempo bajo tensión, más hipertrofia<br/>
+              • <strong>Progreso medible:</strong> Comparar rendimiento entre entrenamientos con el mismo tiempo<br/>
+              • <strong>Técnica:</strong> Controlar la velocidad ayuda a mantener buena forma y prevenir lesiones<br/>
+              • <strong>Objetivos:</strong> 20-40s (fuerza), 40-60s (hipertrofia), 60s+ (resistencia)
             </Typography>
           </Alert>
 
-          {/* Cronómetro y campo de segundos en la misma fila */}
-          <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 2, flexWrap: 'wrap' }}>
-            <Box sx={{ flex: '1 1 auto', minWidth: '200px' }}>
+          {/* Cronómetro y campo de segundos */}
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'center', sm: 'flex-end' }, 
+            gap: 3,
+            justifyContent: 'space-between'
+          }}>
+            {/* Cronómetro */}
+            <Box sx={{ flex: '1 1 auto', width: '100%', maxWidth: '300px' }}>
               <TimerComponent onTimeComplete={handleTimerComplete} />
             </Box>
-            <TextField
-              label="Segundos"
-              type="number"
-              inputProps={{ 
-                inputMode: 'numeric',
-                pattern: '[0-9]*',
-                min: 0
-              }}
-              {...register('seconds', { valueAsNumber: true })}
-              sx={{ 
-                width: '120px',
-                '& .MuiInputBase-root': {
-                  minWidth: '120px'
-                },
-                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                  display: 'none'
-                },
-                '& input[type=number]': {
-                  MozAppearance: 'textfield'
-                }
-              }}
-            />
+            
+            {/* Input de segundos */}
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center',
+              minWidth: '140px'
+            }}>
+              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+                Tiempo manual
+              </Typography>
+              <TextField
+                label="Segundos"
+                type="number"
+                inputProps={{ 
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*',
+                  min: 0
+                }}
+                {...register('seconds', { valueAsNumber: true })}
+                sx={{ 
+                  width: '120px',
+                  '& .MuiInputBase-root': {
+                    minWidth: '120px'
+                  },
+                  '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                    display: 'none'
+                  },
+                  '& input[type=number]': {
+                    MozAppearance: 'textfield'
+                  }
+                }}
+              />
+            </Box>
           </Box>
         </Box>
 
