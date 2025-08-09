@@ -280,28 +280,28 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 sx: {
                   width: '100%',
                   '& .MuiOutlinedInput-root': {
-                    bgcolor: 'white',
-                    border: '2px solid rgba(255, 255, 255, 0.3)',
+                    bgcolor: 'white !important',
+                    border: '1px solid rgba(0, 0, 0, 0.23) !important',
                     borderRadius: 2,
                     '&:hover': {
-                      bgcolor: 'white',
-                      border: '2px solid rgba(255, 255, 255, 0.5)',
+                      bgcolor: 'white !important',
+                      borderColor: 'rgba(0, 0, 0, 0.87) !important',
                     },
                     '&.Mui-focused': {
-                      bgcolor: 'white',
-                      border: '2px solid white',
+                      bgcolor: 'white !important',
+                      borderColor: '#1976d2 !important',
                     }
                   },
                   '& .MuiInputBase-input': {
-                    color: '#333',
+                    color: '#000 !important',
                     fontSize: '1rem',
                     fontWeight: 500
                   },
                   '& .MuiInputAdornment-root': {
-                    color: 'white'
+                    color: '#000 !important'
                   },
                   '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-                    color: 'white',
+                    color: '#000 !important',
                     fontSize: '1.4rem'
                   },
                   '& .MuiInputLabel-root': {
