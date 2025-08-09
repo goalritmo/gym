@@ -329,9 +329,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             slotProps={{
               popper: {
                 sx: {
-                  '& .MuiPickersCalendarHeader-switchViewButton': {
-                    display: 'none'
-                  },
+
                   '& .MuiDateCalendar-viewTransitionContainer': {
                     '& .MuiPickersArrowSwitcher-root': {
                       display: 'flex'
@@ -347,6 +345,15 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                     display: 'none !important'
                   },
                   '& .MuiPickersCalendarHeader-labelContainer': {
+                    display: 'none !important'
+                  },
+                  '& .MuiPickersCalendarHeader-root': {
+                    display: 'none !important'
+                  },
+                  '& .MuiTypography-h4': {
+                    display: 'none !important'
+                  },
+                  '& .MuiPickersCalendarHeader-switchViewButton': {
                     display: 'none !important'
                   },
                   '& .MuiPickersLayout-actionBar': {
@@ -957,10 +964,11 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             minWidth: '300px',
             fontSize: '0.95rem',
             fontWeight: 500,
-            backgroundColor: '#4caf50',
-            color: 'white',
+            backgroundColor: '#e8f5e8',
+            color: '#2e7d32',
+            border: '1px solid #4caf50',
             '& .MuiAlert-icon': {
-              color: 'white'
+              color: '#2e7d32'
             }
           }}
         >
@@ -986,7 +994,13 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             width: '100%',
             minWidth: '300px',
             fontSize: '0.95rem',
-            fontWeight: 500
+            fontWeight: 500,
+            backgroundColor: '#ffebee',
+            color: '#c62828',
+            border: '1px solid #f44336',
+            '& .MuiAlert-icon': {
+              color: '#c62828'
+            }
           }}
         >
           ❌ {errorMessage}

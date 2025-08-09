@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, Snackbar, Alert } from '@mui/material'
 import { useState, useEffect } from 'react'
 import Navigation from '../navigation/Navigation'
 import WorkoutForm from '../workout/WorkoutForm'
@@ -16,6 +16,8 @@ export default function AuthenticatedApp() {
   const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
   const [exercises, setExercises] = useState<any[]>([])
   const [isSubmittingWorkout, setIsSubmittingWorkout] = useState(false)
+  const [deleteMessage, setDeleteMessage] = useState('')
+  const [deleteError, setDeleteError] = useState('')
 
   // Cargar datos desde el backend al montar el componente
   useEffect(() => {
@@ -144,9 +146,10 @@ export default function AuthenticatedApp() {
       // Actualizar estado local
       setWorkouts(prev => prev.filter(w => w.id !== workoutId))
       console.log('✅ Workout eliminado exitosamente')
+      setDeleteMessage('Entrenamiento eliminado exitosamente')
     } catch (error) {
       console.error('❌ Error eliminando workout:', error)
-      alert('Error al eliminar el entrenamiento. Revisa la consola para más detalles.')
+      setDeleteError('Error al eliminar el entrenamiento')
     }
   }
 
@@ -322,6 +325,69 @@ export default function AuthenticatedApp() {
           </Box>
         )}
       </Box>
+
+      {/* Notificaciones para eliminación */}
+      <Snackbar
+        open={!!deleteMessage}
+        autoHideDuration={3000}
+        onClose={() => setDeleteMessage('')}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{ 
+          mt: 6,
+          width: { xs: '95%', sm: '90%', md: '70%' },
+          left: '50%',
+          transform: 'translateX(-50%)'
+        }}
+      >
+        <Alert 
+          severity="success" 
+          sx={{ 
+            width: '100%',
+            minWidth: '300px',
+            fontSize: '0.95rem',
+            fontWeight: 500,
+            backgroundColor: '#e8f5e8',
+            color: '#2e7d32',
+            border: '1px solid #4caf50',
+            '& .MuiAlert-icon': {
+              color: '#2e7d32'
+            }
+          }}
+        >
+          ✅ {deleteMessage}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={!!deleteError}
+        autoHideDuration={4000}
+        onClose={() => setDeleteError('')}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{ 
+          mt: 6,
+          width: { xs: '95%', sm: '90%', md: '70%' },
+          left: '50%',
+          transform: 'translateX(-50%)'
+        }}
+      >
+        <Alert 
+          severity="error" 
+          sx={{ 
+            width: '100%',
+            minWidth: '300px',
+            fontSize: '0.95rem',
+            fontWeight: 500,
+            backgroundColor: '#ffebee',
+            color: '#c62828',
+            border: '1px solid #f44336',
+            '& .MuiAlert-icon': {
+              color: '#c62828'
+            }
+          }}
+        >
+          ❌ {deleteError}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }

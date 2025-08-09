@@ -404,17 +404,23 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         transform: 'translateX(-50%)'
       }}
     >
-      <Alert 
-        severity="success" 
-        sx={{ 
-          width: '100%',
-          minWidth: '300px',
-          fontSize: '0.95rem',
-          fontWeight: 500
-        }}
-      >
-        ✅ Entrenamiento guardado exitosamente
-      </Alert>
+              <Alert 
+          severity="success" 
+          sx={{ 
+            width: '100%',
+            minWidth: '300px',
+            fontSize: '0.95rem',
+            fontWeight: 500,
+            backgroundColor: '#e8f5e8',
+            color: '#2e7d32',
+            border: '1px solid #4caf50',
+            '& .MuiAlert-icon': {
+              color: '#2e7d32'
+            }
+          }}
+        >
+          ✅ Entrenamiento guardado exitosamente
+        </Alert>
     </Snackbar>
 
     <Snackbar
@@ -429,17 +435,23 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         transform: 'translateX(-50%)'
       }}
     >
-      <Alert 
-        severity="error" 
-        sx={{ 
-          width: '100%',
-          minWidth: '300px',
-          fontSize: '0.95rem',
-          fontWeight: 500
-        }}
-      >
-        ❌ {errorMessage}
-      </Alert>
+              <Alert 
+          severity="error" 
+          sx={{ 
+            width: '100%',
+            minWidth: '300px',
+            fontSize: '0.95rem',
+            fontWeight: 500,
+            backgroundColor: '#ffebee',
+            color: '#c62828',
+            border: '1px solid #f44336',
+            '& .MuiAlert-icon': {
+              color: '#c62828'
+            }
+          }}
+        >
+          ❌ {errorMessage}
+        </Alert>
     </Snackbar>
 
     </Box>
