@@ -31,6 +31,9 @@ type WorkoutFormProps = {
 }
 
 export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: WorkoutFormProps) {
+  // Debug: Ver qué ejercicios estamos recibiendo
+  console.log('WorkoutForm exercises received:', exercises)
+  
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
@@ -76,7 +79,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
-        <FormControl fullWidth error={Boolean(errors.exerciseId)} disabled={isLoading}>
+        <FormControl fullWidth error={Boolean(errors.exerciseId)} disabled={isLoading || exercises.length === 0}>
           <InputLabel id="exercise-select-label">Ejercicio</InputLabel>
           <Select
             labelId="exercise-select-label"
@@ -98,7 +101,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
               }
             }}
           >
-            <MenuItem value="">Seleccionar ejercicio...</MenuItem>
+            <MenuItem value="" disabled={exercises.length === 0}>
+              {exercises.length === 0 ? 'Cargando ejercicios...' : 'Seleccionar ejercicio...'}
+            </MenuItem>
             {exercises.map((ex) => (
               <MenuItem key={ex.id} value={ex.id}>
                 {ex.name}

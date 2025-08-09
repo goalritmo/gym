@@ -305,9 +305,12 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                     fontSize: '1.4rem'
                   },
                   '& .MuiInputLabel-root': {
-                    color: 'white',
+                    color: '#333 !important',
                     fontWeight: 600,
                     fontSize: '1rem',
+                    backgroundColor: 'white !important',
+                    px: 1,
+                    borderRadius: 1,
                     '&.Mui-focused': {
                       transform: 'translate(14px, -9px) scale(0)',
                       opacity: 0
@@ -318,7 +321,10 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                     }
                   },
                   '& .MuiFormLabel-root': {
-                    color: 'white'
+                    color: '#333 !important',
+                    backgroundColor: 'white !important',
+                    px: 1,
+                    borderRadius: 1
                   }
                 }
               },

@@ -53,17 +53,9 @@ export default function AuthenticatedApp() {
           setWorkoutSessions(JSON.parse(savedSessions))
         }
         
-        // Ejercicios por defecto si no se pueden cargar del backend
-        setExercises([
-          { id: 1, name: 'Press de Banca' },
-          { id: 2, name: 'Sentadilla' },
-          { id: 3, name: 'Peso Muerto' },
-          { id: 4, name: 'Press Militar' },
-          { id: 5, name: 'Curl de Bíceps' },
-          { id: 6, name: 'Extensiones de Tríceps' },
-          { id: 7, name: 'Remo con Barra' },
-          { id: 8, name: 'Pull-ups' }
-        ])
+        // Solo usar ejercicios por defecto si no hay ninguno cargado
+        console.log('⚠️ No se pudieron cargar ejercicios del backend. Usando array vacío.')
+        setExercises([])
       }
     }
     
