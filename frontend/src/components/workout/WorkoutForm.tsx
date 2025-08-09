@@ -16,9 +16,9 @@ type Exercise = {
 const workoutFormSchema = z.object({
   exerciseId: z.coerce.number().min(1, 'Selecciona un ejercicio'),
   weight: z.coerce.number().min(0.1, 'El peso debe ser mayor a 0'),
-  reps: z.coerce.number().int('Las repeticiones deben ser un número entero').min(1, 'Debe ser al menos 1 repetición'),
-  serie: z.coerce.number().int('La serie debe ser un número entero').min(1, 'Debe ser al menos la serie 1').optional(),
-  seconds: z.coerce.number().min(0, 'Los segundos no pueden ser negativos').optional(),
+  reps: z.coerce.number().int().min(1, 'Debe ser al menos 1 repe'),
+  serie: z.coerce.number().int().min(1, 'Debe ser al menos 1 serie'),
+  seconds: z.coerce.number().min(0, 'Los segundos deben ser mayores a 0').optional(),
   observations: z.string().default('')
 })
 
@@ -34,11 +34,11 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
-      exerciseId: 0,
-      weight: 0,
-      reps: 0,
-      serie: 0,
-      seconds: 0,
+      exerciseId: '',
+      weight: '',
+      reps: '',
+      serie: 1,
+      seconds: '',
       observations: ''
     }
   })
@@ -113,72 +113,85 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           </Select>
         </FormControl>
 
-        <TextField
-          label="Peso (kg)"
-          type="number"
-          disabled={isLoading}
-          error={Boolean(errors.weight)}
-          helperText={errors.weight?.message}
-          inputProps={{ 
-            step: 'any',
-            inputMode: 'decimal',
-            pattern: '[0-9]*',
-            min: '0'
-          }}
-          {...register('weight', { valueAsNumber: true })}
-          sx={{
-            '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-              display: 'none'
-            },
-            '& input[type=number]': {
-              MozAppearance: 'textfield'
-            }
-          }}
-        />
+        {/* Peso, Reps y Serie en la misma fila */}
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 2, 
+          flexDirection: { xs: 'column', sm: 'row' }
+        }}>
+          <TextField
+            label="Peso (kg)"
+            type="number"
+            disabled={isLoading}
+            error={Boolean(errors.weight)}
+            helperText={errors.weight?.message}
+            inputProps={{ 
+              step: 'any',
+              inputMode: 'decimal',
+              pattern: '[0-9]*',
+              min: '0'
+            }}
+            {...register('weight', { valueAsNumber: true })}
+            sx={{
+              flex: 1,
+              '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                display: 'none'
+              },
+              '& input[type=number]': {
+                MozAppearance: 'textfield'
+              }
+            }}
+          />
 
-        <TextField
-          label="Repeticiones"
-          type="number"
-          disabled={isLoading}
-          error={Boolean(errors.reps)}
-          helperText={errors.reps?.message}
-          inputProps={{ 
-            inputMode: 'numeric',
-            pattern: '[0-9]*',
-            min: '0'
-          }}
-          {...register('reps', { valueAsNumber: true })}
-          sx={{
-            '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-              display: 'none'
-            },
-            '& input[type=number]': {
-              MozAppearance: 'textfield'
-            }
-          }}
-        />
+          <TextField
+            label="Reps"
+            type="number"
+            disabled={isLoading}
+            error={Boolean(errors.reps)}
+            helperText={errors.reps?.message}
+            inputProps={{ 
+              inputMode: 'numeric',
+              pattern: '[0-9]*',
+              min: '0'
+            }}
+            {...register('reps', { valueAsNumber: true })}
+            sx={{
+              flex: 1,
+              '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                display: 'none'
+              },
+              '& input[type=number]': {
+                MozAppearance: 'textfield'
+              }
+            }}
+          />
 
-        <TextField
-          label="Serie"
-          type="number"
-          disabled={isLoading}
-          error={Boolean(errors.serie)}
-          helperText={errors.serie?.message}
-          inputProps={{ 
-            inputMode: 'numeric',
-            pattern: '[0-9]*',
-            min: '0'
-          }}
-          {...register('serie', { valueAsNumber: true })}
-          sx={{
-            '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-              display: 'none'
-            },
-            '& input[type=number]': {
-              MozAppearance: 'textfield'
-            }
-          }}
-        />
+          <FormControl 
+            fullWidth 
+            error={Boolean(errors.serie)} 
+            disabled={isLoading}
+            sx={{ flex: 1 }}
+          >
+            <InputLabel id="serie-select-label">Serie</InputLabel>
+            <Select
+              labelId="serie-select-label"
+              label="Serie"
+              value={watch('serie')}
+              {...register('serie', { valueAsNumber: true })}
+            >
+              {[1, 2, 3, 4, 5].map((serie) => (
+                <MenuItem key={serie} value={serie}>
+                  {serie}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.serie && (
+              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                {errors.serie.message}
+              </Typography>
+            )}
+          </FormControl>
+        </Box>
 
         <Box>
           <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
