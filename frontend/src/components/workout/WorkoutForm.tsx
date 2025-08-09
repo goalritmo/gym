@@ -31,9 +31,6 @@ type WorkoutFormProps = {
 }
 
 export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: WorkoutFormProps) {
-  // Debug: Ver qué ejercicios estamos recibiendo
-  console.log('WorkoutForm exercises received:', exercises)
-  
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
