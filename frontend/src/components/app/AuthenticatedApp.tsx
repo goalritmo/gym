@@ -184,7 +184,7 @@ export default function AuthenticatedApp() {
       
       <Box sx={{ 
         flexGrow: 1, 
-        py: activeTab === TABS.HISTORY ? 0 : 2, // Sin padding solo para Historial
+        p: 2, // Mantener padding uniforme
         overflow: 'auto',
         '&::-webkit-scrollbar': {
           display: 'none'

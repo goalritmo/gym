@@ -160,7 +160,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         justifyContent: 'center', 
         alignItems: 'center', 
         minHeight: '60vh',
-        px: 3
+        px: 3,
+        mt: -2
       }}>
         <Paper sx={{ 
           p: 6, 
@@ -213,7 +214,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', mt: -2 }}>
       <Typography variant="h5" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
         Mis Entrenamientos
       </Typography>
@@ -302,6 +303,9 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             boxShadow: 2, 
             width: '100%',
             cursor: 'pointer',
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: 'divider',
             '&:hover': {
               boxShadow: 4,
               transform: 'translateY(-2px)',
@@ -369,6 +373,9 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                       key={exerciseGroup.exerciseName} 
                       sx={{ 
                         cursor: 'pointer',
+                        borderRadius: 2,
+                        border: '1px solid',
+                        borderColor: 'divider',
                         '&:hover': {
                           backgroundColor: 'action.hover',
                           transform: 'translateY(-1px)',
@@ -434,7 +441,12 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           <Box sx={{ mt: 2 }}>
             <Stack spacing={3}>
               {selectedExercise?.map((workout, index) => (
-                <Card key={index} sx={{ boxShadow: 2 }}>
+                <Card key={index} sx={{ 
+                  boxShadow: 2,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}>
                   <CardContent sx={{ py: 2, px: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                       <Typography variant="h6" component="h4" sx={{ fontWeight: 'bold' }}>
