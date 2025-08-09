@@ -128,7 +128,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Buscar o crear workout_session para hoy
 	today := time.Now().Format("2006-01-02")
-	var sessionID string
+	var sessionID int
 	
 	// Verificar si ya existe una sesión para hoy
 	sessionQuery := `SELECT id FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 LIMIT 1`
@@ -149,9 +149,9 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error creando sesión de entrenamiento", http.StatusInternalServerError)
 			return
 		}
-		fmt.Printf("✅ Sesión creada con ID: %s\n", sessionID)
+		fmt.Printf("✅ Sesión creada con ID: %d\n", sessionID)
 	} else {
-		fmt.Printf("✅ Sesión existente encontrada con ID: %s\n", sessionID)
+		fmt.Printf("✅ Sesión existente encontrada con ID: %d\n", sessionID)
 	}
 
 	// Insertar workout asociado a la sesión
@@ -184,12 +184,12 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	err = database.DB.QueryRow(
 		query,
 		userID, req.ExerciseID, req.Weight, req.Reps,
-		serieValue, secondsValue, req.Observations, sessionID,
+		serieValue, secondsValue, req.Observations, strconv.Itoa(sessionID),
 	).Scan(&workout.ID, &workout.ExerciseSessionID, &workout.CreatedAt)
 
 	if err != nil {
 		fmt.Printf("❌ Error creando workout: %v\n", err)
-		fmt.Printf("📋 Datos del workout: userID=%s, exerciseID=%d, sessionID=%s\n", userID, req.ExerciseID, sessionID)
+		fmt.Printf("📋 Datos del workout: userID=%s, exerciseID=%d, sessionID=%d\n", userID, req.ExerciseID, sessionID)
 		http.Error(w, "Error creando workout", http.StatusInternalServerError)
 		return
 	}
