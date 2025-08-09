@@ -165,21 +165,21 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
             }}
           >
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main', mb: 1.5, textAlign: 'left' }}>
-              💡 Controla el tiempo para maximizar resultados
+              💡 Controlalo para maximizar resultados
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, width: '100%', textAlign: 'left' }}>
-              <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Controla la velocidad para mejorar técnica y comparar progreso.
+              <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Este registro te va a permitir mejorar la técnica y comparar tu progreso.
             </Typography>
             <Box sx={{ 
               display: 'flex', 
-              gap: 2, 
+              gap: 1, 
               mt: 1.5, 
               justifyContent: 'space-between',
               width: '100%',
               '& > div': {
                 bgcolor: 'rgba(255,255,255,0.8)',
-                px: 1.5,
-                py: 1,
+                px: 1,
+                py: 0.8,
                 borderRadius: 1,
                 border: '1px solid rgba(33, 150, 243, 0.1)',
                 textAlign: 'center',
@@ -188,10 +188,10 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
               }
             }}>
               <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: 'error.main', display: 'block' }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block' }}>
                   Fuerza:
                 </Typography>
-                <Typography variant="caption" sx={{ fontWeight: 500, color: 'error.main', display: 'block', mt: 0.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3 }}>
                   20-40s
                 </Typography>
               </Box>
@@ -199,15 +199,15 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
                 <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block' }}>
                   Hipertrofia:
                 </Typography>
-                <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3 }}>
                   40-60s
                 </Typography>
               </Box>
               <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: 'success.main', display: 'block' }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block' }}>
                   Resistencia:
                 </Typography>
-                <Typography variant="caption" sx={{ fontWeight: 500, color: 'success.main', display: 'block', mt: 0.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3 }}>
                   60s+
                 </Typography>
               </Box>

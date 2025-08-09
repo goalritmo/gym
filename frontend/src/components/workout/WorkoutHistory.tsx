@@ -165,7 +165,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         <Paper sx={{ 
           p: 6, 
           textAlign: 'center',
-          width: '70%',
+          width: '100%',
           maxWidth: 500,
           borderRadius: 3,
           boxShadow: 3,
