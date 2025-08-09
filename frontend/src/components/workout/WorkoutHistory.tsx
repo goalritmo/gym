@@ -209,20 +209,19 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               fontSize: 80, 
               color: 'primary.main',
               opacity: 0.7,
-              mb: 1
             }} />
           </Box>
           
           <Typography variant="h5" sx={{ 
             fontWeight: 'bold', 
             color: 'text.primary',
-            mb: 2
+            mb: 1
           }}>
             ¡Comienza tu entrenamiento!
           </Typography>
           
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 1, lineHeight: 1.6 }}>
-            No hay entrenamientos registrados aún.
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
+            No hay entrenamientos registrados aún
           </Typography>
           
           <Box 
