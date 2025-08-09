@@ -1,7 +1,10 @@
 import { useForm } from 'react-hook-form'
-import { TextField, Button, Stack, Box, Typography, Alert } from '@mui/material'
+import { TextField, Button, Stack, Box, Typography, Alert, Snackbar } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import { AccessTime } from '@mui/icons-material'
+import { useState } from 'react'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import TimerComponent from '../timer/TimerComponent'
 
 type Exercise = {
@@ -9,14 +12,17 @@ type Exercise = {
   name: string
 }
 
-type WorkoutFormData = {
-  exerciseId: number
-  weight: number
-  reps: number
-  serie?: number
-  seconds?: number
-  observations?: string
-}
+// Esquema de validación con Zod
+const workoutFormSchema = z.object({
+  exerciseId: z.coerce.number().min(1, 'Selecciona un ejercicio'),
+  weight: z.coerce.number().min(0.1, 'El peso debe ser mayor a 0'),
+  reps: z.coerce.number().int('Las repeticiones deben ser un número entero').min(1, 'Debe ser al menos 1 repetición'),
+  serie: z.coerce.number().int('La serie debe ser un número entero').min(1, 'Debe ser al menos la serie 1').optional(),
+  seconds: z.coerce.number().min(0, 'Los segundos no pueden ser negativos').optional(),
+  observations: z.string().default('')
+})
+
+type WorkoutFormData = z.infer<typeof workoutFormSchema>
 
 type WorkoutFormProps = {
   exercises: Exercise[]
@@ -24,7 +30,8 @@ type WorkoutFormProps = {
 }
 
 export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
-  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<WorkoutFormData>({
+  const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
+    resolver: zodResolver(workoutFormSchema),
     defaultValues: {
       exerciseId: 0,
       weight: 0,
@@ -34,10 +41,19 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
       observations: ''
     }
   })
+  
+  const [showSuccess, setShowSuccess] = useState(false)
 
   const selectedExerciseId = watch('exerciseId')
 
-  const submit = handleSubmit((data) => onSubmit(data))
+  const submit = handleSubmit((data: WorkoutFormData) => {
+    console.log('Form submitted with data:', data)
+    onSubmit(data)
+    setShowSuccess(true)
+    reset() // Limpiar el formulario después de guardar
+  }, (errors) => {
+    console.log('Form validation errors:', errors)
+  })
 
   // Función para capturar el tiempo del cronómetro
   const handleTimerComplete = (seconds: number) => {
@@ -131,6 +147,8 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
         <TextField
           label="Serie"
           type="number"
+          error={Boolean(errors.serie)}
+          helperText={errors.serie?.message}
           inputProps={{ 
             inputMode: 'numeric',
             pattern: '[0-9]*',
@@ -237,6 +255,8 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
               <TextField
                 label="Segundos"
                 type="number"
+                error={Boolean(errors.seconds)}
+                helperText={errors.seconds?.message}
                 inputProps={{ 
                   inputMode: 'numeric',
                   pattern: '[0-9]*',
@@ -294,6 +314,15 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
         </Button>
       </Stack>
     </form>
+
+    {/* Notificación de éxito */}
+    <Snackbar
+      open={showSuccess}
+      autoHideDuration={3000}
+      onClose={() => setShowSuccess(false)}
+      message="✅ Entrenamiento guardado exitosamente"
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+    />
     </Box>
   )
 }
