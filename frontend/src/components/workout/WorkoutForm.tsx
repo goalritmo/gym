@@ -363,13 +363,30 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
           sx={{ 
             mt: 2, 
+            px: 4,
             py: 1.5,
+            borderRadius: 3,
             fontSize: '1.1rem',
-            fontWeight: 'bold',
-            minWidth: 140
+            fontWeight: 600,
+            textTransform: 'none',
+            minWidth: 140,
+            backgroundColor: '#1976d2',
+            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+            '&:hover': {
+              backgroundColor: '#1565c0',
+              boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)',
+              transform: 'translateY(-1px)'
+            },
+            '&:disabled': {
+              backgroundColor: '#e0e0e0',
+              color: '#9e9e9e',
+              boxShadow: 'none',
+              transform: 'none'
+            },
+            transition: 'all 0.2s ease-in-out'
           }}
         >
-          {isLoading ? 'Guardando...' : 'Guardar'}
+          {isLoading ? 'Guardando...' : 'Guardar Entrenamiento'}
         </Button>
       </Stack>
     </form>

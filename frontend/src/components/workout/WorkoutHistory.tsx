@@ -324,70 +324,122 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             value={dateFilter}
             onChange={(newValue: Date | null) => setDateFilter(newValue)}
             shouldDisableDate={shouldDisableDate}
+            views={['year', 'month', 'day']}
+            openTo="day"
             slotProps={{
+              popper: {
+                sx: {
+                  '& .MuiPickersCalendarHeader-switchViewButton': {
+                    display: 'none'
+                  },
+                  '& .MuiDateCalendar-viewTransitionContainer': {
+                    '& .MuiPickersArrowSwitcher-root': {
+                      display: 'flex'
+                    }
+                  },
+                  '& .MuiPickersLayout-toolbar': {
+                    display: 'none'
+                  },
+                  '& .MuiPickersLayout-actionBar': {
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    px: 3,
+                    py: 2,
+                    '& .MuiButton-root': {
+                      borderRadius: 2,
+                      px: 3,
+                      py: 1,
+                      fontWeight: 600,
+                      textTransform: 'none',
+                      fontSize: '0.95rem',
+                      '&:first-of-type': {
+                        // Botón Cancelar
+                        color: '#666',
+                        backgroundColor: 'transparent',
+                        border: '1px solid #ddd',
+                        '&:hover': {
+                          backgroundColor: '#f5f5f5',
+                          borderColor: '#bbb'
+                        }
+                      },
+                      '&:last-of-type': {
+                        // Botón OK
+                        color: 'white',
+                        backgroundColor: '#1976d2',
+                        border: '1px solid #1976d2',
+                        '&:hover': {
+                          backgroundColor: '#1565c0',
+                          borderColor: '#1565c0'
+                        }
+                      }
+                    }
+                  }
+                }
+              },
               textField: {
                 sx: {
                   width: '100%',
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: '#1976d2 !important',
-                    border: '1px solid #1976d2 !important',
-                    borderRadius: 2,
-                    '&:hover': {
-                      bgcolor: '#1565c0 !important',
-                      borderColor: '#1565c0 !important',
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: '#1976d2 !important',
-                      borderColor: '#1976d2 !important',
-                    },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      backgroundColor: '#1976d2 !important',
-                      borderColor: '#1976d2 !important'
-                    }
-                  },
-                  '& .MuiInputBase-root': {
-                    backgroundColor: '#1976d2 !important'
-                  },
-                  '& .MuiInputBase-input': {
-                    color: 'white !important',
-                    fontSize: '1rem',
-                    fontWeight: 500,
-                    backgroundColor: 'transparent !important'
-                  },
-                  '& .MuiInputAdornment-root': {
-                    color: 'white !important',
-                    backgroundColor: 'transparent !important'
-                  },
-                  '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-                    color: 'white !important',
-                    fontSize: '1.4rem',
-                    backgroundColor: 'transparent !important'
-                  },
+                                   '& .MuiOutlinedInput-root': {
+                   bgcolor: 'transparent !important',
+                   border: '1px solid #1976d2 !important',
+                   borderRadius: 2,
+                   '&:hover': {
+                     bgcolor: 'rgba(25, 118, 210, 0.04) !important',
+                     borderColor: '#1976d2 !important',
+                   },
+                   '&.Mui-focused': {
+                     bgcolor: 'transparent !important',
+                     borderColor: '#1976d2 !important',
+                   },
+                   '& .MuiOutlinedInput-notchedOutline': {
+                     backgroundColor: 'transparent !important',
+                     borderColor: '#1976d2 !important'
+                   }
+                 },
+                 '& .MuiInputBase-root': {
+                   backgroundColor: 'transparent !important'
+                 },
+                                   '& .MuiInputBase-input': {
+                   color: '#1976d2 !important',
+                   fontSize: '1rem',
+                   fontWeight: 500,
+                   backgroundColor: 'transparent !important'
+                 },
+                 '& .MuiInputAdornment-root': {
+                   color: '#1976d2 !important',
+                   backgroundColor: 'transparent !important'
+                 },
+                 '& .MuiInputAdornment-root .MuiSvgIcon-root': {
+                   color: '#1976d2 !important',
+                   fontSize: '1.4rem',
+                   backgroundColor: 'transparent !important'
+                 },
                   '& .MuiInputBase-inputAdornedEnd': {
                     backgroundColor: 'transparent !important'
                   },
-                  '& .MuiInputLabel-root': {
-                    color: 'white !important',
-                    fontWeight: 600,
-                    fontSize: '1rem',
-                    backgroundColor: '#1976d2 !important',
-                    px: 1,
-                    borderRadius: 1,
-                    '&.Mui-focused': {
-                      transform: 'translate(14px, -9px) scale(0)',
-                      opacity: 0
-                    },
-                    '&.MuiInputLabel-shrink': {
-                      transform: 'translate(14px, -9px) scale(0)',
-                      opacity: 0
-                    }
-                  },
-                  '& .MuiFormLabel-root': {
-                    color: 'white !important',
-                    backgroundColor: '#1976d2 !important',
-                    px: 1,
-                    borderRadius: 1
-                  }
+                                   '& .MuiInputLabel-root': {
+                   color: '#1976d2 !important',
+                   fontWeight: 600,
+                   fontSize: '1rem',
+                   backgroundColor: 'transparent !important',
+                   px: 1,
+                   borderRadius: 1,
+                   '&.Mui-focused': {
+                     transform: 'translate(14px, -9px) scale(0)',
+                     opacity: 0
+                   },
+                   '&.MuiInputLabel-shrink': {
+                     transform: 'translate(14px, -9px) scale(0)',
+                     opacity: 0
+                   }
+                 },
+                 '& .MuiFormLabel-root': {
+                   color: '#1976d2 !important',
+                   backgroundColor: 'transparent !important',
+                   px: 1,
+                   borderRadius: 1
+                 }
                 }
               },
               day: {
@@ -726,8 +778,23 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           </Box>
         </DialogContent>
         
-        <DialogActions sx={{ p: { xs: 2, sm: 4 }, pt: 0 }}>
-          <Button onClick={handleCloseModal} variant="contained" color="primary">
+        <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, justifyContent: 'center' }}>
+          <Button 
+            onClick={handleCloseModal}
+            variant="contained"
+            sx={{
+              px: 4,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              backgroundColor: '#1976d2',
+              '&:hover': {
+                backgroundColor: '#1565c0'
+              }
+            }}
+          >
             Cerrar
           </Button>
         </DialogActions>
@@ -741,16 +808,48 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         aria-describedby="delete-dialog-description"
       >
         <DialogTitle id="delete-dialog-title">Confirmar eliminación</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ pb: 1 }}>
           <Typography id="delete-dialog-description">
             ¿Estás seguro de que quieres eliminar esta serie? Esta acción no se puede deshacer.
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ p: { xs: 2, sm: 4 }, pt: 0 }}>
-          <Button onClick={handleCancelDelete} color="primary">
+        <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, gap: 2 }}>
+          <Button 
+            onClick={handleCancelDelete}
+            sx={{
+              px: 3,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              color: '#666',
+              backgroundColor: 'transparent',
+              border: '1px solid #ddd',
+              '&:hover': {
+                backgroundColor: '#f5f5f5',
+                borderColor: '#bbb'
+              }
+            }}
+          >
             Cancelar
           </Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+          <Button 
+            onClick={handleConfirmDelete}
+            variant="contained"
+            sx={{
+              px: 3,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              backgroundColor: '#d32f2f',
+              '&:hover': {
+                backgroundColor: '#c62828'
+              }
+            }}
+          >
             Eliminar
           </Button>
         </DialogActions>
@@ -764,7 +863,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         fullWidth
       >
         <DialogTitle>Editar nombre</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ pb: 1 }}>
           <TextField
             autoFocus
             margin="dense"
@@ -779,17 +878,50 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 handleSaveSessionName();
               }
             }}
+            sx={{ mt: 1 }}
           />
         </DialogContent>
-        <DialogActions sx={{ p: { xs: 2, sm: 4 }, pt: 0 }}>
-          <Button onClick={handleCancelEditSession} color="primary">
+        <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, gap: 2 }}>
+          <Button 
+            onClick={handleCancelEditSession}
+            sx={{
+              px: 3,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              color: '#666',
+              backgroundColor: 'transparent',
+              border: '1px solid #ddd',
+              '&:hover': {
+                backgroundColor: '#f5f5f5',
+                borderColor: '#bbb'
+              }
+            }}
+          >
             Cancelar
           </Button>
           <Button 
-            onClick={handleSaveSessionName} 
-            color="primary" 
+            onClick={handleSaveSessionName}
             variant="contained"
             disabled={!newSessionName.trim()}
+            sx={{
+              px: 3,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              backgroundColor: '#1976d2',
+              '&:hover': {
+                backgroundColor: '#1565c0'
+              },
+              '&:disabled': {
+                backgroundColor: '#e0e0e0',
+                color: '#9e9e9e'
+              }
+            }}
           >
             Guardar
           </Button>

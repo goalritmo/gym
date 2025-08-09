@@ -79,7 +79,6 @@ export default function UserAvatar() {
         id="account-menu"
         open={open}
         onClose={handleClose}
-        onClick={handleClose}
         PaperProps={{
           elevation: 3,
           sx: {
