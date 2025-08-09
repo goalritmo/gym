@@ -16,6 +16,7 @@ import {
   Button,
   Paper,
   TextField,
+  Snackbar,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
@@ -43,6 +44,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     currentName: ''
   })
   const [newSessionName, setNewSessionName] = useState('')
+  const [showUpdateSuccess, setShowUpdateSuccess] = useState(false)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -125,10 +127,12 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   const handleEffortChange = (sessionId: number, newValue: number) => {
     onUpdateSession(sessionId, { effort: newValue });
+    setShowUpdateSuccess(true);
   }
 
   const handleMoodChange = (sessionId: number, newValue: number) => {
     onUpdateSession(sessionId, { mood: newValue });
+    setShowUpdateSuccess(true);
   }
 
   const handleEditSessionName = (sessionId: number, currentName: string) => {
@@ -141,6 +145,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
       onUpdateSession(editSessionModal.sessionId, { session_name: newSessionName.trim() });
       setEditSessionModal({ show: false, sessionId: null, currentName: '' })
       setNewSessionName('')
+      setShowUpdateSuccess(true)
     }
   }
 
@@ -450,28 +455,46 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               </Box>
 
               {/* Esfuerzo y Estado de Ánimo */}
-              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 2 }}>
-                <Box onClick={(e) => e.stopPropagation()}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Box sx={{ mb: 2 }}>
+                {/* Esfuerzo */}
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    mb: 1 
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Typography variant="body2" color="text.secondary">
                     Esfuerzo
                   </Typography>
                   <Rating 
                     value={day.session.effort} 
                     onChange={(_, newValue) => handleEffortChange(day.session.id, newValue || 0)}
                     size="small"
-                    max={3}
+                    max={5}
                     sx={{ '& .MuiRating-iconFilled': { color: '#ffc107' } }}
                   />
                 </Box>
-                <Box onClick={(e) => e.stopPropagation()}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                
+                {/* Ánimo */}
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between' 
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Typography variant="body2" color="text.secondary">
                     Ánimo
                   </Typography>
                   <Rating 
                     value={day.session.mood} 
                     onChange={(_, newValue) => handleMoodChange(day.session.id, newValue || 0)}
                     size="small"
-                    max={3}
+                    max={5}
                     sx={{ '& .MuiRating-iconFilled': { color: '#ff9800' } }}
                   />
                 </Box>
@@ -713,6 +736,16 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Notificación de éxito para edición de sesión */}
+      <Snackbar
+        open={showUpdateSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowUpdateSuccess(false)}
+        message="✅ Sesión actualizada exitosamente"
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{ mt: 8 }}
+      />
     </Box>
   );
 };
