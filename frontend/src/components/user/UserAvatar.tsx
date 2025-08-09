@@ -10,7 +10,7 @@ import {
   Box,
   IconButton
 } from '@mui/material'
-import { Logout as LogoutIcon, Person as PersonIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function UserAvatar() {
@@ -137,16 +137,7 @@ export default function UserAvatar() {
 
         <Divider />
 
-        {/* Opciones del menú */}
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <PersonIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Mi Perfil</ListItemText>
-        </MenuItem>
-
-        <Divider />
-
+        {/* Opción de logout */}
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />

@@ -1,17 +1,119 @@
 import { Box } from '@mui/material'
+import { useState, useEffect } from 'react'
 import Navigation from '../navigation/Navigation'
 import WorkoutForm from '../workout/WorkoutForm'
 import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
 import WorkoutHistory from '../workout/WorkoutHistory'
 import ApiTest from '../debug/ApiTest'
+import type { Workout, WorkoutSession } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
+
+// Lista de ejercicios disponibles
+const exercises = [
+  { id: 1, name: 'Press de Banca' },
+  { id: 2, name: 'Sentadilla' },
+  { id: 3, name: 'Peso Muerto' },
+  { id: 4, name: 'Press Militar' },
+  { id: 5, name: 'Curl de Bíceps' },
+  { id: 6, name: 'Extensiones de Tríceps' },
+  { id: 7, name: 'Remo con Barra' },
+  { id: 8, name: 'Pull-ups' }
+]
 
 export default function AuthenticatedApp() {
   const { activeTab, setActiveTab } = useTab()
+  const [workouts, setWorkouts] = useState<Workout[]>([])
+  const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
+
+  // Cargar datos desde localStorage al montar el componente
+  useEffect(() => {
+    const savedWorkouts = localStorage.getItem('gym-workouts')
+    const savedSessions = localStorage.getItem('gym-workout-sessions')
+    
+    if (savedWorkouts) {
+      setWorkouts(JSON.parse(savedWorkouts))
+    }
+    
+    if (savedSessions) {
+      setWorkoutSessions(JSON.parse(savedSessions))
+    }
+  }, [])
+
+  // Guardar workouts cuando cambien
+  useEffect(() => {
+    if (workouts.length > 0) {
+      localStorage.setItem('gym-workouts', JSON.stringify(workouts))
+    }
+  }, [workouts])
+
+  // Guardar sessions cuando cambien
+  useEffect(() => {
+    if (workoutSessions.length > 0) {
+      localStorage.setItem('gym-workout-sessions', JSON.stringify(workoutSessions))
+    }
+  }, [workoutSessions])
 
   const handleTabChange = (newValue: number) => {
     setActiveTab(newValue)
+  }
+
+  // Función para manejar el envío del formulario de workout
+  const handleWorkoutSubmit = (data: any) => {
+    const today = new Date().toISOString()
+    const todayDate = today.split('T')[0] + 'T00:00:00Z'
+
+    // Buscar si ya existe una sesión para hoy
+    let currentSession = workoutSessions.find(session => 
+      session.session_date.split('T')[0] === today.split('T')[0]
+    )
+
+    // Si no existe, crear una nueva sesión
+    if (!currentSession) {
+      const newSessionId = Math.max(0, ...workoutSessions.map(s => s.id)) + 1
+      currentSession = {
+        id: newSessionId,
+        session_date: todayDate,
+        session_name: 'Entrenamiento del día',
+        effort: 2,
+        mood: 2,
+        created_at: today
+      }
+      setWorkoutSessions(prev => [...prev, currentSession!])
+    }
+
+    // Crear el nuevo workout
+    const newWorkoutId = Math.max(0, ...workouts.map(w => w.id)) + 1
+    const newWorkout: Workout = {
+      id: newWorkoutId,
+      exercise_name: exercises.find(e => e.id === data.exerciseId)?.name || 'Ejercicio desconocido',
+      weight: data.weight || 0,
+      reps: data.reps || 0,
+      serie: data.serie || null,
+      seconds: data.seconds || null,
+      observations: data.observations || null,
+      exercise_session_id: currentSession.id,
+      created_at: today
+    }
+
+    setWorkouts(prev => [...prev, newWorkout])
+    console.log('Workout guardado:', newWorkout)
+  }
+
+  // Función para eliminar un workout
+  const handleDeleteWorkout = (workoutId: number) => {
+    setWorkouts(prev => prev.filter(w => w.id !== workoutId))
+  }
+
+  // Función para actualizar una sesión
+  const handleUpdateSession = (sessionId: number, updates: Partial<WorkoutSession>) => {
+    setWorkoutSessions(prev => 
+      prev.map(session => 
+        session.id === sessionId 
+          ? { ...session, ...updates }
+          : session
+      )
+    )
   }
 
 
@@ -37,17 +139,8 @@ export default function AuthenticatedApp() {
         {activeTab === 0 && (
           <Box sx={{ position: 'relative', zIndex: 1 }}>
             <WorkoutForm 
-              exercises={[
-                { id: 1, name: 'Press de Banca' },
-                { id: 2, name: 'Sentadilla' },
-                { id: 3, name: 'Peso Muerto' },
-                { id: 4, name: 'Press Militar' },
-                { id: 5, name: 'Curl de Bíceps' },
-                { id: 6, name: 'Extensiones de Tríceps' },
-                { id: 7, name: 'Remo con Barra' },
-                { id: 8, name: 'Pull-ups' }
-              ]} 
-              onSubmit={(data) => console.log('Entrenamiento guardado:', data)} 
+              exercises={exercises} 
+              onSubmit={handleWorkoutSubmit} 
             />
           </Box>
         )}
@@ -169,61 +262,10 @@ export default function AuthenticatedApp() {
         {activeTab === 4 && (
           <Box>
             <WorkoutHistory 
-              workoutSessions={[
-                {
-                  id: 1,
-                  session_date: '2024-01-15T00:00:00Z',
-                  session_name: 'Rutina de Fullbody',
-                  effort: 2,
-                  mood: 3,
-                  created_at: '2024-01-15T10:00:00Z'
-                },
-                {
-                  id: 2,
-                  session_date: '2024-01-14T00:00:00Z',
-                  session_name: 'Rutina de Fullbody',
-                  effort: 3,
-                  mood: 2,
-                  created_at: '2024-01-14T09:00:00Z'
-                }
-              ]}
-              workouts={[
-                {
-                  id: 1,
-                  exercise_name: 'Press de Banca',
-                  weight: 80,
-                  reps: 8,
-                  serie: 1,
-                  seconds: 45,
-                  observations: 'Buena técnica',
-                  created_at: '2024-01-15T10:30:00Z',
-                  exercise_session_id: 1
-                },
-                {
-                  id: 2,
-                  exercise_name: 'Sentadilla',
-                  weight: 100,
-                  reps: 6,
-                  serie: 2,
-                  seconds: null,
-                  observations: null,
-                  created_at: '2024-01-15T10:45:00Z',
-                  exercise_session_id: 1
-                },
-                {
-                  id: 3,
-                  exercise_name: 'Peso Muerto',
-                  weight: 120,
-                  reps: 5,
-                  serie: 3,
-                  seconds: 60,
-                  observations: 'Peso máximo',
-                  created_at: '2024-01-14T09:15:00Z',
-                  exercise_session_id: 2
-                }
-              ]}
-              onDelete={(id) => console.log('Eliminar entrenamiento:', id)}
-              onUpdateSession={(sessionId, updates) => console.log('Actualizar sesión:', sessionId, updates)}
+              workoutSessions={workoutSessions}
+              workouts={workouts}
+              onDelete={handleDeleteWorkout}
+              onUpdateSession={handleUpdateSession}
             />
           </Box>
         )}

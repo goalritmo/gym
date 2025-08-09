@@ -157,17 +157,48 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
           <Alert 
             severity="info" 
             icon={<TrendingUp />}
-            sx={{ mb: 3, borderRadius: 2 }}
+            sx={{ 
+              mb: 3, 
+              borderRadius: 2,
+              bgcolor: 'rgba(33, 150, 243, 0.04)',
+              border: '1px solid rgba(33, 150, 243, 0.2)'
+            }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
-              ⏱️ <strong>¿Por qué medir el tiempo de cada serie?</strong>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main', mb: 1.5 }}>
+              ⏱️ Controla el tiempo para maximizar resultados
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              • <strong>Control de intensidad:</strong> Series más lentas = mayor tiempo bajo tensión, más hipertrofia<br/>
-              • <strong>Progreso medible:</strong> Comparar rendimiento entre entrenamientos con el mismo tiempo<br/>
-              • <strong>Técnica:</strong> Controlar la velocidad ayuda a mantener buena forma y prevenir lesiones<br/>
-              • <strong>Objetivos:</strong> 20-40s (fuerza), 40-60s (hipertrofia), 60s+ (resistencia)
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+              <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Controla la velocidad para mejorar técnica y comparar progreso.
             </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              mt: 1.5, 
+              flexWrap: 'wrap',
+              '& > div': {
+                bgcolor: 'rgba(255,255,255,0.8)',
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 1,
+                border: '1px solid rgba(33, 150, 243, 0.1)'
+              }
+            }}>
+              <Box>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: 'error.main' }}>
+                  Fuerza: 20-40s
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main' }}>
+                  Hipertrofia: 40-60s
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: 'success.main' }}>
+                  Resistencia: 60s+
+                </Typography>
+              </Box>
+            </Box>
           </Alert>
 
           {/* Cronómetro y campo de segundos */}
@@ -190,9 +221,6 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
               alignItems: 'center',
               minWidth: '140px'
             }}>
-              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
-                Tiempo manual
-              </Typography>
               <TextField
                 label="Segundos"
                 type="number"
