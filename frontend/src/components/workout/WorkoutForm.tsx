@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { TextField, Button, Stack, Box, Typography, Alert } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import { AccessTime, TrendingUp } from '@mui/icons-material'
+import { AccessTime } from '@mui/icons-material'
 import TimerComponent from '../timer/TimerComponent'
 
 type Exercise = {
@@ -156,7 +156,7 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
           {/* Mensaje educativo */}
           <Alert 
             severity="info" 
-            icon={<TrendingUp />}
+            icon={false}
             sx={{ 
               mb: 3, 
               borderRadius: 2,
@@ -164,10 +164,10 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
               border: '1px solid rgba(33, 150, 243, 0.2)'
             }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main', mb: 1.5 }}>
-              ⏱️ Controla el tiempo para maximizar resultados
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main', mb: 1.5, textAlign: 'left' }}>
+              💡 Controla el tiempo para maximizar resultados
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, width: '100%' }}>
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, width: '100%', textAlign: 'left' }}>
               <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Controla la velocidad para mejorar técnica y comparar progreso.
             </Typography>
             <Box sx={{ 
