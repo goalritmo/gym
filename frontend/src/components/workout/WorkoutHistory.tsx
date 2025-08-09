@@ -271,7 +271,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         }}>
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
           <DatePicker
-            label="📅 Filtrar por fecha"
+            label="Filtrar por fecha"
             value={dateFilter}
             onChange={(newValue: Date | null) => setDateFilter(newValue)}
             shouldDisableDate={shouldDisableDate}
@@ -298,18 +298,27 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                     fontWeight: 500
                   },
                   '& .MuiInputAdornment-root': {
-                    color: '#1976d2'
+                    color: 'white'
                   },
                   '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-                    color: '#1976d2',
+                    color: 'white',
                     fontSize: '1.4rem'
-                  }
-                },
-                InputLabelProps: {
-                  style: { 
+                  },
+                  '& .MuiInputLabel-root': {
                     color: 'white',
                     fontWeight: 600,
-                    fontSize: '1rem'
+                    fontSize: '1rem',
+                    '&.Mui-focused': {
+                      transform: 'translate(14px, -9px) scale(0)',
+                      opacity: 0
+                    },
+                    '&.MuiInputLabel-shrink': {
+                      transform: 'translate(14px, -9px) scale(0)',
+                      opacity: 0
+                    }
+                  },
+                  '& .MuiFormLabel-root': {
+                    color: 'white'
                   }
                 }
               },
@@ -643,7 +652,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Editar nombre de sesión</DialogTitle>
+        <DialogTitle>Editar nombre</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -661,7 +670,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             }}
           />
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: { xs: 2, sm: 4 }, pt: 0 }}>
           <Button onClick={handleCancelEditSession} color="primary">
             Cancelar
           </Button>
