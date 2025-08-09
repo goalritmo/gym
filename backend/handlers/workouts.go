@@ -101,18 +101,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Debug: imprimir la request recibida
-	fmt.Printf("🔍 Request recibida: %+v\n", req)
-	if req.Serie != nil {
-		fmt.Printf("🔍 Serie value: %d\n", *req.Serie)
-	} else {
-		fmt.Printf("🔍 Serie is nil\n")
-	}
-	if req.Seconds != nil {
-		fmt.Printf("🔍 Seconds value: %d\n", *req.Seconds)
-	} else {
-		fmt.Printf("🔍 Seconds is nil\n")
-	}
+
 
 	// Validaciones básicas
 	if req.Weight <= 0 {
@@ -129,12 +118,10 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	err = database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM exercises WHERE id = $1)", req.ExerciseID).Scan(&exerciseExists)
 	if err != nil {
-		fmt.Printf("❌ Error en query de verificación: %v\n", err)
 		http.Error(w, "Error verificando ejercicio", http.StatusInternalServerError)
 		return
 	}
 	if !exerciseExists {
-		fmt.Printf("❌ Ejercicio con ID %d no existe en la tabla\n", req.ExerciseID)
 		http.Error(w, "Ejercicio no encontrado", http.StatusBadRequest)
 		return
 	}
@@ -164,8 +151,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		secondsValue = *req.Seconds
 	}
 	
-	fmt.Printf("🔥 Intentando crear workout: userID=%s, exerciseID=%d, weight=%.2f, reps=%d, serie=%d, seconds=%d\n", 
-		userID, req.ExerciseID, req.Weight, req.Reps, serieValue, secondsValue)
+
 	
 	err = database.DB.QueryRow(
 		query,
@@ -174,13 +160,9 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	).Scan(&workout.ID, &workout.ExerciseSessionID, &workout.CreatedAt)
 
 	if err != nil {
-		fmt.Printf("❌ Error ejecutando query INSERT: %v\n", err)
-		fmt.Printf("📋 Query ejecutado: %s\n", query)
 		http.Error(w, "Error creando workout", http.StatusInternalServerError)
 		return
 	}
-	
-	fmt.Printf("✅ Workout creado exitosamente con ID: %d\n", workout.ID)
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(workout)

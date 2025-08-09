@@ -14,7 +14,7 @@ type Exercise = {
 
 // Esquema de validación con Zod
 const workoutFormSchema = z.object({
-  exerciseId: z.coerce.number().min(1, 'Selecciona un ejercicio'),
+  exercise_id: z.coerce.number().min(1, 'Selecciona un ejercicio'),
   weight: z.coerce.number().min(0.1, 'El peso debe ser mayor a 0'),
   reps: z.coerce.number().int().min(1, 'Debe ser al menos 1 repe'),
   serie: z.coerce.number().int().min(1, 'Debe ser al menos 1 serie'),
@@ -34,7 +34,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
-      exerciseId: 0,
+      exercise_id: '',
       weight: '',
       reps: '',
       serie: 1,
@@ -48,35 +48,22 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = exercises.length === 0
 
-  const selectedExerciseId = watch('exerciseId')
-
   const submit = handleSubmit(async (data: WorkoutFormData) => {
-    console.log('🔥 Form submitted with data:', data)
-    console.log('🔍 Current form values:', {
-      exerciseId: watch('exerciseId'),
-      weight: watch('weight'),
-      reps: watch('reps'),
-      serie: watch('serie'),
-      seconds: watch('seconds'),
-      observations: watch('observations')
-    })
     try {
       await onSubmit(data)
       setShowSuccess(true)
       reset({
-        exerciseId: 0,
+        exercise_id: '',
         weight: '',
         reps: '',
         serie: 1,
         seconds: '',
         observations: ''
-      }) // Limpiar el formulario después de guardar exitosamente
+      })
     } catch (error) {
       console.error('Error submitting workout:', error)
       alert('Error al guardar el entrenamiento. Revisa la consola para más detalles.')
     }
-  }, (errors) => {
-    console.log('❌ Form validation errors:', errors)
   })
 
   // Función para capturar el tiempo del cronómetro
@@ -95,13 +82,12 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
-        <FormControl fullWidth error={Boolean(errors.exerciseId)} disabled={isLoading || exercises.length === 0}>
+        <FormControl fullWidth error={Boolean(errors.exercise_id)} disabled={isLoading || exercises.length === 0}>
           <InputLabel id="exercise-select-label">Ejercicio</InputLabel>
           <Select
             labelId="exercise-select-label"
             label="Ejercicio"
-            value={selectedExerciseId}
-            {...register('exerciseId', { valueAsNumber: true })}
+            {...register('exercise_id', { valueAsNumber: true })}
             sx={{
               '& .MuiInputLabel-root': {
                 transform: 'translate(14px, -9px) scale(0.75)',
@@ -117,7 +103,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
               }
             }}
           >
-            <MenuItem value={0} disabled={exercises.length === 0}>
+            <MenuItem value="" disabled>
               {exercises.length === 0 ? 'Cargando ejercicios...' : 'Seleccionar ejercicio...'}
             </MenuItem>
             {exercises.map((ex) => (
@@ -126,6 +112,11 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
               </MenuItem>
             ))}
           </Select>
+          {errors.exercise_id && (
+            <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+              {errors.exercise_id.message}
+            </Typography>
+          )}
         </FormControl>
 
         {/* Peso, Reps y Serie en la misma fila */}
