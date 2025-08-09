@@ -444,6 +444,12 @@ func UpdateWorkoutSessionHandler(w http.ResponseWriter, r *http.Request) {
 	args := []interface{}{}
 	argIndex := 1
 
+	if req.SessionName != nil {
+		setParts = append(setParts, fmt.Sprintf("session_name = $%d", argIndex))
+		args = append(args, *req.SessionName)
+		argIndex++
+	}
+
 	if req.Effort != nil {
 		setParts = append(setParts, fmt.Sprintf("effort = $%d", argIndex))
 		args = append(args, *req.Effort)
