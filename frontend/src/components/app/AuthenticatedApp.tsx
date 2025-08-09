@@ -314,12 +314,14 @@ export default function AuthenticatedApp() {
 
         {/* Pestaña Historial */}
         {activeTab === TABS.HISTORY && (
-          <WorkoutHistory 
-            workoutSessions={workoutSessions}
-            workouts={workouts}
-            onDelete={handleDeleteWorkout}
-            onUpdateSession={handleUpdateSession}
-          />
+          <Box>
+            <WorkoutHistory 
+              workoutSessions={workoutSessions}
+              workouts={workouts}
+              onDelete={handleDeleteWorkout}
+              onUpdateSession={handleUpdateSession}
+            />
+          </Box>
         )}
       </Box>
     </Box>
