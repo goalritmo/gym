@@ -72,8 +72,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
       console.log('🔍 Workouts disponibles:', workouts.map(w => ({ id: w.id, created_at: w.created_at, exercise_name: w.exercise_name })))
       
       const sessionWorkouts = workouts.filter(w => {
-        const workoutDate = new Date(w.created_at).toDateString()
-        const sessionDate = new Date(session.session_date).toDateString()
+        const workoutDate = new Date(w.created_at).toISOString().split('T')[0]
+        const sessionDate = new Date(session.session_date).toISOString().split('T')[0]
         console.log(`🔍 Comparando workout ${w.id}: ${workoutDate} vs sesión ${session.id}: ${sessionDate}`)
         return workoutDate === sessionDate
       })
