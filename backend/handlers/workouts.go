@@ -144,6 +144,9 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	workout.Observations = req.Observations
 
 	var err error
+	fmt.Printf("🔥 Intentando crear workout: userID=%s, exerciseID=%d, weight=%.2f, reps=%d, serie=%d, seconds=%d\n", 
+		userID, req.ExerciseID, req.Weight, req.Reps, req.Serie, req.Seconds)
+	
 	err = database.DB.QueryRow(
 		query,
 		userID, req.ExerciseID, req.Weight, req.Reps,
@@ -151,9 +154,13 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	).Scan(&workout.ID, &workout.ExerciseSessionID, &workout.CreatedAt)
 
 	if err != nil {
+		fmt.Printf("❌ Error ejecutando query INSERT: %v\n", err)
+		fmt.Printf("📋 Query ejecutado: %s\n", query)
 		http.Error(w, "Error creando workout", http.StatusInternalServerError)
 		return
 	}
+	
+	fmt.Printf("✅ Workout creado exitosamente con ID: %d\n", workout.ID)
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(workout)
