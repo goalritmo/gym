@@ -133,8 +133,7 @@ export default function AuthenticatedApp() {
       console.log('✅ Workout guardado exitosamente en Supabase')
     } catch (error) {
       console.error('❌ Error guardando workout:', error)
-      // Aquí podrías mostrar un mensaje de error al usuario
-      alert('Error al guardar el entrenamiento. Revisa la consola para más detalles.')
+      throw error // Re-lanzar el error para que el formulario lo capture
     } finally {
       setIsSubmittingWorkout(false)
     }

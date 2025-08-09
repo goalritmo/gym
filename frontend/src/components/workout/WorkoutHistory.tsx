@@ -311,15 +311,15 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           >
             <CardContent>
               {/* Header del día */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <Box sx={{ pl: 0, ml: 2 }}>
-                  <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left' }}>
-                    {formatDate(day.date)}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                    {day.session.session_name} • {day.workouts.length} {day.workouts.length === 1 ? 'ejercicio' : 'ejercicios'}
-                  </Typography>
-                </Box>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Box sx={{ pl: 0, ml: 0 }}>
+                    <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left' }}>
+                      {formatDate(day.date)}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                      {day.session.session_name} • {day.workouts.length} {day.workouts.length === 1 ? 'ejercicio' : 'ejercicios'}
+                    </Typography>
+                  </Box>
                 
                 <IconButton 
                   onClick={(e) => {
@@ -332,8 +332,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 </IconButton>
               </Box>
 
-              {/* Esfuerzo y Estado de Ánimo */}
-              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', ml: 2  }}>
+                              {/* Esfuerzo y Estado de Ánimo */}
+                <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
                 <Box onClick={(e) => e.stopPropagation()}>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
                     Esfuerzo
