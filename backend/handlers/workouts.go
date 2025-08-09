@@ -101,6 +101,19 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Debug: imprimir la request recibida
+	fmt.Printf("🔍 Request recibida: %+v\n", req)
+	if req.Serie != nil {
+		fmt.Printf("🔍 Serie value: %d\n", *req.Serie)
+	} else {
+		fmt.Printf("🔍 Serie is nil\n")
+	}
+	if req.Seconds != nil {
+		fmt.Printf("🔍 Seconds value: %d\n", *req.Seconds)
+	} else {
+		fmt.Printf("🔍 Seconds is nil\n")
+	}
+
 	// Validaciones básicas
 	if req.Weight <= 0 {
 		http.Error(w, "El peso debe ser mayor a 0", http.StatusBadRequest)
