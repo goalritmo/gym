@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import { supabase, auth } from '../lib/supabase'
+import { auth } from '../lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 
 type AuthContextType = {
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signInWithGoogle = async () => {
     try {
-      const { data, error } = await auth.signInWithGoogle()
+      const { error } = await auth.signInWithGoogle()
       return { error }
     } catch (error) {
       console.error('Google sign in error:', error)

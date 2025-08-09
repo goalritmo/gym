@@ -44,7 +44,7 @@ export default function Navigation({ activeTab, onTabChange, onLogout }: Navigat
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowToolbarElements(true)
-    }, 50)
+    }, 50) as unknown as number
     timeoutsRef.current.push(timer)
     
     return () => clearTimeout(timer)
@@ -55,7 +55,7 @@ export default function Navigation({ activeTab, onTabChange, onLogout }: Navigat
     setShowToolbarElements(false)
     const timer = setTimeout(() => {
       setShowToolbarElements(true)
-    }, 80)
+    }, 80) as unknown as number
     timeoutsRef.current.push(timer)
     
     return () => clearTimeout(timer)
@@ -73,7 +73,7 @@ export default function Navigation({ activeTab, onTabChange, onLogout }: Navigat
       menuItems.forEach((_, index) => {
         const timeoutId = setTimeout(() => {
           setVisibleItems(prev => [...prev, index])
-        }, index * 80) // 80ms entre cada item
+        }, index * 80) as unknown as number // 80ms entre cada item
         timeoutsRef.current.push(timeoutId)
       })
     } else {

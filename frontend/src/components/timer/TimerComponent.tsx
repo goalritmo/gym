@@ -14,7 +14,7 @@ export default function TimerComponent({ onTimeComplete }: TimerComponentProps) 
     if (isRunning) {
       intervalRef.current = setInterval(() => {
         setTime(prevTime => prevTime + 1)
-      }, 1000)
+      }, 1000) as unknown as number
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)

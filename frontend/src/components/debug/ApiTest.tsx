@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Box, Button, Typography, Alert, CircularProgress, Stack, Paper } from '@mui/material'
 import { useHealthCheck, useWorkouts, useCurrentUser } from '../../hooks/useApi'
 import { useAuth } from '../../contexts/AuthContext'
@@ -58,11 +58,13 @@ export default function ApiTest() {
           {healthCheck.error && (
             <Alert severity="error">Error: {healthCheck.error}</Alert>
           )}
-          {healthCheck.data && (
-            <Alert severity="success">
-              Backend: {JSON.stringify(healthCheck.data, null, 2)}
-            </Alert>
-          )}
+                      {healthCheck.data && (
+              <Alert severity="success">
+                <div>
+                  Backend: <pre>{JSON.stringify(healthCheck.data as any, null, 2)}</pre>
+                </div>
+              </Alert>
+            )}
           <Button 
             variant="outlined" 
             onClick={() => healthCheck.execute()}
@@ -96,7 +98,9 @@ export default function ApiTest() {
             )}
             {workouts.data && (
               <Alert severity="success">
-                Workouts: {JSON.stringify(workouts.data, null, 2)}
+                <div>
+                  Workouts: <pre>{JSON.stringify(workouts.data as any, null, 2)}</pre>
+                </div>
               </Alert>
             )}
           </Box>
@@ -110,7 +114,9 @@ export default function ApiTest() {
             )}
             {currentUser.data && (
               <Alert severity="success">
-                User: {JSON.stringify(currentUser.data, null, 2)}
+                <div>
+                  User: <pre>{JSON.stringify(currentUser.data as any, null, 2)}</pre>
+                </div>
               </Alert>
             )}
           </Box>
