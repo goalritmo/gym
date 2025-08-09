@@ -1,15 +1,16 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
+import { TABS, type TabType } from '../constants/tabs'
 
 type TabContextType = {
-  activeTab: number
-  setActiveTab: (tab: number) => void
+  activeTab: TabType
+  setActiveTab: (tab: TabType) => void
 }
 
 const TabContext = createContext<TabContextType | undefined>(undefined)
 
 export function TabProvider({ children }: { children: ReactNode }) {
-  const [activeTab, setActiveTab] = useState(0)
+  const [activeTab, setActiveTab] = useState<TabType>(TABS.WORKOUT)
 
   return (
     <TabContext.Provider value={{ activeTab, setActiveTab }}>

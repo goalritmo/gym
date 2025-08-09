@@ -20,10 +20,11 @@ import ListAltIcon from '@mui/icons-material/ListAlt'
 import HistoryIcon from '@mui/icons-material/History'
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
 import UserAvatar from '../user/UserAvatar'
+import { TABS, type TabType } from '../../constants/tabs'
 
 type NavigationProps = {
-  activeTab: number
-  onTabChange: (newValue: number) => void
+  activeTab: TabType
+  onTabChange: (newValue: TabType) => void
   onLogout: () => void
 }
 
@@ -82,17 +83,17 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
     }
   }
 
-  const handleTabChange = (newValue: number) => {
+  const handleTabChange = (newValue: TabType) => {
     onTabChange(newValue)
     setDrawerOpen(false)
     setVisibleItems([])
   }
 
   const menuItems = [
-    { label: 'Entrenatiempo', icon: <AllInclusiveIcon />, value: 0 },
-    { label: 'Todos los Ejercicios', icon: <ListAltIcon />, value: 1 },
-    { label: 'Todo el Equipamiento', icon: <FitnessCenterIcon />, value: 2 },
-    { label: 'Historial', icon: <HistoryIcon />, value: 3 },
+    { label: 'Entrenatiempo', icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
+    { label: 'Todos los Ejercicios', icon: <ListAltIcon />, value: TABS.EXERCISES },
+    { label: 'Todo el Equipamiento', icon: <FitnessCenterIcon />, value: TABS.EQUIPMENT },
+    { label: 'Mis Entrenamientos', icon: <HistoryIcon />, value: TABS.HISTORY },
   ]
 
   return (

@@ -3,9 +3,10 @@ import { Button, Box, Typography } from '@mui/material'
 
 type TimerComponentProps = {
   onTimeComplete?: (seconds: number) => void
+  disabled?: boolean
 }
 
-export default function TimerComponent({ onTimeComplete }: TimerComponentProps) {
+export default function TimerComponent({ onTimeComplete, disabled = false }: TimerComponentProps) {
   const [time, setTime] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
   const intervalRef = useRef<number | null>(null)
@@ -71,6 +72,7 @@ export default function TimerComponent({ onTimeComplete }: TimerComponentProps) 
         <Button 
           variant="contained" 
           onClick={handleToggleTimer}
+          disabled={disabled}
           size="large"
           sx={{ 
             minWidth: 140,

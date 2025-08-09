@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { TextField, Button, Stack, Box, Typography, Alert, Snackbar } from '@mui/material'
+import { TextField, Button, Stack, Box, Typography, Alert, Snackbar, CircularProgress } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import { AccessTime } from '@mui/icons-material'
 import { useState } from 'react'
@@ -27,9 +27,10 @@ type WorkoutFormData = z.infer<typeof workoutFormSchema>
 type WorkoutFormProps = {
   exercises: Exercise[]
   onSubmit: (data: WorkoutFormData) => void
+  isLoading?: boolean
 }
 
-export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
+export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: WorkoutFormProps) {
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
@@ -70,7 +71,7 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
       
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
-        <FormControl fullWidth error={Boolean(errors.exerciseId)}>
+        <FormControl fullWidth error={Boolean(errors.exerciseId)} disabled={isLoading}>
           <InputLabel id="exercise-select-label">Ejercicio</InputLabel>
           <Select
             labelId="exercise-select-label"
@@ -104,6 +105,7 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
         <TextField
           label="Peso (kg)"
           type="number"
+          disabled={isLoading}
           error={Boolean(errors.weight)}
           helperText={errors.weight?.message}
           inputProps={{ 
@@ -126,6 +128,7 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
         <TextField
           label="Repeticiones"
           type="number"
+          disabled={isLoading}
           error={Boolean(errors.reps)}
           helperText={errors.reps?.message}
           inputProps={{ 
@@ -147,6 +150,7 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
         <TextField
           label="Serie"
           type="number"
+          disabled={isLoading}
           error={Boolean(errors.serie)}
           helperText={errors.serie?.message}
           inputProps={{ 
@@ -242,7 +246,7 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
           }}>
             {/* Cronómetro */}
             <Box sx={{ flex: '1 1 auto', width: '100%', maxWidth: '300px' }}>
-              <TimerComponent onTimeComplete={handleTimerComplete} />
+              <TimerComponent onTimeComplete={handleTimerComplete} disabled={isLoading} />
             </Box>
             
             {/* Input de segundos */}
@@ -255,6 +259,7 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
               <TextField
                 label="Segundos"
                 type="number"
+                disabled={isLoading}
                 error={Boolean(errors.seconds)}
                 helperText={errors.seconds?.message}
                 inputProps={{ 
@@ -284,6 +289,7 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
           label="Observaciones"
           multiline
           minRows={2}
+          disabled={isLoading}
           {...register('observations')}
           sx={{
             '& .MuiInputLabel-root': {
@@ -303,14 +309,17 @@ export default function WorkoutForm({ exercises, onSubmit }: WorkoutFormProps) {
           type="submit" 
           variant="contained" 
           size="large"
+          disabled={isLoading}
+          startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
           sx={{ 
             mt: 2, 
             py: 1.5,
             fontSize: '1.1rem',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            minWidth: 140
           }}
         >
-          Guardar
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </Stack>
     </form>

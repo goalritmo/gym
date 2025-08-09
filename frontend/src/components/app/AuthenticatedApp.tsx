@@ -7,6 +7,8 @@ import EquipmentList from '../equipment/EquipmentList'
 import WorkoutHistory from '../workout/WorkoutHistory'
 import type { Workout, WorkoutSession } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
+import { apiClient } from '../../lib/api'
+import { TABS, type TabType } from '../../constants/tabs'
 
 // Lista de ejercicios disponibles
 const exercises = [
@@ -24,19 +26,44 @@ export default function AuthenticatedApp() {
   const { activeTab, setActiveTab } = useTab()
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
+  const [isSubmittingWorkout, setIsSubmittingWorkout] = useState(false)
 
-  // Cargar datos desde localStorage al montar el componente
+  // Cargar datos desde el backend al montar el componente
   useEffect(() => {
-    const savedWorkouts = localStorage.getItem('gym-workouts')
-    const savedSessions = localStorage.getItem('gym-workout-sessions')
-    
-    if (savedWorkouts) {
-      setWorkouts(JSON.parse(savedWorkouts))
+    const loadData = async () => {
+      try {
+        console.log('Cargando datos desde el backend...')
+        
+        // Cargar workouts y sesiones en paralelo
+        const [workoutsData, sessionsData] = await Promise.all([
+          apiClient.getWorkouts(),
+          apiClient.getWorkoutSessions()
+        ])
+        
+        console.log('Workouts cargados:', workoutsData)
+        console.log('Sesiones cargadas:', sessionsData)
+        
+        setWorkouts(Array.isArray(workoutsData) ? workoutsData : [])
+        setWorkoutSessions(Array.isArray(sessionsData) ? sessionsData : [])
+      } catch (error) {
+        console.error('Error cargando datos del backend:', error)
+        
+        // Fallback a localStorage si el backend falla
+        console.log('Intentando cargar desde localStorage...')
+        const savedWorkouts = localStorage.getItem('gym-workouts')
+        const savedSessions = localStorage.getItem('gym-workout-sessions')
+        
+        if (savedWorkouts) {
+          setWorkouts(JSON.parse(savedWorkouts))
+        }
+        
+        if (savedSessions) {
+          setWorkoutSessions(JSON.parse(savedSessions))
+        }
+      }
     }
     
-    if (savedSessions) {
-      setWorkoutSessions(JSON.parse(savedSessions))
-    }
+    loadData()
   }, [])
 
   // Guardar workouts cuando cambien
@@ -53,66 +80,100 @@ export default function AuthenticatedApp() {
     }
   }, [workoutSessions])
 
-  const handleTabChange = (newValue: number) => {
+  const handleTabChange = (newValue: TabType) => {
     setActiveTab(newValue)
   }
 
   // Función para manejar el envío del formulario de workout
-  const handleWorkoutSubmit = (data: any) => {
-    const today = new Date().toISOString()
-    const todayDate = today.split('T')[0] + 'T00:00:00Z'
+  const handleWorkoutSubmit = async (data: any) => {
+    setIsSubmittingWorkout(true)
+    try {
+      const today = new Date().toISOString()
+      const todayDate = today.split('T')[0] + 'T00:00:00Z'
 
-    // Buscar si ya existe una sesión para hoy
-    let currentSession = workoutSessions.find(session => 
-      session.session_date.split('T')[0] === today.split('T')[0]
-    )
+      // Buscar si ya existe una sesión para hoy (primero en estado local)
+      let currentSession = workoutSessions.find(session => 
+        session.session_date.split('T')[0] === today.split('T')[0]
+      )
 
-    // Si no existe, crear una nueva sesión
-    if (!currentSession) {
-      const newSessionId = Math.max(0, ...workoutSessions.map(s => s.id)) + 1
-      currentSession = {
-        id: newSessionId,
-        session_date: todayDate,
-        session_name: 'Entrenamiento del día',
-        effort: 2,
-        mood: 2,
-        created_at: today
+      // Si no existe, crear una nueva sesión en el backend
+      if (!currentSession) {
+        console.log('Creando nueva sesión en el backend...')
+        const newSessionData = {
+          session_date: todayDate,
+          session_name: 'Entrenamiento del día',
+          effort: 2,
+          mood: 2
+        }
+        
+        const newSession = await apiClient.createWorkoutSession(newSessionData) as WorkoutSession
+        currentSession = newSession
+        console.log('Sesión creada:', currentSession)
+        setWorkoutSessions(prev => [...prev, currentSession!])
       }
-      setWorkoutSessions(prev => [...prev, currentSession!])
-    }
 
-    // Crear el nuevo workout
-    const newWorkoutId = Math.max(0, ...workouts.map(w => w.id)) + 1
-    const newWorkout: Workout = {
-      id: newWorkoutId,
-      exercise_name: exercises.find(e => e.id === data.exerciseId)?.name || 'Ejercicio desconocido',
-      weight: data.weight || 0,
-      reps: data.reps || 0,
-      serie: data.serie || null,
-      seconds: data.seconds || null,
-      observations: data.observations || null,
-      exercise_session_id: currentSession.id,
-      created_at: today
-    }
+      // Crear el nuevo workout en el backend
+      console.log('Creando workout en el backend...')
+      const workoutData = {
+        exercise_name: exercises.find(e => e.id === data.exerciseId)?.name || 'Ejercicio desconocido',
+        weight: data.weight || 0,
+        reps: data.reps || 0,
+        serie: data.serie || null,
+        seconds: data.seconds || null,
+        observations: data.observations || null,
+        exercise_session_id: currentSession.id
+      }
 
-    setWorkouts(prev => [...prev, newWorkout])
-    console.log('Workout guardado:', newWorkout)
+      const newWorkout = await apiClient.createWorkout(workoutData) as Workout
+      console.log('Workout creado en backend:', newWorkout)
+      
+      // Actualizar estado local
+      setWorkouts(prev => [...prev, newWorkout])
+      
+      console.log('✅ Workout guardado exitosamente en Supabase')
+    } catch (error) {
+      console.error('❌ Error guardando workout:', error)
+      // Aquí podrías mostrar un mensaje de error al usuario
+      alert('Error al guardar el entrenamiento. Revisa la consola para más detalles.')
+    } finally {
+      setIsSubmittingWorkout(false)
+    }
   }
 
   // Función para eliminar un workout
-  const handleDeleteWorkout = (workoutId: number) => {
-    setWorkouts(prev => prev.filter(w => w.id !== workoutId))
+  const handleDeleteWorkout = async (workoutId: number) => {
+    try {
+      console.log('Eliminando workout del backend...', workoutId)
+      await apiClient.deleteWorkout(workoutId)
+      
+      // Actualizar estado local
+      setWorkouts(prev => prev.filter(w => w.id !== workoutId))
+      console.log('✅ Workout eliminado exitosamente')
+    } catch (error) {
+      console.error('❌ Error eliminando workout:', error)
+      alert('Error al eliminar el entrenamiento. Revisa la consola para más detalles.')
+    }
   }
 
   // Función para actualizar una sesión
-  const handleUpdateSession = (sessionId: number, updates: Partial<WorkoutSession>) => {
-    setWorkoutSessions(prev => 
-      prev.map(session => 
-        session.id === sessionId 
-          ? { ...session, ...updates }
-          : session
+  const handleUpdateSession = async (sessionId: number, updates: Partial<WorkoutSession>) => {
+    try {
+      console.log('Actualizando sesión en el backend...', sessionId, updates)
+      await apiClient.updateWorkoutSession(sessionId, updates)
+      
+      // Actualizar estado local
+      setWorkoutSessions(prev => 
+        prev.map(session => 
+          session.id === sessionId 
+            ? { ...session, ...updates }
+            : session
+        )
       )
-    )
+      console.log('✅ Sesión actualizada exitosamente')
+    } catch (error) {
+      console.error('❌ Error actualizando sesión:', error)
+      alert('Error al actualizar la sesión. Revisa la consola para más detalles.')
+    }
   }
 
 
@@ -123,7 +184,7 @@ export default function AuthenticatedApp() {
       
       <Box sx={{ 
         flexGrow: 1, 
-        py: 2, 
+        py: activeTab === TABS.HISTORY ? 0 : 2, // Sin padding para tab Historial
         overflow: 'auto',
         '&::-webkit-scrollbar': {
           display: 'none'
@@ -135,17 +196,18 @@ export default function AuthenticatedApp() {
         msOverflowStyle: 'none'
       }}>
         {/* Pestaña Entrenamiento */}
-        {activeTab === 0 && (
+        {activeTab === TABS.WORKOUT && (
           <Box sx={{ position: 'relative', zIndex: 1 }}>
             <WorkoutForm 
               exercises={exercises} 
-              onSubmit={handleWorkoutSubmit} 
+              onSubmit={handleWorkoutSubmit}
+              isLoading={isSubmittingWorkout}
             />
           </Box>
         )}
 
         {/* Pestaña Ejercicios */}
-        {activeTab === 1 && (
+        {activeTab === TABS.EXERCISES && (
           <Box>
             <ExerciseList 
               exercises={[
@@ -201,7 +263,7 @@ export default function AuthenticatedApp() {
         )}
 
         {/* Pestaña Equipamiento */}
-        {activeTab === 2 && (
+        {activeTab === TABS.EQUIPMENT && (
           <Box>
             <EquipmentList 
               equipment={[
@@ -251,15 +313,13 @@ export default function AuthenticatedApp() {
         )}
 
         {/* Pestaña Historial */}
-        {activeTab === 3 && (
-          <Box>
-            <WorkoutHistory 
-              workoutSessions={workoutSessions}
-              workouts={workouts}
-              onDelete={handleDeleteWorkout}
-              onUpdateSession={handleUpdateSession}
-            />
-          </Box>
+        {activeTab === TABS.HISTORY && (
+          <WorkoutHistory 
+            workoutSessions={workoutSessions}
+            workouts={workouts}
+            onDelete={handleDeleteWorkout}
+            onUpdateSession={handleUpdateSession}
+          />
         )}
       </Box>
     </Box>
