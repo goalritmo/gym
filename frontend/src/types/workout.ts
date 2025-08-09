@@ -31,9 +31,12 @@ export type ExerciseGroup = {
   workouts: Workout[]
 }
 
+import type { TabType } from '../constants/tabs'
+
 export type WorkoutHistoryProps = {
   workoutSessions: WorkoutSession[]
   workouts: Workout[]
   onDelete: (id: number) => void
   onUpdateSession: (sessionId: number, updates: Partial<WorkoutSession>) => void
+  onTabChange?: (tab: TabType) => void
 }

@@ -24,9 +24,10 @@ import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { es } from 'date-fns/locale'
+import { TABS } from '../../constants/tabs'
 import type { Workout, WorkoutDay, ExerciseGroup, WorkoutHistoryProps } from '../../types/workout'
 
-export default function WorkoutHistory({ workoutSessions, workouts, onDelete, onUpdateSession }: WorkoutHistoryProps) {
+export default function WorkoutHistory({ workoutSessions, workouts, onDelete, onUpdateSession, onTabChange }: WorkoutHistoryProps) {
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
   const [selectedExercise, setSelectedExercise] = useState<Workout[] | null>(null);
   const [dateFilter, setDateFilter] = useState<Date | null>(null)
@@ -168,10 +169,9 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           mx: 2
         }}>
           <Paper sx={{ 
-            p: 6, 
+            p: 4, 
             textAlign: 'center',
             width: '100%',
-            maxWidth: 500,
             borderRadius: 3,
             boxShadow: 3,
             background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
@@ -190,26 +190,35 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
             color: 'text.primary',
             mb: 2
           }}>
-            ¡Comienza tu primer entrenamiento!
+            ¡Comienza tu entrenamiento!
           </Typography>
           
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
             No hay entrenamientos registrados aún. Ve al menú y selecciona <strong>Entrenatiempo</strong> para comenzar a registrar tus ejercicios.
           </Typography>
           
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            gap: 1,
-            p: 2,
-            bgcolor: 'rgba(25, 118, 210, 0.1)',
-            borderRadius: 2,
-            border: '1px solid rgba(25, 118, 210, 0.2)'
-          }}>
+          <Box 
+            onClick={() => onTabChange?.(TABS.WORKOUT)} // Cambiar a tab Entrenatiempo
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              gap: 1,
+              p: 2,
+              bgcolor: 'rgba(25, 118, 210, 0.1)',
+              borderRadius: 2,
+              border: '1px solid rgba(25, 118, 210, 0.2)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                bgcolor: 'rgba(25, 118, 210, 0.2)',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)'
+              }
+            }}>
             <AllInclusiveIcon sx={{ color: 'primary.main' }} />
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-              Menú → Entrenatiempo
+              Entrenatiempo
             </Typography>
           </Box>
         </Paper>

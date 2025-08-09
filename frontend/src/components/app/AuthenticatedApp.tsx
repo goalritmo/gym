@@ -319,6 +319,7 @@ export default function AuthenticatedApp() {
               workouts={workouts}
               onDelete={handleDeleteWorkout}
               onUpdateSession={handleUpdateSession}
+              onTabChange={handleTabChange}
             />
           </Box>
         )}

@@ -204,7 +204,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
               fontSize: '0.8rem',
               display: 'block'
             }}>
-              💡 Controlalo para maximizar resultados
+              💡 Tips para maximizar resultados
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ 
               lineHeight: 1.6, 
