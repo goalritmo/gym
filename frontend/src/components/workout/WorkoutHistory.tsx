@@ -17,6 +17,8 @@ import {
   Paper,
   TextField,
   Snackbar,
+  Backdrop,
+  CircularProgress,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
@@ -45,6 +47,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   })
   const [newSessionName, setNewSessionName] = useState('')
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false)
+  const [loadingSessionId, setLoadingSessionId] = useState<number | null>(null)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -126,20 +129,26 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   }
 
   const handleEffortChange = async (sessionId: number, newValue: number) => {
+    setLoadingSessionId(sessionId);
     try {
       await onUpdateSession(sessionId, { effort: newValue });
       setShowUpdateSuccess(true);
     } catch (error) {
       console.error('Error actualizando esfuerzo:', error);
+    } finally {
+      setLoadingSessionId(null);
     }
   }
 
   const handleMoodChange = async (sessionId: number, newValue: number) => {
+    setLoadingSessionId(sessionId);
     try {
       await onUpdateSession(sessionId, { mood: newValue });
       setShowUpdateSuccess(true);
     } catch (error) {
       console.error('Error actualizando ánimo:', error);
+    } finally {
+      setLoadingSessionId(null);
     }
   }
 
@@ -150,6 +159,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   const handleSaveSessionName = async () => {
     if (editSessionModal.sessionId && newSessionName.trim()) {
+      setLoadingSessionId(editSessionModal.sessionId);
       try {
         await onUpdateSession(editSessionModal.sessionId, { session_name: newSessionName.trim() });
         setEditSessionModal({ show: false, sessionId: null, currentName: '' })
@@ -157,6 +167,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         setShowUpdateSuccess(true)
       } catch (error) {
         console.error('Error actualizando nombre de sesión:', error);
+      } finally {
+        setLoadingSessionId(null);
       }
     }
   }
@@ -397,22 +409,24 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         {/* Cards de entrenamientos */}
         <Box sx={{ mx: 2 }}>
           {filteredWorkoutDays.map((day) => (
-          <Card key={day.date} sx={{ 
-            mb: 2, 
-            boxShadow: 2, 
-            width: '100%',
-            cursor: 'pointer',
-            borderRadius: 2,
-            border: '1px solid',
-            borderColor: 'divider',
-            '&:hover': {
-              boxShadow: 4,
-              transform: 'translateY(-2px)',
-              transition: 'all 0.2s ease-in-out'
-            }
-          }}
-          onClick={() => toggleDayExpansion(day.date)}
-          >
+          <Box key={day.date} sx={{ position: 'relative', mb: 2 }}>
+            <Card sx={{ 
+              boxShadow: 2, 
+              width: '100%',
+              cursor: 'pointer',
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: 'divider',
+              filter: loadingSessionId === day.session.id ? 'blur(1px)' : 'none',
+              transition: 'filter 0.2s ease-in-out',
+              '&:hover': {
+                boxShadow: 4,
+                transform: 'translateY(-2px)',
+                transition: 'all 0.2s ease-in-out'
+              }
+            }}
+            onClick={() => toggleDayExpansion(day.date)}
+            >
             <CardContent sx={{ pl: 2, pr: 2, pt: 2, pb: 2 }}>
               {/* Header del día */}
                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -551,6 +565,29 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               </Collapse>
             </CardContent>
           </Card>
+          
+          {/* Loader overlay */}
+          {loadingSessionId === day.session.id && (
+            <Backdrop
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                borderRadius: 2,
+                zIndex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              open={true}
+            >
+              <CircularProgress size={40} sx={{ color: 'primary.main' }} />
+            </Backdrop>
+          )}
+          </Box>
                   ))}
         </Box>
       </Stack>
