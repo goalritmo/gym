@@ -406,7 +406,7 @@ export default function AuthenticatedApp() {
       <Backdrop
         sx={{
           color: 'primary.main',
-          zIndex: (theme) => theme.zIndex.modal + 1,
+          zIndex: 99999,
           backgroundColor: 'rgba(255, 255, 255, 0.8)',
           backdropFilter: 'blur(4px)',
           position: 'fixed',

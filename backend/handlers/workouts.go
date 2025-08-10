@@ -162,14 +162,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Generar un UUID único para este workout
-	var sessionUUID string
-	uuidQuery := `SELECT gen_random_uuid()`
-	err = database.DB.QueryRow(uuidQuery).Scan(&sessionUUID)
-	if err != nil {
-		http.Error(w, "Error generando identificador único", http.StatusInternalServerError)
-		return
-	}
+
 
 	// Insertar workout asociado a la sesión
 	query := `
@@ -201,7 +194,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	err = database.DB.QueryRow(
 		query,
 		userID, req.ExerciseID, req.Weight, req.Reps,
-		serieValue, secondsValue, req.Observations, sessionUUID,
+		serieValue, secondsValue, req.Observations, sessionID,
 	).Scan(&workout.ID, &workout.ExerciseSessionID, &workout.CreatedAt)
 
 	if err != nil {
@@ -284,6 +277,15 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Primero obtener el exercise_session_id del workout antes de eliminarlo
+	var exerciseSessionID int
+	err = database.DB.QueryRow("SELECT exercise_session_id FROM workouts WHERE id = $1 AND user_id = $2", id, userID).Scan(&exerciseSessionID)
+	if err != nil {
+		http.Error(w, "Workout no encontrado", http.StatusNotFound)
+		return
+	}
+
+	// Eliminar el workout
 	result, err := database.DB.Exec("DELETE FROM workouts WHERE id = $1 AND user_id = $2", id, userID)
 	if err != nil {
 		http.Error(w, "Error eliminando workout", http.StatusInternalServerError)
@@ -294,6 +296,22 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil || rowsAffected == 0 {
 		http.Error(w, "Workout no encontrado", http.StatusNotFound)
 		return
+	}
+
+	// Verificar si la sesión se queda sin workouts y eliminarla si es necesario
+	var workoutCount int
+	err = database.DB.QueryRow("SELECT COUNT(*) FROM workouts WHERE exercise_session_id = $1", exerciseSessionID).Scan(&workoutCount)
+	if err != nil {
+		// Si hay error al contar, no eliminamos la sesión por seguridad
+		fmt.Printf("Error contando workouts para sesión %d: %v\n", exerciseSessionID, err)
+	} else if workoutCount == 0 {
+		// Si no quedan workouts en la sesión, eliminarla
+		_, err = database.DB.Exec("DELETE FROM workout_sessions WHERE id = $1", exerciseSessionID)
+		if err != nil {
+			fmt.Printf("Error eliminando sesión vacía %d: %v\n", exerciseSessionID, err)
+		} else {
+			fmt.Printf("Sesión %d eliminada automáticamente por estar vacía\n", exerciseSessionID)
+		}
 	}
 
 	w.WriteHeader(http.StatusNoContent)

@@ -117,7 +117,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
   return (
     <Box sx={{ 
       position: 'relative',
-      zIndex: 9999,
+      zIndex: 99998,
       '@keyframes slideInFromLeft': {
         '0%': {
           transform: 'translateX(-60px)',
