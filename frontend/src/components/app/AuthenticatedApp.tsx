@@ -14,7 +14,7 @@ import { TABS, type TabType } from '../../constants/tabs'
 
 export default function AuthenticatedApp() {
   const { activeTab, setActiveTab } = useTab()
-  const { isLoggingOut } = useAuth()
+  const { isLoggingOut, isSigningIn } = useAuth()
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
   const [exercises, setExercises] = useState<any[]>([])
@@ -418,7 +418,7 @@ export default function AuthenticatedApp() {
           alignItems: 'center',
           justifyContent: 'center'
         }}
-        open={isLoading || isLoggingOut}
+        open={isLoading || isLoggingOut || isSigningIn}
       >
         <Box
           sx={{
@@ -430,7 +430,7 @@ export default function AuthenticatedApp() {
         >
           <CircularProgress size={48} thickness={4} />
           <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
-            {isLoggingOut ? 'Cerrando sesión...' : 'Cargando...'}
+            {isLoggingOut ? 'Cerrando sesión...' : isSigningIn ? 'Iniciando sesión...' : 'Cargando...'}
           </Typography>
         </Box>
       </Backdrop>

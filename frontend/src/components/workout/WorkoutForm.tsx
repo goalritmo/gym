@@ -38,7 +38,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       weight: '',
       reps: '',
       serie: 1,
-      seconds: '',
+      seconds: 0,
       observations: ''
     }
   })
