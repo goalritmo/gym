@@ -51,7 +51,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
 
   // Función para validar y limitar valores en tiempo real
   const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {
-    const numValue = parseFloat(value)
+    // Normalizar el valor: convertir coma a punto para parseFloat
+    const normalizedValue = value.replace(',', '.')
+    const numValue = parseFloat(normalizedValue)
     
     if (isNaN(numValue)) {
       setValue(field, '')
@@ -83,6 +85,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
     } else if (numValue < minLimit && value !== '') {
       setValue(field, minLimit.toString())
     } else {
+      // Mantener el formato original (coma o punto) que usó el usuario
       setValue(field, value)
     }
   }
@@ -343,7 +346,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
                 type="number"
                 disabled={isLoading}
                 error={Boolean(errors.seconds)}
-                value={watch('seconds') || ''}
+                value={watch('seconds') || 0}
                 onChange={(e) => handleNumberInput('seconds', e.target.value)}
                 inputProps={{ 
                   inputMode: 'numeric',
