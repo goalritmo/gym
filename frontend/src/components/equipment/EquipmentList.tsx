@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Card,
   CardContent,
@@ -16,6 +16,8 @@ import {
   FormControl,
   Select,
   MenuItem,
+  Alert,
+  Snackbar,
 } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
 import ImageIcon from '@mui/icons-material/Image'
@@ -41,6 +43,16 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
   const [openDialog, setOpenDialog] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
+  const [showTestAlert, setShowTestAlert] = useState(true)
+
+  // Ocultar la alerta después de 5 segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowTestAlert(false)
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   // Obtener categorías únicas para el filtro
   const categories = useMemo(() => {
@@ -427,6 +439,36 @@ export default function EquipmentList({ equipment }: EquipmentListProps) {
           </DialogActions>
         </Dialog>
       )}
+
+      {/* Alerta de información de prueba */}
+      <Snackbar
+        open={showTestAlert}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{ 
+          mt: 6,
+          width: { xs: '95%', sm: '90%', md: '70%' },
+          left: '50%',
+          transform: 'translateX(-50%)'
+        }}
+      >
+        <Alert 
+          severity="warning" 
+          sx={{ 
+            width: '100%',
+            minWidth: '300px',
+            fontSize: '0.95rem',
+            fontWeight: 500,
+            backgroundColor: '#fff3cd',
+            color: '#856404',
+            border: '1px solid #ffeaa7',
+            '& .MuiAlert-icon': {
+              color: '#856404'
+            }
+          }}
+        >
+          ⚠️ Información de prueba: Los datos mostrados no son reales.
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }
