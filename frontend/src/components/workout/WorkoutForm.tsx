@@ -38,7 +38,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       weight: '',
       reps: '',
       serie: 1,
-      seconds: 0,
+      seconds: '',
       observations: ''
     }
   })
@@ -51,6 +51,12 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
 
   // Función para validar y limitar valores en tiempo real
   const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {
+    // Si el valor está vacío, permitir que se borre
+    if (value === '') {
+      setValue(field, '')
+      return
+    }
+
     // Normalizar el valor: convertir coma a punto para parseFloat
     const normalizedValue = value.replace(',', '.')
     const numValue = parseFloat(normalizedValue)
@@ -346,7 +352,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
                 type="number"
                 disabled={isLoading}
                 error={Boolean(errors.seconds)}
-                value={watch('seconds') || 0}
+                value={watch('seconds') || ''}
                 onChange={(e) => handleNumberInput('seconds', e.target.value)}
                 inputProps={{ 
                   inputMode: 'numeric',

@@ -50,6 +50,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [loadingSessionId, setLoadingSessionId] = useState<number | null>(null)
+  const [deletingWorkoutId, setDeletingWorkoutId] = useState<number | null>(null)
 
   const formatDate = (dateString: string) => {
     // Si la fecha termina en Z (UTC), la convertimos a zona horaria local
@@ -215,10 +216,17 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     setDeleteConfirmation({ show: true, workoutId })
   }
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deleteConfirmation.workoutId) {
-      onDelete(deleteConfirmation.workoutId)
-      setDeleteConfirmation({ show: false, workoutId: null })
+      setDeletingWorkoutId(deleteConfirmation.workoutId)
+      try {
+        await onDelete(deleteConfirmation.workoutId)
+        setDeleteConfirmation({ show: false, workoutId: null })
+      } catch (error) {
+        console.error('❌ Error eliminando workout:', error)
+      } finally {
+        setDeletingWorkoutId(null)
+      }
     }
   }
 
@@ -723,8 +731,24 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                   boxShadow: 2,
                   borderRadius: 2,
                   border: '1px solid',
-                  borderColor: 'divider'
+                  borderColor: 'divider',
+                  position: 'relative'
                 }}>
+                  {/* Loader para eliminación */}
+                  {deletingWorkoutId === workout.id && (
+                    <Backdrop
+                      sx={{
+                        color: '#fff',
+                        zIndex: (theme) => theme.zIndex.modal + 1,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        position: 'absolute',
+                        borderRadius: 2
+                      }}
+                      open={true}
+                    >
+                      <CircularProgress color="inherit" size={24} />
+                    </Backdrop>
+                  )}
                   <CardContent sx={{ py: 2, px: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                       <Typography variant="h6" component="h4" sx={{ fontWeight: 'bold' }}>
