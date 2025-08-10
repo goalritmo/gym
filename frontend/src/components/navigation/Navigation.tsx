@@ -244,7 +244,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
             top: '100%',
             left: 0,
             right: 0,
-            zIndex: 1000,
+            zIndex: (theme) => theme.zIndex.modal + 2,
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
           }} 
           role="presentation"
