@@ -1,4 +1,4 @@
-import { Box, Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material'
+import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography } from '@mui/material'
 import { useState, useEffect } from 'react'
 import Navigation from '../navigation/Navigation'
 import WorkoutForm from '../workout/WorkoutForm'
@@ -402,17 +402,37 @@ export default function AuthenticatedApp() {
         </Alert>
       </Snackbar>
 
-      {/* Loader principal */}
+      {/* Loader completo para carga inicial y logout */}
       <Backdrop
         sx={{
-          color: '#fff',
-          zIndex: 9999,
+          color: 'primary.main',
+          zIndex: (theme) => theme.zIndex.modal + 1,
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
           backdropFilter: 'blur(4px)',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)'
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
         open={isLoading || isLoggingOut}
       >
-        <CircularProgress color="inherit" />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2
+          }}
+        >
+          <CircularProgress size={48} thickness={4} />
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+            {isLoggingOut ? 'Cerrando sesión...' : 'Cargando...'}
+          </Typography>
+        </Box>
       </Backdrop>
 
       {/* Botón flotante para navegación rápida */}
