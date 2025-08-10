@@ -13,15 +13,24 @@ export default function FloatingNavButton({ currentTab, onTabChange }: FloatingN
   const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
-    // Ocultar el botón después de 5 segundos
-    const timer = setTimeout(() => {
-      setIsVisible(false)
-    }, 5000)
-
-    return () => {
-      clearTimeout(timer)
+    // En historial, siempre mostrar el botón
+    if (currentTab === TABS.HISTORY) {
+      setIsVisible(true)
+      return
     }
-  }, [])
+
+    // En el formulario de registro, ocultar después de 5 segundos
+    if (currentTab === TABS.WORKOUT) {
+      setIsVisible(true)
+      const timer = setTimeout(() => {
+        setIsVisible(false)
+      }, 5000)
+
+      return () => {
+        clearTimeout(timer)
+      }
+    }
+  }, [currentTab])
 
   const handleClick = () => {
     if (currentTab === TABS.WORKOUT) {
