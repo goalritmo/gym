@@ -286,6 +286,7 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	result, err := database.DB.Exec("DELETE FROM workouts WHERE id = $1 AND user_id = $2", id, userID)
 	if err != nil {
+		fmt.Printf("Error eliminando workout %d: %v\n", id, err)
 		http.Error(w, "Error eliminando workout", http.StatusInternalServerError)
 		return
 	}

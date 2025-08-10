@@ -981,7 +981,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           mt: 6,
           width: { xs: '95%', sm: '90%', md: '70%' },
           left: '50%',
-          transform: 'translateX(-50%)'
+          transform: 'translateX(-50%)',
+          zIndex: 99998
         }}
       >
         <Alert 
@@ -1012,7 +1013,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           mt: 6,
           width: { xs: '95%', sm: '90%', md: '70%' },
           left: '50%',
-          transform: 'translateX(-50%)'
+          transform: 'translateX(-50%)',
+          zIndex: 99999
         }}
       >
         <Alert 
