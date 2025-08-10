@@ -117,6 +117,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
   return (
     <Box sx={{ 
       position: 'relative',
+      zIndex: 9999,
       '@keyframes slideInFromLeft': {
         '0%': {
           transform: 'translateX(-60px)',
@@ -244,7 +245,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
             top: '100%',
             left: 0,
             right: 0,
-            zIndex: (theme) => theme.zIndex.modal + 2,
+            zIndex: 9999,
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
           }} 
           role="presentation"
