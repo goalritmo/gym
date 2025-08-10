@@ -74,6 +74,9 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const workoutDays = useMemo(() => {
     const days: WorkoutDay[] = [];
     
+    console.log('🔍 Total de sesiones:', workoutSessions.length)
+    console.log('🔍 Total de workouts:', workouts.length)
+    
     workoutSessions.forEach(session => {
       console.log('🔍 Procesando sesión:', session.session_date, 'ID:', session.id)
       console.log('🔍 Workouts disponibles:', workouts.map(w => ({ id: w.id, created_at: w.created_at, exercise_name: w.exercise_name })))

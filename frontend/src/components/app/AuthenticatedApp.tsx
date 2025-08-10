@@ -126,15 +126,14 @@ export default function AuthenticatedApp() {
       const newWorkout = await apiClient.createWorkout(workoutData) as Workout
       console.log('Workout creado en backend:', newWorkout)
       
-      // Refrescar todos los datos del backend para asegurar consistencia
-      console.log('🔄 Refrescando datos después de crear workout...')
-      await loadData()
-      console.log('✅ Datos refrescados exitosamente')
-      
-      // Cambiar automáticamente a la pestaña Entrenamientos para mostrar el nuevo workout
-      setActiveTab(TABS.HISTORY)
-      
       console.log('✅ Workout guardado exitosamente en Supabase')
+      
+      // Esperar un poco para que se vea el mensaje de éxito antes de refrescar
+      setTimeout(async () => {
+        console.log('🔄 Refrescando datos después de crear workout...')
+        await loadData()
+        console.log('✅ Datos refrescados exitosamente')
+      }, 2000)
     } catch (error) {
       console.error('❌ Error guardando workout:', error)
       throw error // Re-lanzar el error para que el formulario lo capture

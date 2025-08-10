@@ -14,11 +14,11 @@ type Exercise = {
 
 // Esquema de validación con Zod
 const workoutFormSchema = z.object({
-  exercise_id: z.coerce.number().refine(val => val > 0, ''),
-  weight: z.coerce.number().refine(val => val > 0, ''),
-  reps: z.coerce.number().int().refine(val => val > 0, ''),
-  serie: z.coerce.number().int().min(1, 'Debe ser al menos 1 serie'),
-  seconds: z.coerce.number().min(0, 'Los segundos deben ser mayores o iguales a 0').optional(),
+  exercise_id: z.coerce.number().refine(val => val > 0, ' '),
+  weight: z.coerce.number().refine(val => val > 0, ' '),
+  reps: z.coerce.number().int().refine(val => val > 0, ' '),
+  serie: z.coerce.number().int().min(1, ' '),
+  seconds: z.coerce.number().min(0, ' ').optional(),
   observations: z.string().default('')
 })
 
