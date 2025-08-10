@@ -128,10 +128,10 @@ export default function AuthenticatedApp() {
       
       console.log('✅ Workout guardado exitosamente en Supabase')
       
-      // Refrescar la página después de 2 segundos para que se vea el mensaje de éxito
+      // Refrescar la página después de 1 segundo para que se vea el mensaje de éxito
       setTimeout(() => {
         window.location.reload()
-      }, 2000)
+      }, 1000)
     } catch (error) {
       console.error('❌ Error guardando workout:', error)
       throw error // Re-lanzar el error para que el formulario lo capture

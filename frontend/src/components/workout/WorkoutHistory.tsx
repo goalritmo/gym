@@ -81,11 +81,11 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
       console.log('🔍 Procesando sesión:', session.session_date, 'ID:', session.id)
       console.log('🔍 Workouts disponibles:', workouts.map(w => ({ id: w.id, created_at: w.created_at, exercise_name: w.exercise_name })))
       
-      // Filtrar workouts por fecha de sesión usando timezone local
+      // Filtrar workouts por fecha de sesión - simplificado
       const sessionWorkouts = workouts.filter(w => {
-        // Convertir fechas a timezone local para comparación
-        const workoutDate = new Date(w.created_at).toLocaleDateString('en-CA')
-        const sessionDate = new Date(session.session_date).toLocaleDateString('en-CA')
+        // Usar solo la fecha sin tiempo para comparar
+        const workoutDate = w.created_at.split('T')[0]
+        const sessionDate = session.session_date.split('T')[0]
         console.log(`🔍 Comparando workout ${w.id}: ${workoutDate} vs sesión ${session.id}: ${sessionDate}`)
         return workoutDate === sessionDate
       })
