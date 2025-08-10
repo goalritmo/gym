@@ -849,6 +849,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         onClose={handleCancelDelete}
         aria-labelledby="delete-dialog-title"
         aria-describedby="delete-dialog-description"
+        sx={{ zIndex: 99997 }}
       >
         <DialogTitle id="delete-dialog-title">Confirmar eliminación</DialogTitle>
         <DialogContent sx={{ pb: 1 }}>
@@ -904,6 +905,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         onClose={handleCancelEditSession}
         maxWidth="sm"
         fullWidth
+        sx={{ zIndex: 99997 }}
       >
         <DialogTitle>Editar nombre</DialogTitle>
         <DialogContent sx={{ pb: 1 }}>

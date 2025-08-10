@@ -284,6 +284,20 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Primero verificar que el workout existe y pertenece al usuario
+	var workoutExists bool
+	err = database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM workouts WHERE id = $1 AND user_id = $2)", id, userID).Scan(&workoutExists)
+	if err != nil {
+		fmt.Printf("Error verificando workout %d: %v\n", id, err)
+		http.Error(w, "Error verificando workout", http.StatusInternalServerError)
+		return
+	}
+	
+	if !workoutExists {
+		http.Error(w, "Workout no encontrado", http.StatusNotFound)
+		return
+	}
+
 	result, err := database.DB.Exec("DELETE FROM workouts WHERE id = $1 AND user_id = $2", id, userID)
 	if err != nil {
 		fmt.Printf("Error eliminando workout %d: %v\n", id, err)
