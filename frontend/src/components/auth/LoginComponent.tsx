@@ -1,17 +1,15 @@
 import { useState } from 'react'
-import { Button, Typography, Alert, Box } from '@mui/material'
+import { Button, Typography, Alert, Box, Backdrop, CircularProgress } from '@mui/material'
 import { Google as GoogleIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function LoginComponent() {
   const [error, setError] = useState('')
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const { signInWithGoogle } = useAuth()
+  const { signInWithGoogle, isSigningIn } = useAuth()
 
 
 
   const handleGoogleSignIn = async () => {
-    setIsGoogleLoading(true)
     setError('')
     
     try {
@@ -23,8 +21,6 @@ export default function LoginComponent() {
     } catch (error) {
       setError('Error inesperado. Inténtalo de nuevo.')
       console.error('Unexpected error:', error)
-    } finally {
-      setIsGoogleLoading(false)
     }
   }
 
@@ -64,7 +60,7 @@ export default function LoginComponent() {
         {/* Google OAuth Login */}
         <Button
           onClick={handleGoogleSignIn}
-          disabled={isGoogleLoading}
+          disabled={isSigningIn}
           variant="outlined"
           fullWidth
           size="large"
@@ -79,7 +75,7 @@ export default function LoginComponent() {
             }
           }}
         >
-          {isGoogleLoading ? 'Iniciando...' : 'Continuar'}
+          {isSigningIn ? 'Iniciando...' : 'Continuar'}
         </Button>
 
         {error && (
@@ -88,6 +84,39 @@ export default function LoginComponent() {
           </Alert>
         )}
       </Box>
+
+      {/* Loader completo para login */}
+      <Backdrop
+        sx={{
+          color: 'primary.main',
+          zIndex: (theme) => theme.zIndex.modal + 1,
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(4px)',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+        open={isSigningIn}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2
+          }}
+        >
+          <CircularProgress size={48} thickness={4} />
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+            Iniciando sesión...
+          </Typography>
+        </Box>
+      </Backdrop>
     </Box>
   )
 }
