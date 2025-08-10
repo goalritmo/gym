@@ -8,16 +8,18 @@ import WorkoutHistory from '../workout/WorkoutHistory'
 import FloatingNavButton from '../navigation/FloatingNavButton'
 import type { Workout, WorkoutSession } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { apiClient } from '../../lib/api'
 import { TABS, type TabType } from '../../constants/tabs'
 
 export default function AuthenticatedApp() {
   const { activeTab, setActiveTab } = useTab()
+  const { isLoggingOut } = useAuth()
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
   const [exercises, setExercises] = useState<any[]>([])
   const [isSubmittingWorkout, setIsSubmittingWorkout] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [deleteMessage, setDeleteMessage] = useState('')
   const [deleteError, setDeleteError] = useState('')
 
@@ -67,7 +69,10 @@ export default function AuthenticatedApp() {
 
   // Cargar datos desde el backend al montar el componente
   useEffect(() => {
-    loadData()
+    // Solo cargar datos si no están ya cargados
+    if (workouts.length === 0 && workoutSessions.length === 0 && exercises.length === 0) {
+      loadData()
+    }
   }, [])
 
   // Guardar workouts cuando cambien
@@ -405,7 +410,7 @@ export default function AuthenticatedApp() {
           backdropFilter: 'blur(4px)',
           backgroundColor: 'rgba(0, 0, 0, 0.5)'
         }}
-        open={isLoading}
+        open={isLoading || isLoggingOut}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

@@ -8,6 +8,7 @@ type AuthContextType = {
   session: Session | null
   isAuthenticated: boolean
   isLoading: boolean
+  isLoggingOut: boolean
   signInWithGoogle: () => Promise<{ error?: any }>
   logout: () => Promise<void>
 }
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   useEffect(() => {
     // Get initial session
@@ -61,12 +63,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const logout = async () => {
+    setIsLoggingOut(true)
     try {
       await auth.signOut()
       setUser(null)
       setSession(null)
     } catch (error) {
       console.error('Logout error:', error)
+    } finally {
+      setIsLoggingOut(false)
     }
   }
 
@@ -78,6 +83,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       session, 
       isAuthenticated, 
       isLoading, 
+      isLoggingOut,
       signInWithGoogle, 
       logout 
     }}>
