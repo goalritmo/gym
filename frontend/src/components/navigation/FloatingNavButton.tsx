@@ -20,11 +20,12 @@ export default function FloatingNavButton({ currentTab, onTabChange }: FloatingN
       const windowHeight = window.innerHeight
       const scrollPercentage = (currentScrollY + windowHeight) / documentHeight
       
-      // Ocultar al hacer scroll hacia abajo, mostrar al hacer scroll hacia arriba
+      // Ocultar al hacer scroll hacia abajo (más sensible, desde 50px)
       // También ocultar cuando esté cerca del final del scroll (último 10%)
-      if ((currentScrollY > lastScrollY && currentScrollY > 100) || scrollPercentage > 0.9) {
+      if ((currentScrollY > lastScrollY && currentScrollY > 50) || scrollPercentage > 0.9) {
         setIsVisible(false)
-      } else {
+      } else if (currentScrollY < lastScrollY || currentScrollY <= 50) {
+        // Mostrar al hacer scroll hacia arriba o estar cerca del top
         setIsVisible(true)
       }
       
