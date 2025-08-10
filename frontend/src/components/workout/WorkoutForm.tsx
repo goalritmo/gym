@@ -12,13 +12,13 @@ type Exercise = {
   name: string
 }
 
-// Esquema de validación con Zod - deshabilitado temporalmente
+// Esquema de validación con Zod
 const workoutFormSchema = z.object({
-  exercise_id: z.any(),
-  weight: z.any(),
-  reps: z.any(),
-  serie: z.any(),
-  seconds: z.any(),
+  exercise_id: z.coerce.number().refine(val => val > 0, ' '),
+  weight: z.coerce.number().refine(val => val > 0, ' '),
+  reps: z.coerce.number().int().refine(val => val > 0, ' '),
+  serie: z.coerce.number().int().min(1, ' '),
+  seconds: z.coerce.number().min(0, ' ').optional(),
   observations: z.string().default('')
 })
 
@@ -84,7 +84,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
-        <FormControl fullWidth disabled={isLoading || exercises.length === 0}>
+        <FormControl fullWidth error={Boolean(errors.exercise_id)} disabled={isLoading || exercises.length === 0}>
           <InputLabel id="exercise-select-label">Ejercicio</InputLabel>
           <Select
             labelId="exercise-select-label"
@@ -128,12 +128,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             type="number"
             disabled={isLoading}
             error={Boolean(errors.weight)}
-            helperText={errors.weight?.message}
             inputProps={{ 
               step: 'any',
-              inputMode: 'decimal',
-              pattern: '[0-9]*',
-              min: '0'
+              inputMode: 'decimal'
             }}
             {...register('weight', { valueAsNumber: true })}
             sx={{
@@ -152,11 +149,8 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             type="number"
             disabled={isLoading}
             error={Boolean(errors.reps)}
-            helperText={errors.reps?.message}
             inputProps={{ 
-              inputMode: 'numeric',
-              pattern: '[0-9]*',
-              min: '0'
+              inputMode: 'numeric'
             }}
             {...register('reps', { valueAsNumber: true })}
             sx={{
@@ -172,7 +166,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
 
           <FormControl 
             fullWidth 
-            error={Boolean(errors.serie)} 
+            error={Boolean(errors.serie)}
             disabled={isLoading}
             sx={{ flex: 1 }}
           >
@@ -189,11 +183,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
                 </MenuItem>
               ))}
             </Select>
-            {errors.serie && (
-              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
-                {errors.serie.message}
-              </Typography>
-            )}
+
           </FormControl>
         </Box>
 
@@ -303,28 +293,14 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
               alignItems: 'center',
               minWidth: '140px'
             }}>
-              {errors.seconds && (
-                <Typography 
-                  variant="caption" 
-                  color="error" 
-                  sx={{ 
-                    mb: 1, 
-                    textAlign: 'center',
-                    fontSize: '0.75rem'
-                  }}
-                >
-                  {errors.seconds.message}
-                </Typography>
-              )}
+
               <TextField
                 label="Segundos"
                 type="number"
                 disabled={isLoading}
                 error={Boolean(errors.seconds)}
                 inputProps={{ 
-                  inputMode: 'numeric',
-                  pattern: '[0-9]*',
-                  min: 0
+                  inputMode: 'numeric'
                 }}
                 {...register('seconds', { valueAsNumber: true })}
                 sx={{ 
