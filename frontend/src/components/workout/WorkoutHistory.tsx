@@ -211,6 +211,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         setDeleteConfirmation({ show: false, workoutId: null })
       } catch (error) {
         console.error('❌ Error eliminando workout:', error)
+        setErrorMessage('Error al eliminar el entrenamiento')
+        setDeleteConfirmation({ show: false, workoutId: null })
       } finally {
         setDeletingWorkoutId(null)
       }

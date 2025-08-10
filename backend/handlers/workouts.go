@@ -293,7 +293,10 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
+	fmt.Printf("Workout %d existe: %v\n", id, workoutExists)
+	
 	if !workoutExists {
+		fmt.Printf("Workout %d no encontrado para usuario %s\n", id, userID)
 		http.Error(w, "Workout no encontrado", http.StatusNotFound)
 		return
 	}
