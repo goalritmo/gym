@@ -49,6 +49,44 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = exercises.length === 0
 
+  // Función para validar y limitar valores en tiempo real
+  const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {
+    const numValue = parseFloat(value)
+    
+    if (isNaN(numValue)) {
+      setValue(field, '')
+      return
+    }
+
+    let maxLimit: number
+    let minLimit: number
+
+    switch (field) {
+      case 'weight':
+        maxLimit = 1000
+        minLimit = 0.1
+        break
+      case 'reps':
+        maxLimit = 100
+        minLimit = 1
+        break
+      case 'seconds':
+        maxLimit = 3600
+        minLimit = 0
+        break
+      default:
+        return
+    }
+
+    if (numValue > maxLimit) {
+      setValue(field, maxLimit.toString())
+    } else if (numValue < minLimit && value !== '') {
+      setValue(field, minLimit.toString())
+    } else {
+      setValue(field, value)
+    }
+  }
+
   const submit = handleSubmit(async (data: WorkoutFormData) => {
     try {
       await onSubmit(data)
@@ -128,13 +166,14 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             type="number"
             disabled={isLoading}
             error={Boolean(errors.weight)}
+            value={watch('weight') || ''}
+            onChange={(e) => handleNumberInput('weight', e.target.value)}
             inputProps={{ 
               step: 'any',
               inputMode: 'decimal',
               min: 0.1,
               max: 1000
             }}
-            {...register('weight', { valueAsNumber: true })}
             sx={{
               flex: 1,
               '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
@@ -151,12 +190,13 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             type="number"
             disabled={isLoading}
             error={Boolean(errors.reps)}
+            value={watch('reps') || ''}
+            onChange={(e) => handleNumberInput('reps', e.target.value)}
             inputProps={{ 
               inputMode: 'numeric',
               min: 1,
               max: 100
             }}
-            {...register('reps', { valueAsNumber: true })}
             sx={{
               flex: 1,
               '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
@@ -303,12 +343,13 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
                 type="number"
                 disabled={isLoading}
                 error={Boolean(errors.seconds)}
+                value={watch('seconds') || ''}
+                onChange={(e) => handleNumberInput('seconds', e.target.value)}
                 inputProps={{ 
                   inputMode: 'numeric',
                   min: 0,
                   max: 3600
                 }}
-                {...register('seconds', { valueAsNumber: true })}
                 sx={{ 
                   width: '120px',
                   '& .MuiInputBase-root': {
