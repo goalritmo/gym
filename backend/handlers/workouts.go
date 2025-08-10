@@ -134,7 +134,8 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	now := time.Now().In(argentinaLocation)
 	today := now.Format("2006-01-02")
-	todayTimestamp := now.Format("2006-01-02T00:00:00Z")
+	// Crear timestamp en zona horaria local de Argentina (no UTC)
+	todayTimestamp := now.Format("2006-01-02T00:00:00-03:00")
 	var sessionID int
 	
 
