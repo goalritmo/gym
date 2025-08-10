@@ -127,7 +127,9 @@ export default function AuthenticatedApp() {
       console.log('Workout creado en backend:', newWorkout)
       
       // Refrescar todos los datos del backend para asegurar consistencia
+      console.log('🔄 Refrescando datos después de crear workout...')
       await loadData()
+      console.log('✅ Datos refrescados exitosamente')
       
       console.log('✅ Workout guardado exitosamente en Supabase')
     } catch (error) {

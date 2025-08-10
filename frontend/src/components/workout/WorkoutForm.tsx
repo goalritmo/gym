@@ -14,9 +14,9 @@ type Exercise = {
 
 // Esquema de validación con Zod
 const workoutFormSchema = z.object({
-  exercise_id: z.coerce.number().min(1, 'Vacío'),
-  weight: z.coerce.number().min(0.1, 'Vacío'),
-  reps: z.coerce.number().int().min(1, 'Vacío'),
+  exercise_id: z.coerce.number().refine(val => val > 0, 'Vacío'),
+  weight: z.coerce.number().refine(val => val > 0, 'Vacío'),
+  reps: z.coerce.number().int().refine(val => val > 0, 'Vacío'),
   serie: z.coerce.number().int().min(1, 'Debe ser al menos 1 serie'),
   seconds: z.coerce.number().min(0, 'Los segundos deben ser mayores o iguales a 0').optional(),
   observations: z.string().default('')
@@ -62,7 +62,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         observations: ''
       })
       // Scroll hacia arriba después de registrar exitosamente
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 100)
     } catch (error) {
       console.error('Error submitting workout:', error)
       setErrorMessage('Error al registrar el entrenamiento')
