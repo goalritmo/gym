@@ -13,22 +13,28 @@ export default function FloatingNavButton({ currentTab, onTabChange }: FloatingN
   const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
-    // En historial, siempre mostrar el botón
-    if (currentTab === TABS.HISTORY) {
-      setIsVisible(true)
-      return
-    }
-
-    // En el formulario de registro, ocultar después de 5 segundos
-    if (currentTab === TABS.WORKOUT) {
-      setIsVisible(true)
-      const timer = setTimeout(() => {
-        setIsVisible(false)
-      }, 5000)
-
-      return () => {
-        clearTimeout(timer)
+    // Solo mostrar el botón en WORKOUT e HISTORY
+    if (currentTab === TABS.WORKOUT || currentTab === TABS.HISTORY) {
+      // En historial, siempre mostrar el botón
+      if (currentTab === TABS.HISTORY) {
+        setIsVisible(true)
+        return
       }
+
+      // En el formulario de registro, ocultar después de 5 segundos
+      if (currentTab === TABS.WORKOUT) {
+        setIsVisible(true)
+        const timer = setTimeout(() => {
+          setIsVisible(false)
+        }, 3000)
+
+        return () => {
+          clearTimeout(timer)
+        }
+      }
+    } else {
+      // En otras tabs (EXERCISES, EQUIPMENT), ocultar el botón
+      setIsVisible(false)
     }
   }, [currentTab])
 
