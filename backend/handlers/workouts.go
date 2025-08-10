@@ -134,7 +134,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	now := time.Now().In(argentinaLocation)
 	today := now.Format("2006-01-02")
-	todayTimestamp := now.Format("2006-01-02T15:04:05Z07:00")
+	todayTimestamp := now.Format("2006-01-02T00:00:00Z")
 	var sessionID int
 	
 

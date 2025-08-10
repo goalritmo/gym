@@ -131,6 +131,9 @@ export default function AuthenticatedApp() {
       await loadData()
       console.log('✅ Datos refrescados exitosamente')
       
+      // Cambiar automáticamente a la pestaña Entrenamientos para mostrar el nuevo workout
+      setActiveTab(TABS.HISTORY)
+      
       console.log('✅ Workout guardado exitosamente en Supabase')
     } catch (error) {
       console.error('❌ Error guardando workout:', error)
