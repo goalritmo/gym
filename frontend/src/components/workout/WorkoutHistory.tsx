@@ -205,8 +205,10 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   const handleConfirmDelete = async () => {
     if (deleteConfirmation.workoutId) {
-      // Cerrar el modal inmediatamente
+      // Cerrar todos los modales inmediatamente
       setDeleteConfirmation({ show: false, workoutId: null })
+      setEditSessionModal({ show: false, sessionId: null, currentName: '' })
+      setSelectedExercise(null) // Cerrar el modal de detalles del ejercicio
       setDeletingWorkoutId(deleteConfirmation.workoutId)
       
       try {
@@ -222,6 +224,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   const handleCancelDelete = () => {
     setDeleteConfirmation({ show: false, workoutId: null })
+    setEditSessionModal({ show: false, sessionId: null, currentName: '' })
+    setSelectedExercise(null) // Cerrar el modal de detalles del ejercicio
   }
 
   // Filtrar días por fecha

@@ -100,12 +100,12 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
       })
     } else {
       setIsClosing(true)
-      // Animación de cierre escalonada
+      // Animación de cierre escalonada más rápida
       const reversedItems = [...visibleItems].reverse()
       reversedItems.forEach((_, index) => {
         const timeoutId = setTimeout(() => {
           setVisibleItems(prev => prev.slice(0, -1))
-        }, index * 60) as unknown as number
+        }, index * 20) as unknown as number // 20ms entre cada item (más rápido)
         timeoutsRef.current.push(timeoutId)
       })
       
@@ -113,19 +113,19 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
       setTimeout(() => {
         setDrawerOpen(false)
         setIsClosing(false)
-      }, reversedItems.length * 60 + 200)
+      }, reversedItems.length * 20 + 100) // 100ms adicionales (más rápido)
     }
   }
 
   const handleTabChange = (newValue: TabType) => {
     onTabChange(newValue)
     setIsClosing(true)
-    // Animación de cierre escalonada
+    // Animación de cierre escalonada más rápida
     const reversedItems = [...visibleItems].reverse()
     reversedItems.forEach((_, index) => {
       const timeoutId = setTimeout(() => {
         setVisibleItems(prev => prev.slice(0, -1))
-      }, index * 60) as unknown as number
+      }, index * 20) as unknown as number // 20ms entre cada item (más rápido)
       timeoutsRef.current.push(timeoutId)
     })
     
@@ -133,7 +133,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
     setTimeout(() => {
       setDrawerOpen(false)
       setIsClosing(false)
-    }, reversedItems.length * 60 + 200)
+    }, reversedItems.length * 20 + 100) // 100ms adicionales (más rápido)
   }
 
   const menuItems = [
