@@ -16,9 +16,9 @@ type Exercise = {
 const workoutFormSchema = z.object({
   exercise_id: z.coerce.number().min(1, 'Selecciona un ejercicio'),
   weight: z.coerce.number().min(0.1, 'El peso debe ser mayor a 0'),
-  reps: z.coerce.number().int().min(1, 'Debe ser al menos 1 repe'),
+  reps: z.coerce.number().int().min(1, 'Debe ser al menos 1 repetición'),
   serie: z.coerce.number().int().min(1, 'Debe ser al menos 1 serie'),
-  seconds: z.coerce.number().min(0, 'Los segundos deben ser mayores a 0').optional(),
+  seconds: z.coerce.number().min(0, 'Los segundos deben ser mayores o iguales a 0').optional(),
   observations: z.string().default('')
 })
 
@@ -306,12 +306,24 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
               alignItems: 'center',
               minWidth: '140px'
             }}>
+              {errors.seconds && (
+                <Typography 
+                  variant="caption" 
+                  color="error" 
+                  sx={{ 
+                    mb: 1, 
+                    textAlign: 'center',
+                    fontSize: '0.75rem'
+                  }}
+                >
+                  {errors.seconds.message}
+                </Typography>
+              )}
               <TextField
                 label="Segundos"
                 type="number"
                 disabled={isLoading}
                 error={Boolean(errors.seconds)}
-                helperText={errors.seconds?.message}
                 inputProps={{ 
                   inputMode: 'numeric',
                   pattern: '[0-9]*',
