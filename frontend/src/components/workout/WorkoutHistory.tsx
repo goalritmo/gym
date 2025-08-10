@@ -240,7 +240,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center', 
-          minHeight: '60vh'
+          minHeight: '40vh'
         }}>
           <Paper sx={{ 
             p: 5, 
