@@ -13,41 +13,13 @@ export default function FloatingNavButton({ currentTab, onTabChange }: FloatingN
   const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
-    const handleVisibility = () => {
-      const currentScrollY = window.scrollY
-      const documentHeight = document.documentElement.scrollHeight
-      const windowHeight = window.innerHeight
-      const scrollPercentage = (currentScrollY + windowHeight) / documentHeight
-      
-      // Ocultar cuando esté cerca del final del contenido (último 20%)
-      if (scrollPercentage > 0.8) {
-        setIsVisible(false)
-      } else {
-        setIsVisible(true)
-      }
-    }
+    // Ocultar el botón después de 5 segundos
+    const timer = setTimeout(() => {
+      setIsVisible(false)
+    }, 5000)
 
-    // Verificar visibilidad inicial
-    handleVisibility()
-
-    // Agregar listener con throttling para mejor rendimiento
-    let ticking = false
-    const throttledHandleVisibility = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          handleVisibility()
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-
-    window.addEventListener('scroll', throttledHandleVisibility, { passive: true })
-    window.addEventListener('resize', throttledHandleVisibility, { passive: true })
-    
     return () => {
-      window.removeEventListener('scroll', throttledHandleVisibility)
-      window.removeEventListener('resize', throttledHandleVisibility)
+      clearTimeout(timer)
     }
   }, [])
 
