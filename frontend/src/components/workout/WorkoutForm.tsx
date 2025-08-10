@@ -308,6 +308,16 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
                   '& .MuiInputBase-root': {
                     minWidth: '120px'
                   },
+                  '& .MuiInputLabel-root': {
+                    backgroundColor: 'white',
+                    px: 1,
+                    zIndex: 1
+                  },
+                  '& .MuiInputLabel-shrink': {
+                    backgroundColor: 'white',
+                    px: 1,
+                    zIndex: 1
+                  },
                   '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
                     display: 'none'
                   },
