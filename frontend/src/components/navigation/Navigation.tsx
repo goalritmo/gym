@@ -33,6 +33,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [visibleItems, setVisibleItems] = useState<number[]>([])
   const [showToolbarElements, setShowToolbarElements] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
   const timeoutsRef = useRef<number[]>([])
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -88,6 +89,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
     
     if (!drawerOpen) {
       setDrawerOpen(true)
+      setIsClosing(false)
       // Animación escalonada: mostrar items uno por uno
       setVisibleItems([])
       menuItems.forEach((_, index) => {
@@ -97,15 +99,41 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
         timeoutsRef.current.push(timeoutId)
       })
     } else {
-      setDrawerOpen(false)
-      setVisibleItems([])
+      setIsClosing(true)
+      // Animación de cierre escalonada
+      const reversedItems = [...visibleItems].reverse()
+      reversedItems.forEach((_, index) => {
+        const timeoutId = setTimeout(() => {
+          setVisibleItems(prev => prev.slice(0, -1))
+        }, index * 60) as unknown as number
+        timeoutsRef.current.push(timeoutId)
+      })
+      
+      // Cerrar el menú después de la animación
+      setTimeout(() => {
+        setDrawerOpen(false)
+        setIsClosing(false)
+      }, reversedItems.length * 60 + 200)
     }
   }
 
   const handleTabChange = (newValue: TabType) => {
     onTabChange(newValue)
-    setDrawerOpen(false)
-    setVisibleItems([])
+    setIsClosing(true)
+    // Animación de cierre escalonada
+    const reversedItems = [...visibleItems].reverse()
+    reversedItems.forEach((_, index) => {
+      const timeoutId = setTimeout(() => {
+        setVisibleItems(prev => prev.slice(0, -1))
+      }, index * 60) as unknown as number
+      timeoutsRef.current.push(timeoutId)
+    })
+    
+    // Cerrar el menú después de la animación
+    setTimeout(() => {
+      setDrawerOpen(false)
+      setIsClosing(false)
+    }, reversedItems.length * 60 + 200)
   }
 
   const menuItems = [
@@ -258,7 +286,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
             <Box sx={{ 
               transform: 'translateX(0)',
               transition: 'all 0.3s ease-in-out',
-              animation: drawerOpen ? 'slideOutToLeft 0.3s ease-out' : 'slideInFromLeft 0.3s ease-out'
+              animation: isClosing ? 'slideOutToLeft 0.3s ease-out' : 'slideInFromLeft 0.3s ease-out'
             }}>
               <IconButton
                 color="inherit"
@@ -317,27 +345,7 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
           }} 
           role="presentation"
         >
-          {/* Botón de cerrar en la parte superior del menú */}
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'flex-end', 
-            p: 1,
-            borderBottom: '1px solid rgba(255,255,255,0.1)'
-          }}>
-            <IconButton
-              color="inherit"
-              aria-label="cerrar menú"
-              onClick={handleDrawerToggle}
-              sx={{ 
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.1)'
-                }
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
+
           <List>
             {menuItems.map((item, index) => (
               <Fade 

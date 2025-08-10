@@ -205,14 +205,15 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   const handleConfirmDelete = async () => {
     if (deleteConfirmation.workoutId) {
+      // Cerrar el modal inmediatamente
+      setDeleteConfirmation({ show: false, workoutId: null })
       setDeletingWorkoutId(deleteConfirmation.workoutId)
+      
       try {
         await onDelete(deleteConfirmation.workoutId)
-        setDeleteConfirmation({ show: false, workoutId: null })
       } catch (error) {
         console.error('❌ Error eliminando workout:', error)
         setErrorMessage('Error al eliminar el entrenamiento')
-        setDeleteConfirmation({ show: false, workoutId: null })
       } finally {
         setDeletingWorkoutId(null)
       }
