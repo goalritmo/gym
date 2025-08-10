@@ -15,10 +15,10 @@ type Exercise = {
 // Esquema de validación con Zod
 const workoutFormSchema = z.object({
   exercise_id: z.coerce.number().refine(val => val > 0, ' '),
-  weight: z.coerce.number().refine(val => val > 0, ' '),
-  reps: z.coerce.number().int().refine(val => val > 0, ' '),
+  weight: z.coerce.number().refine(val => val > 0 && val <= 1000, ' '), // Máximo 1000 kg
+  reps: z.coerce.number().int().refine(val => val > 0 && val <= 100, ' '), // Máximo 100 reps
   serie: z.coerce.number().int().min(1, ' '),
-  seconds: z.coerce.number().min(0, ' ').optional(),
+  seconds: z.coerce.number().min(0).max(3600).optional(), // Máximo 1 hora (3600 segundos)
   observations: z.string().default('')
 })
 
@@ -130,7 +130,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             error={Boolean(errors.weight)}
             inputProps={{ 
               step: 'any',
-              inputMode: 'decimal'
+              inputMode: 'decimal',
+              min: 0.1,
+              max: 1000
             }}
             {...register('weight', { valueAsNumber: true })}
             sx={{
@@ -150,7 +152,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             disabled={isLoading}
             error={Boolean(errors.reps)}
             inputProps={{ 
-              inputMode: 'numeric'
+              inputMode: 'numeric',
+              min: 1,
+              max: 100
             }}
             {...register('reps', { valueAsNumber: true })}
             sx={{
@@ -300,7 +304,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
                 disabled={isLoading}
                 error={Boolean(errors.seconds)}
                 inputProps={{ 
-                  inputMode: 'numeric'
+                  inputMode: 'numeric',
+                  min: 0,
+                  max: 3600
                 }}
                 {...register('seconds', { valueAsNumber: true })}
                 sx={{ 
