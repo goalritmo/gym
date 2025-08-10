@@ -127,28 +127,19 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Buscar o crear workout_session para hoy (en timezone de Argentina)
-	argentinaLocation, _ := time.LoadLocation("America/Argentina/Buenos_Aires")
+	argentinaLocation, err := time.LoadLocation("America/Argentina/Buenos_Aires")
+	if err != nil {
+		// Si falla, usar UTC como fallback
+		argentinaLocation = time.UTC
+	}
 	now := time.Now().In(argentinaLocation)
 	today := now.Format("2006-01-02")
 	todayTimestamp := now.Format("2006-01-02T15:04:05Z07:00")
 	var sessionID int
 	
-	fmt.Printf("🕐 Fecha actual (Argentina): %s, timestamp: %s\n", today, todayTimestamp)
+
 	
-	// Debug: ver todas las sesiones del usuario
-	debugQuery := `SELECT id, session_date, DATE(session_date) FROM workout_sessions WHERE user_id = $1 ORDER BY session_date DESC LIMIT 5`
-	rows, debugErr := database.DB.Query(debugQuery, userID)
-	if debugErr == nil {
-		fmt.Printf("🔍 Sesiones del usuario:\n")
-		for rows.Next() {
-			var id int
-			var sessionDate, dateOnly string
-			if rows.Scan(&id, &sessionDate, &dateOnly) == nil {
-				fmt.Printf("  - ID: %d, session_date: %s, DATE(): %s\n", id, sessionDate, dateOnly)
-			}
-		}
-		rows.Close()
-	}
+
 	
 	// Verificar si ya existe una sesión para hoy
 	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 LIMIT 1`
@@ -157,7 +148,6 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	
 	if err != nil {
 		// No existe sesión para hoy, crear una nueva
-		fmt.Printf("🔄 Creando nueva sesión para usuario %s, fecha %s\n", userID, today)
 		createSessionQuery := `
 			INSERT INTO workout_sessions (user_id, session_date, session_name, total_exercises, effort, mood) 
 			VALUES ($1, $2, $3, 0, 0, 0) 
@@ -166,14 +156,9 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		sessionName := "Entrenamiento del día"
 		err = database.DB.QueryRow(createSessionQuery, userID, todayTimestamp, sessionName).Scan(&sessionID)
 		if err != nil {
-			fmt.Printf("❌ Error creando sesión: %v\n", err)
 			http.Error(w, "Error creando sesión de entrenamiento", http.StatusInternalServerError)
 			return
 		}
-		fmt.Printf("✅ Sesión creada con ID: %d\n", sessionID)
-	} else {
-		fmt.Printf("✅ Sesión existente encontrada con ID: %d, fecha: %s\n", sessionID, sessionDate)
-		fmt.Printf("🔍 Buscando sesiones para fecha: %s\n", today)
 	}
 
 	// Generar un UUID único para este workout
@@ -181,12 +166,9 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	uuidQuery := `SELECT gen_random_uuid()`
 	err = database.DB.QueryRow(uuidQuery).Scan(&sessionUUID)
 	if err != nil {
-		fmt.Printf("❌ Error generando UUID: %v\n", err)
 		http.Error(w, "Error generando identificador único", http.StatusInternalServerError)
 		return
 	}
-	
-	fmt.Printf("✅ UUID generado para workout: %s\n", sessionUUID)
 
 	// Insertar workout asociado a la sesión
 	query := `
@@ -222,13 +204,9 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	).Scan(&workout.ID, &workout.ExerciseSessionID, &workout.CreatedAt)
 
 	if err != nil {
-		fmt.Printf("❌ Error creando workout: %v\n", err)
-		fmt.Printf("📋 Datos del workout: userID=%s, exerciseID=%d, sessionUUID=%s\n", userID, req.ExerciseID, sessionUUID)
 		http.Error(w, "Error creando workout", http.StatusInternalServerError)
 		return
 	}
-	
-	fmt.Printf("✅ Workout creado exitosamente con ID: %d\n", workout.ID)
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(workout)
@@ -489,8 +467,7 @@ func UpdateWorkoutSessionHandler(w http.ResponseWriter, r *http.Request) {
 
 	args = append(args, id, userID)
 
-	fmt.Printf("🔍 Query de actualización: %s\n", query)
-	fmt.Printf("🔍 Args: %v\n", args)
+
 
 	var session models.WorkoutSession
 	err = database.DB.QueryRow(query, args...).Scan(
@@ -500,21 +477,9 @@ func UpdateWorkoutSessionHandler(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		fmt.Printf("❌ Error actualizando sesión: %v\n", err)
-		fmt.Printf("🔍 Verificando si la sesión existe: SELECT * FROM workout_sessions WHERE id = %d AND user_id = '%s'\n", id, userID)
-		
-		// Verificar si la sesión existe
-		var count int
-		countErr := database.DB.QueryRow("SELECT COUNT(*) FROM workout_sessions WHERE id = $1 AND user_id = $2", id, userID).Scan(&count)
-		if countErr == nil {
-			fmt.Printf("🔍 Sesiones encontradas: %d\n", count)
-		}
-		
 		http.Error(w, "Sesión no encontrada o error actualizando", http.StatusNotFound)
 		return
 	}
-
-	fmt.Printf("✅ Sesión actualizada exitosamente: ID %d\n", session.ID)
 
 	session.UserID = userID
 	json.NewEncoder(w).Encode(session)
