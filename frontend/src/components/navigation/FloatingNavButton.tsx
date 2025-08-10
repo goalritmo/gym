@@ -11,66 +11,45 @@ type FloatingNavButtonProps = {
 
 export default function FloatingNavButton({ currentTab, onTabChange }: FloatingNavButtonProps) {
   const [isVisible, setIsVisible] = useState(true)
-  const [lastScrollY, setLastScrollY] = useState(0)
 
   useEffect(() => {
-    console.log('🔍 FloatingNavButton montado')
-    
-    const handleScroll = () => {
+    const handleVisibility = () => {
       const currentScrollY = window.scrollY
       const documentHeight = document.documentElement.scrollHeight
       const windowHeight = window.innerHeight
       const scrollPercentage = (currentScrollY + windowHeight) / documentHeight
       
-      console.log('🔍 Scroll detectado:', {
-        currentScrollY,
-        lastScrollY,
-        documentHeight,
-        windowHeight,
-        scrollPercentage,
-        isScrollingDown: currentScrollY > lastScrollY,
-        shouldHide: (currentScrollY > lastScrollY && currentScrollY > 50) || scrollPercentage > 0.9
-      })
-      
-      // Ocultar al hacer scroll hacia abajo (más sensible, desde 50px)
-      // También ocultar cuando esté cerca del final del scroll (último 10%)
-      if ((currentScrollY > lastScrollY && currentScrollY > 50) || scrollPercentage > 0.9) {
-        console.log('🔍 Ocultando botón')
+      // Ocultar cuando esté cerca del final del contenido (último 20%)
+      if (scrollPercentage > 0.8) {
         setIsVisible(false)
-      } else if (currentScrollY < lastScrollY || currentScrollY <= 50) {
-        // Mostrar al hacer scroll hacia arriba o estar cerca del top
-        console.log('🔍 Mostrando botón')
+      } else {
         setIsVisible(true)
       }
-      
-      setLastScrollY(currentScrollY)
     }
+
+    // Verificar visibilidad inicial
+    handleVisibility()
 
     // Agregar listener con throttling para mejor rendimiento
     let ticking = false
-    const throttledHandleScroll = () => {
+    const throttledHandleVisibility = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          handleScroll()
+          handleVisibility()
           ticking = false
         })
         ticking = true
       }
     }
 
-    window.addEventListener('scroll', throttledHandleScroll, { passive: true })
-    
-    // También escuchar en el documento completo
-    document.addEventListener('scroll', throttledHandleScroll, { passive: true })
-    
-    console.log('🔍 Event listeners agregados')
+    window.addEventListener('scroll', throttledHandleVisibility, { passive: true })
+    window.addEventListener('resize', throttledHandleVisibility, { passive: true })
     
     return () => {
-      window.removeEventListener('scroll', throttledHandleScroll)
-      document.removeEventListener('scroll', throttledHandleScroll)
-      console.log('🔍 Event listeners removidos')
+      window.removeEventListener('scroll', throttledHandleVisibility)
+      window.removeEventListener('resize', throttledHandleVisibility)
     }
-  }, [lastScrollY])
+  }, [])
 
   const handleClick = () => {
     if (currentTab === TABS.WORKOUT) {
