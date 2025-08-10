@@ -19,48 +19,49 @@ export default function AuthenticatedApp() {
   const [deleteMessage, setDeleteMessage] = useState('')
   const [deleteError, setDeleteError] = useState('')
 
+  // Función para cargar datos desde el backend
+  const loadData = async () => {
+    try {
+      console.log('Cargando datos desde el backend...')
+      
+      // Cargar workouts, sesiones y ejercicios en paralelo
+      const [workoutsData, sessionsData, exercisesData] = await Promise.all([
+        apiClient.getWorkouts(),
+        apiClient.getWorkoutSessions(),
+        apiClient.getExercises()
+      ])
+      
+      console.log('Workouts cargados:', workoutsData)
+      console.log('Sesiones cargadas:', sessionsData)
+      console.log('Ejercicios cargados:', exercisesData)
+      
+      setWorkouts(Array.isArray(workoutsData) ? workoutsData : [])
+      setWorkoutSessions(Array.isArray(sessionsData) ? sessionsData : [])
+      setExercises(Array.isArray(exercisesData) ? exercisesData : [])
+    } catch (error) {
+      console.error('Error cargando datos del backend:', error)
+      
+      // Fallback a localStorage si el backend falla
+      console.log('Intentando cargar desde localStorage...')
+      const savedWorkouts = localStorage.getItem('gym-workouts')
+      const savedSessions = localStorage.getItem('gym-workout-sessions')
+      
+      if (savedWorkouts) {
+        setWorkouts(JSON.parse(savedWorkouts))
+      }
+      
+      if (savedSessions) {
+        setWorkoutSessions(JSON.parse(savedSessions))
+      }
+      
+      // Solo usar ejercicios por defecto si no hay ninguno cargado
+      console.log('⚠️ No se pudieron cargar ejercicios del backend. Usando array vacío.')
+      setExercises([])
+    }
+  }
+
   // Cargar datos desde el backend al montar el componente
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        console.log('Cargando datos desde el backend...')
-        
-        // Cargar workouts, sesiones y ejercicios en paralelo
-        const [workoutsData, sessionsData, exercisesData] = await Promise.all([
-          apiClient.getWorkouts(),
-          apiClient.getWorkoutSessions(),
-          apiClient.getExercises()
-        ])
-        
-        console.log('Workouts cargados:', workoutsData)
-        console.log('Sesiones cargadas:', sessionsData)
-        console.log('Ejercicios cargados:', exercisesData)
-        
-        setWorkouts(Array.isArray(workoutsData) ? workoutsData : [])
-        setWorkoutSessions(Array.isArray(sessionsData) ? sessionsData : [])
-        setExercises(Array.isArray(exercisesData) ? exercisesData : [])
-      } catch (error) {
-        console.error('Error cargando datos del backend:', error)
-        
-        // Fallback a localStorage si el backend falla
-        console.log('Intentando cargar desde localStorage...')
-        const savedWorkouts = localStorage.getItem('gym-workouts')
-        const savedSessions = localStorage.getItem('gym-workout-sessions')
-        
-        if (savedWorkouts) {
-          setWorkouts(JSON.parse(savedWorkouts))
-        }
-        
-        if (savedSessions) {
-          setWorkoutSessions(JSON.parse(savedSessions))
-        }
-        
-        // Solo usar ejercicios por defecto si no hay ninguno cargado
-        console.log('⚠️ No se pudieron cargar ejercicios del backend. Usando array vacío.')
-        setExercises([])
-      }
-    }
-    
     loadData()
   }, [])
 
@@ -125,8 +126,8 @@ export default function AuthenticatedApp() {
       const newWorkout = await apiClient.createWorkout(workoutData) as Workout
       console.log('Workout creado en backend:', newWorkout)
       
-      // Actualizar estado local
-      setWorkouts(prev => [...prev, newWorkout])
+      // Refrescar todos los datos del backend para asegurar consistencia
+      await loadData()
       
       console.log('✅ Workout guardado exitosamente en Supabase')
     } catch (error) {

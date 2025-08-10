@@ -129,8 +129,8 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Buscar o crear workout_session para hoy (en timezone de Argentina)
 	argentinaLocation, err := time.LoadLocation("America/Argentina/Buenos_Aires")
 	if err != nil {
-		// Si falla, usar UTC como fallback
-		argentinaLocation = time.UTC
+		// Si falla, usar UTC-3 (hora de Argentina) como fallback
+		argentinaLocation = time.FixedZone("UTC-3", -3*60*60)
 	}
 	now := time.Now().In(argentinaLocation)
 	today := now.Format("2006-01-02")
