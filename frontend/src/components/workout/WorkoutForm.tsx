@@ -61,6 +61,8 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         seconds: '',
         observations: ''
       })
+      // Scroll hacia arriba después de registrar exitosamente
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
       console.error('Error submitting workout:', error)
       setErrorMessage('Error al registrar el entrenamiento')
@@ -431,7 +433,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             }
           }}
         >
-          ✅ Entrenamiento guardado exitosamente
+          ✅ Serie de entrenamiento guardada exitosamente
         </Alert>
     </Snackbar>
 
