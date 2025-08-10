@@ -12,13 +12,13 @@ type Exercise = {
   name: string
 }
 
-// Esquema de validación con Zod
+// Esquema de validación con Zod - deshabilitado temporalmente
 const workoutFormSchema = z.object({
-  exercise_id: z.coerce.number().refine(val => val > 0, ' '),
-  weight: z.coerce.number().refine(val => val > 0, ' '),
-  reps: z.coerce.number().int().refine(val => val > 0, ' '),
-  serie: z.coerce.number().int().min(1, ' '),
-  seconds: z.coerce.number().min(0, ' ').optional(),
+  exercise_id: z.any(),
+  weight: z.any(),
+  reps: z.any(),
+  serie: z.any(),
+  seconds: z.any(),
   observations: z.string().default('')
 })
 
@@ -84,7 +84,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
-        <FormControl fullWidth error={Boolean(errors.exercise_id)} disabled={isLoading || exercises.length === 0}>
+        <FormControl fullWidth disabled={isLoading || exercises.length === 0}>
           <InputLabel id="exercise-select-label">Ejercicio</InputLabel>
           <Select
             labelId="exercise-select-label"
@@ -114,11 +114,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
               </MenuItem>
             ))}
           </Select>
-          {errors.exercise_id && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
-              {errors.exercise_id.message}
-            </Typography>
-          )}
+
         </FormControl>
 
         {/* Peso, Reps y Serie en la misma fila */}
