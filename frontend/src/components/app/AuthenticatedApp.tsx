@@ -5,6 +5,7 @@ import WorkoutForm from '../workout/WorkoutForm'
 import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
 import WorkoutHistory from '../workout/WorkoutHistory'
+import FloatingNavButton from '../navigation/FloatingNavButton'
 import type { Workout, WorkoutSession } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
 import { apiClient } from '../../lib/api'
@@ -391,6 +392,12 @@ export default function AuthenticatedApp() {
           ❌ {deleteError}
         </Alert>
       </Snackbar>
+
+      {/* Botón flotante para navegación rápida */}
+      <FloatingNavButton 
+        currentTab={activeTab} 
+        onTabChange={handleTabChange} 
+      />
     </Box>
   )
 }
