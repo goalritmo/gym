@@ -52,20 +52,24 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const [loadingSessionId, setLoadingSessionId] = useState<number | null>(null)
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    // Forzar timezone local para evitar problemas de UTC
+    const date = new Date(dateString + 'T00:00:00')
     const options: Intl.DateTimeFormatOptions = {
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
+      timeZone: 'America/Argentina/Buenos_Aires'
     }
     return date.toLocaleDateString('es-ES', options)
   }
 
   const formatDateShort = (dateString: string) => {
-    const date = new Date(dateString)
+    // Forzar timezone local para evitar problemas de UTC
+    const date = new Date(dateString + 'T00:00:00')
     const options: Intl.DateTimeFormatOptions = {
       day: 'numeric',
-      month: 'long'
+      month: 'long',
+      timeZone: 'America/Argentina/Buenos_Aires'
     }
     return date.toLocaleDateString('es-ES', options)
   }
