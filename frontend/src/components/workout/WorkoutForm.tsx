@@ -350,7 +350,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             mt: 2, 
             px: 4,
             py: 1.5,
-            borderRadius: 3,
+            borderRadius: 1.5,
             fontSize: '1.1rem',
             fontWeight: 600,
             textTransform: 'none',
