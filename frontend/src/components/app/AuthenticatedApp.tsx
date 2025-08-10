@@ -27,18 +27,12 @@ export default function AuthenticatedApp() {
   const loadData = async () => {
     setIsLoading(true)
     try {
-      console.log('Cargando datos desde el backend...')
-      
       // Cargar workouts, sesiones y ejercicios en paralelo
       const [workoutsData, sessionsData, exercisesData] = await Promise.all([
         apiClient.getWorkouts(),
         apiClient.getWorkoutSessions(),
         apiClient.getExercises()
       ])
-      
-      console.log('Workouts cargados:', workoutsData)
-      console.log('Sesiones cargadas:', sessionsData)
-      console.log('Ejercicios cargados:', exercisesData)
       
       setWorkouts(Array.isArray(workoutsData) ? workoutsData : [])
       setWorkoutSessions(Array.isArray(sessionsData) ? sessionsData : [])
@@ -47,7 +41,7 @@ export default function AuthenticatedApp() {
       console.error('Error cargando datos del backend:', error)
       
       // Fallback a localStorage si el backend falla
-      console.log('Intentando cargar desde localStorage...')
+
       const savedWorkouts = localStorage.getItem('gym-workouts')
       const savedSessions = localStorage.getItem('gym-workout-sessions')
       
@@ -60,7 +54,7 @@ export default function AuthenticatedApp() {
       }
       
       // Solo usar ejercicios por defecto si no hay ninguno cargado
-      console.log('⚠️ No se pudieron cargar ejercicios del backend. Usando array vacío.')
+
       setExercises([])
     } finally {
       setIsLoading(false)
@@ -107,7 +101,7 @@ export default function AuthenticatedApp() {
 
       // Si no existe, crear una nueva sesión en el backend
       if (!currentSession) {
-        console.log('Creando nueva sesión en el backend...')
+  
         const newSessionData = {
           session_date: todayDate,
           session_name: 'Entrenamiento del día',
@@ -117,12 +111,12 @@ export default function AuthenticatedApp() {
         
         const newSession = await apiClient.createWorkoutSession(newSessionData) as WorkoutSession
         currentSession = newSession
-        console.log('Sesión creada:', currentSession)
+
         setWorkoutSessions(prev => [...prev, currentSession!])
       }
 
       // Crear el nuevo workout en el backend
-      console.log('Creando workout en el backend...')
+
       const workoutData = {
         exercise_id: data.exercise_id,
         weight: data.weight || 0,
@@ -133,10 +127,7 @@ export default function AuthenticatedApp() {
         exercise_session_id: currentSession.id
       }
 
-      const newWorkout = await apiClient.createWorkout(workoutData) as Workout
-      console.log('Workout creado en backend:', newWorkout)
-      
-      console.log('✅ Workout guardado exitosamente en Supabase')
+      await apiClient.createWorkout(workoutData) as Workout
       
       // Refrescar la página después de 1 segundo para que se vea el mensaje de éxito
       setTimeout(() => {
@@ -153,12 +144,12 @@ export default function AuthenticatedApp() {
   // Función para eliminar un workout
   const handleDeleteWorkout = async (workoutId: number) => {
     try {
-      console.log('Eliminando workout del backend...', workoutId)
+
       await apiClient.deleteWorkout(workoutId)
       
       // Actualizar estado local
       setWorkouts(prev => prev.filter(w => w.id !== workoutId))
-      console.log('✅ Workout eliminado exitosamente')
+
       setDeleteMessage('Entrenamiento eliminado exitosamente')
     } catch (error) {
       console.error('❌ Error eliminando workout:', error)
@@ -169,9 +160,9 @@ export default function AuthenticatedApp() {
   // Función para actualizar una sesión
   const handleUpdateSession = async (sessionId: number, updates: Partial<WorkoutSession>) => {
     try {
-      console.log('Actualizando sesión en el backend...', sessionId, updates)
+
       const result = await apiClient.updateWorkoutSession(sessionId, updates)
-      console.log('🔍 Respuesta del backend:', result)
+
       
       // Solo actualizar estado local si el backend confirma éxito
       setWorkoutSessions(prev => 
@@ -181,7 +172,6 @@ export default function AuthenticatedApp() {
             : session
         )
       )
-      console.log('✅ Sesión actualizada exitosamente')
       return result
     } catch (error) {
       console.error('❌ Error actualizando sesión:', error)

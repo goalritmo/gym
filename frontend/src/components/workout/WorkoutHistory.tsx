@@ -84,26 +84,16 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   // Agrupar workouts por sesión y crear días
   const workoutDays = useMemo(() => {
     const days: WorkoutDay[] = [];
-    
-    console.log('🔍 Total de sesiones:', workoutSessions.length)
-    console.log('🔍 Total de workouts:', workouts.length)
-    
+
     workoutSessions.forEach(session => {
-      console.log('🔍 Procesando sesión:', session.session_date, 'ID:', session.id)
-      console.log('🔍 Workouts disponibles:', workouts.map(w => ({ id: w.id, created_at: w.created_at, exercise_name: w.exercise_name })))
-      
+
       // Filtrar workouts por fecha de sesión - simplificado
       const sessionWorkouts = workouts.filter(w => {
         // Usar solo la fecha sin tiempo para comparar
         const workoutDate = w.created_at.split('T')[0]
         const sessionDate = session.session_date.split('T')[0]
-        console.log(`🔍 Comparando workout ${w.id}: ${workoutDate} vs sesión ${session.id}: ${sessionDate}`)
         return workoutDate === sessionDate
       })
-      console.log(`🔍 Workouts filtrados para sesión ${session.id}: ${sessionWorkouts.length}`)
-      
-      console.log('🔍 Workouts filtrados para sesión:', sessionWorkouts.length)
-      
       // Agrupar ejercicios por nombre
       const exerciseGroups: ExerciseGroup[] = [];
       const exerciseMap = new Map<string, Workout[]>();
@@ -150,8 +140,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const handleEffortChange = async (sessionId: number, newValue: number) => {
     setLoadingSessionId(sessionId);
     try {
-      const result = await onUpdateSession(sessionId, { effort: newValue });
-      console.log('✅ Resultado actualización esfuerzo:', result);
+      await onUpdateSession(sessionId, { effort: newValue });
       setSuccessMessage('Esfuerzo actualizado exitosamente');
     } catch (error) {
       console.error('❌ Error actualizando esfuerzo:', error);
@@ -164,8 +153,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const handleMoodChange = async (sessionId: number, newValue: number) => {
     setLoadingSessionId(sessionId);
     try {
-      const result = await onUpdateSession(sessionId, { mood: newValue });
-      console.log('✅ Resultado actualización ánimo:', result);
+      await onUpdateSession(sessionId, { mood: newValue });
       setSuccessMessage('Ánimo actualizado exitosamente');
     } catch (error) {
       console.error('❌ Error actualizando ánimo:', error);
@@ -184,8 +172,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     if (editSessionModal.sessionId && newSessionName.trim()) {
       setLoadingSessionId(editSessionModal.sessionId);
       try {
-        const result = await onUpdateSession(editSessionModal.sessionId, { session_name: newSessionName.trim() });
-        console.log('✅ Resultado actualización nombre:', result);
+        await onUpdateSession(editSessionModal.sessionId, { session_name: newSessionName.trim() });
         setEditSessionModal({ show: false, sessionId: null, currentName: '' })
         setNewSessionName('')
         setSuccessMessage('Nombre actualizado exitosamente')
