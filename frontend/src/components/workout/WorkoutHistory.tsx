@@ -52,13 +52,20 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const [loadingSessionId, setLoadingSessionId] = useState<number | null>(null)
 
   const formatDate = (dateString: string) => {
+    console.log('🔍 formatDate recibió:', dateString)
     const date = new Date(dateString)
+    console.log('🔍 Date creado:', date)
+    console.log('🔍 Date.toISOString():', date.toISOString())
+    console.log('🔍 Date.toLocaleDateString():', date.toLocaleDateString('es-ES'))
+    
     const options: Intl.DateTimeFormatOptions = {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     }
-    return date.toLocaleDateString('es-ES', options)
+    const result = date.toLocaleDateString('es-ES', options)
+    console.log('🔍 Resultado final:', result)
+    return result
   }
 
   const formatDateShort = (dateString: string) => {
