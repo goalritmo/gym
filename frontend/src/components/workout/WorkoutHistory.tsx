@@ -52,20 +52,23 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const [loadingSessionId, setLoadingSessionId] = useState<number | null>(null)
 
   const formatDate = (dateString: string) => {
-    console.log('🔍 formatDate recibió:', dateString)
-    const date = new Date(dateString)
-    console.log('🔍 Date creado:', date)
-    console.log('🔍 Date.toISOString():', date.toISOString())
-    console.log('🔍 Date.toLocaleDateString():', date.toLocaleDateString('es-ES'))
+    // Si la fecha termina en Z (UTC), la convertimos a zona horaria local
+    let date: Date
+    if (dateString.endsWith('Z')) {
+      // Parsear la fecha UTC y convertirla a zona horaria local
+      const utcDate = new Date(dateString)
+      // Crear una nueva fecha en zona horaria local
+      date = new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000))
+    } else {
+      date = new Date(dateString)
+    }
     
     const options: Intl.DateTimeFormatOptions = {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     }
-    const result = date.toLocaleDateString('es-ES', options)
-    console.log('🔍 Resultado final:', result)
-    return result
+    return date.toLocaleDateString('es-ES', options)
   }
 
   const formatDateShort = (dateString: string) => {

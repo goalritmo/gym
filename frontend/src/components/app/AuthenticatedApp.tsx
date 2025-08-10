@@ -1,4 +1,4 @@
-import { Box, Snackbar, Alert } from '@mui/material'
+import { Box, Snackbar, Alert, Backdrop, CircularProgress } from '@mui/material'
 import { useState, useEffect } from 'react'
 import Navigation from '../navigation/Navigation'
 import WorkoutForm from '../workout/WorkoutForm'
@@ -17,11 +17,13 @@ export default function AuthenticatedApp() {
   const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
   const [exercises, setExercises] = useState<any[]>([])
   const [isSubmittingWorkout, setIsSubmittingWorkout] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [deleteMessage, setDeleteMessage] = useState('')
   const [deleteError, setDeleteError] = useState('')
 
   // Función para cargar datos desde el backend
   const loadData = async () => {
+    setIsLoading(true)
     try {
       console.log('Cargando datos desde el backend...')
       
@@ -58,6 +60,8 @@ export default function AuthenticatedApp() {
       // Solo usar ejercicios por defecto si no hay ninguno cargado
       console.log('⚠️ No se pudieron cargar ejercicios del backend. Usando array vacío.')
       setExercises([])
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -392,6 +396,19 @@ export default function AuthenticatedApp() {
           ❌ {deleteError}
         </Alert>
       </Snackbar>
+
+      {/* Loader principal */}
+      <Backdrop
+        sx={{
+          color: '#fff',
+          zIndex: 9999,
+          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        }}
+        open={isLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
 
       {/* Botón flotante para navegación rápida */}
       <FloatingNavButton 
