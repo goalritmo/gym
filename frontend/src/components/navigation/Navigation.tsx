@@ -14,6 +14,7 @@ import {
   Fade
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
+import CloseIcon from '@mui/icons-material/Close'
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
 import ListAltIcon from '@mui/icons-material/ListAlt'
 
@@ -183,6 +184,72 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
           transform: 'translateX(0)',
           opacity: 1
         }
+      },
+      '@keyframes slideOutToLeft': {
+        '0%': {
+          transform: 'translateX(0)',
+          opacity: 1
+        },
+        '15%': {
+          transform: 'translateX(-6px)',
+          opacity: 0.8
+        },
+        '40%': {
+          transform: 'translateX(-10px)',
+          opacity: 0.4
+        },
+        '70%': {
+          transform: 'translateX(-40px)',
+          opacity: 0.1
+        },
+        '100%': {
+          transform: 'translateX(-60px)',
+          opacity: 0
+        }
+      },
+      '@keyframes slideOutToTop': {
+        '0%': {
+          transform: 'translateY(0)',
+          opacity: 1
+        },
+        '15%': {
+          transform: 'translateY(4px)',
+          opacity: 0.8
+        },
+        '40%': {
+          transform: 'translateY(-5px)',
+          opacity: 0.4
+        },
+        '70%': {
+          transform: 'translateY(-20px)',
+          opacity: 0.1
+        },
+        '100%': {
+          transform: 'translateY(-30px)',
+          opacity: 0
+        }
+      },
+      '@keyframes slideOutToRight': {
+        '0%': {
+          transform: 'translateX(0)',
+          opacity: 1
+        },
+        '15%': {
+          transform: 'translateX(8px)',
+          opacity: 0.8
+        },
+        '40%': {
+          transform: 'translateX(-10px)',
+          opacity: 0.4
+        },
+        '70%': {
+          transform: 'translateX(-40px)',
+          opacity: 0.1
+        },
+        '100%': {
+          transform: 'translateX(-60px)',
+          opacity: 0
+        }
       }
     }}>
       <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
@@ -191,16 +258,16 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
             <Box sx={{ 
               transform: 'translateX(0)',
               transition: 'all 0.3s ease-in-out',
-              animation: 'slideInFromLeft 0.3s ease-out'
+              animation: drawerOpen ? 'slideOutToLeft 0.3s ease-out' : 'slideInFromLeft 0.3s ease-out'
             }}>
               <IconButton
                 color="inherit"
-                aria-label="abrir menú"
+                aria-label={drawerOpen ? "cerrar menú" : "abrir menú"}
                 edge="start"
                 onClick={handleDrawerToggle}
                 sx={{ mr: 2 }}
               >
-                <MenuIcon />
+                {drawerOpen ? <CloseIcon /> : <MenuIcon />}
               </IconButton>
             </Box>
           )}
@@ -250,6 +317,27 @@ export default function Navigation({ activeTab, onTabChange }: Omit<NavigationPr
           }} 
           role="presentation"
         >
+          {/* Botón de cerrar en la parte superior del menú */}
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'flex-end', 
+            p: 1,
+            borderBottom: '1px solid rgba(255,255,255,0.1)'
+          }}>
+            <IconButton
+              color="inherit"
+              aria-label="cerrar menú"
+              onClick={handleDrawerToggle}
+              sx={{ 
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.1)'
+                }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
           <List>
             {menuItems.map((item, index) => (
               <Fade 
