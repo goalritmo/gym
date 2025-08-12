@@ -186,15 +186,6 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Generar un UUID único para este workout
-	var workoutUUID string
-	uuidQuery := `SELECT gen_random_uuid()`
-	err = database.DB.QueryRow(uuidQuery).Scan(&workoutUUID)
-	if err != nil {
-		http.Error(w, "Error generando identificador único", http.StatusInternalServerError)
-		return
-	}
-
 	// Insertar workout asociado a la sesión
 	query := `
 		INSERT INTO workouts (user_id, exercise_id, weight, reps, serie, seconds, observations, exercise_session_id)
@@ -225,7 +216,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	err = database.DB.QueryRow(
 		query,
 		userID, req.ExerciseID, req.Weight, req.Reps,
-		serieValue, secondsValue, req.Observations, workoutUUID,
+		serieValue, secondsValue, req.Observations, sessionID,
 	).Scan(&workout.ID, &workout.ExerciseSessionID, &workout.CreatedAt)
 
 	if err != nil {
