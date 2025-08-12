@@ -223,7 +223,12 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const filteredWorkoutDays = workoutDays.filter(day => {
     if (!dateFilter) return true;
     const dayDate = normalizeDate(day.date);
-    return dayDate.toDateString() === dateFilter.toDateString();
+    const filterDate = new Date(dateFilter);
+    
+    // Comparar solo año, mes y día
+    return dayDate.getFullYear() === filterDate.getFullYear() &&
+           dayDate.getMonth() === filterDate.getMonth() &&
+           dayDate.getDate() === filterDate.getDate();
   });
 
   // Función para normalizar fechas de Argentina
@@ -254,15 +259,31 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   // Obtener fechas con ejercicios para el calendario
   const datesWithWorkouts = useMemo(() => {
-    return workoutSessions.map(session => normalizeDate(session.session_date));
+    return workoutSessions.map(session => {
+      const date = normalizeDate(session.session_date);
+      // Normalizar a medianoche para comparaciones consistentes
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    });
   }, [workoutSessions]);
 
   // Función para verificar si una fecha tiene ejercicios
   const shouldDisableDate = (date: Date) => {
+    // Normalizar la fecha a medianoche para comparación
+    const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    
     return !datesWithWorkouts.some(sessionDate => 
-      sessionDate.toDateString() === date.toDateString()
+      sessionDate.getTime() === normalizedDate.getTime()
     );
   };
+
+  // Debug logs
+  console.log('🔍 WorkoutHistory Debug:', {
+    workoutSessionsCount: workoutSessions.length,
+    workoutsCount: workouts.length,
+    workoutDaysCount: workoutDays.length,
+    datesWithWorkouts: datesWithWorkouts.map(d => d.toISOString().split('T')[0]),
+    dateFilter: dateFilter ? dateFilter.toISOString().split('T')[0] : null
+  });
 
   if (workoutDays.length === 0) {
     return (
