@@ -8,16 +8,19 @@ import {
   Typography,
   Divider,
   Box,
-  IconButton
+  IconButton,
+  Badge
 } from '@mui/material'
-import { Logout as LogoutIcon, Settings as SettingsIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon, Settings as SettingsIcon, Notifications as NotificationsIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 
 type UserAvatarProps = {
   onOpenSettings?: () => void
+  onOpenNotifications?: () => void
+  unreadNotifications?: number
 }
 
-export default function UserAvatar({ onOpenSettings }: UserAvatarProps) {
+export default function UserAvatar({ onOpenSettings, onOpenNotifications, unreadNotifications = 0 }: UserAvatarProps) {
   const { user, logout } = useAuth()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -39,6 +42,13 @@ export default function UserAvatar({ onOpenSettings }: UserAvatarProps) {
     handleClose()
     if (onOpenSettings) {
       onOpenSettings()
+    }
+  }
+
+  const handleOpenNotifications = () => {
+    handleClose()
+    if (onOpenNotifications) {
+      onOpenNotifications()
     }
   }
 
@@ -71,18 +81,31 @@ export default function UserAvatar({ onOpenSettings }: UserAvatarProps) {
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
       >
-        <Avatar
-          sx={{ 
-            width: 32, 
-            height: 32,
-            bgcolor: avatarUrl ? 'transparent' : 'primary.main',
-            fontSize: '14px',
-            fontWeight: 'bold'
+        <Badge 
+          badgeContent={unreadNotifications} 
+          color="error"
+          invisible={unreadNotifications === 0}
+          sx={{
+            '& .MuiBadge-badge': {
+              fontSize: '0.7rem',
+              minWidth: '18px',
+              height: '18px'
+            }
           }}
-          src={avatarUrl}
         >
-          {!avatarUrl && getUserInitials()}
-        </Avatar>
+          <Avatar
+            sx={{ 
+              width: 32, 
+              height: 32,
+              bgcolor: avatarUrl ? 'transparent' : 'primary.main',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }}
+            src={avatarUrl}
+          >
+            {!avatarUrl && getUserInitials()}
+          </Avatar>
+        </Badge>
       </IconButton>
 
       <Menu
@@ -146,6 +169,34 @@ export default function UserAvatar({ onOpenSettings }: UserAvatarProps) {
         </Box>
 
         <Divider />
+
+        {/* Opción de notificaciones */}
+        <MenuItem onClick={handleOpenNotifications}>
+          <ListItemIcon>
+            <Badge 
+              badgeContent={unreadNotifications} 
+              color="error"
+              invisible={unreadNotifications === 0}
+              sx={{
+                '& .MuiBadge-badge': {
+                  fontSize: '0.6rem',
+                  minWidth: '16px',
+                  height: '16px'
+                }
+              }}
+            >
+              <NotificationsIcon fontSize="small" />
+            </Badge>
+          </ListItemIcon>
+          <ListItemText>
+            Notificaciones
+            {unreadNotifications > 0 && (
+              <Typography variant="caption" color="error.main" sx={{ ml: 1 }}>
+                ({unreadNotifications})
+              </Typography>
+            )}
+          </ListItemText>
+        </MenuItem>
 
         {/* Opción de configuración */}
         <MenuItem onClick={handleOpenSettings}>

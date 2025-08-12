@@ -21,7 +21,6 @@ import ListAltIcon from '@mui/icons-material/ListAlt'
 import HistoryIcon from '@mui/icons-material/History'
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
 import PeopleIcon from '@mui/icons-material/People'
-import NotificationsIcon from '@mui/icons-material/Notifications'
 import UserAvatar from '../user/UserAvatar'
 import { TABS, type TabType } from '../../constants/tabs'
 
@@ -30,9 +29,11 @@ type NavigationProps = {
   onTabChange: (newValue: TabType) => void
   onLogout: () => void
   onOpenSettings?: () => void
+  onOpenNotifications?: () => void
+  unreadNotifications?: number
 }
 
-export default function Navigation({ activeTab, onTabChange, onOpenSettings }: Omit<NavigationProps, 'onLogout'>) {
+export default function Navigation({ activeTab, onTabChange, onOpenSettings, onOpenNotifications, unreadNotifications = 0 }: Omit<NavigationProps, 'onLogout'>) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [visibleItems, setVisibleItems] = useState<number[]>([])
   const [showToolbarElements, setShowToolbarElements] = useState(false)
@@ -145,7 +146,6 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings }: O
     { label: 'Todo el Equipamiento', icon: <FitnessCenterIcon />, value: TABS.EQUIPMENT },
     { label: 'Mis Entrenamientos', icon: <HistoryIcon />, value: TABS.HISTORY },
     { label: 'Social', icon: <PeopleIcon />, value: TABS.SOCIAL },
-    { label: 'Notificaciones', icon: <NotificationsIcon />, value: TABS.NOTIFICATIONS },
   ]
 
   return (
@@ -328,7 +328,11 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings }: O
               transition: 'all 0.3s ease-in-out',
               animation: 'slideInFromRight 0.3s ease-out'
             }}>
-                              <UserAvatar onOpenSettings={onOpenSettings} />
+                              <UserAvatar 
+                  onOpenSettings={onOpenSettings} 
+                  onOpenNotifications={onOpenNotifications}
+                  unreadNotifications={unreadNotifications}
+                />
             </Box>
           )}
         </Toolbar>

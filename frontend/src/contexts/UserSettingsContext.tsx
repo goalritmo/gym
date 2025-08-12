@@ -2,22 +2,19 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 
 type UserSettings = {
-  showWorkoutsInSocial: boolean
-  canViewOthersWorkouts: boolean
+  socialEnabled: boolean
 }
 
 type UserSettingsContextType = {
   settings: UserSettings
   updateSettings: (newSettings: Partial<UserSettings>) => void
-  toggleSocialVisibility: () => void
-  toggleViewOthersWorkouts: () => void
+  toggleSocial: () => void
 }
 
 const UserSettingsContext = createContext<UserSettingsContextType | undefined>(undefined)
 
 const defaultSettings: UserSettings = {
-  showWorkoutsInSocial: true, // Por defecto mostrar en social
-  canViewOthersWorkouts: true // Por defecto poder ver otros
+  socialEnabled: true // Por defecto habilitado
 }
 
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
@@ -46,40 +43,18 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     setSettings(prev => ({ ...prev, ...newSettings }))
   }
 
-  const toggleSocialVisibility = () => {
-    setSettings(prev => {
-      const newShowWorkouts = !prev.showWorkoutsInSocial
-      // Si no quiere mostrar sus entrenamientos, tampoco puede ver los de otros
-      const newCanViewOthers = newShowWorkouts ? prev.canViewOthersWorkouts : false
-      
-      return { 
-        ...prev, 
-        showWorkoutsInSocial: newShowWorkouts,
-        canViewOthersWorkouts: newCanViewOthers
-      }
-    })
-  }
-
-  const toggleViewOthersWorkouts = () => {
-    setSettings(prev => {
-      const newCanViewOthers = !prev.canViewOthersWorkouts
-      // Si quiere ver otros entrenamientos, debe mostrar los suyos
-      const newShowWorkouts = newCanViewOthers ? true : prev.showWorkoutsInSocial
-      
-      return { 
-        ...prev, 
-        canViewOthersWorkouts: newCanViewOthers,
-        showWorkoutsInSocial: newShowWorkouts
-      }
-    })
+  const toggleSocial = () => {
+    setSettings(prev => ({ 
+      ...prev, 
+      socialEnabled: !prev.socialEnabled
+    }))
   }
 
   return (
     <UserSettingsContext.Provider value={{ 
       settings, 
       updateSettings, 
-      toggleSocialVisibility,
-      toggleViewOthersWorkouts
+      toggleSocial
     }}>
       {children}
     </UserSettingsContext.Provider>

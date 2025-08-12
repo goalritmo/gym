@@ -12,24 +12,29 @@ import {
   Paper,
   Button,
   IconButton,
-  Tooltip
+  Tooltip,
+  Divider
 } from '@mui/material'
 import { FitnessCenter, AccessTime, TrendingUp, Settings, ThumbUp, ThumbUpOutlined } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 type SocialWorkout = {
   id: number
-  exercise_name: string
-  weight: number
-  reps: number
-  seconds?: number
-  serie: number
-  created_at: string
   user: {
     id: string
     name: string
     avatar_url?: string
   }
+  date: string
+  exercises: {
+    exercise_name: string
+    weight: number
+    reps: number
+    seconds?: number
+    serie: number
+  }[]
+  total_exercises: number
+  total_series: number
   likes: number
   isLiked: boolean
 }
@@ -44,17 +49,16 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
-
   useEffect(() => {
     loadSocialWorkouts()
-  }, [settings.canViewOthersWorkouts])
+  }, [settings.socialEnabled])
 
   const loadSocialWorkouts = async () => {
     setIsLoading(true)
     setError('')
     
-    // Si el usuario no puede ver otros entrenamientos, no cargar nada
-    if (!settings.canViewOthersWorkouts) {
+    // Si el usuario no tiene habilitada la funcionalidad social, no cargar nada
+    if (!settings.socialEnabled) {
       setSocialWorkouts([])
       setIsLoading(false)
       return
@@ -65,48 +69,105 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
       const mockData: SocialWorkout[] = [
         {
           id: 1,
-          exercise_name: 'Press de Banca',
-          weight: 80,
-          reps: 8,
-          seconds: 120,
-          serie: 1,
-          created_at: new Date().toISOString(),
           user: {
             id: '1',
             name: 'María',
             avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
           },
+          date: new Date().toISOString(),
+          exercises: [
+            {
+              exercise_name: 'Press de Banca',
+              weight: 80,
+              reps: 8,
+              seconds: 120,
+              serie: 1
+            },
+            {
+              exercise_name: 'Press de Banca',
+              weight: 80,
+              reps: 6,
+              seconds: 90,
+              serie: 2
+            },
+            {
+              exercise_name: 'Press de Banca',
+              weight: 75,
+              reps: 8,
+              seconds: 100,
+              serie: 3
+            }
+          ],
+          total_exercises: 1,
+          total_series: 3,
           likes: 3,
           isLiked: false
         },
         {
           id: 2,
-          exercise_name: 'Sentadillas',
-          weight: 100,
-          reps: 10,
-          serie: 2,
-          created_at: new Date().toISOString(),
           user: {
             id: '2',
             name: 'Carlos',
             avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
           },
+          date: new Date().toISOString(),
+          exercises: [
+            {
+              exercise_name: 'Sentadillas',
+              weight: 100,
+              reps: 10,
+              serie: 1
+            },
+            {
+              exercise_name: 'Sentadillas',
+              weight: 100,
+              reps: 8,
+              serie: 2
+            },
+            {
+              exercise_name: 'Peso Muerto',
+              weight: 120,
+              reps: 6,
+              serie: 1
+            },
+            {
+              exercise_name: 'Peso Muerto',
+              weight: 120,
+              reps: 6,
+              serie: 2
+            }
+          ],
+          total_exercises: 2,
+          total_series: 4,
           likes: 1,
           isLiked: true
         },
         {
           id: 3,
-          exercise_name: 'Remo al mentón',
-          weight: 45,
-          reps: 12,
-          seconds: 90,
-          serie: 1,
-          created_at: new Date().toISOString(),
           user: {
             id: '3',
             name: 'Ana',
             avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
           },
+          date: new Date().toISOString(),
+          exercises: [
+            {
+              exercise_name: 'Remo al mentón',
+              weight: 45,
+              reps: 12,
+              seconds: 90,
+              serie: 1
+            },
+            {
+              exercise_name: 'Remo al mentón',
+              weight: 45,
+              reps: 10,
+              seconds: 85,
+              serie: 2
+            }
+          ],
+          total_exercises: 1,
+          total_series: 2,
           likes: 0,
           isLiked: false
         }
@@ -140,7 +201,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
       const currentWorkout = socialWorkouts.find(w => w.id === workoutId)
       console.log(`Kudos ${currentWorkout?.isLiked ? 'removido' : 'agregado'} al workout ${workoutId}`)
     } catch (error) {
-      console.error('Error al dar like:', error)
+      console.error('Error al dar kudos:', error)
       // Revertir el cambio si hay error
       setSocialWorkouts(prev => 
         prev.map(workout => 
@@ -183,8 +244,17 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
     }
   }
 
-  // Si el usuario no puede ver otros entrenamientos, mostrar mensaje de privacidad
-  if (!settings.canViewOthersWorkouts) {
+  const formatWorkoutDate = (dateString: string): string => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('es-ES', { 
+      weekday: 'long',
+      day: 'numeric', 
+      month: 'long'
+    })
+  }
+
+  // Si el usuario no tiene habilitada la funcionalidad social, mostrar mensaje de privacidad
+  if (!settings.socialEnabled) {
     return (
       <Box sx={{ p: 3 }}>
         <Paper 
@@ -198,10 +268,10 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
         >
           <TrendingUp sx={{ fontSize: 60, color: 'grey.400', mb: 2 }} />
           <Typography variant="h6" color="text.secondary" gutterBottom>
-            Privacidad activada
+            Funcionalidad Social Deshabilitada
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Para ver entrenamientos de otros usuarios, debes permitir que otros vean los tuyos en la configuración.
+            Para ver y compartir entrenamientos con otros usuarios, habilita la funcionalidad social en la configuración.
           </Typography>
           {onOpenSettings && (
             <Button
@@ -210,7 +280,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
               onClick={onOpenSettings}
               sx={{ mt: 2 }}
             >
-              Ir a Configuración
+              Habilitar Social
             </Button>
           )}
         </Paper>
@@ -280,7 +350,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
         Social
       </Typography>
 
-      <Stack spacing={2}>
+      <Stack spacing={3}>
         {socialWorkouts.map((workout) => (
           <Card 
             key={workout.id} 
@@ -292,7 +362,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
             }}
           >
             <CardContent sx={{ p: 3 }}>
-              {/* Header con usuario */}
+              {/* Header con usuario y fecha */}
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Avatar 
                   src={workout.user.avatar_url}
@@ -311,57 +381,87 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                     {workout.user.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {formatDate(workout.created_at)}
+                    {formatWorkoutDate(workout.date)} • {formatDate(workout.date)}
                   </Typography>
                 </Box>
               </Box>
 
-              {/* Detalles del entrenamiento */}
+              {/* Resumen del entrenamiento */}
               <Box sx={{ mb: 2 }}>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  {workout.exercise_name}
+                  Entrenamiento del día
                 </Typography>
                 
-                <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
                   <Chip 
                     icon={<FitnessCenter />}
-                    label={`${workout.weight} kg`} 
+                    label={`${workout.total_exercises} ejercicio${workout.total_exercises > 1 ? 's' : ''}`} 
                     color="primary" 
                     size="small"
                     sx={{ fontWeight: 'bold' }}
                   />
                   <Chip 
-                    label={`${workout.reps} reps`} 
+                    label={`${workout.total_series} serie${workout.total_series > 1 ? 's' : ''}`} 
                     color="secondary" 
                     size="small"
                     sx={{ fontWeight: 'bold' }}
                   />
-                  {workout.seconds && (
-                    <Chip 
-                      icon={<AccessTime />}
-                      label={formatTime(workout.seconds)} 
-                      color="info" 
-                      size="small"
-                      sx={{ fontWeight: 'bold' }}
-                    />
-                  )}
-                  <Chip 
-                    label={`Serie ${workout.serie}`} 
-                    variant="outlined" 
-                    size="small"
-                    sx={{ fontWeight: 'bold' }}
-                  />
                 </Stack>
+
+                {/* Lista de ejercicios */}
+                <Box sx={{ mt: 2 }}>
+                  {workout.exercises.map((exercise, index) => (
+                    <Box key={index} sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      py: 1,
+                      borderBottom: index < workout.exercises.length - 1 ? '1px solid' : 'none',
+                      borderColor: 'divider'
+                    }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {exercise.exercise_name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Serie {exercise.serie}
+                        </Typography>
+                      </Box>
+                      <Stack direction="row" spacing={1}>
+                        <Chip 
+                          label={`${exercise.weight} kg`} 
+                          size="small"
+                          variant="outlined"
+                          sx={{ fontSize: '0.7rem' }}
+                        />
+                        <Chip 
+                          label={`${exercise.reps} reps`} 
+                          size="small"
+                          variant="outlined"
+                          sx={{ fontSize: '0.7rem' }}
+                        />
+                        {exercise.seconds && (
+                          <Chip 
+                            icon={<AccessTime sx={{ fontSize: '0.8rem' }} />}
+                            label={formatTime(exercise.seconds)} 
+                            size="small"
+                            variant="outlined"
+                            sx={{ fontSize: '0.7rem' }}
+                          />
+                        )}
+                      </Stack>
+                    </Box>
+                  ))}
+                </Box>
               </Box>
 
-              {/* Sección de likes */}
+              <Divider sx={{ my: 2 }} />
+
+              {/* Sección de kudos */}
               <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                justifyContent: 'space-between',
-                pt: 2,
-                borderTop: '1px solid',
-                borderColor: 'divider'
+                justifyContent: 'space-between'
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Typography variant="body2" color="text.secondary">

@@ -6,9 +6,9 @@ import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
 import WorkoutHistory from '../workout/WorkoutHistory'
 import SocialList from '../social/SocialList'
-import NotificationsList from '../notifications/NotificationsList'
 import FloatingNavButton from '../navigation/FloatingNavButton'
 import SettingsModal from '../settings/SettingsModal'
+import NotificationsModal from '../notifications/NotificationsModal'
 import { UserSettingsProvider } from '../../contexts/UserSettingsContext'
 import type { Workout, WorkoutSession } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
@@ -27,6 +27,8 @@ function AuthenticatedAppContent() {
   const [deleteMessage, setDeleteMessage] = useState('')
   const [deleteError, setDeleteError] = useState('')
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
+  const [notificationsModalOpen, setNotificationsModalOpen] = useState(false)
+  const [unreadNotifications, setUnreadNotifications] = useState(2) // Ejemplo: 2 notificaciones no leídas
 
   // Función para cargar datos desde el backend
   const loadData = async () => {
@@ -98,6 +100,14 @@ function AuthenticatedAppContent() {
 
   const handleCloseSettings = () => {
     setSettingsModalOpen(false)
+  }
+
+  const handleOpenNotifications = () => {
+    setNotificationsModalOpen(true)
+  }
+
+  const handleCloseNotifications = () => {
+    setNotificationsModalOpen(false)
   }
 
   // Función para manejar el envío del formulario de workout
@@ -200,6 +210,8 @@ function AuthenticatedAppContent() {
           activeTab={activeTab} 
           onTabChange={handleTabChange}
           onOpenSettings={handleOpenSettings}
+          onOpenNotifications={handleOpenNotifications}
+          unreadNotifications={unreadNotifications}
         />
       
       <Box sx={{ 
@@ -352,12 +364,7 @@ function AuthenticatedAppContent() {
           </Box>
         )}
 
-        {/* Pestaña Notificaciones */}
-        {activeTab === TABS.NOTIFICATIONS && (
-          <Box>
-            <NotificationsList />
-          </Box>
-        )}
+
       </Box>
 
       {/* Notificaciones para eliminación */}
@@ -468,6 +475,13 @@ function AuthenticatedAppContent() {
       <SettingsModal 
         open={settingsModalOpen} 
         onClose={handleCloseSettings} 
+      />
+
+      {/* Modal de notificaciones */}
+      <NotificationsModal 
+        open={notificationsModalOpen} 
+        onClose={handleCloseNotifications}
+        onMarkAsRead={(count) => setUnreadNotifications(Math.max(0, unreadNotifications - count))}
       />
     </Box>
   )
