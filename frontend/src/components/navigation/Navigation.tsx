@@ -15,9 +15,6 @@ import {
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import CloseIcon from '@mui/icons-material/Close'
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
-import ListAltIcon from '@mui/icons-material/ListAlt'
-
 import HistoryIcon from '@mui/icons-material/History'
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
 import PeopleIcon from '@mui/icons-material/People'
@@ -142,8 +139,6 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
 
   const menuItems = [
     { label: 'Registrar', icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
-    { label: 'Todos los Ejercicios', icon: <ListAltIcon />, value: TABS.EXERCISES },
-    { label: 'Todo el Equipamiento', icon: <FitnessCenterIcon />, value: TABS.EQUIPMENT },
     { label: 'Mis Entrenamientos', icon: <HistoryIcon />, value: TABS.HISTORY },
     { label: 'Social', icon: <PeopleIcon />, value: TABS.SOCIAL },
   ]
