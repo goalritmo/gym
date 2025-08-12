@@ -267,22 +267,33 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   // Función para normalizar fechas de Argentina
   const normalizeDate = (dateString: string): Date => {
-    const date = new Date(dateString);
-    
-    // Si la fecha termina en 'Z', es UTC, convertir a Argentina (UTC-3)
-    if (dateString.endsWith('Z')) {
-      // Agregar 3 horas para convertir de UTC a Argentina
-      const argentinaDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
-      return argentinaDate;
-    }
-    
-    // Si ya tiene offset de Argentina (-03:00), usar directamente
-    if (dateString.includes('-03:00')) {
+    try {
+      const date = new Date(dateString);
+      
+      // Verificar si la fecha es válida
+      if (isNaN(date.getTime())) {
+        console.error('❌ Fecha inválida:', dateString);
+        return new Date();
+      }
+      
+      // Si la fecha termina en 'Z', es UTC, convertir a Argentina (UTC-3)
+      if (dateString.endsWith('Z')) {
+        // Agregar 3 horas para convertir de UTC a Argentina
+        const argentinaDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+        return argentinaDate;
+      }
+      
+      // Si ya tiene offset de Argentina (-03:00), usar directamente
+      if (dateString.includes('-03:00')) {
+        return date;
+      }
+      
+      // Para otras fechas, asumir que ya están en zona horaria local
       return date;
+    } catch (error) {
+      console.error('❌ Error normalizando fecha:', dateString, error);
+      return new Date();
     }
-    
-    // Para otras fechas, asumir que ya están en zona horaria local
-    return date;
   };
 
   // Obtener fechas con ejercicios para el calendario
@@ -296,12 +307,23 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   // Función para verificar si una fecha tiene ejercicios
   const shouldDisableDate = (date: Date) => {
-    // Normalizar la fecha a medianoche para comparación
-    const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    
-    return !datesWithWorkouts.some(sessionDate => 
-      sessionDate.getTime() === normalizedDate.getTime()
-    );
+    try {
+      // Verificar si la fecha es válida
+      if (isNaN(date.getTime())) {
+        console.error('❌ Fecha inválida en shouldDisableDate:', date);
+        return true;
+      }
+      
+      // Normalizar la fecha a medianoche para comparación
+      const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      
+      return !datesWithWorkouts.some(sessionDate => 
+        sessionDate.getTime() === normalizedDate.getTime()
+      );
+    } catch (error) {
+      console.error('❌ Error en shouldDisableDate:', error);
+      return true;
+    }
   };
 
   // Debug logs
@@ -406,162 +428,54 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           <DatePicker
             label="Filtrar por fecha"
             value={dateFilter}
-            onChange={(newValue: Date | null) => setDateFilter(newValue)}
+            onChange={(newValue: Date | null) => {
+              try {
+                console.log('🔍 DatePicker onChange:', { newValue, type: typeof newValue });
+                setDateFilter(newValue);
+              } catch (error) {
+                console.error('❌ Error en DatePicker onChange:', error);
+                setDateFilter(null);
+              }
+            }}
             shouldDisableDate={shouldDisableDate}
-            views={['year', 'month', 'day']}
-            openTo="day"
             slotProps={{
-              popper: {
-                sx: {
-
-                  '& .MuiDateCalendar-viewTransitionContainer': {
-                    '& .MuiPickersArrowSwitcher-root': {
-                      display: 'flex'
-                    }
-                  },
-                  '& .MuiPickersLayout-toolbar': {
-                    display: 'none !important'
-                  },
-                  '& .MuiDateCalendar-header': {
-                    display: 'none !important'
-                  },
-                  '& .MuiPickersCalendarHeader-label': {
-                    display: 'none !important'
-                  },
-                  '& .MuiPickersCalendarHeader-labelContainer': {
-                    display: 'none !important'
-                  },
-                  '& .MuiPickersCalendarHeader-root': {
-                    display: 'none !important'
-                  },
-                  '& .MuiTypography-h4': {
-                    display: 'none !important'
-                  },
-                  '& .MuiPickersCalendarHeader-switchViewButton': {
-                    display: 'none !important'
-                  },
-                  '& .MuiPickersLayout-actionBar': {
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    gap: 2,
-                    px: 3,
-                    py: 2,
-                    '& .MuiButton-root': {
-                      borderRadius: 2,
-                      px: 3,
-                      py: 1,
-                      fontWeight: 600,
-                      textTransform: 'none',
-                      fontSize: '0.95rem',
-                      '&:first-of-type': {
-                        // Botón Cancelar
-                        color: '#666',
-                        backgroundColor: 'transparent',
-                        border: '1px solid #ddd',
-                        '&:hover': {
-                          backgroundColor: '#f5f5f5',
-                          borderColor: '#bbb'
-                        }
-                      },
-                      '&:last-of-type': {
-                        // Botón OK
-                        color: 'white',
-                        backgroundColor: '#1976d2',
-                        border: '1px solid #1976d2',
-                        '&:hover': {
-                          backgroundColor: '#1565c0',
-                          borderColor: '#1565c0'
-                        }
-                      }
-                    }
-                  }
-                }
-              },
               textField: {
                 sx: {
                   width: '100%',
-
                   '& .MuiOutlinedInput-root': {
-                   bgcolor: 'transparent !important',
-                   border: '1px solid #1976d2 !important',
-                   borderRadius: 2,
-                   '&:hover': {
-                     bgcolor: 'rgba(25, 118, 210, 0.04) !important',
-                     borderColor: '#1976d2 !important',
-                   },
-                   '&.Mui-focused': {
-                     bgcolor: 'transparent !important',
-                     borderColor: '#1976d2 !important',
-                   },
-                   '& .MuiOutlinedInput-notchedOutline': {
-                     backgroundColor: 'transparent !important',
-                     borderColor: '#1976d2 !important'
-                   }
-                 },
-                 '& .MuiInputBase-root': {
-                   backgroundColor: 'transparent !important'
-                 },
-                                   '& .MuiInputBase-input': {
-                   color: 'white !important',
-                   fontSize: '1rem',
-                   fontWeight: 500,
-                   backgroundColor: 'transparent !important'
-                 },
-                 '& .MuiInputAdornment-root': {
-                   color: 'white !important',
-                   backgroundColor: 'transparent !important'
-                 },
-                 '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-                   color: 'white !important',
-                   fontSize: '1.4rem',
-                   backgroundColor: 'transparent !important'
-                 },
-                  '& .MuiInputBase-inputAdornedEnd': {
-                    backgroundColor: 'transparent !important'
-                  },
-                                   '& .MuiInputLabel-root': {
-                   color: 'white !important',
-                   fontWeight: 600,
-                   fontSize: '1rem',
-                   backgroundColor: 'transparent !important',
-                   px: 1,
-                   borderRadius: 1,
-                   '&.Mui-focused': {
-                     color: 'white !important',
-                     transform: 'translate(14px, -9px) scale(0.75)',
-                     opacity: 1
-                   },
-                   '&.MuiInputLabel-shrink': {
-                     color: 'white !important',
-                     transform: 'translate(14px, -9px) scale(0.75)',
-                     opacity: 1
-                   }
-                 },
-                 '& .MuiFormLabel-root': {
-                   color: 'white !important',
-                   backgroundColor: 'transparent !important',
-                   px: 1,
-                   borderRadius: 1
-                 }
-                }
-              },
-              day: {
-                sx: {
-                  '&.MuiPickersDay-root': {
-                    '&.Mui-selected': {
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: 'primary.dark'
-                      }
+                    bgcolor: 'transparent',
+                    border: '1px solid white',
+                    borderRadius: 2,
+                    '&:hover': {
+                      bgcolor: 'rgba(255, 255, 255, 0.1)',
                     },
-                    '&:not(.Mui-disabled)': {
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: 'primary.dark'
-                      }
+                    '&.Mui-focused': {
+                      bgcolor: 'transparent',
+                      borderColor: 'white',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'transparent'
                     }
+                  },
+                  '& .MuiInputBase-input': {
+                    color: 'white',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '1rem',
+                    '&.Mui-focused': {
+                      color: 'white',
+                    },
+                    '&.MuiInputLabel-shrink': {
+                      color: 'white',
+                    }
+                  },
+                  '& .MuiInputAdornment-root .MuiSvgIcon-root': {
+                    color: 'white',
+                    fontSize: '1.4rem',
                   }
                 }
               }

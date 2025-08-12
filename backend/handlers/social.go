@@ -224,11 +224,26 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Probar inserción manual
+	var testSessionID int
+	testQuery := `INSERT INTO workout_sessions (user_id, session_date, session_name, total_exercises, effort, mood) VALUES ($1, $2, $3, 0, 0, 0) RETURNING id`
+	testErr := database.DB.QueryRow(testQuery, "b08a34be-92d3-4c3f-9b05-e0d869764de7", "2025-08-12", "Test Manual").Scan(&testSessionID)
+	
 	response := map[string]interface{}{
 		"all_tables": allTables,
 		"tables": tableInfo,
 		"workout_sessions_columns": sessionColumns,
 		"workouts_columns": workoutColumns,
+		"test_insert": map[string]interface{}{
+			"success": testErr == nil,
+			"session_id": testSessionID,
+			"error": func() string {
+				if testErr != nil {
+					return testErr.Error()
+				}
+				return ""
+			}(),
+		},
 	}
 
 	json.NewEncoder(w).Encode(response)

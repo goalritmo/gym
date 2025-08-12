@@ -45,7 +45,7 @@ func SupabaseAuthMiddleware(next http.Handler) http.Handler {
 
 		// Para desarrollo/testing, permitir token "salud"
 		if tokenString == "salud" {
-			ctx := context.WithValue(r.Context(), "user_id", "00000000-0000-0000-0000-000000000001")
+			ctx := context.WithValue(r.Context(), "user_id", "b08a34be-92d3-4c3f-9b05-e0d869764de7")
 			next.ServeHTTP(w, r.WithContext(ctx))
 			return
 		}

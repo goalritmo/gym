@@ -69,6 +69,9 @@ func main() {
 
 	// Debug endpoint (temporal)
 	api.HandleFunc("/debug", handlers.DebugHandler).Methods("GET")
+	
+	// Test endpoint (temporal)
+	api.HandleFunc("/test-session", handlers.TestSessionHandler).Methods("POST")
 
 	// Configurar CORS
 	c := cors.New(cors.Options{

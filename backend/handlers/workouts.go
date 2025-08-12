@@ -165,11 +165,9 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	now := time.Now().In(argentinaLocation)
 	today := now.Format("2006-01-02")
-	// Crear timestamp en zona horaria local de Argentina (no UTC)
-	todayTimestamp := now.Format("2006-01-02T00:00:00-03:00")
 	var sessionID int
 	
-	fmt.Printf("Buscando sesión para fecha: %s, timestamp: %s\n", today, todayTimestamp)
+	fmt.Printf("Buscando sesión para fecha: %s\n", today)
 
 	// Verificar si ya existe una sesión para hoy
 	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 LIMIT 1`
@@ -178,6 +176,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	
 	if err != nil {
 		fmt.Printf("No existe sesión para hoy, creando nueva...\n")
+		fmt.Printf("Intentando insertar con userID: %s, today: %s\n", userID, today)
 		// No existe sesión para hoy, crear una nueva
 		createSessionQuery := `
 			INSERT INTO workout_sessions (user_id, session_date, session_name, total_exercises, effort, mood) 
@@ -185,9 +184,12 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 			RETURNING id
 		`
 		sessionName := "Entrenamiento del día"
-		err = database.DB.QueryRow(createSessionQuery, userID, todayTimestamp, sessionName).Scan(&sessionID)
+		fmt.Printf("Query: %s\n", createSessionQuery)
+		fmt.Printf("Parámetros: userID=%s, today=%s, sessionName=%s\n", userID, today, sessionName)
+		err = database.DB.QueryRow(createSessionQuery, userID, today, sessionName).Scan(&sessionID)
 		if err != nil {
 			fmt.Printf("Error creando sesión de entrenamiento: %v\n", err)
+			fmt.Printf("Tipo de error: %T\n", err)
 			http.Error(w, "Error creando sesión de entrenamiento", http.StatusInternalServerError)
 			return
 		}
@@ -344,6 +346,44 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// TestSessionHandler es un endpoint temporal para probar inserción de sesiones
+func TestSessionHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
+	
+	fmt.Printf("TestSessionHandler - userID: %s\n", userID)
+	
+	// Intentar insertar una sesión de prueba
+	query := `
+		INSERT INTO workout_sessions (user_id, session_date, session_name, total_exercises, effort, mood) 
+		VALUES ($1, $2, $3, 0, 0, 0) 
+		RETURNING id
+	`
+	
+	var sessionID int
+	err := database.DB.QueryRow(query, userID, "2025-08-12", "Test Session").Scan(&sessionID)
+	if err != nil {
+		fmt.Printf("Error en TestSessionHandler: %v\n", err)
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return
+	}
+	
+	fmt.Printf("Sesión creada exitosamente con ID: %d\n", sessionID)
+	
+	response := map[string]interface{}{
+		"success": true,
+		"session_id": sessionID,
+		"user_id": userID,
+	}
+	
+	json.NewEncoder(w).Encode(response)
 }
 
 // GetWorkoutSessionsHandler obtiene la lista de sesiones de entrenamiento
