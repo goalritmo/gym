@@ -65,6 +65,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
     
     try {
       const data = await apiClient.getSocialWorkouts()
+      console.log('🔍 Social workouts recibidos:', data)
       setSocialWorkouts(data)
     } catch (error: any) {
       console.error('Error cargando entrenamientos sociales:', error)
@@ -204,6 +205,8 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
     )
   }
 
+  console.log('🔍 Estado de socialWorkouts:', { socialWorkouts, length: socialWorkouts?.length })
+  
   if (!socialWorkouts || socialWorkouts.length === 0) {
     return (
       <Box sx={{ p: 3 }}>

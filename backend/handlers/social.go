@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/goalritmo/gym/backend/database"
@@ -46,36 +47,48 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	// Por ahora, asumir que la funcionalidad social está habilitada para todos
 	// En el futuro, esto se verificará contra la tabla user_settings
 
-	// Obtener la fecha de hoy en la zona horaria local
-	loc, err := time.LoadLocation("America/Argentina/Buenos_Aires")
-	if err != nil {
-		loc = time.FixedZone("UTC-3", -3*60*60)
+	// Obtener parámetros de paginación
+	limit := 10
+	offset := 0
+	
+	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
 	}
-	today := time.Now().In(loc).Format("2006-01-02")
+	
+	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
+		if o, err := strconv.Atoi(offsetStr); err == nil && o >= 0 {
+			offset = o
+		}
+	}
 
-	fmt.Printf("Consultando entrenamientos sociales para fecha: %s, usuario: %s\n", today, userID)
+	fmt.Printf("Consultando entrenamientos sociales con límite: %d, offset: %d, usuario: %s\n", limit, offset, userID)
 
-	// Query de prueba muy simple
+	// Query para obtener todos los entrenamientos con paginación
 	query := `
 		SELECT 
 			ws.id as session_id,
 			ws.user_id,
-			'Usuario' as user_name,
-			'' as user_avatar_url,
+			COALESCE(up.name, 'Usuario') as user_name,
+			COALESCE(up.avatar_url, '') as user_avatar_url,
 			ws.created_at as workout_date,
-			0 as total_exercises,
-			0 as total_series,
+			COALESCE(COUNT(DISTINCT w.exercise_id), 0) as total_exercises,
+			COALESCE(COUNT(w.id), 0) as total_series,
 			'[]'::json as exercises
 		FROM workout_sessions ws
-		WHERE DATE(ws.created_at) = $1
-		AND ws.user_id != $2
+		LEFT JOIN user_profiles up ON ws.user_id = up.user_id
+		LEFT JOIN workouts w ON w.exercise_session_id = '00000000-0000-0000-0000-' || LPAD(ws.id::text, 12, '0')
+		WHERE ws.user_id != $1
+		GROUP BY ws.id, ws.user_id, ws.created_at, up.name, up.avatar_url
 		ORDER BY ws.created_at DESC
+		LIMIT $2 OFFSET $3
 	`
 
 	fmt.Printf("Query: %s\n", query)
-	fmt.Printf("Ejecutando query con parámetros: fecha=%s, userID=%s\n", today, userID)
+	fmt.Printf("Ejecutando query con parámetros: userID=%s, limit=%d, offset=%d\n", userID, limit, offset)
 	
-	rows, err := database.DB.Query(query, today, userID)
+	rows, err := database.DB.Query(query, userID, limit, offset)
 	if err != nil {
 		fmt.Printf("Error consultando entrenamientos sociales: %v\n", err)
 		http.Error(w, "Error consultando entrenamientos sociales", http.StatusInternalServerError)
