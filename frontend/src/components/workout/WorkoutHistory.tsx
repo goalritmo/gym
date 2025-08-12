@@ -53,10 +53,22 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   // Función para normalizar fecha a zona horaria de Argentina
   const normalizeDate = (dateString: string) => {
     const date = new Date(dateString)
-    // Ajustar a zona horaria de Argentina (UTC-3)
-    const argentinaOffset = -3 * 60 * 60 * 1000 // -3 horas en milisegundos
-    const argentinaTime = new Date(date.getTime() + argentinaOffset)
-    return argentinaTime
+    console.log('🔍 normalizeDate - Input:', dateString, 'Parsed date:', date.toISOString())
+    
+    // Si la fecha ya está en formato YYYY-MM-DD, no necesitamos ajustar timezone
+    if (dateString.includes('T')) {
+      // Es un timestamp completo, ajustar a Argentina
+      const argentinaOffset = -3 * 60 * 60 * 1000 // -3 horas en milisegundos
+      const argentinaTime = new Date(date.getTime() + argentinaOffset)
+      console.log('🔍 normalizeDate - Adjusted to Argentina:', argentinaTime.toISOString())
+      return argentinaTime
+    } else {
+      // Es solo una fecha (YYYY-MM-DD), crear en zona horaria de Argentina
+      const [year, month, day] = dateString.split('-').map(Number)
+      const argentinaTime = new Date(year, month - 1, day) // month - 1 porque JS usa 0-indexed months
+      console.log('🔍 normalizeDate - Created in Argentina timezone:', argentinaTime.toISOString())
+      return argentinaTime
+    }
   }
 
   const formatDate = (dateString: string) => {
@@ -429,11 +441,14 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 textTransform: 'none',
                 '&::-webkit-calendar-picker-indicator': {
                   filter: 'invert(1)',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  width: '24px',
+                  height: '24px'
                 },
                 '&::placeholder': {
                   color: 'rgba(255, 255, 255, 0.7)',
-                  opacity: 1
+                  opacity: 1,
+                  textTransform: 'uppercase'
                 }
               }
             }}

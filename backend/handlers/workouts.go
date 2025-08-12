@@ -168,16 +168,16 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	now := time.Now().In(argentinaLocation)
 	today := now.Format("2006-01-02")
-	// Crear timestamp completo en zona horaria de Argentina
-	todayTimestamp := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, argentinaLocation)
 	
-	// Asegurar que todayTimestamp esté en UTC para la base de datos
-	todayTimestampUTC := todayTimestamp.UTC()
+	// Crear timestamp para la base de datos en UTC pero representando el inicio del día en Argentina
+	// Esto evita el problema de que 00:00 UTC se convierta al día anterior en Argentina
+	todayTimestampUTC := time.Date(now.Year(), now.Month(), now.Day(), 3, 0, 0, 0, time.UTC) // 3:00 UTC = 00:00 Argentina
 	
 
 	var sessionID int
 	
 	fmt.Printf("🔍 DEBUG: Buscando sesión para fecha: %s, userID: %s\n", today, userID)
+	fmt.Printf("🔍 DEBUG: todayTimestampUTC: %s\n", todayTimestampUTC.Format(time.RFC3339))
 
 	// Verificar si ya existe una sesión para hoy
 	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 ORDER BY session_date DESC LIMIT 1`
