@@ -260,17 +260,17 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
       const dayDate = normalizeDate(day.date);
       const filterDate = new Date(dateFilter);
       
-      // Normalizar ambas fechas a medianoche para comparación
-      const dayMidnight = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate());
-      const filterMidnight = new Date(filterDate.getFullYear(), filterDate.getMonth(), filterDate.getDate());
+      // Convertir ambas fechas a formato YYYY-MM-DD para comparación
+      const dayString = dayDate.toISOString().split('T')[0];
+      const filterString = filterDate.toISOString().split('T')[0];
       
       console.log('🔍 Comparando fechas:', {
-        dayDate: dayMidnight.toISOString(),
-        filterDate: filterMidnight.toISOString(),
-        match: dayMidnight.getTime() === filterMidnight.getTime()
+        dayDate: dayString,
+        filterDate: filterString,
+        match: dayString === filterString
       });
       
-      return dayMidnight.getTime() === filterMidnight.getTime();
+      return dayString === filterString;
     } catch (error) {
       console.error('❌ Error filtrando por fecha:', error);
       return true;
@@ -288,19 +288,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         return new Date();
       }
       
-      // Si la fecha termina en 'Z', es UTC, convertir a Argentina (UTC-3)
-      if (dateString.endsWith('Z')) {
-        // Agregar 3 horas para convertir de UTC a Argentina
-        const argentinaDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
-        return argentinaDate;
-      }
-      
-      // Si ya tiene offset de Argentina (-03:00), usar directamente
-      if (dateString.includes('-03:00')) {
-        return date;
-      }
-      
-      // Para otras fechas, asumir que ya están en zona horaria local
+      // Las fechas del backend ya vienen en formato correcto, no necesitan conversión
       return date;
     } catch (error) {
       console.error('❌ Error normalizando fecha:', dateString, error);
@@ -311,9 +299,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   // Obtener fechas con ejercicios para el calendario
   const datesWithWorkouts = useMemo(() => {
     return workoutSessions.map(session => {
-      const date = normalizeDate(session.session_date);
-      // Normalizar a medianoche para comparaciones consistentes
-      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      // Convertir directamente a formato YYYY-MM-DD para comparaciones consistentes
+      return session.session_date.split('T')[0];
     });
   }, [workoutSessions]);
 
@@ -326,12 +313,10 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         return true;
       }
       
-      // Normalizar la fecha a medianoche para comparación
-      const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      // Convertir la fecha a formato YYYY-MM-DD para comparación
+      const dateString = date.toISOString().split('T')[0];
       
-      return !datesWithWorkouts.some(sessionDate => 
-        sessionDate.getTime() === normalizedDate.getTime()
-      );
+      return !datesWithWorkouts.includes(dateString);
     } catch (error) {
       console.error('❌ Error en shouldDisableDate:', error);
       return true;
@@ -343,7 +328,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     workoutSessionsCount: workoutSessions.length,
     workoutsCount: workouts.length,
     workoutDaysCount: workoutDays.length,
-    datesWithWorkouts: datesWithWorkouts.map(d => d.toISOString().split('T')[0]),
+    datesWithWorkouts: datesWithWorkouts,
     dateFilter: dateFilter ? dateFilter.toISOString().split('T')[0] : null
   });
 
