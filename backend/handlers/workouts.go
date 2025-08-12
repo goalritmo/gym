@@ -242,6 +242,9 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
+	// Convertir fecha a zona horaria de Argentina antes de devolver
+	workout.CreatedAt = convertToArgentinaTime(workout.CreatedAt)
+	
 	fmt.Printf("Workout creado exitosamente con ID: %d\n", workout.ID)
 
 	w.WriteHeader(http.StatusCreated)
