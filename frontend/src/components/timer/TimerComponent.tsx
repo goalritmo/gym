@@ -73,9 +73,10 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
   return (
     <Box sx={{ 
       display: 'flex', 
-      flexDirection: 'column',
+      flexDirection: 'row',
       alignItems: 'center', 
-      gap: 2,
+      justifyContent: 'center',
+      gap: 3,
       width: '100%'
     }}>
       {/* Display del tiempo */}
@@ -87,7 +88,8 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
           color: isRunning ? 'primary.main' : isCaptured ? 'warning.main' : 'text.primary',
           textAlign: 'center',
           fontSize: '2.5rem',
-          fontWeight: 'bold'
+          fontWeight: 'bold',
+          minWidth: '140px'
         }}
       >
         {formatTime(time)}
