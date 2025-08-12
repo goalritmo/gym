@@ -117,7 +117,11 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Convertir fecha a zona horaria de Argentina
-		workout.Date = convertToArgentinaTime(workoutDate).Format(time.RFC3339)
+		loc, err := time.LoadLocation("America/Argentina/Buenos_Aires")
+		if err != nil {
+			loc = time.FixedZone("UTC-3", -3*60*60)
+		}
+		workout.Date = workoutDate.In(loc).Format(time.RFC3339)
 
 		// Parsear el JSON de ejercicios
 		if err := json.Unmarshal([]byte(exercisesJSON), &workout.Exercises); err != nil {

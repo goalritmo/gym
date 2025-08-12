@@ -177,6 +177,8 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Verificar si ya existe una sesión para hoy
 	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 ORDER BY created_at DESC LIMIT 1`
 	var sessionDate string
+	fmt.Printf("🔍 Buscando sesión con query: %s\n", sessionQuery)
+	fmt.Printf("🔍 Parámetros: userID=%s, today=%s\n", userID, today)
 	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&sessionID, &sessionDate)
 	
 	if err != nil {
@@ -200,7 +202,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Printf("Sesión creada con ID: %d\n", sessionID)
 	} else {
-		fmt.Printf("Sesión existente encontrada con ID: %d\n", sessionID)
+		fmt.Printf("Sesión existente encontrada con ID: %d, session_date: %s\n", sessionID, sessionDate)
 	}
 
 	// Insertar workout asociado a la sesión
