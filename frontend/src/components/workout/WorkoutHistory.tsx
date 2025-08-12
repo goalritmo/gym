@@ -271,15 +271,9 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     
     // Si la fecha termina en 'Z', es UTC, convertir a Argentina (UTC-3)
     if (dateString.endsWith('Z')) {
-      // Crear una nueva fecha en zona horaria de Argentina
-      return new Date(
-        date.getUTCFullYear(),
-        date.getUTCMonth(),
-        date.getUTCDate(),
-        date.getUTCHours(),
-        date.getUTCMinutes(),
-        date.getUTCSeconds()
-      );
+      // Agregar 3 horas para convertir de UTC a Argentina
+      const argentinaDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+      return argentinaDate;
     }
     
     // Si ya tiene offset de Argentina (-03:00), usar directamente
