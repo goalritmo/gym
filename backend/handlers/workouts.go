@@ -15,12 +15,15 @@ import (
 
 // convertToArgentinaTime convierte una fecha UTC a la zona horaria de Argentina
 func convertToArgentinaTime(utcTime time.Time) time.Time {
+	fmt.Printf("🔍 convertToArgentinaTime - Antes: %s (UTC: %v)\n", utcTime.Format(time.RFC3339), utcTime.Location())
 	loc, err := time.LoadLocation("America/Argentina/Buenos_Aires")
 	if err != nil {
 		// Fallback a UTC-3 si no se puede cargar la zona horaria
 		loc = time.FixedZone("UTC-3", -3*60*60)
 	}
-	return utcTime.In(loc)
+	result := utcTime.In(loc)
+	fmt.Printf("🔍 convertToArgentinaTime - Después: %s (Location: %v)\n", result.Format(time.RFC3339), result.Location())
+	return result
 }
 
 // GetWorkoutsHandler obtiene la lista de workouts
