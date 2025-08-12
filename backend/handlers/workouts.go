@@ -170,7 +170,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Buscando sesión para fecha: %s\n", today)
 
 	// Verificar si ya existe una sesión para hoy
-	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 LIMIT 1`
+	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 ORDER BY created_at DESC LIMIT 1`
 	var sessionDate string
 	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&sessionID, &sessionDate)
 	

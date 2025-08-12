@@ -256,13 +256,25 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   // Filtrar días por fecha
   const filteredWorkoutDays = workoutDays.filter(day => {
     if (!dateFilter) return true;
-    const dayDate = normalizeDate(day.date);
-    const filterDate = new Date(dateFilter);
-    
-    // Comparar solo año, mes y día
-    return dayDate.getFullYear() === filterDate.getFullYear() &&
-           dayDate.getMonth() === filterDate.getMonth() &&
-           dayDate.getDate() === filterDate.getDate();
+    try {
+      const dayDate = normalizeDate(day.date);
+      const filterDate = new Date(dateFilter);
+      
+      // Normalizar ambas fechas a medianoche para comparación
+      const dayMidnight = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate());
+      const filterMidnight = new Date(filterDate.getFullYear(), filterDate.getMonth(), filterDate.getDate());
+      
+      console.log('🔍 Comparando fechas:', {
+        dayDate: dayMidnight.toISOString(),
+        filterDate: filterMidnight.toISOString(),
+        match: dayMidnight.getTime() === filterMidnight.getTime()
+      });
+      
+      return dayMidnight.getTime() === filterMidnight.getTime();
+    } catch (error) {
+      console.error('❌ Error filtrando por fecha:', error);
+      return true;
+    }
   });
 
   // Función para normalizar fechas de Argentina
