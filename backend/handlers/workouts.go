@@ -350,43 +350,7 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// TestSessionHandler es un endpoint temporal para probar inserción de sesiones
-func TestSessionHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	
-	userID, ok := r.Context().Value("user_id").(string)
-	if !ok || userID == "" {
-		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
-		return
-	}
-	
-	fmt.Printf("TestSessionHandler - userID: %s\n", userID)
-	
-	// Intentar insertar una sesión de prueba
-	query := `
-		INSERT INTO workout_sessions (user_id, session_date, session_name, total_exercises, effort, mood) 
-		VALUES ($1, $2, $3, 0, 0, 0) 
-		RETURNING id
-	`
-	
-	var sessionID int
-	err := database.DB.QueryRow(query, userID, "2025-08-12", "Test Session").Scan(&sessionID)
-	if err != nil {
-		fmt.Printf("Error en TestSessionHandler: %v\n", err)
-		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-		return
-	}
-	
-	fmt.Printf("Sesión creada exitosamente con ID: %d\n", sessionID)
-	
-	response := map[string]interface{}{
-		"success": true,
-		"session_id": sessionID,
-		"user_id": userID,
-	}
-	
-	json.NewEncoder(w).Encode(response)
-}
+
 
 // GetWorkoutSessionsHandler obtiene la lista de sesiones de entrenamiento
 func GetWorkoutSessionsHandler(w http.ResponseWriter, r *http.Request) {
