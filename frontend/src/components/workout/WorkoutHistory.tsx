@@ -55,8 +55,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     const options: Intl.DateTimeFormatOptions = {
       weekday: 'long',
       day: 'numeric',
-      month: 'long',
-      year: 'numeric'
+      month: 'long'
     }
     return date.toLocaleDateString('es-ES', options)
   }
