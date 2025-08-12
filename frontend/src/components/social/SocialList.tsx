@@ -268,7 +268,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
         >
           <TrendingUp sx={{ fontSize: 60, color: 'grey.400', mb: 2 }} />
           <Typography variant="h6" color="text.secondary" gutterBottom>
-            Funcionalidad Social Deshabilitada
+            Funcionalidad Deshabilitada
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Para ver y compartir entrenamientos con otros usuarios, habilita la funcionalidad social en la configuración.
@@ -280,7 +280,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
               onClick={onOpenSettings}
               sx={{ mt: 2 }}
             >
-              Habilitar Social
+              Habilitar
             </Button>
           )}
         </Paper>

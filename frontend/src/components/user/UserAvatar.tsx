@@ -83,15 +83,16 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, unread
       >
         <Badge 
           badgeContent={unreadNotifications} 
-          color="error"
-          invisible={unreadNotifications === 0}
           sx={{
             '& .MuiBadge-badge': {
               fontSize: '0.7rem',
               minWidth: '18px',
-              height: '18px'
+              height: '18px',
+              backgroundColor: '#ff9800',
+              color: 'white'
             }
           }}
+          invisible={unreadNotifications === 0}
         >
           <Avatar
             sx={{ 
@@ -175,26 +176,22 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, unread
           <ListItemIcon>
             <Badge 
               badgeContent={unreadNotifications} 
-              color="error"
-              invisible={unreadNotifications === 0}
               sx={{
                 '& .MuiBadge-badge': {
                   fontSize: '0.6rem',
                   minWidth: '16px',
-                  height: '16px'
+                  height: '16px',
+                  backgroundColor: '#ff9800',
+                  color: 'white'
                 }
               }}
+              invisible={unreadNotifications === 0}
             >
               <NotificationsIcon fontSize="small" />
             </Badge>
           </ListItemIcon>
           <ListItemText>
             Notificaciones
-            {unreadNotifications > 0 && (
-              <Typography variant="caption" color="error.main" sx={{ ml: 1 }}>
-                ({unreadNotifications})
-              </Typography>
-            )}
           </ListItemText>
         </MenuItem>
 

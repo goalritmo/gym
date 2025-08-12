@@ -81,7 +81,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       <DialogContent sx={{ pt: 2 }}>
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            Funcionalidad Social
+            SOCIAL
           </Typography>
           
           <FormControlLabel

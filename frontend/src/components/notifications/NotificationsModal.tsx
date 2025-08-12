@@ -13,7 +13,8 @@ import {
   Alert,
   Paper,
   Avatar,
-  IconButton
+  IconButton,
+  Button
 } from '@mui/material'
 import { 
   Notifications, 
@@ -250,15 +251,50 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
           {unreadCount > 0 && (
             <Chip 
               label={unreadCount} 
-              color="error" 
               size="small"
-              sx={{ ml: 1, fontWeight: 'bold' }}
+              sx={{ 
+                ml: 1, 
+                fontWeight: 'bold',
+                backgroundColor: '#ff9800',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#f57c00'
+                }
+              }}
             />
           )}
         </Box>
-        <IconButton onClick={onClose} size="small">
-          <Close />
-        </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {unreadCount > 0 && (
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => {
+                // Marcar todas como leídas
+                setNotifications(prev => 
+                  prev.map(notif => ({ ...notif, read: true }))
+                )
+                onMarkAsRead(unreadCount)
+              }}
+              sx={{
+                fontSize: '0.75rem',
+                py: 0.5,
+                px: 1.5,
+                borderColor: '#ff9800',
+                color: '#ff9800',
+                '&:hover': {
+                  borderColor: '#f57c00',
+                  backgroundColor: '#fff3e0'
+                }
+              }}
+            >
+              Marcar como leída
+            </Button>
+          )}
+          <IconButton onClick={onClose} size="small">
+            <Close />
+          </IconButton>
+        </Box>
       </DialogTitle>
 
       <DialogContent sx={{ pt: 2 }}>
