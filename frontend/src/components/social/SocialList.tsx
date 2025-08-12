@@ -256,7 +256,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
         <Paper 
           elevation={0} 
           sx={{ 
-            p: 4, 
+            py: 4, 
             textAlign: 'center',
             backgroundColor: 'grey.50',
             borderRadius: 2

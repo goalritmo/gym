@@ -22,7 +22,7 @@ import {
   ThumbUp, 
   Announcement,
   Close,
-  CheckCircle
+  CheckCircleOutline
 } from '@mui/icons-material'
 
 type NotificationType = 'general' | 'kudos' | 'announcement'
@@ -411,8 +411,8 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                     }}>
                       <Button
                         size="small"
-                        variant="outlined"
-                        startIcon={<CheckCircle />}
+                        variant="contained"
+                        startIcon={<CheckCircleOutline />}
                         onClick={(e) => {
                           e.stopPropagation()
                           markAsRead(notification.id)
@@ -421,11 +421,10 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                           fontSize: '0.75rem',
                           py: 0.5,
                           px: 1.5,
-                          borderColor: '#ff9800',
-                          color: '#ff9800',
+                          backgroundColor: '#ff9800',
+                          color: 'transparent',
                           '&:hover': {
-                            borderColor: '#f57c00',
-                            backgroundColor: '#fff3e0'
+                            backgroundColor: '#f57c00'
                           }
                         }}
                       >
