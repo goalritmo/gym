@@ -90,12 +90,13 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		var workout SocialWorkout
 		var exercisesJSON string
 		
+		var workoutDate time.Time
 		err := rows.Scan(
 			&workout.ID,
 			&workout.UserID,
 			&workout.UserName,
 			&workout.UserAvatarURL,
-			&workout.Date,
+			&workoutDate,
 			&workout.TotalExercises,
 			&workout.TotalSeries,
 			&exercisesJSON,
@@ -104,6 +105,9 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Error escaneando entrenamiento social: %v\n", err)
 			continue
 		}
+
+		// Convertir fecha a zona horaria de Argentina
+		workout.Date = workoutDate.Format(time.RFC3339)
 
 		// Parsear el JSON de ejercicios
 		if err := json.Unmarshal([]byte(exercisesJSON), &workout.Exercises); err != nil {
