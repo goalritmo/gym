@@ -51,12 +51,17 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
 
   const handleToggleTimer = () => {
     if (!isRunning) {
-      // Iniciar el cronómetro
-      setIsRunning(true)
-      setIsCaptured(false)
-      setTime(0)
+      if (isCaptured) {
+        // Reiniciar el cronómetro
+        setIsRunning(true)
+        setIsCaptured(false)
+        setTime(0)
+      } else {
+        // Iniciar el cronómetro por primera vez
+        setIsRunning(true)
+      }
     } else {
-      // Pausar y registrar los segundos
+      // Parar y registrar los segundos
       setIsRunning(false)
       setIsCaptured(true)
       if (onTimeComplete) {
@@ -66,7 +71,13 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
   }
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: 'column',
+      alignItems: 'center', 
+      gap: 2,
+      width: '100%'
+    }}>
       {/* Display del tiempo */}
       <Typography 
         variant="h4" 
@@ -74,24 +85,26 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
         sx={{ 
           fontFamily: 'monospace',
           color: isRunning ? 'primary.main' : isCaptured ? 'warning.main' : 'text.primary',
-          flex: 1,
-          textAlign: 'center'
+          textAlign: 'center',
+          fontSize: '2.5rem',
+          fontWeight: 'bold'
         }}
       >
         {formatTime(time)}
       </Typography>
       
-      {/* Botón a la derecha */}
+      {/* Botón centrado */}
       <Button 
         variant="contained" 
         onClick={handleToggleTimer}
         disabled={disabled}
         size="large"
         sx={{ 
-          minWidth: 120,
+          minWidth: 140,
           py: 1.5,
+          px: 3,
           borderRadius: 1.5,
-          fontSize: '1rem',
+          fontSize: '1.1rem',
           fontWeight: 'bold',
           backgroundColor: isCaptured ? 'warning.main' : 'primary.main',
           '&:hover': {
@@ -99,7 +112,7 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
           }
         }}
       >
-        {!isRunning ? 'Iniciar' : 'Capturar'}
+        {!isRunning ? (isCaptured ? 'Reiniciar' : 'Iniciar') : 'Parar'}
       </Button>
     </Box>
   )
