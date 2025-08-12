@@ -11,8 +11,7 @@ import {
   Box,
   Divider,
   Alert,
-  Chip,
-  Stack
+  IconButton
 } from '@mui/material'
 import { 
   Settings, 
@@ -20,8 +19,7 @@ import {
   PersonOff, 
   Timer, 
   TimerOff, 
-  Star,
-  StarBorder
+  Close
 } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 
@@ -101,9 +99,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     onClose()
   }
 
-  const getExerciseName = (id: number) => {
-    return exercises.find(ex => ex.id === id)?.name || `Ejercicio ${id}`
-  }
+
 
   return (
     <Dialog 
@@ -122,13 +118,27 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       <DialogTitle sx={{ 
         display: 'flex', 
         alignItems: 'center', 
-        gap: 1,
+        justifyContent: 'space-between',
         pb: 1
       }}>
-        <Settings sx={{ color: 'primary.main' }} />
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-          Configuración
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Settings sx={{ color: 'primary.main' }} />
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            Configuración
+          </Typography>
+        </Box>
+        <IconButton
+          onClick={handleCancel}
+          size="small"
+          sx={{ 
+            color: 'text.secondary',
+            '&:hover': {
+              backgroundColor: 'grey.100'
+            }
+          }}
+        >
+          <Close />
+        </IconButton>
       </DialogTitle>
 
       <DialogContent sx={{ pt: 2 }}>
@@ -239,56 +249,43 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           </Typography>
           
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Selecciona los ejercicios que quieres que aparezcan primero en el selector
+            Selecciona los ejercicios que quieres que aparezcan en el selector
           </Typography>
 
           {exercises.length > 0 ? (
             <Box>
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-                Ejercicios favoritos ({tempSettings.favoriteExercises.length}):
-              </Typography>
-              <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
-                {tempSettings.favoriteExercises.map(exerciseId => (
-                  <Chip
-                    key={exerciseId}
-                    label={getExerciseName(exerciseId)}
-                    onDelete={() => handleToggleFavoriteExercise(exerciseId)}
-                    color="primary"
-                    size="small"
-                    icon={<Star />}
-                  />
-                ))}
-                {tempSettings.favoriteExercises.length === 0 && (
-                  <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                    No hay ejercicios favoritos seleccionados
-                  </Typography>
-                )}
-              </Stack>
-
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-                Todos los ejercicios:
-              </Typography>
-              <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+              <Box sx={{ 
+                maxHeight: 200, 
+                overflowY: 'auto',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                p: 1
+              }}>
                 {exercises.map(exercise => (
-                  <Chip
+                  <FormControlLabel
                     key={exercise.id}
+                    control={
+                      <Switch
+                        checked={tempSettings.favoriteExercises.includes(exercise.id)}
+                        onChange={() => handleToggleFavoriteExercise(exercise.id)}
+                        size="small"
+                        color="primary"
+                      />
+                    }
                     label={exercise.name}
-                    onClick={() => handleToggleFavoriteExercise(exercise.id)}
-                    variant={tempSettings.favoriteExercises.includes(exercise.id) ? "filled" : "outlined"}
-                    color={tempSettings.favoriteExercises.includes(exercise.id) ? "primary" : "default"}
-                    size="small"
-                    icon={tempSettings.favoriteExercises.includes(exercise.id) ? <Star /> : <StarBorder />}
                     sx={{ 
-                      cursor: 'pointer',
+                      m: 0,
+                      py: 0.5,
+                      px: 1,
+                      borderRadius: 1,
                       '&:hover': {
-                        backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) 
-                          ? 'primary.dark' 
-                          : 'grey.100'
+                        backgroundColor: 'grey.50'
                       }
                     }}
                   />
                 ))}
-              </Stack>
+              </Box>
             </Box>
           ) : (
             <Alert severity="info">
@@ -301,12 +298,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
         <Divider sx={{ my: 2 }} />
 
-        <Alert severity="info" sx={{ mb: 2 }}>
-          <Typography variant="body2">
-            <strong>Nota:</strong> Los ejercicios favoritos aparecerán primero en el selector 
-            cuando registres un entrenamiento.
-          </Typography>
-        </Alert>
+
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 3 }}>
