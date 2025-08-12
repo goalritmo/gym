@@ -14,7 +14,7 @@ Aplicación web para registrar entrenamientos (peso, repeticiones, series, tiemp
 - API: REST (Go) con endpoints para workouts, exercises y equipment
 - Frontend: React + TypeScript + Vite
 - Testing: Vitest + React Testing Library (frontend), Go testing stdlib (backend)
-- Autenticación: código "salud" en el frontend (MVP)
+- Autenticación: Google OAuth con Supabase
 
 ## Requisitos
 - Node.js 20+ (recomendado 20.19+)
@@ -59,7 +59,7 @@ Ver definiciones SQL en `especificaciones.md`.
 
 ## TDD — Resumen
 - Frontend (Vitest + RTL): componentes (`LoginComponent`, `WorkoutForm`, `TimerComponent`, `ExerciseList`, `EquipmentDetail`), hooks e integración de flujos clave.
-- Backend (Go stdlib): handlers (`/api/workouts`, `/api/exercises`, `/api/equipment`), middleware (auth código "salud", CORS, logging) y validaciones.
+- Backend (Go stdlib): handlers (`/api/workouts`, `/api/exercises`, `/api/equipment`), middleware (Supabase Auth, CORS, logging) y validaciones.
 - E2E: flujos de registro y navegación (posterior).
 
 ## Roadmap (MVP)
@@ -72,4 +72,4 @@ Ver definiciones SQL en `especificaciones.md`.
 
 ## Notas
 - Node 18 puede mostrar advertencias con Vite 7; usa Node 20+ para evitar errores.
-- En producción, reemplazar el código "salud" por Supabase Auth.
+- Autenticación implementada con Supabase Auth y Google OAuth.

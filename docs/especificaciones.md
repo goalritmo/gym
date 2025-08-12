@@ -18,7 +18,7 @@ Frecuencia óptima: entrenar todo el cuerpo 3 veces por semana (lunes/miércoles
 | Funcionalidad | Descripción |
 | --- | --- |
 | Registro de entrenamientos | Formulario con campos: ejercicio, serie, peso, segundos, repeticiones, observaciones. Guarda en Supabase. |
-| Acceso con código | Validación en frontend con código "salud" para poder cargar datos. |
+| Autenticación | Google OAuth con Supabase para autenticación segura. |
 | Cronómetro | Iniciar/pausar/resetear. Guía visual para 40–50 segundos por serie. No persiste. |
 | Ejercicios y equipos | Buscador; al seleccionar ejercicio muestra equipo, grupo muscular y tips. |
 | Notificaciones | Recordatorios sobre horarios del gym (feriados, paros, recesos). Carga manual inicial. |
@@ -110,7 +110,7 @@ create table public.exercise_muscle_groups (
 ---
 
 ### 🔐 Seguridad
-- Acceso con código "salud" en el frontend antes de permitir el registro
+- Autenticación con Google OAuth antes de permitir el registro
 - Futuro: Supabase Auth si hay usuarios múltiples
 - RLS a definir según necesidades de lectura/escritura por recurso
 
@@ -147,7 +147,7 @@ Validación Back-End:
 
 #### Fase 2 — Backend (Go stdlib)
 - Handlers: `GET/POST /api/workouts`, `GET /api/exercises`, `GET /api/equipment`
-- Middleware: auth (código "salud"), CORS, logging
+- Middleware: Supabase Auth, CORS, logging
 - Modelos/utilidades: validaciones y conversión de tipos
 
 #### Fase 3 — Base de datos
@@ -167,7 +167,7 @@ Validación Back-End:
   - Manejo de errores de red/validación
 
 - Autenticación
-  - Código "salud" requerido
+  - Autenticación con Google OAuth requerida
   - Error con código incorrecto; acceso con código correcto
   - Sesión simple mientras navega (estado global)
 

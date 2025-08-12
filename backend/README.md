@@ -79,11 +79,6 @@ GET    /api/me/stats                 # Estadísticas del usuario
 Authorization: Bearer <jwt_token_from_supabase>
 ```
 
-### Desarrollo/Testing
-```
-Authorization: Bearer salud
-```
-
 Ver [GOOGLE_AUTH_SETUP.md](GOOGLE_AUTH_SETUP.md) para configuración completa.
 
 ## 📊 Estructura de Datos

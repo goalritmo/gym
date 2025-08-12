@@ -86,10 +86,10 @@ Esto creará:
 
 ### Para desarrollo local
 
-El middleware sigue aceptando `"salud"` como token para desarrollo:
+El middleware usa Supabase Auth para validación:
 
 ```bash
-curl -H "Authorization: Bearer salud" http://localhost:3210/api/workouts
+curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:3210/api/workouts
 ```
 
 ### Para testing con JWT real
