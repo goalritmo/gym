@@ -388,7 +388,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <TextField
             type="date"
-            label="Filtrar por fecha"
+            placeholder="DD/MM/YYYY"
             value={dateFilter ? dateFilter.toISOString().split('T')[0] : ''}
             onChange={(e) => {
               try {
@@ -426,30 +426,14 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 color: 'white',
                 fontSize: '1rem',
                 fontWeight: 500,
-                textTransform: 'uppercase',
+                textTransform: 'none',
                 '&::-webkit-calendar-picker-indicator': {
                   filter: 'invert(1)',
                   cursor: 'pointer'
-                }
-              },
-              '& .MuiInputLabel-root': {
-                color: 'white',
-                fontWeight: 600,
-                fontSize: '1rem',
-                textTransform: 'none',
-                transform: 'translate(14px, -9px) scale(0.75)',
-                background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-                padding: '0 4px',
-                borderRadius: '2px',
-                '&.Mui-focused': {
-                  color: 'white',
-                  transform: 'translate(14px, -9px) scale(0.75)',
-                  background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
                 },
-                '&.MuiInputLabel-shrink': {
-                  color: 'white',
-                  transform: 'translate(14px, -9px) scale(0.75)',
-                  background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+                '&::placeholder': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  opacity: 1
                 }
               }
             }}
