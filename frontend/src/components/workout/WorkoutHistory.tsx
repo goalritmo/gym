@@ -395,7 +395,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <TextField
             type="date"
-            label="Filtrar por fecha"
+            label="FILTRAR POR FECHA"
             value={dateFilter ? dateFilter.toISOString().split('T')[0] : ''}
             onChange={(e) => {
               try {
@@ -433,36 +433,29 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 color: 'white',
                 fontSize: '1rem',
                 fontWeight: 500,
+                textTransform: 'uppercase',
+                '&::-webkit-calendar-picker-indicator': {
+                  filter: 'invert(1)',
+                  cursor: 'pointer'
+                }
               },
               '& .MuiInputLabel-root': {
                 color: 'white',
                 fontWeight: 600,
                 fontSize: '1rem',
+                textTransform: 'uppercase',
                 '&.Mui-focused': {
                   color: 'white',
+                  transform: 'translate(14px, -9px) scale(0.75)',
                 },
                 '&.MuiInputLabel-shrink': {
                   color: 'white',
+                  transform: 'translate(14px, -9px) scale(0.75)',
                 }
               }
             }}
           />
-          {dateFilter && (
-            <Button
-              variant="outlined"
-              onClick={() => setDateFilter(null)}
-              sx={{
-                color: 'white',
-                borderColor: 'white',
-                '&:hover': {
-                  borderColor: 'white',
-                  bgcolor: 'rgba(255, 255, 255, 0.1)',
-                }
-              }}
-            >
-              Limpiar
-            </Button>
-          )}
+
         </Box>
       </Box>
 
