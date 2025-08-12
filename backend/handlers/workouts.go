@@ -170,12 +170,15 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	today := now.Format("2006-01-02")
 	// Crear timestamp completo en zona horaria de Argentina
 	todayTimestamp := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, argentinaLocation)
+	
+	fmt.Printf("🔍 Debug fechas - now: %s, today: %s, todayTimestamp: %s\n", 
+		now.Format(time.RFC3339), today, todayTimestamp.Format(time.RFC3339))
 	var sessionID int
 	
 	fmt.Printf("Buscando sesión para fecha: %s\n", today)
 
 	// Verificar si ya existe una sesión para hoy
-	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 ORDER BY created_at DESC LIMIT 1`
+	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date AT TIME ZONE 'America/Argentina/Buenos_Aires') = $2 ORDER BY created_at DESC LIMIT 1`
 	var sessionDate string
 	fmt.Printf("🔍 Buscando sesión con query: %s\n", sessionQuery)
 	fmt.Printf("🔍 Parámetros: userID=%s, today=%s\n", userID, today)
