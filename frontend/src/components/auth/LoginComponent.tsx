@@ -30,7 +30,7 @@ export default function LoginComponent() {
       justifyContent: 'center', 
       alignItems: 'center', 
       height: '100%',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      backgroundColor: 'primary.main',
       borderRadius: 1,
       mx: 1,
       my: 1
