@@ -79,15 +79,15 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
       console.log('🔍 Social workouts recibidos:', data)
       
       if (isLoadMore) {
-        setSocialWorkouts(prev => [...prev, ...data])
+        setSocialWorkouts(prev => [...(prev || []), ...(data || [])])
         setOffset(prev => prev + limit)
       } else {
-        setSocialWorkouts(data)
+        setSocialWorkouts(data || [])
         setOffset(limit)
       }
       
       // Si recibimos menos de 'limit' items, no hay más datos
-      setHasMore(data.length === limit)
+      setHasMore((data || []).length === limit)
     } catch (error: any) {
       console.error('Error cargando entrenamientos sociales:', error)
       if (error.response?.status === 403) {
@@ -229,9 +229,12 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
     )
   }
 
-  console.log('🔍 Estado de socialWorkouts:', { socialWorkouts, length: socialWorkouts?.length })
+  // Asegurar que socialWorkouts nunca sea null
+  const safeSocialWorkouts = socialWorkouts || []
   
-  if (!socialWorkouts || socialWorkouts.length === 0) {
+  console.log('🔍 Estado de socialWorkouts:', { socialWorkouts: safeSocialWorkouts, length: safeSocialWorkouts.length })
+  
+  if (safeSocialWorkouts.length === 0) {
     return (
       <Box sx={{ p: 3 }}>
         <Paper 
@@ -271,7 +274,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
       </Typography>
 
       <Stack spacing={3}>
-        {socialWorkouts?.map((workout) => (
+        {safeSocialWorkouts.map((workout) => (
           <Card 
             key={workout.id} 
             sx={{ 

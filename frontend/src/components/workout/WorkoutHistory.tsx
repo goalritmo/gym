@@ -426,7 +426,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 color: 'white',
                 fontWeight: 600,
                 fontSize: '1rem',
-                textTransform: 'capitalize',
+                textTransform: 'none',
                 transform: 'translate(14px, -9px) scale(0.75)',
                 background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
                 padding: '0 4px',
