@@ -179,10 +179,12 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("🔍 DEBUG: Buscando sesión para fecha: %s, userID: %s\n", today, userID)
 	fmt.Printf("🔍 DEBUG: todayTimestampUTC: %s\n", todayTimestampUTC.Format(time.RFC3339))
 
-	// Verificar si ya existe una sesión para hoy
-	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date) = $2 ORDER BY session_date DESC LIMIT 1`
+	// Verificar si ya existe una sesión para hoy (buscar por la fecha en Argentina timezone)
+	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND DATE(session_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires') = $2 ORDER BY session_date DESC LIMIT 1`
 	var sessionDate string
 
+	fmt.Printf("🔍 DEBUG: Ejecutando query: %s\n", sessionQuery)
+	fmt.Printf("🔍 DEBUG: Parámetros: userID=%s, today=%s\n", userID, today)
 	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&sessionID, &sessionDate)
 	
 	if err != nil {
