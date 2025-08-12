@@ -81,15 +81,24 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
       workouts: workouts.map(w => ({ id: w.id, created_at: w.created_at, exercise_session_id: w.exercise_session_id }))
     });
 
+    // Agrupar workouts por exercise_session_id en lugar de fecha
+    const workoutsBySession = new Map<string, Workout[]>();
+    workouts.forEach(workout => {
+      const sessionId = workout.exercise_session_id.toString();
+      if (!workoutsBySession.has(sessionId)) {
+        workoutsBySession.set(sessionId, []);
+      }
+      workoutsBySession.get(sessionId)!.push(workout);
+    });
+
+    console.log('🔍 Workouts agrupados por session_id:', Object.fromEntries(workoutsBySession));
+
     workoutSessions.forEach(session => {
 
-      // Filtrar workouts por fecha de sesión - simplificado
+      // Filtrar workouts por exercise_session_id
       const sessionWorkouts = workouts.filter(w => {
-        // Usar solo la fecha sin tiempo para comparar
-        const workoutDate = w.created_at.split('T')[0]
-        const sessionDate = session.session_date.split('T')[0]
-        const matches = workoutDate === sessionDate
-        console.log(`🔍 Comparando: workout ${w.id} (${workoutDate}) vs session ${session.id} (${sessionDate}) = ${matches}`)
+        const matches = w.exercise_session_id === session.id
+        console.log(`🔍 Comparando: workout ${w.id} (session_id: ${w.exercise_session_id}) vs session ${session.id} = ${matches}`)
         return matches
       })
       
