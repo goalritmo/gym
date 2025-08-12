@@ -50,18 +50,29 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const [loadingSessionId, setLoadingSessionId] = useState<number | null>(null)
   const [deletingWorkoutId, setDeletingWorkoutId] = useState<number | null>(null)
 
-  const formatDate = (dateString: string) => {
+  // Función para normalizar fecha a zona horaria de Argentina
+  const normalizeDate = (dateString: string) => {
     const date = new Date(dateString)
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long'
-    }
-    return date.toLocaleDateString('es-ES', options)
+    // Ajustar a zona horaria de Argentina (UTC-3)
+    const argentinaOffset = -3 * 60 * 60 * 1000 // -3 horas en milisegundos
+    const argentinaTime = new Date(date.getTime() + argentinaOffset)
+    return argentinaTime
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = normalizeDate(dateString)
+    const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    
+    const weekday = weekdays[date.getDay()]
+    const day = date.getDate()
+    const month = months[date.getMonth()]
+    
+    return `${weekday} ${day} de ${month}`
   }
 
   const formatDateShort = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = normalizeDate(dateString)
     const options: Intl.DateTimeFormatOptions = {
       day: 'numeric',
       month: 'long'
