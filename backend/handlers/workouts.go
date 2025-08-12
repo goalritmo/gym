@@ -223,12 +223,13 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	workout.Observations = req.Observations
 
 	// Obtener valores de los punteros de forma segura
-	var serieValue, secondsValue int
+	var serieValue int
+	var secondsValue *int
 	if req.Serie != nil {
 		serieValue = *req.Serie
 	}
 	if req.Seconds != nil {
-		secondsValue = *req.Seconds
+		secondsValue = req.Seconds
 	}
 	
 
