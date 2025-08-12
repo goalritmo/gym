@@ -46,27 +46,48 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
   const { settings } = useUserSettings()
   const [socialWorkouts, setSocialWorkouts] = useState<SocialWorkout[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [error, setError] = useState('')
+  const [hasMore, setHasMore] = useState(true)
+  const [offset, setOffset] = useState(0)
+  const limit = 10
 
   useEffect(() => {
     loadSocialWorkouts()
   }, [settings.socialEnabled])
 
-  const loadSocialWorkouts = async () => {
-    setIsLoading(true)
+  const loadSocialWorkouts = async (isLoadMore: boolean = false) => {
+    if (isLoadMore) {
+      setIsLoadingMore(true)
+    } else {
+      setIsLoading(true)
+      setOffset(0)
+    }
     setError('')
     
     // Si el usuario no tiene habilitada la funcionalidad social, no cargar nada
     if (!settings.socialEnabled) {
       setSocialWorkouts([])
       setIsLoading(false)
+      setIsLoadingMore(false)
       return
     }
     
     try {
-      const data = await apiClient.getSocialWorkouts()
+      const currentOffset = isLoadMore ? offset : 0
+      const data = await apiClient.getSocialWorkouts(limit, currentOffset)
       console.log('🔍 Social workouts recibidos:', data)
-      setSocialWorkouts(data)
+      
+      if (isLoadMore) {
+        setSocialWorkouts(prev => [...prev, ...data])
+        setOffset(prev => prev + limit)
+      } else {
+        setSocialWorkouts(data)
+        setOffset(limit)
+      }
+      
+      // Si recibimos menos de 'limit' items, no hay más datos
+      setHasMore(data.length === limit)
     } catch (error: any) {
       console.error('Error cargando entrenamientos sociales:', error)
       if (error.response?.status === 403) {
@@ -74,9 +95,12 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
       } else {
         setError('Error cargando entrenamientos sociales')
       }
-      setSocialWorkouts([])
+      if (!isLoadMore) {
+        setSocialWorkouts([])
+      }
     } finally {
       setIsLoading(false)
+      setIsLoadingMore(false)
     }
   }
 
@@ -348,6 +372,20 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
             </CardContent>
           </Card>
         ))}
+        
+        {/* Botón "Cargar más" */}
+        {hasMore && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Button
+              variant="outlined"
+              onClick={() => loadSocialWorkouts(true)}
+              disabled={isLoadingMore}
+              startIcon={isLoadingMore ? <CircularProgress size={20} /> : null}
+            >
+              {isLoadingMore ? 'Cargando...' : 'Cargar más'}
+            </Button>
+          </Box>
+        )}
       </Stack>
     </Box>
   )

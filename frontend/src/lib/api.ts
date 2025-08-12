@@ -167,8 +167,12 @@ class ApiClient {
   }
 
   // Social API
-  async getSocialWorkouts(): Promise<any[]> {
-    return this.request('/social/workouts')
+  async getSocialWorkouts(limit: number = 10, offset: number = 0): Promise<any[]> {
+    const params = new URLSearchParams({
+      limit: limit.toString(),
+      offset: offset.toString()
+    })
+    return this.request(`/social/workouts?${params}`)
   }
 }
 
