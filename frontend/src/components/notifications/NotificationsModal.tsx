@@ -13,7 +13,8 @@ import {
   Alert,
   Paper,
   Avatar,
-  IconButton
+  IconButton,
+  Button
 } from '@mui/material'
 import { 
   Notifications, 
@@ -347,23 +348,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                       </Typography>
                     </Box>
 
-                    {!notification.read && (
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          markAsRead(notification.id)
-                        }}
-                        sx={{
-                          color: '#ff9800',
-                          '&:hover': {
-                            backgroundColor: '#fff3e0'
-                          }
-                        }}
-                      >
-                        <CheckCircle fontSize="small" />
-                      </IconButton>
-                    )}
+
                   </Box>
 
                   {/* Mensaje */}
@@ -425,6 +410,38 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                       size="small"
                       sx={{ mt: 2 }}
                     />
+                  )}
+
+                  {/* Botón Marcar como leída */}
+                  {!notification.read && (
+                    <Box sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'flex-end', 
+                      mt: 2 
+                    }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<CheckCircle />}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          markAsRead(notification.id)
+                        }}
+                        sx={{
+                          fontSize: '0.75rem',
+                          py: 0.5,
+                          px: 1.5,
+                          borderColor: '#ff9800',
+                          color: '#ff9800',
+                          '&:hover': {
+                            borderColor: '#f57c00',
+                            backgroundColor: '#fff3e0'
+                          }
+                        }}
+                      >
+                        Marcar como leída
+                      </Button>
+                    </Box>
                   )}
                 </CardContent>
               </Card>

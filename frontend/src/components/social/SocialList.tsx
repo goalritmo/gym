@@ -15,7 +15,7 @@ import {
   Tooltip,
   Divider
 } from '@mui/material'
-import { FitnessCenter, AccessTime, TrendingUp, Settings, ThumbUp, ThumbUpOutlined } from '@mui/icons-material'
+import { FitnessCenter, TrendingUp, Settings, ThumbUp, ThumbUpOutlined } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 type SocialWorkout = {
@@ -217,11 +217,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
     }
   }
 
-  const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
-  }
+
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
@@ -388,7 +384,14 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
 
               {/* Resumen del entrenamiento */}
               <Box sx={{ mb: 2 }}>
-                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 'bold', 
+                    mb: 1,
+                    fontSize: { xs: '1rem', sm: '1.25rem' }
+                  }}
+                >
                   Entrenamiento del día
                 </Typography>
                 
@@ -408,49 +411,21 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                   />
                 </Stack>
 
-                {/* Lista de ejercicios */}
+                {/* Píldoras de ejercicios únicos */}
                 <Box sx={{ mt: 2 }}>
-                  {workout.exercises.map((exercise, index) => (
-                    <Box key={index} sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'space-between',
-                      py: 1,
-                      borderBottom: index < workout.exercises.length - 1 ? '1px solid' : 'none',
-                      borderColor: 'divider'
-                    }}>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {exercise.exercise_name}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Serie {exercise.serie}
-                        </Typography>
-                      </Box>
-                      <Stack direction="row" spacing={1}>
-                        <Chip 
-                          label={`${exercise.weight} kg`} 
-                          size="small"
-                          variant="outlined"
-                          sx={{ fontSize: '0.7rem' }}
-                        />
-                        <Chip 
-                          label={`${exercise.reps} reps`} 
-                          size="small"
-                          variant="outlined"
-                          sx={{ fontSize: '0.7rem' }}
-                        />
-                        {exercise.seconds && (
-                          <Chip 
-                            icon={<AccessTime sx={{ fontSize: '0.8rem' }} />}
-                            label={formatTime(exercise.seconds)} 
-                            size="small"
-                            variant="outlined"
-                            sx={{ fontSize: '0.7rem' }}
-                          />
-                        )}
-                      </Stack>
-                    </Box>
+                  {Array.from(new Set(workout.exercises.map(e => e.exercise_name))).map((exerciseName, index) => (
+                    <Chip 
+                      key={index}
+                      label={exerciseName}
+                      size="small"
+                      variant="outlined"
+                      sx={{ 
+                        mr: 1, 
+                        mb: 1,
+                        fontSize: '0.8rem',
+                        fontWeight: 500
+                      }}
+                    />
                   ))}
                 </Box>
               </Box>
