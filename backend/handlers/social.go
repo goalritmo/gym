@@ -72,17 +72,8 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		ORDER BY ws.created_at DESC
 	`
 
+	fmt.Printf("Query: %s\n", query)
 	fmt.Printf("Ejecutando query con parámetros: fecha=%s, userID=%s\n", today, userID)
-	
-	// Verificar si la tabla user_profiles existe
-	var tableExists bool
-	err = database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name = 'user_profiles' AND table_schema = 'public')").Scan(&tableExists)
-	if err != nil {
-		fmt.Printf("Error verificando tabla user_profiles: %v\n", err)
-		http.Error(w, "Error verificando estructura de base de datos", http.StatusInternalServerError)
-		return
-	}
-	fmt.Printf("Tabla user_profiles existe: %v\n", tableExists)
 	
 	rows, err := database.DB.Query(query, today, userID)
 	if err != nil {
