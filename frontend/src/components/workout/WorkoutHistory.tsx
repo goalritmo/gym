@@ -27,9 +27,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import { es } from 'date-fns/locale'
+
 import { TABS } from '../../constants/tabs'
 import type { Workout, WorkoutDay, ExerciseGroup, WorkoutHistoryProps } from '../../types/workout'
 
@@ -293,39 +291,15 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     }
   };
 
-  // Obtener fechas con ejercicios para el calendario
-  const datesWithWorkouts = useMemo(() => {
-    return workoutSessions.map(session => {
-      // Convertir directamente a formato YYYY-MM-DD para comparaciones consistentes
-      return session.session_date.split('T')[0];
-    });
-  }, [workoutSessions]);
 
-  // Función para verificar si una fecha tiene ejercicios
-  const shouldDisableDate = (date: Date) => {
-    try {
-      // Verificar si la fecha es válida
-      if (isNaN(date.getTime())) {
-        console.error('❌ Fecha inválida en shouldDisableDate:', date);
-        return true;
-      }
-      
-      // Convertir la fecha a formato YYYY-MM-DD para comparación
-      const dateString = date.toISOString().split('T')[0];
-      
-      return !datesWithWorkouts.includes(dateString);
-    } catch (error) {
-      console.error('❌ Error en shouldDisableDate:', error);
-      return true;
-    }
-  };
+
+
 
   // Debug logs
   console.log('🔍 WorkoutHistory Debug:', {
     workoutSessionsCount: workoutSessions.length,
     workoutsCount: workouts.length,
     workoutDaysCount: workoutDays.length,
-    datesWithWorkouts: datesWithWorkouts,
     dateFilter: dateFilter ? dateFilter.toISOString().split('T')[0] : null
   });
 
