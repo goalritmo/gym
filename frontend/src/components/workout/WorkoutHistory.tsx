@@ -76,6 +76,11 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const workoutDays = useMemo(() => {
     const days: WorkoutDay[] = [];
 
+    console.log('🔍 Debug workoutDays:', {
+      sessions: workoutSessions.map(s => ({ id: s.id, session_date: s.session_date })),
+      workouts: workouts.map(w => ({ id: w.id, created_at: w.created_at, exercise_session_id: w.exercise_session_id }))
+    });
+
     workoutSessions.forEach(session => {
 
       // Filtrar workouts por fecha de sesión - simplificado
@@ -83,8 +88,13 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         // Usar solo la fecha sin tiempo para comparar
         const workoutDate = w.created_at.split('T')[0]
         const sessionDate = session.session_date.split('T')[0]
-        return workoutDate === sessionDate
+        const matches = workoutDate === sessionDate
+        console.log(`🔍 Comparando: workout ${w.id} (${workoutDate}) vs session ${session.id} (${sessionDate}) = ${matches}`)
+        return matches
       })
+      
+      console.log(`🔍 Sesión ${session.id}: encontró ${sessionWorkouts.length} workouts`)
+      
       // Agrupar ejercicios por nombre
       const exerciseGroups: ExerciseGroup[] = [];
       const exerciseMap = new Map<string, Workout[]>();
