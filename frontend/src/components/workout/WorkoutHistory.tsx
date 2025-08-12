@@ -77,8 +77,17 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     const days: WorkoutDay[] = [];
 
     console.log('🔍 Debug workoutDays:', {
-      sessions: workoutSessions.map(s => ({ id: s.id, session_date: s.session_date })),
-      workouts: workouts.map(w => ({ id: w.id, created_at: w.created_at, exercise_session_id: w.exercise_session_id }))
+      sessions: workoutSessions.map(s => ({ 
+        id: s.id, 
+        idType: typeof s.id,
+        session_date: s.session_date 
+      })),
+      workouts: workouts.map(w => ({ 
+        id: w.id, 
+        created_at: w.created_at, 
+        exercise_session_id: w.exercise_session_id,
+        sessionIdType: typeof w.exercise_session_id
+      }))
     });
 
     // Agrupar workouts por exercise_session_id en lugar de fecha
@@ -97,8 +106,11 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
       // Filtrar workouts por exercise_session_id
       const sessionWorkouts = workouts.filter(w => {
-        const matches = w.exercise_session_id === session.id
-        console.log(`🔍 Comparando: workout ${w.id} (session_id: ${w.exercise_session_id}) vs session ${session.id} = ${matches}`)
+        // Convertir ambos a string para comparación
+        const workoutSessionId = w.exercise_session_id.toString();
+        const sessionId = session.id.toString();
+        const matches = workoutSessionId === sessionId;
+        console.log(`🔍 Comparando: workout ${w.id} (session_id: ${workoutSessionId}) vs session ${sessionId} = ${matches}`)
         return matches
       })
       
