@@ -64,6 +64,9 @@ func main() {
 	api.HandleFunc("/me", handlers.GetCurrentUserHandler).Methods("GET")
 	api.HandleFunc("/me/stats", handlers.GetUserStatsHandler).Methods("GET")
 
+	// Social endpoints
+	api.HandleFunc("/social/workouts", handlers.GetSocialWorkoutsHandler).Methods("GET")
+
 	// Configurar CORS
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{

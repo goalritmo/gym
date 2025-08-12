@@ -165,6 +165,11 @@ class ApiClient {
   async getUserStats() {
     return this.request('/me/stats')
   }
+
+  // Social API
+  async getSocialWorkouts(): Promise<any[]> {
+    return this.request('/social/workouts')
+  }
 }
 
 // Export singleton instance

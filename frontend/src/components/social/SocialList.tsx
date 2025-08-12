@@ -17,14 +17,13 @@ import {
 } from '@mui/material'
 import { FitnessCenter, TrendingUp, Settings, ThumbUp, ThumbUpOutlined } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
+import { apiClient } from '../../lib/api'
 
 type SocialWorkout = {
-  id: number
-  user: {
-    id: string
-    name: string
-    avatar_url?: string
-  }
+  id: string
+  user_id: string
+  user_name: string
+  user_avatar_url?: string
   date: string
   exercises: {
     exercise_name: string
@@ -36,7 +35,7 @@ type SocialWorkout = {
   total_exercises: number
   total_series: number
   likes: number
-  isLiked: boolean
+  is_liked: boolean
 }
 
 type SocialListProps = {
@@ -65,124 +64,22 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
     }
     
     try {
-      // Por ahora usaremos datos de ejemplo hasta que el backend esté listo
-      const mockData: SocialWorkout[] = [
-        {
-          id: 1,
-          user: {
-            id: '1',
-            name: 'María',
-            avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
-          },
-          date: new Date().toISOString(),
-          exercises: [
-            {
-              exercise_name: 'Press de Banca',
-              weight: 80,
-              reps: 8,
-              seconds: 120,
-              serie: 1
-            },
-            {
-              exercise_name: 'Press de Banca',
-              weight: 80,
-              reps: 6,
-              seconds: 90,
-              serie: 2
-            },
-            {
-              exercise_name: 'Press de Banca',
-              weight: 75,
-              reps: 8,
-              seconds: 100,
-              serie: 3
-            }
-          ],
-          total_exercises: 1,
-          total_series: 3,
-          likes: 3,
-          isLiked: false
-        },
-        {
-          id: 2,
-          user: {
-            id: '2',
-            name: 'Carlos',
-            avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-          },
-          date: new Date().toISOString(),
-          exercises: [
-            {
-              exercise_name: 'Sentadillas',
-              weight: 100,
-              reps: 10,
-              serie: 1
-            },
-            {
-              exercise_name: 'Sentadillas',
-              weight: 100,
-              reps: 8,
-              serie: 2
-            },
-            {
-              exercise_name: 'Peso Muerto',
-              weight: 120,
-              reps: 6,
-              serie: 1
-            },
-            {
-              exercise_name: 'Peso Muerto',
-              weight: 120,
-              reps: 6,
-              serie: 2
-            }
-          ],
-          total_exercises: 2,
-          total_series: 4,
-          likes: 1,
-          isLiked: true
-        },
-        {
-          id: 3,
-          user: {
-            id: '3',
-            name: 'Ana',
-            avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
-          },
-          date: new Date().toISOString(),
-          exercises: [
-            {
-              exercise_name: 'Remo al mentón',
-              weight: 45,
-              reps: 12,
-              seconds: 90,
-              serie: 1
-            },
-            {
-              exercise_name: 'Remo al mentón',
-              weight: 45,
-              reps: 10,
-              seconds: 85,
-              serie: 2
-            }
-          ],
-          total_exercises: 1,
-          total_series: 2,
-          likes: 0,
-          isLiked: false
-        }
-      ]
-      
-      setSocialWorkouts(mockData)
-    } catch (error) {
+      const data = await apiClient.getSocialWorkouts()
+      setSocialWorkouts(data)
+    } catch (error: any) {
       console.error('Error cargando entrenamientos sociales:', error)
-      setError('Error al cargar los entrenamientos')
+      if (error.response?.status === 403) {
+        setError('La funcionalidad social está deshabilitada para tu cuenta')
+      } else {
+        setError('Error cargando entrenamientos sociales')
+      }
+      setSocialWorkouts([])
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleLike = async (workoutId: number) => {
+  const handleLike = async (workoutId: string) => {
     try {
       // Simular llamada al backend
       setSocialWorkouts(prev => 
@@ -190,8 +87,8 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
           workout.id === workoutId 
             ? { 
                 ...workout, 
-                likes: workout.isLiked ? workout.likes - 1 : workout.likes + 1,
-                isLiked: !workout.isLiked 
+                likes: workout.is_liked ? workout.likes - 1 : workout.likes + 1,
+                is_liked: !workout.is_liked 
               }
             : workout
         )
@@ -199,7 +96,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
 
       // En el futuro, aquí se enviaría la notificación al usuario del workout
       const currentWorkout = socialWorkouts.find(w => w.id === workoutId)
-      console.log(`Kudos ${currentWorkout?.isLiked ? 'removido' : 'agregado'} al workout ${workoutId}`)
+      console.log(`Kudos ${currentWorkout?.is_liked ? 'removido' : 'agregado'} al workout ${workoutId}`)
     } catch (error) {
       console.error('Error al dar kudos:', error)
       // Revertir el cambio si hay error
@@ -208,8 +105,8 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
           workout.id === workoutId 
             ? { 
                 ...workout, 
-                likes: workout.isLiked ? workout.likes + 1 : workout.likes - 1,
-                isLiked: !workout.isLiked 
+                        likes: workout.is_liked ? workout.likes + 1 : workout.likes - 1,
+        is_liked: !workout.is_liked 
               }
             : workout
         )
@@ -361,7 +258,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
               {/* Header con usuario y fecha */}
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Avatar 
-                  src={workout.user.avatar_url}
+                  src={workout.user_avatar_url}
                   sx={{ 
                     width: 48, 
                     height: 48, 
@@ -370,11 +267,11 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                     borderColor: 'primary.main'
                   }}
                 >
-                  {workout.user.name.charAt(0)}
+                  {workout.user_name.charAt(0)}
                 </Avatar>
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                    {workout.user.name}
+                    {workout.user_name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {formatWorkoutDate(workout.date)} • {formatDate(workout.date)}
@@ -429,19 +326,19 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                   </Typography>
                 </Box>
                 
-                <Tooltip title={workout.isLiked ? 'Quitar kudos' : 'Dar kudos'}>
+                <Tooltip title={workout.is_liked ? 'Quitar kudos' : 'Dar kudos'}>
                   <IconButton
                     onClick={() => handleLike(workout.id)}
                     sx={{ 
-                      color: workout.isLiked ? 'success.main' : 'text.secondary',
+                      color: workout.is_liked ? 'success.main' : 'text.secondary',
                       '&:hover': {
-                        color: workout.isLiked ? 'success.dark' : 'success.main',
+                        color: workout.is_liked ? 'success.dark' : 'success.main',
                         transform: 'scale(1.1)'
                       },
                       transition: 'all 0.2s ease-in-out'
                     }}
                   >
-                    {workout.isLiked ? <ThumbUp /> : <ThumbUpOutlined />}
+                    {workout.is_liked ? <ThumbUp /> : <ThumbUpOutlined />}
                   </IconButton>
                 </Tooltip>
               </Box>
