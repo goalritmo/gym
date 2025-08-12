@@ -428,13 +428,18 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 fontSize: '1rem',
                 textTransform: 'uppercase',
                 transform: 'translate(14px, -9px) scale(0.75)',
+                backgroundColor: 'primary.main',
+                padding: '0 4px',
+                borderRadius: '2px',
                 '&.Mui-focused': {
                   color: 'white',
                   transform: 'translate(14px, -9px) scale(0.75)',
+                  backgroundColor: 'primary.main',
                 },
                 '&.MuiInputLabel-shrink': {
                   color: 'white',
                   transform: 'translate(14px, -9px) scale(0.75)',
+                  backgroundColor: 'primary.main',
                 }
               }
             }}
