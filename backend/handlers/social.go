@@ -239,6 +239,25 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+
+	// Verificar triggers específicos de workouts
+	var workoutTriggers []string
+	workoutTriggerRows, err := database.DB.Query(`
+		SELECT trigger_name, event_manipulation, action_statement 
+		FROM information_schema.triggers 
+		WHERE trigger_schema = 'public' 
+		AND event_object_table = 'workouts'
+		ORDER BY trigger_name
+	`)
+	if err == nil {
+		defer workoutTriggerRows.Close()
+		for workoutTriggerRows.Next() {
+			var triggerName, eventManipulation, actionStatement string
+			if err := workoutTriggerRows.Scan(&triggerName, &eventManipulation, &actionStatement); err == nil {
+				workoutTriggers = append(workoutTriggers, fmt.Sprintf("%s (%s): %s", triggerName, eventManipulation, actionStatement))
+			}
+		}
+	}
 	
 	response := map[string]interface{}{
 		"all_tables": allTables,
@@ -246,6 +265,7 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 		"workout_sessions_columns": sessionColumns,
 		"workouts_columns": workoutColumns,
 		"user_profiles": userProfiles,
+		"workout_triggers": workoutTriggers,
 	}
 
 	json.NewEncoder(w).Encode(response)
