@@ -13,6 +13,16 @@ import (
 	"github.com/goalritmo/gym/backend/models"
 )
 
+// convertToArgentinaTime convierte una fecha UTC a la zona horaria de Argentina
+func convertToArgentinaTime(utcTime time.Time) time.Time {
+	loc, err := time.LoadLocation("America/Argentina/Buenos_Aires")
+	if err != nil {
+		// Fallback a UTC-3 si no se puede cargar la zona horaria
+		loc = time.FixedZone("UTC-3", -3*60*60)
+	}
+	return utcTime.In(loc)
+}
+
 // GetWorkoutsHandler obtiene la lista de workouts
 func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -79,6 +89,10 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error escaneando workout", http.StatusInternalServerError)
 			return
 		}
+		
+		// Convertir fecha a zona horaria de Argentina
+		workout.CreatedAt = convertToArgentinaTime(workout.CreatedAt)
+		
 		workouts = append(workouts, workout)
 	}
 
@@ -361,6 +375,12 @@ func GetWorkoutSessionsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error escaneando sesión", http.StatusInternalServerError)
 			return
 		}
+		
+		// Convertir fechas a zona horaria de Argentina
+		session.SessionDate = convertToArgentinaTime(session.SessionDate)
+		session.CreatedAt = convertToArgentinaTime(session.CreatedAt)
+		session.UpdatedAt = convertToArgentinaTime(session.UpdatedAt)
+		
 		sessions = append(sessions, session)
 	}
 

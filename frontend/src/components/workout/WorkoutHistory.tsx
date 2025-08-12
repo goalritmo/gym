@@ -53,18 +53,9 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const [deletingWorkoutId, setDeletingWorkoutId] = useState<number | null>(null)
 
   const formatDate = (dateString: string) => {
-    // Si la fecha termina en Z (UTC), la convertimos a zona horaria local
-    let date: Date
-    if (dateString.endsWith('Z')) {
-      // Parsear la fecha UTC y convertirla a zona horaria local
-      const utcDate = new Date(dateString)
-      // Crear una nueva fecha en zona horaria local
-      date = new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000))
-    } else {
-      date = new Date(dateString)
-    }
-    
+    const date = normalizeDate(dateString)
     const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
       day: 'numeric',
       month: 'long',
       year: 'numeric'
@@ -73,7 +64,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   }
 
   const formatDateShort = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = normalizeDate(dateString)
     const options: Intl.DateTimeFormatOptions = {
       day: 'numeric',
       month: 'long'
@@ -231,13 +222,39 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   // Filtrar días por fecha
   const filteredWorkoutDays = workoutDays.filter(day => {
     if (!dateFilter) return true;
-    const dayDate = new Date(day.date);
+    const dayDate = normalizeDate(day.date);
     return dayDate.toDateString() === dateFilter.toDateString();
   });
 
+  // Función para normalizar fechas de Argentina
+  const normalizeDate = (dateString: string): Date => {
+    const date = new Date(dateString);
+    
+    // Si la fecha termina en 'Z', es UTC, convertir a Argentina (UTC-3)
+    if (dateString.endsWith('Z')) {
+      // Crear una nueva fecha en zona horaria de Argentina
+      return new Date(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        date.getUTCSeconds()
+      );
+    }
+    
+    // Si ya tiene offset de Argentina (-03:00), usar directamente
+    if (dateString.includes('-03:00')) {
+      return date;
+    }
+    
+    // Para otras fechas, asumir que ya están en zona horaria local
+    return date;
+  };
+
   // Obtener fechas con ejercicios para el calendario
   const datesWithWorkouts = useMemo(() => {
-    return workoutSessions.map(session => new Date(session.session_date));
+    return workoutSessions.map(session => normalizeDate(session.session_date));
   }, [workoutSessions]);
 
   // Función para verificar si una fecha tiene ejercicios
@@ -414,7 +431,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               textField: {
                 sx: {
                   width: '100%',
-                                   '& .MuiOutlinedInput-root': {
+
+                  '& .MuiOutlinedInput-root': {
                    bgcolor: 'transparent !important',
                    border: '1px solid #1976d2 !important',
                    borderRadius: 2,
@@ -460,12 +478,14 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                    px: 1,
                    borderRadius: 1,
                    '&.Mui-focused': {
-                     transform: 'translate(14px, -9px) scale(0)',
-                     opacity: 0
+                     color: 'white !important',
+                     transform: 'translate(14px, -9px) scale(0.75)',
+                     opacity: 1
                    },
                    '&.MuiInputLabel-shrink': {
-                     transform: 'translate(14px, -9px) scale(0)',
-                     opacity: 0
+                     color: 'white !important',
+                     transform: 'translate(14px, -9px) scale(0.75)',
+                     opacity: 1
                    }
                  },
                  '& .MuiFormLabel-root': {
