@@ -135,3 +135,72 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Encontrados %d entrenamientos sociales\n", len(socialWorkouts))
 	json.NewEncoder(w).Encode(socialWorkouts)
 }
+
+// DebugHandler es un endpoint temporal para debug
+func DebugHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Verificar si las tablas existen
+	tables := []string{"workout_sessions", "workouts", "exercises", "users"}
+	tableInfo := make(map[string]interface{})
+
+	for _, table := range tables {
+		var count int
+		err := database.DB.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s", table)).Scan(&count)
+		if err != nil {
+			tableInfo[table] = map[string]interface{}{
+				"exists": false,
+				"error":  err.Error(),
+			}
+		} else {
+			tableInfo[table] = map[string]interface{}{
+				"exists": true,
+				"count":  count,
+			}
+		}
+	}
+
+	// Verificar estructura de workout_sessions
+	var sessionColumns []string
+	rows, err := database.DB.Query(`
+		SELECT column_name, data_type 
+		FROM information_schema.columns 
+		WHERE table_name = 'workout_sessions' 
+		ORDER BY ordinal_position
+	`)
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var colName, dataType string
+			if err := rows.Scan(&colName, &dataType); err == nil {
+				sessionColumns = append(sessionColumns, fmt.Sprintf("%s (%s)", colName, dataType))
+			}
+		}
+	}
+
+	// Verificar estructura de workouts
+	var workoutColumns []string
+	rows2, err := database.DB.Query(`
+		SELECT column_name, data_type 
+		FROM information_schema.columns 
+		WHERE table_name = 'workouts' 
+		ORDER BY ordinal_position
+	`)
+	if err == nil {
+		defer rows2.Close()
+		for rows2.Next() {
+			var colName, dataType string
+			if err := rows2.Scan(&colName, &dataType); err == nil {
+				workoutColumns = append(workoutColumns, fmt.Sprintf("%s (%s)", colName, dataType))
+			}
+		}
+	}
+
+	response := map[string]interface{}{
+		"tables": tableInfo,
+		"workout_sessions_columns": sessionColumns,
+		"workouts_columns": workoutColumns,
+	}
+
+	json.NewEncoder(w).Encode(response)
+}

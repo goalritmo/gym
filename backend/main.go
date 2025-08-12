@@ -67,6 +67,9 @@ func main() {
 	// Social endpoints
 	api.HandleFunc("/social/workouts", handlers.GetSocialWorkoutsHandler).Methods("GET")
 
+	// Debug endpoint (temporal)
+	api.HandleFunc("/debug", handlers.DebugHandler).Methods("GET")
+
 	// Configurar CORS
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{
