@@ -225,11 +225,13 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	
 
 	
-	fmt.Printf("Insertando workout con sessionID: %d\n", sessionID)
+	// Convertir sessionID (bigint) a formato UUID
+	sessionUUID := fmt.Sprintf("00000000-0000-0000-0000-%012d", sessionID)
+	fmt.Printf("Insertando workout con sessionID: %d, UUID: %s\n", sessionID, sessionUUID)
 	err = database.DB.QueryRow(
 		query,
 		userID, req.ExerciseID, req.Weight, req.Reps,
-		serieValue, secondsValue, req.Observations, sessionID,
+		serieValue, secondsValue, req.Observations, sessionUUID,
 	).Scan(&workout.ID, &workout.ExerciseSessionID, &workout.CreatedAt)
 
 	if err != nil {
