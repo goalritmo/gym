@@ -257,12 +257,9 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const filteredWorkoutDays = workoutDays.filter(day => {
     if (!dateFilter) return true;
     try {
-      const dayDate = normalizeDate(day.date);
-      const filterDate = new Date(dateFilter);
-      
-      // Convertir ambas fechas a formato YYYY-MM-DD para comparación
-      const dayString = dayDate.toISOString().split('T')[0];
-      const filterString = filterDate.toISOString().split('T')[0];
+      // Extraer solo la fecha (YYYY-MM-DD) de la fecha de la sesión
+      const dayString = day.date.split('T')[0];
+      const filterString = dateFilter.toISOString().split('T')[0];
       
       console.log('🔍 Comparando fechas:', {
         dayDate: dayString,
@@ -421,64 +418,78 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
           color: 'white'
         }}>
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
-          <DatePicker
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+          <TextField
+            type="date"
             label="Filtrar por fecha"
-            value={dateFilter}
-            onChange={(newValue: Date | null) => {
+            value={dateFilter ? dateFilter.toISOString().split('T')[0] : ''}
+            onChange={(e) => {
               try {
-                console.log('🔍 DatePicker onChange:', { newValue, type: typeof newValue });
-                setDateFilter(newValue);
+                const dateValue = e.target.value;
+                console.log('🔍 Date input onChange:', dateValue);
+                if (dateValue) {
+                  setDateFilter(new Date(dateValue + 'T00:00:00'));
+                } else {
+                  setDateFilter(null);
+                }
               } catch (error) {
-                console.error('❌ Error en DatePicker onChange:', error);
+                console.error('❌ Error en date input onChange:', error);
                 setDateFilter(null);
               }
             }}
-            shouldDisableDate={shouldDisableDate}
-            slotProps={{
-              textField: {
-                sx: {
-                  width: '100%',
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: 'transparent',
-                    border: '1px solid white',
-                    borderRadius: 2,
-                    '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 0.1)',
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'transparent',
-                      borderColor: 'white',
-                    },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'transparent'
-                    }
-                  },
-                  '& .MuiInputBase-input': {
-                    color: 'white',
-                    fontSize: '1rem',
-                    fontWeight: 500,
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: 'white',
-                    fontWeight: 600,
-                    fontSize: '1rem',
-                    '&.Mui-focused': {
-                      color: 'white',
-                    },
-                    '&.MuiInputLabel-shrink': {
-                      color: 'white',
-                    }
-                  },
-                  '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-                    color: 'white',
-                    fontSize: '1.4rem',
-                  }
+            sx={{
+              flex: 1,
+              minWidth: 200,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'transparent',
+                border: '1px solid white',
+                borderRadius: 2,
+                '&:hover': {
+                  bgcolor: 'rgba(255, 255, 255, 0.1)',
+                },
+                '&.Mui-focused': {
+                  bgcolor: 'transparent',
+                  borderColor: 'white',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'transparent'
+                }
+              },
+              '& .MuiInputBase-input': {
+                color: 'white',
+                fontSize: '1rem',
+                fontWeight: 500,
+              },
+              '& .MuiInputLabel-root': {
+                color: 'white',
+                fontWeight: 600,
+                fontSize: '1rem',
+                '&.Mui-focused': {
+                  color: 'white',
+                },
+                '&.MuiInputLabel-shrink': {
+                  color: 'white',
                 }
               }
             }}
           />
-        </LocalizationProvider>
+          {dateFilter && (
+            <Button
+              variant="outlined"
+              onClick={() => setDateFilter(null)}
+              sx={{
+                color: 'white',
+                borderColor: 'white',
+                '&:hover': {
+                  borderColor: 'white',
+                  bgcolor: 'rgba(255, 255, 255, 0.1)',
+                }
+              }}
+            >
+              Limpiar
+            </Button>
+          )}
+        </Box>
       </Box>
 
         {/* Cards de entrenamientos */}
