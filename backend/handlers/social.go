@@ -79,7 +79,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			) as exercises
 		FROM workout_sessions ws
 		LEFT JOIN user_profiles up ON ws.user_id = up.user_id
-		LEFT JOIN workouts w ON ws.id::text = SPLIT_PART(w.exercise_session_id::text, '-', 5)
+		LEFT JOIN workouts w ON w.exercise_session_id = CONCAT('00000000-0000-0000-0000-', LPAD(ws.id::text, 12, '0'))
 		LEFT JOIN exercises e ON w.exercise_id = e.id
 		WHERE DATE(ws.created_at) = $1
 		AND ws.user_id != $2
@@ -224,11 +224,34 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Verificar datos de user_profiles
+	var userProfiles []map[string]interface{}
+	profileRows, err := database.DB.Query(`
+		SELECT user_id, name, avatar_url, created_at 
+		FROM user_profiles 
+		ORDER BY created_at DESC
+	`)
+	if err == nil {
+		defer profileRows.Close()
+		for profileRows.Next() {
+			var userID, name, avatarURL, createdAt string
+			if err := profileRows.Scan(&userID, &name, &avatarURL, &createdAt); err == nil {
+				userProfiles = append(userProfiles, map[string]interface{}{
+					"user_id": userID,
+					"name": name,
+					"avatar_url": avatarURL,
+					"created_at": createdAt,
+				})
+			}
+		}
+	}
+	
 	response := map[string]interface{}{
 		"all_tables": allTables,
 		"tables": tableInfo,
 		"workout_sessions_columns": sessionColumns,
 		"workouts_columns": workoutColumns,
+		"user_profiles": userProfiles,
 	}
 
 	json.NewEncoder(w).Encode(response)
