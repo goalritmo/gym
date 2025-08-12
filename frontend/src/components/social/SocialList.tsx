@@ -204,7 +204,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
     )
   }
 
-  if (socialWorkouts.length === 0) {
+  if (!socialWorkouts || socialWorkouts.length === 0) {
     return (
       <Box sx={{ p: 3 }}>
         <Paper 
@@ -244,7 +244,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
       </Typography>
 
       <Stack spacing={3}>
-        {socialWorkouts.map((workout) => (
+        {socialWorkouts?.map((workout) => (
           <Card 
             key={workout.id} 
             sx={{ 
