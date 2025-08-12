@@ -33,7 +33,7 @@ export default function FloatingNavButton({ currentTab, onTabChange }: FloatingN
         }
       }
     } else {
-      // En otras tabs (EXERCISES, EQUIPMENT), ocultar el botón
+      // En otras tabs (EXERCISES, EQUIPMENT, SOCIAL, NOTIFICATIONS), ocultar el botón
       setIsVisible(false)
     }
   }, [currentTab])

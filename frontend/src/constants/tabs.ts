@@ -3,7 +3,9 @@ export const TABS = {
   WORKOUT: 0,
   EXERCISES: 1,
   EQUIPMENT: 2,
-  HISTORY: 3
+  HISTORY: 3,
+  SOCIAL: 4,
+  NOTIFICATIONS: 5
 } as const
 
 export type TabType = typeof TABS[keyof typeof TABS]

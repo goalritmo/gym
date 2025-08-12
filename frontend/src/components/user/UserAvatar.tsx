@@ -10,10 +10,14 @@ import {
   Box,
   IconButton
 } from '@mui/material'
-import { Logout as LogoutIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon, Settings as SettingsIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 
-export default function UserAvatar() {
+type UserAvatarProps = {
+  onOpenSettings?: () => void
+}
+
+export default function UserAvatar({ onOpenSettings }: UserAvatarProps) {
   const { user, logout } = useAuth()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -29,6 +33,13 @@ export default function UserAvatar() {
   const handleLogout = async () => {
     handleClose()
     await logout()
+  }
+
+  const handleOpenSettings = () => {
+    handleClose()
+    if (onOpenSettings) {
+      onOpenSettings()
+    }
   }
 
   // Función para obtener iniciales del usuario
@@ -135,6 +146,14 @@ export default function UserAvatar() {
         </Box>
 
         <Divider />
+
+        {/* Opción de configuración */}
+        <MenuItem onClick={handleOpenSettings}>
+          <ListItemIcon>
+            <SettingsIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Configuración</ListItemText>
+        </MenuItem>
 
         {/* Opción de logout */}
         <MenuItem onClick={handleLogout}>

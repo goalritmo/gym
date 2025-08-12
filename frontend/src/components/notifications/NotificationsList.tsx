@@ -1,0 +1,358 @@
+import { useState, useEffect } from 'react'
+import { 
+  Box, 
+  Typography, 
+  Card, 
+  CardContent, 
+  Stack, 
+  Chip, 
+  CircularProgress,
+  Alert,
+  Paper,
+  Avatar
+} from '@mui/material'
+import { 
+  Notifications, 
+  Info, 
+  ThumbUp, 
+  Announcement
+} from '@mui/icons-material'
+
+type NotificationType = 'general' | 'kudos' | 'announcement'
+
+type Notification = {
+  id: string
+  type: NotificationType
+  title: string
+  message: string
+  created_at: string
+  read: boolean
+  // Para likes
+  from_user?: {
+    id: string
+    name: string
+    avatar_url?: string
+  }
+  workout?: {
+    id: number
+    exercise_name: string
+  }
+  // Para anuncios generales
+  priority?: 'low' | 'medium' | 'high'
+}
+
+export default function NotificationsList() {
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    loadNotifications()
+  }, [])
+
+  const loadNotifications = async () => {
+    setIsLoading(true)
+    setError('')
+    
+    try {
+      // Datos de ejemplo - en el futuro vendrán del backend
+      const mockNotifications: Notification[] = [
+        {
+          id: '1',
+          type: 'announcement',
+          title: 'Gimnasio cerrado por la tarde',
+          message: 'El gimnasio estará cerrado hoy de 14:00 a 18:00 por mantenimiento. Disculpen las molestias.',
+          created_at: new Date().toISOString(),
+          read: false,
+          priority: 'high'
+        },
+        {
+          id: '2',
+          type: 'kudos',
+          title: 'Nuevo kudos en tu entrenamiento',
+          message: 'María dio kudos a tu entrenamiento de Press de Banca',
+          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 horas atrás
+          read: false,
+          from_user: {
+            id: '1',
+            name: 'María',
+            avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
+          },
+          workout: {
+            id: 1,
+            exercise_name: 'Press de Banca'
+          }
+        },
+        {
+          id: '3',
+          type: 'kudos',
+          title: 'Nuevo kudos en tu entrenamiento',
+          message: 'Carlos dio kudos a tu entrenamiento de Sentadillas',
+          created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 horas atrás
+          read: true,
+          from_user: {
+            id: '2',
+            name: 'Carlos',
+            avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+          },
+          workout: {
+            id: 2,
+            exercise_name: 'Sentadillas'
+          }
+        },
+        {
+          id: '4',
+          type: 'general',
+          title: 'Nuevo equipamiento disponible',
+          message: 'Ya está disponible el nuevo rack de sentadillas en la zona de peso libre.',
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 día atrás
+          read: true,
+          priority: 'medium'
+        }
+      ]
+      
+      setNotifications(mockNotifications)
+    } catch (error) {
+      console.error('Error cargando notificaciones:', error)
+      setError('Error al cargar las notificaciones')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const markAsRead = (notificationId: string) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === notificationId 
+          ? { ...notif, read: true }
+          : notif
+      )
+    )
+  }
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+    
+    if (diffInHours < 1) {
+      return 'Hace unos minutos'
+    } else if (diffInHours === 1) {
+      return 'Hace 1 hora'
+    } else if (diffInHours < 24) {
+      return `Hace ${diffInHours} horas`
+    } else {
+      const diffInDays = Math.floor(diffInHours / 24)
+      if (diffInDays === 1) {
+        return 'Ayer'
+      } else {
+        return `Hace ${diffInDays} días`
+      }
+    }
+  }
+
+  const getNotificationIcon = (type: NotificationType, priority?: string) => {
+    switch (type) {
+      case 'announcement':
+        return <Announcement sx={{ color: priority === 'high' ? 'error.main' : 'warning.main' }} />
+      case 'kudos':
+        return <ThumbUp sx={{ color: 'success.main' }} />
+      case 'general':
+        return <Info sx={{ color: 'info.main' }} />
+      default:
+        return <Notifications />
+    }
+  }
+
+  const getNotificationColor = (type: NotificationType, priority?: string) => {
+    switch (type) {
+      case 'announcement':
+        return priority === 'high' ? 'error' : 'warning'
+      case 'kudos':
+        return 'success'
+      case 'general':
+        return 'info'
+      default:
+        return 'default'
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '60vh' 
+      }}>
+        <CircularProgress size={60} />
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      </Box>
+    )
+  }
+
+  if (notifications.length === 0) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 4, 
+            textAlign: 'center',
+            backgroundColor: 'grey.50',
+            borderRadius: 2
+          }}
+        >
+          <Notifications sx={{ fontSize: 60, color: 'grey.400', mb: 2 }} />
+          <Typography variant="h6" color="text.secondary" gutterBottom>
+            No hay notificaciones
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Te notificaremos cuando haya novedades importantes
+          </Typography>
+        </Paper>
+      </Box>
+    )
+  }
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  return (
+    <Box sx={{ p: 2, maxWidth: 600, mx: 'auto' }}>
+      <Typography 
+        variant="h4" 
+        gutterBottom 
+        sx={{ 
+          mb: 3, 
+          textAlign: 'center', 
+          color: 'primary.main', 
+          fontWeight: 'bold' 
+        }}
+      >
+        Notificaciones
+        {unreadCount > 0 && (
+          <Chip 
+            label={unreadCount} 
+            color="error" 
+            size="small" 
+            sx={{ ml: 2, fontWeight: 'bold' }}
+          />
+        )}
+      </Typography>
+
+      <Stack spacing={2}>
+        {notifications.map((notification) => (
+          <Card 
+            key={notification.id} 
+            sx={{ 
+              boxShadow: notification.read ? 1 : 3,
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: notification.read ? 'divider' : 'primary.main',
+              backgroundColor: notification.read ? 'background.paper' : 'primary.50',
+              opacity: notification.read ? 0.8 : 1,
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                boxShadow: 4,
+                transform: 'translateY(-1px)'
+              }
+            }}
+            onClick={() => markAsRead(notification.id)}
+          >
+            <CardContent sx={{ p: 3 }}>
+              {/* Header con icono y fecha */}
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  width: 40, 
+                  height: 40, 
+                  borderRadius: '50%',
+                  backgroundColor: `${getNotificationColor(notification.type, notification.priority)}.light`,
+                  mr: 2,
+                  flexShrink: 0
+                }}>
+                  {getNotificationIcon(notification.type, notification.priority)}
+                </Box>
+                
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                    {notification.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {formatDate(notification.created_at)}
+                  </Typography>
+                </Box>
+
+                {!notification.read && (
+                  <Box sx={{ 
+                    width: 8, 
+                    height: 8, 
+                    borderRadius: '50%', 
+                    backgroundColor: 'primary.main',
+                    flexShrink: 0
+                  }} />
+                )}
+              </Box>
+
+              {/* Mensaje */}
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                {notification.message}
+              </Typography>
+
+              {/* Información adicional para kudos */}
+              {notification.type === 'kudos' && notification.from_user && (
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  p: 2, 
+                  backgroundColor: 'grey.50',
+                  borderRadius: 1,
+                  mt: 2
+                }}>
+                  <Avatar 
+                    src={notification.from_user.avatar_url}
+                    sx={{ width: 32, height: 32, mr: 2 }}
+                  >
+                    {notification.from_user.name.charAt(0)}
+                  </Avatar>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {notification.from_user.name}
+                    </Typography>
+                    {notification.workout && (
+                      <Typography variant="caption" color="text.secondary">
+                        Ejercicio: {notification.workout.exercise_name}
+                      </Typography>
+                    )}
+                  </Box>
+                  <ThumbUp sx={{ color: 'success.main', fontSize: 20 }} />
+                </Box>
+              )}
+
+              {/* Prioridad para anuncios */}
+              {notification.type === 'announcement' && notification.priority && (
+                <Chip 
+                  label={notification.priority === 'high' ? 'Importante' : 'Información'} 
+                  color={getNotificationColor(notification.type, notification.priority) as any}
+                  size="small"
+                  sx={{ mt: 2 }}
+                />
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </Stack>
+    </Box>
+  )
+}

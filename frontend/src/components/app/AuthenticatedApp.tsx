@@ -5,14 +5,18 @@ import WorkoutForm from '../workout/WorkoutForm'
 import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
 import WorkoutHistory from '../workout/WorkoutHistory'
+import SocialList from '../social/SocialList'
+import NotificationsList from '../notifications/NotificationsList'
 import FloatingNavButton from '../navigation/FloatingNavButton'
+import SettingsModal from '../settings/SettingsModal'
+import { UserSettingsProvider } from '../../contexts/UserSettingsContext'
 import type { Workout, WorkoutSession } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { apiClient } from '../../lib/api'
 import { TABS, type TabType } from '../../constants/tabs'
 
-export default function AuthenticatedApp() {
+function AuthenticatedAppContent() {
   const { activeTab, setActiveTab } = useTab()
   const { isLoggingOut, isSigningIn } = useAuth()
   const [workouts, setWorkouts] = useState<Workout[]>([])
@@ -22,6 +26,7 @@ export default function AuthenticatedApp() {
   const [isLoading, setIsLoading] = useState(false)
   const [deleteMessage, setDeleteMessage] = useState('')
   const [deleteError, setDeleteError] = useState('')
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
   // Función para cargar datos desde el backend
   const loadData = async () => {
@@ -85,6 +90,14 @@ export default function AuthenticatedApp() {
 
   const handleTabChange = (newValue: TabType) => {
     setActiveTab(newValue)
+  }
+
+  const handleOpenSettings = () => {
+    setSettingsModalOpen(true)
+  }
+
+  const handleCloseSettings = () => {
+    setSettingsModalOpen(false)
   }
 
   // Función para manejar el envío del formulario de workout
@@ -183,7 +196,11 @@ export default function AuthenticatedApp() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
+              <Navigation 
+          activeTab={activeTab} 
+          onTabChange={handleTabChange}
+          onOpenSettings={handleOpenSettings}
+        />
       
       <Box sx={{ 
         flexGrow: 1, 
@@ -327,6 +344,20 @@ export default function AuthenticatedApp() {
             />
           </Box>
         )}
+
+        {/* Pestaña Social */}
+        {activeTab === TABS.SOCIAL && (
+          <Box>
+            <SocialList onOpenSettings={handleOpenSettings} />
+          </Box>
+        )}
+
+        {/* Pestaña Notificaciones */}
+        {activeTab === TABS.NOTIFICATIONS && (
+          <Box>
+            <NotificationsList />
+          </Box>
+        )}
       </Box>
 
       {/* Notificaciones para eliminación */}
@@ -432,6 +463,20 @@ export default function AuthenticatedApp() {
         currentTab={activeTab} 
         onTabChange={handleTabChange} 
       />
+
+      {/* Modal de configuración */}
+      <SettingsModal 
+        open={settingsModalOpen} 
+        onClose={handleCloseSettings} 
+      />
     </Box>
+  )
+}
+
+export default function AuthenticatedApp() {
+  return (
+    <UserSettingsProvider>
+      <AuthenticatedAppContent />
+    </UserSettingsProvider>
   )
 }
