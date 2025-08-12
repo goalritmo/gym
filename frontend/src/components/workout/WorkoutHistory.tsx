@@ -52,12 +52,11 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
 
   // Función para normalizar fecha a zona horaria de Argentina
   const normalizeDate = (dateString: string) => {
-    const date = new Date(dateString)
-    console.log('🔍 normalizeDate - Input:', dateString, 'Parsed date:', date.toISOString())
+    console.log('🔍 normalizeDate - Input:', dateString)
     
-    // Si la fecha ya está en formato YYYY-MM-DD, no necesitamos ajustar timezone
     if (dateString.includes('T')) {
       // Es un timestamp completo, ajustar a Argentina
+      const date = new Date(dateString)
       const argentinaOffset = -3 * 60 * 60 * 1000 // -3 horas en milisegundos
       const argentinaTime = new Date(date.getTime() + argentinaOffset)
       console.log('🔍 normalizeDate - Adjusted to Argentina:', argentinaTime.toISOString())
@@ -65,7 +64,8 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     } else {
       // Es solo una fecha (YYYY-MM-DD), crear en zona horaria de Argentina
       const [year, month, day] = dateString.split('-').map(Number)
-      const argentinaTime = new Date(year, month - 1, day) // month - 1 porque JS usa 0-indexed months
+      // Crear fecha en UTC pero representando el día en Argentina
+      const argentinaTime = new Date(Date.UTC(year, month - 1, day, 3, 0, 0)) // 3:00 UTC = 00:00 Argentina
       console.log('🔍 normalizeDate - Created in Argentina timezone:', argentinaTime.toISOString())
       return argentinaTime
     }
