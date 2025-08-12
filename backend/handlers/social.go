@@ -60,15 +60,30 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		SELECT 
 			ws.id as session_id,
 			ws.user_id,
-			'Usuario' as user_name,
-			'' as user_avatar_url,
+			COALESCE(up.name, 'Usuario') as user_name,
+			COALESCE(up.avatar_url, '') as user_avatar_url,
 			ws.created_at as workout_date,
-			0 as total_exercises,
-			0 as total_series,
-			'[]'::json as exercises
+			COALESCE(COUNT(DISTINCT w.exercise_id), 0) as total_exercises,
+			COALESCE(COUNT(w.id), 0) as total_series,
+			COALESCE(
+				json_agg(
+					json_build_object(
+						'exercise_name', e.name,
+						'weight', w.weight,
+						'reps', w.reps,
+						'seconds', w.seconds,
+						'serie', w.serie
+					) ORDER BY w.serie
+				) FILTER (WHERE w.id IS NOT NULL),
+				'[]'::json
+			) as exercises
 		FROM workout_sessions ws
+		LEFT JOIN user_profiles up ON ws.user_id = up.user_id
+		LEFT JOIN workouts w ON ws.id::text = w.exercise_session_id::text
+		LEFT JOIN exercises e ON w.exercise_id = e.id
 		WHERE DATE(ws.created_at) = $1
 		AND ws.user_id != $2
+		GROUP BY ws.id, ws.user_id, ws.created_at, up.name, up.avatar_url
 		ORDER BY ws.created_at DESC
 	`
 
