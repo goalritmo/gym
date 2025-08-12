@@ -272,24 +272,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     }
   });
 
-  // Función para normalizar fechas de Argentina
-  const normalizeDate = (dateString: string): Date => {
-    try {
-      const date = new Date(dateString);
-      
-      // Verificar si la fecha es válida
-      if (isNaN(date.getTime())) {
-        console.error('❌ Fecha inválida:', dateString);
-        return new Date();
-      }
-      
-      // Las fechas del backend ya vienen en formato correcto, no necesitan conversión
-      return date;
-    } catch (error) {
-      console.error('❌ Error normalizando fecha:', dateString, error);
-      return new Date();
-    }
-  };
+
 
 
 
