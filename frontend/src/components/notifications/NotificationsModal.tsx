@@ -270,7 +270,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2 }}>
+      <DialogContent sx={{ pt: 2, px: 3, pb: 3 }}>
         {isLoading ? (
           <Box sx={{ 
             display: 'flex', 
@@ -303,7 +303,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
             </Typography>
           </Paper>
         ) : (
-          <Stack spacing={2}>
+          <Stack spacing={2} sx={{ maxWidth: 600, mx: 'auto' }}>
             {notifications.map((notification) => (
               <Card 
                 key={notification.id} 
@@ -311,8 +311,8 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                   boxShadow: notification.read ? 1 : 3,
                   borderRadius: 2,
                   border: '1px solid',
-                  borderColor: notification.read ? 'divider' : 'primary.main',
-                  backgroundColor: notification.read ? 'background.paper' : 'primary.50',
+                  borderColor: notification.read ? 'divider' : 'divider',
+                  backgroundColor: notification.read ? 'background.paper' : 'grey.50',
                   opacity: notification.read ? 0.8 : 1,
                   transition: 'all 0.2s ease-in-out',
                   '&:hover': {
@@ -402,23 +402,24 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                     </Box>
                   )}
 
-                  {/* Prioridad para anuncios */}
-                  {notification.type === 'announcement' && notification.priority && (
-                    <Chip 
-                      label={notification.priority === 'high' ? 'Importante' : 'Información'} 
-                      color={getNotificationColor(notification.type, notification.priority) as any}
-                      size="small"
-                      sx={{ mt: 2 }}
-                    />
-                  )}
-
-                  {/* Botón Marcar como leída */}
-                  {!notification.read && (
-                    <Box sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'flex-end', 
-                      mt: 2 
-                    }}>
+                  {/* Prioridad para anuncios y botón marcar como leída */}
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    mt: 2 
+                  }}>
+                    <Box>
+                      {notification.type === 'announcement' && notification.priority && (
+                        <Chip 
+                          label={notification.priority === 'high' ? 'Importante' : 'Información'} 
+                          color={getNotificationColor(notification.type, notification.priority) as any}
+                          size="small"
+                        />
+                      )}
+                    </Box>
+                    
+                    {!notification.read && (
                       <Button
                         size="small"
                         variant="outlined"
@@ -441,8 +442,8 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                       >
                         Marcar como leída
                       </Button>
-                    </Box>
-                  )}
+                    )}
+                  </Box>
                 </CardContent>
               </Card>
             ))}

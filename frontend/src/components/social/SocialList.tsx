@@ -389,13 +389,14 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                   sx={{ 
                     fontWeight: 'bold', 
                     mb: 1,
-                    fontSize: { xs: '1rem', sm: '1.25rem' }
+                    fontSize: { xs: '1rem', sm: '1.25rem' },
+                    textAlign: 'left'
                   }}
                 >
                   Entrenamiento del día
                 </Typography>
                 
-                <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
+                <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ mb: 2, justifyContent: 'flex-start' }}>
                   <Chip 
                     icon={<FitnessCenter />}
                     label={`${workout.total_exercises} ejercicio${workout.total_exercises > 1 ? 's' : ''}`} 
@@ -411,23 +412,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                   />
                 </Stack>
 
-                {/* Píldoras de ejercicios únicos */}
-                <Box sx={{ mt: 2 }}>
-                  {Array.from(new Set(workout.exercises.map(e => e.exercise_name))).map((exerciseName, index) => (
-                    <Chip 
-                      key={index}
-                      label={exerciseName}
-                      size="small"
-                      variant="outlined"
-                      sx={{ 
-                        mr: 1, 
-                        mb: 1,
-                        fontSize: '0.8rem',
-                        fontWeight: 500
-                      }}
-                    />
-                  ))}
-                </Box>
+
               </Box>
 
               <Divider sx={{ my: 2 }} />
