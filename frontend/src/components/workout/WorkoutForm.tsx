@@ -257,106 +257,103 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           </FormControl>
         </Box>
 
-        <Box>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AccessTime color="primary" />
-            Tiempo de Serie
-          </Typography>
-          
-          {/* Mensaje educativo */}
-          <Alert 
-            severity="info" 
-            icon={false}
-            sx={{ 
-              mb: 3, 
-              borderRadius: 2,
-              bgcolor: 'rgba(33, 150, 243, 0.04)',
-              border: '1px solid rgba(33, 150, 243, 0.2)',
-              p: 2, // Reducir padding del contenedor
-              '& .MuiAlert-message': {
+        {settings.showWorkoutSection && (
+          <Box>
+            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <AccessTime color="primary" />
+              Tiempo de Serie
+            </Typography>
+            
+            {/* Mensaje educativo */}
+            <Alert 
+              severity="info" 
+              icon={false}
+              sx={{ 
+                mb: 3, 
+                borderRadius: 2,
+                bgcolor: 'rgba(33, 150, 243, 0.04)',
+                border: '1px solid rgba(33, 150, 243, 0.2)',
+                p: 2, // Reducir padding del contenedor
+                '& .MuiAlert-message': {
+                  width: '100%',
+                  textAlign: 'left'
+                }
+              }}
+            >
+              <Typography variant="caption" sx={{ 
+                fontWeight: 600, 
+                color: 'primary.main', 
+                mb: 1, 
+                textAlign: 'left', 
+                fontSize: '0.8rem',
+                display: 'block'
+              }}>
+                💡 Tips para maximizar resultados
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ 
+                lineHeight: 1.6, 
+                width: '100%', 
+                textAlign: 'left', 
+                fontSize: '0.75rem',
+                display: 'block',
+                mb: 1
+              }}>
+                <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Este registro te va a permitir mejorar la técnica y comparar tu progreso.
+              </Typography>
+              <Box sx={{ 
+                display: 'flex', 
+                gap: 0.8, 
+                mt: 1, 
+                justifyContent: 'space-between',
                 width: '100%',
-                textAlign: 'left'
-              }
-            }}
-          >
-            <Typography variant="caption" sx={{ 
-              fontWeight: 600, 
-              color: 'primary.main', 
-              mb: 1, 
-              textAlign: 'left', 
-              fontSize: '0.8rem',
-              display: 'block'
-            }}>
-              💡 Tips para maximizar resultados
-            </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ 
-              lineHeight: 1.6, 
-              width: '100%', 
-              textAlign: 'left', 
-              fontSize: '0.75rem',
-              display: 'block',
-              mb: 1
-            }}>
-              <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Este registro te va a permitir mejorar la técnica y comparar tu progreso.
-            </Typography>
-            <Box sx={{ 
-              display: 'flex', 
-              gap: 0.8, 
-              mt: 1, 
-              justifyContent: 'space-between',
-              width: '100%',
-              '& > div': {
-                bgcolor: 'rgba(255,255,255,0.8)',
-                px: 0.8,
-                py: 0.6,
-                borderRadius: 1,
-                border: '1px solid rgba(33, 150, 243, 0.1)',
-                textAlign: 'center',
-                flex: 1,
-                minWidth: 0
-              }
-            }}>
-              <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
-                  Fuerza:
-                </Typography>
-                <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
-                  20-40s
-                </Typography>
+                '& > div': {
+                  bgcolor: 'rgba(255,255,255,0.8)',
+                  px: 0.8,
+                  py: 0.6,
+                  borderRadius: 1,
+                  border: '1px solid rgba(33, 150, 243, 0.1)',
+                  textAlign: 'center',
+                  flex: 1,
+                  minWidth: 0
+                }
+              }}>
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
+                    Fuerza:
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
+                    20-40s
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
+                    Hipertrofia:
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
+                    40-60s
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
+                    Resistencia:
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
+                    60s+
+                  </Typography>
+                </Box>
               </Box>
-              <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
-                  Hipertrofia:
-                </Typography>
-                <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
-                  40-60s
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
-                  Resistencia:
-                </Typography>
-                <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
-                  60s+
-                </Typography>
-              </Box>
-            </Box>
-          </Alert>
+            </Alert>
 
-          {/* Cronómetro y campo de segundos */}
-          {settings.showWorkoutSection && (
-            <Box>
-              {/* Cronómetro */}
-              <Box sx={{ width: '100%' }}>
-                <TimerComponent 
-                  onTimeComplete={handleTimerComplete} 
-                  onTimeUpdate={handleTimerUpdate}
-                  disabled={isLoading} 
-                />
-              </Box>
+            {/* Cronómetro */}
+            <Box sx={{ width: '100%' }}>
+              <TimerComponent 
+                onTimeComplete={handleTimerComplete} 
+                onTimeUpdate={handleTimerUpdate}
+                disabled={isLoading} 
+              />
             </Box>
-          )}
-        </Box>
+          </Box>
+        )}
 
         <TextField
           label="Observaciones"
