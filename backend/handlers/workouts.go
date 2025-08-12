@@ -171,8 +171,11 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Crear timestamp completo en zona horaria de Argentina
 	todayTimestamp := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, argentinaLocation)
 	
-	fmt.Printf("🔍 Debug fechas - now: %s, today: %s, todayTimestamp: %s\n", 
-		now.Format(time.RFC3339), today, todayTimestamp.Format(time.RFC3339))
+	// Asegurar que todayTimestamp esté en UTC para la base de datos
+	todayTimestampUTC := todayTimestamp.UTC()
+	
+	fmt.Printf("🔍 Debug fechas - now: %s, today: %s, todayTimestamp: %s, todayTimestampUTC: %s\n", 
+		now.Format(time.RFC3339), today, todayTimestamp.Format(time.RFC3339), todayTimestampUTC.Format(time.RFC3339))
 	var sessionID int
 	
 	fmt.Printf("Buscando sesión para fecha: %s\n", today)
@@ -186,7 +189,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	
 	if err != nil {
 		fmt.Printf("No existe sesión para hoy, creando nueva...\n")
-		fmt.Printf("Intentando insertar con userID: %s, todayTimestamp: %s\n", userID, todayTimestamp.Format(time.RFC3339))
+		fmt.Printf("Intentando insertar con userID: %s, todayTimestampUTC: %s\n", userID, todayTimestampUTC.Format(time.RFC3339))
 		// No existe sesión para hoy, crear una nueva
 		createSessionQuery := `
 			INSERT INTO workout_sessions (user_id, session_date, session_name, total_exercises, effort, mood) 
@@ -195,8 +198,8 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		`
 		sessionName := "Entrenamiento del día"
 		fmt.Printf("Query: %s\n", createSessionQuery)
-		fmt.Printf("Parámetros: userID=%s, todayTimestamp=%s, sessionName=%s\n", userID, todayTimestamp.Format(time.RFC3339), sessionName)
-		err = database.DB.QueryRow(createSessionQuery, userID, todayTimestamp, sessionName).Scan(&sessionID)
+		fmt.Printf("Parámetros: userID=%s, todayTimestampUTC=%s, sessionName=%s\n", userID, todayTimestampUTC.Format(time.RFC3339), sessionName)
+		err = database.DB.QueryRow(createSessionQuery, userID, todayTimestampUTC, sessionName).Scan(&sessionID)
 		if err != nil {
 			fmt.Printf("Error creando sesión de entrenamiento: %v\n", err)
 			fmt.Printf("Tipo de error: %T\n", err)
