@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TimerComponent from '../timer/TimerComponent'
+import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 type Exercise = {
   id: number
@@ -31,6 +32,7 @@ type WorkoutFormProps = {
 }
 
 export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: WorkoutFormProps) {
+  const { settings } = useUserSettings()
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
@@ -342,18 +344,18 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           </Alert>
 
           {/* Cronómetro y campo de segundos */}
-          <Box>
-            {/* Cronómetro */}
-            <Box sx={{ width: '100%' }}>
-              <TimerComponent 
-                onTimeComplete={handleTimerComplete} 
-                onTimeUpdate={handleTimerUpdate}
-                disabled={isLoading} 
-              />
+          {settings.showWorkoutSection && (
+            <Box>
+              {/* Cronómetro */}
+              <Box sx={{ width: '100%' }}>
+                <TimerComponent 
+                  onTimeComplete={handleTimerComplete} 
+                  onTimeUpdate={handleTimerUpdate}
+                  disabled={isLoading} 
+                />
+              </Box>
             </Box>
-            
-
-          </Box>
+          )}
         </Box>
 
         <TextField

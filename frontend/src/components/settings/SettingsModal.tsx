@@ -155,12 +155,12 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                 )}
                 <Box>
                   <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    Mostrar sección de registro
+                    Mostrar sección de tiempo de serie
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {tempSettings.showWorkoutSection 
-                      ? 'El cronómetro y consejos aparecen en el formulario'
-                      : 'La sección de registro está oculta'
+                      ? 'El cronómetro aparece en el formulario de registro'
+                      : 'La sección de tiempo de serie está oculta'
                     }
                   </Typography>
                 </Box>
@@ -230,55 +230,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           />
         </Box>
 
-        <Divider sx={{ my: 2 }} />
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            REGISTRO
-          </Typography>
-          
-          <FormControlLabel
-            control={
-              <Switch
-                checked={tempSettings.showWorkoutSection}
-                onChange={handleToggleWorkoutSection}
-                color="primary"
-              />
-            }
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                {tempSettings.showWorkoutSection ? (
-                  <Timer sx={{ color: 'primary.main', fontSize: 20 }} />
-                ) : (
-                  <TimerOff sx={{ color: 'text.secondary', fontSize: 20 }} />
-                )}
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    Mostrar sección de registro
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {tempSettings.showWorkoutSection 
-                      ? 'El cronómetro y consejos aparecen en el formulario'
-                      : 'La sección de registro está oculta'
-                    }
-                  </Typography>
-                </Box>
-              </Box>
-            }
-            sx={{ 
-              alignItems: 'flex-start',
-              width: '100%',
-              m: 0,
-              p: 2,
-              borderRadius: 1,
-              backgroundColor: 'grey.50',
-              '&:hover': {
-                backgroundColor: 'grey.100'
-              }
-            }}
-          />
-        </Box>
 
-        <Divider sx={{ my: 2 }} />
 
         {/* Sección EJERCICIOS FAVORITOS */}
         <Box sx={{ mb: 3 }}>
