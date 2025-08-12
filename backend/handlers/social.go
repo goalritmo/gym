@@ -38,6 +38,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	userID, ok := r.Context().Value("user_id").(string)
 	if !ok || userID == "" {
+		fmt.Printf("Error: user_id no encontrado en contexto\n")
 		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
 		return
 	}
@@ -52,6 +53,8 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	today := time.Now().In(loc).Format("2006-01-02")
 
+	fmt.Printf("Consultando entrenamientos sociales para fecha: %s, usuario: %s\n", today, userID)
+
 	// Query para obtener entrenamientos sociales del día
 	query := `
 		SELECT 
@@ -62,18 +65,21 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			DATE(ws.created_at) as workout_date,
 			COUNT(DISTINCT w.exercise_id) as total_exercises,
 			COUNT(w.id) as total_series,
-			json_agg(
-				json_build_object(
-					'exercise_name', e.name,
-					'weight', w.weight,
-					'reps', w.reps,
-					'seconds', w.seconds,
-					'serie', w.serie
-				) ORDER BY w.serie
+			COALESCE(
+				json_agg(
+					json_build_object(
+						'exercise_name', e.name,
+						'weight', w.weight,
+						'reps', w.reps,
+						'seconds', w.seconds,
+						'serie', w.serie
+					) ORDER BY w.serie
+				) FILTER (WHERE w.id IS NOT NULL),
+				'[]'::json
 			) as exercises
 		FROM workout_sessions ws
-		JOIN workouts w ON ws.id = w.exercise_session_id
-		JOIN exercises e ON w.exercise_id = e.id
+		LEFT JOIN workouts w ON ws.id = w.exercise_session_id
+		LEFT JOIN exercises e ON w.exercise_id = e.id
 		JOIN users u ON ws.user_id = u.id
 		WHERE DATE(ws.created_at) = $1
 		AND ws.user_id != $2
@@ -81,7 +87,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		ORDER BY ws.created_at DESC
 	`
 
-	fmt.Printf("Consultando entrenamientos sociales para fecha: %s, usuario: %s\n", today, userID)
+	fmt.Printf("Ejecutando query con parámetros: fecha=%s, userID=%s\n", today, userID)
 	
 	rows, err := database.DB.Query(query, today, userID)
 	if err != nil {
@@ -90,6 +96,8 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer rows.Close()
+
+	fmt.Printf("Query ejecutada exitosamente, procesando resultados...\n")
 
 	var socialWorkouts []SocialWorkout
 	for rows.Next() {
@@ -124,6 +132,6 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		socialWorkouts = append(socialWorkouts, workout)
 	}
 
-		fmt.Printf("Encontrados %d entrenamientos sociales\n", len(socialWorkouts))
+	fmt.Printf("Encontrados %d entrenamientos sociales\n", len(socialWorkouts))
 	json.NewEncoder(w).Encode(socialWorkouts)
 }
