@@ -42,21 +42,8 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Verificar si el usuario tiene habilitada la funcionalidad social
-	var socialEnabled bool
-	err := database.DB.QueryRow(`
-		SELECT social_enabled FROM user_settings WHERE user_id = $1
-	`, userID).Scan(&socialEnabled)
-	
-	if err != nil {
-		// Si no existe configuración, asumir que está habilitado por defecto
-		socialEnabled = true
-	}
-
-	if !socialEnabled {
-		http.Error(w, "Social functionality is disabled for this user", http.StatusForbidden)
-		return
-	}
+	// Por ahora, asumir que la funcionalidad social está habilitada para todos
+	// En el futuro, esto se verificará contra la tabla user_settings
 
 	// Obtener la fecha de hoy en la zona horaria local
 	loc, err := time.LoadLocation("America/Argentina/Buenos_Aires")
@@ -88,14 +75,14 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		JOIN workouts w ON ws.id = w.exercise_session_id
 		JOIN exercises e ON w.exercise_id = e.id
 		JOIN users u ON ws.user_id = u.id
-		JOIN user_settings us ON ws.user_id = us.user_id
 		WHERE DATE(ws.created_at) = $1
-		AND us.social_enabled = true
 		AND ws.user_id != $2
 		GROUP BY ws.id, ws.user_id, u.name, u.avatar_url, DATE(ws.created_at)
 		ORDER BY ws.created_at DESC
 	`
 
+	fmt.Printf("Consultando entrenamientos sociales para fecha: %s, usuario: %s\n", today, userID)
+	
 	rows, err := database.DB.Query(query, today, userID)
 	if err != nil {
 		fmt.Printf("Error consultando entrenamientos sociales: %v\n", err)
@@ -137,5 +124,6 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		socialWorkouts = append(socialWorkouts, workout)
 	}
 
+		fmt.Printf("Encontrados %d entrenamientos sociales\n", len(socialWorkouts))
 	json.NewEncoder(w).Encode(socialWorkouts)
 }
