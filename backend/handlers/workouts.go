@@ -115,17 +115,21 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	userID, ok := r.Context().Value("user_id").(string)
 	if !ok || userID == "" {
+		fmt.Printf("Error: user_id no encontrado en contexto en CreateWorkoutHandler\n")
 		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
 		return
 	}
 
+	fmt.Printf("Creando workout para usuario: %s\n", userID)
+
 	var req models.CreateWorkoutRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		fmt.Printf("Error decodificando JSON: %v\n", err)
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
 
-
+	fmt.Printf("Datos del workout: exercise_id=%d, weight=%.2f, reps=%d\n", req.ExerciseID, req.Weight, req.Reps)
 
 	// Validaciones básicas
 	if req.Weight <= 0 {
@@ -142,13 +146,16 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	err = database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM exercises WHERE id = $1)", req.ExerciseID).Scan(&exerciseExists)
 	if err != nil {
+		fmt.Printf("Error verificando ejercicio: %v\n", err)
 		http.Error(w, "Error verificando ejercicio", http.StatusInternalServerError)
 		return
 	}
 	if !exerciseExists {
+		fmt.Printf("Ejercicio no encontrado: %d\n", req.ExerciseID)
 		http.Error(w, "Ejercicio no encontrado", http.StatusBadRequest)
 		return
 	}
+	fmt.Printf("Ejercicio verificado correctamente\n")
 
 	// Buscar o crear workout_session para hoy (en timezone de Argentina)
 	argentinaLocation, err := time.LoadLocation("America/Argentina/Buenos_Aires")

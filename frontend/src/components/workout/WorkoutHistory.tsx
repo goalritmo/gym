@@ -109,8 +109,10 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         // Extraer el número de sesión del UUID (formato: 00000000-0000-0000-0000-000000000XXX)
         const workoutSessionId = w.exercise_session_id.toString();
         const sessionNumber = workoutSessionId.split('-')[4];
+        // Convertir a número para eliminar ceros a la izquierda
+        const sessionNumberInt = parseInt(sessionNumber, 10);
         const sessionId = session.id.toString();
-        const matches = sessionNumber === sessionId;
+        const matches = sessionNumberInt.toString() === sessionId;
         console.log(`🔍 Comparando: workout ${w.id} (session_id: ${workoutSessionId}, number: ${sessionNumber}) vs session ${sessionId} = ${matches}`)
         return matches
       })
