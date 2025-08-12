@@ -422,7 +422,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                           py: 0.5,
                           px: 1.5,
                           backgroundColor: '#ff9800',
-                          color: 'transparent',
+                          color: 'white',
                           '&:hover': {
                             backgroundColor: '#f57c00'
                           }
