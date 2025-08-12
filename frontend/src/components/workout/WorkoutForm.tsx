@@ -46,6 +46,10 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   const [showSuccess, setShowSuccess] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   
+  // Estado para trackear el tiempo del cronómetro
+  const [currentTimerTime, setCurrentTimerTime] = useState(0)
+  const [isTimerRunning, setIsTimerRunning] = useState(false)
+  
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = exercises.length === 0
 
@@ -98,6 +102,11 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
 
   const submit = handleSubmit(async (data: WorkoutFormData) => {
     try {
+      // Si el cronómetro está corriendo, usar el tiempo actual del cronómetro
+      if (isTimerRunning && currentTimerTime > 0) {
+        data.seconds = currentTimerTime
+      }
+      
       await onSubmit(data)
       setShowSuccess(true)
       reset({
@@ -115,9 +124,15 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
     }
   })
 
-  // Función para capturar el tiempo del cronómetro
+  // Función para capturar el tiempo del cronómetro cuando se pausa
   const handleTimerComplete = (seconds: number) => {
     setValue('seconds', seconds)
+  }
+
+  // Función para trackear el tiempo actual del cronómetro
+  const handleTimerUpdate = (seconds: number, isRunning: boolean) => {
+    setCurrentTimerTime(seconds)
+    setIsTimerRunning(isRunning)
   }
 
   return (
@@ -336,7 +351,11 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           }}>
             {/* Cronómetro */}
             <Box sx={{ flex: '1 1 auto', width: '100%', maxWidth: '300px' }}>
-              <TimerComponent onTimeComplete={handleTimerComplete} disabled={isLoading} />
+              <TimerComponent 
+                onTimeComplete={handleTimerComplete} 
+                onTimeUpdate={handleTimerUpdate}
+                disabled={isLoading} 
+              />
             </Box>
             
             {/* Input de segundos */}

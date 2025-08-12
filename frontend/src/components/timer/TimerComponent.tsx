@@ -3,10 +3,11 @@ import { Button, Box, Typography } from '@mui/material'
 
 type TimerComponentProps = {
   onTimeComplete?: (seconds: number) => void
+  onTimeUpdate?: (seconds: number, isRunning: boolean) => void
   disabled?: boolean
 }
 
-export default function TimerComponent({ onTimeComplete, disabled = false }: TimerComponentProps) {
+export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled = false }: TimerComponentProps) {
   const [time, setTime] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
   const intervalRef = useRef<number | null>(null)
@@ -14,12 +15,23 @@ export default function TimerComponent({ onTimeComplete, disabled = false }: Tim
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
-        setTime(prevTime => prevTime + 1)
+        setTime(prevTime => {
+          const newTime = prevTime + 1
+          // Notificar el tiempo actual cada segundo
+          if (onTimeUpdate) {
+            onTimeUpdate(newTime, true)
+          }
+          return newTime
+        })
       }, 1000) as unknown as number
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
         intervalRef.current = null
+      }
+      // Notificar cuando se pausa
+      if (onTimeUpdate) {
+        onTimeUpdate(time, false)
       }
     }
 
@@ -28,7 +40,7 @@ export default function TimerComponent({ onTimeComplete, disabled = false }: Tim
         clearInterval(intervalRef.current)
       }
     }
-  }, [isRunning])
+  }, [isRunning, onTimeUpdate, time])
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60)
