@@ -342,15 +342,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           </Alert>
 
           {/* Cronómetro y campo de segundos */}
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'row',
-            alignItems: 'flex-end', 
-            gap: 2,
-            justifyContent: 'space-between'
-          }}>
+          <Box>
             {/* Cronómetro */}
-            <Box sx={{ flex: '1 1 auto', width: '100%', maxWidth: '300px' }}>
+            <Box sx={{ width: '100%' }}>
               <TimerComponent 
                 onTimeComplete={handleTimerComplete} 
                 onTimeUpdate={handleTimerUpdate}
@@ -358,50 +352,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
               />
             </Box>
             
-            {/* Input de segundos */}
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center',
-              minWidth: '140px'
-            }}>
 
-              <TextField
-                label="Segundos"
-                type="number"
-                disabled={isLoading}
-                error={Boolean(errors.seconds)}
-                value={watch('seconds') || ''}
-                onChange={(e) => handleNumberInput('seconds', e.target.value)}
-                inputProps={{ 
-                  inputMode: 'numeric',
-                  min: 0,
-                  max: 3600
-                }}
-                sx={{ 
-                  width: '120px',
-                  '& .MuiInputBase-root': {
-                    minWidth: '120px'
-                  },
-                  '& .MuiInputLabel-root': {
-                    backgroundColor: 'white',
-                    px: 1,
-                    zIndex: 1
-                  },
-                  '& .MuiInputLabel-shrink': {
-                    backgroundColor: 'white',
-                    px: 1,
-                    zIndex: 1
-                  },
-                  '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                    display: 'none'
-                  },
-                  '& input[type=number]': {
-                    MozAppearance: 'textfield'
-                  }
-                }}
-              />
-            </Box>
           </Box>
         </Box>
 

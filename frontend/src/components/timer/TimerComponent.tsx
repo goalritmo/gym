@@ -10,6 +10,7 @@ type TimerComponentProps = {
 export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled = false }: TimerComponentProps) {
   const [time, setTime] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
+  const [isCaptured, setIsCaptured] = useState(false)
   const intervalRef = useRef<number | null>(null)
 
   useEffect(() => {
@@ -52,51 +53,54 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
     if (!isRunning) {
       // Iniciar el cronómetro
       setIsRunning(true)
+      setIsCaptured(false)
+      setTime(0)
     } else {
       // Pausar y registrar los segundos
       setIsRunning(false)
+      setIsCaptured(true)
       if (onTimeComplete) {
         onTimeComplete(time)
       }
-      // Resetear automáticamente
-      setTime(0)
     }
   }
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
       {/* Display del tiempo */}
       <Typography 
         variant="h4" 
         component="div" 
         sx={{ 
-          textAlign: 'center', 
-          mb: 2, 
           fontFamily: 'monospace',
-          color: isRunning ? 'primary.main' : 'text.primary'
+          color: isRunning ? 'primary.main' : isCaptured ? 'warning.main' : 'text.primary',
+          flex: 1,
+          textAlign: 'center'
         }}
       >
         {formatTime(time)}
       </Typography>
       
-      {/* Botón centrado */}
-      <Box sx={{ textAlign: 'center' }}>
-        <Button 
-          variant="contained" 
-          onClick={handleToggleTimer}
-          disabled={disabled}
-          size="large"
-          sx={{ 
-            minWidth: 140,
-            py: 1.5,
-            borderRadius: 1.5,
-            fontSize: '1.1rem',
-            fontWeight: 'bold'
-          }}
-        >
-          {!isRunning ? 'Iniciar' : 'Capturar'}
-        </Button>
-      </Box>
+      {/* Botón a la derecha */}
+      <Button 
+        variant="contained" 
+        onClick={handleToggleTimer}
+        disabled={disabled}
+        size="large"
+        sx={{ 
+          minWidth: 120,
+          py: 1.5,
+          borderRadius: 1.5,
+          fontSize: '1rem',
+          fontWeight: 'bold',
+          backgroundColor: isCaptured ? 'warning.main' : 'primary.main',
+          '&:hover': {
+            backgroundColor: isCaptured ? 'warning.dark' : 'primary.dark'
+          }
+        }}
+      >
+        {!isRunning ? 'Iniciar' : 'Capturar'}
+      </Button>
     </Box>
   )
 }
