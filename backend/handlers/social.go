@@ -60,16 +60,30 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		SELECT 
 			ws.id as session_id,
 			ws.user_id,
-			u.name as user_name,
-			u.avatar_url as user_avatar_url,
+			COALESCE(up.name, 'Usuario') as user_name,
+			COALESCE(up.avatar_url, '') as user_avatar_url,
 			ws.created_at as workout_date,
-			0 as total_exercises,
-			0 as total_series,
-			'[]'::json as exercises
+			COALESCE(COUNT(DISTINCT w.exercise_id), 0) as total_exercises,
+			COALESCE(COUNT(w.id), 0) as total_series,
+			COALESCE(
+				json_agg(
+					json_build_object(
+						'exercise_name', e.name,
+						'weight', w.weight,
+						'reps', w.reps,
+						'seconds', w.seconds,
+						'serie', w.serie
+					) ORDER BY w.serie
+				) FILTER (WHERE w.id IS NOT NULL),
+				'[]'::json
+			) as exercises
 		FROM workout_sessions ws
-		JOIN users u ON ws.user_id = u.id
+		LEFT JOIN user_profiles up ON ws.user_id = up.user_id
+		LEFT JOIN workouts w ON ws.id = w.exercise_session_id
+		LEFT JOIN exercises e ON w.exercise_id = e.id
 		WHERE DATE(ws.created_at) = $1
 		AND ws.user_id != $2
+		GROUP BY ws.id, ws.user_id, ws.created_at, up.name, up.avatar_url
 		ORDER BY ws.created_at DESC
 	`
 
@@ -126,8 +140,26 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 func DebugHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	// Listar todas las tablas disponibles
+	var allTables []string
+	rows, err := database.DB.Query(`
+		SELECT table_name 
+		FROM information_schema.tables 
+		WHERE table_schema = 'public' 
+		ORDER BY table_name
+	`)
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var tableName string
+			if err := rows.Scan(&tableName); err == nil {
+				allTables = append(allTables, tableName)
+			}
+		}
+	}
+
 	// Verificar si las tablas existen
-	tables := []string{"workout_sessions", "workouts", "exercises", "users"}
+	tables := []string{"workout_sessions", "workouts", "exercises", "users", "auth.users", "public.users"}
 	tableInfo := make(map[string]interface{})
 
 	for _, table := range tables {
@@ -148,7 +180,7 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Verificar estructura de workout_sessions
 	var sessionColumns []string
-	rows, err := database.DB.Query(`
+	rows, err = database.DB.Query(`
 		SELECT column_name, data_type 
 		FROM information_schema.columns 
 		WHERE table_name = 'workout_sessions' 
@@ -183,6 +215,7 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := map[string]interface{}{
+		"all_tables": allTables,
 		"tables": tableInfo,
 		"workout_sessions_columns": sessionColumns,
 		"workouts_columns": workoutColumns,
