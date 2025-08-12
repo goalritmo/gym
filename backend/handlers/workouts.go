@@ -174,11 +174,10 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Asegurar que todayTimestamp esté en UTC para la base de datos
 	todayTimestampUTC := todayTimestamp.UTC()
 	
-	fmt.Printf("🔍 Debug fechas - now: %s, today: %s, todayTimestamp: %s, todayTimestampUTC: %s\n", 
-		now.Format(time.RFC3339), today, todayTimestamp.Format(time.RFC3339), todayTimestampUTC.Format(time.RFC3339))
+
 	var sessionID int
 	
-	fmt.Printf("Buscando sesión para fecha: %s\n", today)
+	fmt.Printf("🔍 DEBUG: Buscando sesión para fecha: %s, userID: %s\n", today, userID)
 
 	// Verificar si ya existe una sesión para hoy (más flexible para manejar sesiones antiguas)
 	sessionQuery := `SELECT id, session_date FROM workout_sessions WHERE user_id = $1 AND (
@@ -186,13 +185,11 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		OR DATE(session_date) = $2
 	) ORDER BY created_at DESC LIMIT 1`
 	var sessionDate string
-	fmt.Printf("🔍 Buscando sesión con query: %s\n", sessionQuery)
-	fmt.Printf("🔍 Parámetros: userID=%s, today=%s\n", userID, today)
+
 	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&sessionID, &sessionDate)
 	
 	if err != nil {
-		fmt.Printf("No existe sesión para hoy, creando nueva...\n")
-		fmt.Printf("Intentando insertar con userID: %s, todayTimestampUTC: %s\n", userID, todayTimestampUTC.Format(time.RFC3339))
+		fmt.Printf("🔍 DEBUG: No existe sesión para hoy, creando nueva... Error: %v\n", err)
 		// No existe sesión para hoy, crear una nueva
 		createSessionQuery := `
 			INSERT INTO workout_sessions (user_id, session_date, session_name, total_exercises, effort, mood) 
@@ -200,8 +197,6 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 			RETURNING id
 		`
 		sessionName := "Entrenamiento del día"
-		fmt.Printf("Query: %s\n", createSessionQuery)
-		fmt.Printf("Parámetros: userID=%s, todayTimestampUTC=%s, sessionName=%s\n", userID, todayTimestampUTC.Format(time.RFC3339), sessionName)
 		err = database.DB.QueryRow(createSessionQuery, userID, todayTimestampUTC, sessionName).Scan(&sessionID)
 		if err != nil {
 			fmt.Printf("Error creando sesión de entrenamiento: %v\n", err)
@@ -211,7 +206,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Printf("Sesión creada con ID: %d\n", sessionID)
 	} else {
-		fmt.Printf("Sesión existente encontrada con ID: %d, session_date: %s\n", sessionID, sessionDate)
+		fmt.Printf("🔍 DEBUG: Sesión existente encontrada con ID: %d, session_date: %s\n", sessionID, sessionDate)
 	}
 
 	// Insertar workout asociado a la sesión
