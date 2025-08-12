@@ -51,7 +51,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   const [deletingWorkoutId, setDeletingWorkoutId] = useState<number | null>(null)
 
   const formatDate = (dateString: string) => {
-    const date = normalizeDate(dateString)
+    const date = new Date(dateString)
     const options: Intl.DateTimeFormatOptions = {
       weekday: 'long',
       day: 'numeric',
@@ -62,7 +62,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
   }
 
   const formatDateShort = (dateString: string) => {
-    const date = normalizeDate(dateString)
+    const date = new Date(dateString)
     const options: Intl.DateTimeFormatOptions = {
       day: 'numeric',
       month: 'long'
@@ -444,6 +444,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 fontWeight: 600,
                 fontSize: '1rem',
                 textTransform: 'uppercase',
+                transform: 'translate(14px, -9px) scale(0.75)',
                 '&.Mui-focused': {
                   color: 'white',
                   transform: 'translate(14px, -9px) scale(0.75)',
