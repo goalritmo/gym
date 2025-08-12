@@ -65,22 +65,19 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("Consultando entrenamientos sociales con límite: %d, offset: %d, usuario: %s\n", limit, offset, userID)
 
-	// Query para obtener todos los entrenamientos con paginación
+	// Query simplificada para diagnosticar
 	query := `
 		SELECT 
 			ws.id as session_id,
 			ws.user_id,
-			COALESCE(up.name, 'Usuario') as user_name,
-			COALESCE(up.avatar_url, '') as user_avatar_url,
+			'Usuario' as user_name,
+			'' as user_avatar_url,
 			ws.created_at as workout_date,
-			COALESCE(COUNT(DISTINCT w.exercise_id), 0) as total_exercises,
-			COALESCE(COUNT(w.id), 0) as total_series,
+			0 as total_exercises,
+			0 as total_series,
 			'[]'::json as exercises
 		FROM workout_sessions ws
-		LEFT JOIN user_profiles up ON ws.user_id = up.user_id
-		LEFT JOIN workouts w ON w.exercise_session_id = '00000000-0000-0000-0000-' || LPAD(ws.id::text, 12, '0')
 		WHERE ws.user_id != $1
-		GROUP BY ws.id, ws.user_id, ws.created_at, up.name, up.avatar_url
 		ORDER BY ws.created_at DESC
 		LIMIT $2 OFFSET $3
 	`

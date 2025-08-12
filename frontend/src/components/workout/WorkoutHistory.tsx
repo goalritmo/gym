@@ -378,7 +378,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <TextField
             type="date"
-            label="FILTRAR POR FECHA"
+            label="Filtrar por fecha"
             value={dateFilter ? dateFilter.toISOString().split('T')[0] : ''}
             onChange={(e) => {
               try {
@@ -426,20 +426,20 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 color: 'white',
                 fontWeight: 600,
                 fontSize: '1rem',
-                textTransform: 'uppercase',
+                textTransform: 'capitalize',
                 transform: 'translate(14px, -9px) scale(0.75)',
-                backgroundColor: 'primary.main',
+                background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
                 padding: '0 4px',
                 borderRadius: '2px',
                 '&.Mui-focused': {
                   color: 'white',
                   transform: 'translate(14px, -9px) scale(0.75)',
-                  backgroundColor: 'primary.main',
+                  background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
                 },
                 '&.MuiInputLabel-shrink': {
                   color: 'white',
                   transform: 'translate(14px, -9px) scale(0.75)',
-                  backgroundColor: 'primary.main',
+                  background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
                 }
               }
             }}
