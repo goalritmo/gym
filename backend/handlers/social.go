@@ -79,7 +79,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			) as exercises
 		FROM workout_sessions ws
 		LEFT JOIN user_profiles up ON ws.user_id = up.user_id
-		LEFT JOIN workouts w ON ws.id::text = w.exercise_session_id::text
+		LEFT JOIN workouts w ON ws.id::text = SPLIT_PART(w.exercise_session_id::text, '-', 5)
 		LEFT JOIN exercises e ON w.exercise_id = e.id
 		WHERE DATE(ws.created_at) = $1
 		AND ws.user_id != $2
