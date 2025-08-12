@@ -13,15 +13,15 @@ import {
   Alert,
   Paper,
   Avatar,
-  IconButton,
-  Button
+  IconButton
 } from '@mui/material'
 import { 
   Notifications, 
   Info, 
   ThumbUp, 
   Announcement,
-  Close
+  Close,
+  CheckCircle
 } from '@mui/icons-material'
 
 type NotificationType = 'general' | 'kudos' | 'announcement'
@@ -264,37 +264,9 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
             />
           )}
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {unreadCount > 0 && (
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => {
-                // Marcar todas como leídas
-                setNotifications(prev => 
-                  prev.map(notif => ({ ...notif, read: true }))
-                )
-                onMarkAsRead(unreadCount)
-              }}
-              sx={{
-                fontSize: '0.75rem',
-                py: 0.5,
-                px: 1.5,
-                borderColor: '#ff9800',
-                color: '#ff9800',
-                '&:hover': {
-                  borderColor: '#f57c00',
-                  backgroundColor: '#fff3e0'
-                }
-              }}
-            >
-              Marcar como leída
-            </Button>
-          )}
-          <IconButton onClick={onClose} size="small">
-            <Close />
-          </IconButton>
-        </Box>
+        <IconButton onClick={onClose} size="small">
+          <Close />
+        </IconButton>
       </DialogTitle>
 
       <DialogContent sx={{ pt: 2 }}>
@@ -376,13 +348,21 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                     </Box>
 
                     {!notification.read && (
-                      <Box sx={{ 
-                        width: 8, 
-                        height: 8, 
-                        borderRadius: '50%', 
-                        backgroundColor: 'primary.main',
-                        flexShrink: 0
-                      }} />
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          markAsRead(notification.id)
+                        }}
+                        sx={{
+                          color: '#ff9800',
+                          '&:hover': {
+                            backgroundColor: '#fff3e0'
+                          }
+                        }}
+                      >
+                        <CheckCircle fontSize="small" />
+                      </IconButton>
                     )}
                   </Box>
 
