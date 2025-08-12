@@ -185,6 +185,22 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("🔍 DEBUG: Ejecutando query: %s\n", sessionQuery)
 	fmt.Printf("🔍 DEBUG: Parámetros: userID=%s, today=%s\n", userID, today)
+	
+	// Debug: ver todas las sesiones del usuario para hoy
+	debugQuery := `SELECT id, session_date, DATE(session_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires') as argentina_date FROM workout_sessions WHERE user_id = $1 ORDER BY session_date DESC`
+	debugRows, debugErr := database.DB.Query(debugQuery, userID)
+	if debugErr == nil {
+		defer debugRows.Close()
+		fmt.Printf("🔍 DEBUG: Todas las sesiones del usuario:\n")
+		for debugRows.Next() {
+			var debugID int
+			var debugSessionDate, debugArgentinaDate string
+			if err := debugRows.Scan(&debugID, &debugSessionDate, &debugArgentinaDate); err == nil {
+				fmt.Printf("  - Sesión %d: session_date=%s, argentina_date=%s\n", debugID, debugSessionDate, debugArgentinaDate)
+			}
+		}
+	}
+	
 	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&sessionID, &sessionDate)
 	
 	if err != nil {
