@@ -70,6 +70,9 @@ func main() {
 	// Debug endpoint (temporal)
 	api.HandleFunc("/debug", handlers.DebugHandler).Methods("GET")
 	
+	// Fix triggers endpoint (temporal)
+	api.HandleFunc("/fix-triggers", handlers.FixTriggersHandler).Methods("POST")
+	
 
 
 	// Configurar CORS

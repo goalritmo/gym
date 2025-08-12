@@ -270,3 +270,31 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(response)
 }
+
+// FixTriggersHandler elimina los triggers problemáticos temporalmente
+func FixTriggersHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Eliminar triggers problemáticos
+	queries := []string{
+		"DROP TRIGGER IF EXISTS trigger_cleanup_empty_sessions ON workouts",
+		"DROP TRIGGER IF EXISTS trigger_cleanup_empty_sessions_update ON workouts",
+	}
+
+	var results []string
+	for _, query := range queries {
+		_, err := database.DB.Exec(query)
+		if err != nil {
+			results = append(results, fmt.Sprintf("Error: %s - %v", query, err))
+		} else {
+			results = append(results, fmt.Sprintf("Success: %s", query))
+		}
+	}
+
+	response := map[string]interface{}{
+		"message": "Triggers eliminados",
+		"results": results,
+	}
+
+	json.NewEncoder(w).Encode(response)
+}
