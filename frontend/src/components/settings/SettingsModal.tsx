@@ -20,8 +20,6 @@ import {
   PersonOff, 
   Timer, 
   TimerOff, 
-  Lightbulb, 
-  LightbulbOutlined,
   Star,
   StarBorder
 } from '@mui/icons-material'
@@ -42,8 +40,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const { 
     settings, 
     toggleSocial, 
-    toggleTimer, 
-    toggleTip, 
+    toggleWorkoutSection, 
     setFavoriteExercises 
   } = useUserSettings()
   const [hasChanges, setHasChanges] = useState(false)
@@ -62,18 +59,10 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     setHasChanges(true)
   }
 
-  const handleToggleTimer = () => {
+  const handleToggleWorkoutSection = () => {
     setTempSettings(prev => ({ 
       ...prev, 
-      showTimer: !prev.showTimer
-    }))
-    setHasChanges(true)
-  }
-
-  const handleToggleTip = () => {
-    setTempSettings(prev => ({ 
-      ...prev, 
-      showTip: !prev.showTip
+      showWorkoutSection: !prev.showWorkoutSection
     }))
     setHasChanges(true)
   }
@@ -96,11 +85,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     if (tempSettings.socialEnabled !== settings.socialEnabled) {
       toggleSocial()
     }
-    if (tempSettings.showTimer !== settings.showTimer) {
-      toggleTimer()
-    }
-    if (tempSettings.showTip !== settings.showTip) {
-      toggleTip()
+    if (tempSettings.showWorkoutSection !== settings.showWorkoutSection) {
+      toggleWorkoutSection()
     }
     if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
       setFavoriteExercises(tempSettings.favoriteExercises)
@@ -146,6 +132,56 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       </DialogTitle>
 
       <DialogContent sx={{ pt: 2 }}>
+        {/* Sección REGISTRO */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            REGISTRO
+          </Typography>
+          
+          <FormControlLabel
+            control={
+              <Switch
+                checked={tempSettings.showWorkoutSection}
+                onChange={handleToggleWorkoutSection}
+                color="primary"
+              />
+            }
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {tempSettings.showWorkoutSection ? (
+                  <Timer sx={{ color: 'primary.main', fontSize: 20 }} />
+                ) : (
+                  <TimerOff sx={{ color: 'text.secondary', fontSize: 20 }} />
+                )}
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    Mostrar sección de registro
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {tempSettings.showWorkoutSection 
+                      ? 'El cronómetro y consejos aparecen en el formulario'
+                      : 'La sección de registro está oculta'
+                    }
+                  </Typography>
+                </Box>
+              </Box>
+            }
+            sx={{ 
+              alignItems: 'flex-start',
+              width: '100%',
+              m: 0,
+              p: 2,
+              borderRadius: 1,
+              backgroundColor: 'grey.50',
+              '&:hover': {
+                backgroundColor: 'grey.100'
+              }
+            }}
+          />
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
         {/* Sección SOCIAL */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
@@ -195,98 +231,51 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         </Box>
 
         <Divider sx={{ my: 2 }} />
-
-        {/* Sección ENTRENAMIENTO */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            ENTRENAMIENTO
+            REGISTRO
           </Typography>
           
-          <Stack spacing={2}>
-            {/* Cronómetro */}
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={tempSettings.showTimer}
-                  onChange={handleToggleTimer}
-                  color="primary"
-                />
-              }
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {tempSettings.showTimer ? (
-                    <Timer sx={{ color: 'primary.main', fontSize: 20 }} />
-                  ) : (
-                    <TimerOff sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  )}
-                  <Box>
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                      Mostrar cronómetro
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {tempSettings.showTimer 
-                        ? 'El cronómetro aparece en el formulario de entrenamiento'
-                        : 'El cronómetro está oculto'
-                      }
-                    </Typography>
-                  </Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={tempSettings.showWorkoutSection}
+                onChange={handleToggleWorkoutSection}
+                color="primary"
+              />
+            }
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {tempSettings.showWorkoutSection ? (
+                  <Timer sx={{ color: 'primary.main', fontSize: 20 }} />
+                ) : (
+                  <TimerOff sx={{ color: 'text.secondary', fontSize: 20 }} />
+                )}
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    Mostrar sección de registro
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {tempSettings.showWorkoutSection 
+                      ? 'El cronómetro y consejos aparecen en el formulario'
+                      : 'La sección de registro está oculta'
+                    }
+                  </Typography>
                 </Box>
+              </Box>
+            }
+            sx={{ 
+              alignItems: 'flex-start',
+              width: '100%',
+              m: 0,
+              p: 2,
+              borderRadius: 1,
+              backgroundColor: 'grey.50',
+              '&:hover': {
+                backgroundColor: 'grey.100'
               }
-              sx={{ 
-                alignItems: 'flex-start',
-                width: '100%',
-                m: 0,
-                p: 2,
-                borderRadius: 1,
-                backgroundColor: 'grey.50',
-                '&:hover': {
-                  backgroundColor: 'grey.100'
-                }
-              }}
-            />
-
-            {/* Tip */}
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={tempSettings.showTip}
-                  onChange={handleToggleTip}
-                  color="primary"
-                />
-              }
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {tempSettings.showTip ? (
-                    <Lightbulb sx={{ color: 'warning.main', fontSize: 20 }} />
-                  ) : (
-                    <LightbulbOutlined sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  )}
-                  <Box>
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                      Mostrar consejos
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {tempSettings.showTip 
-                        ? 'Se muestran consejos y tips durante el entrenamiento'
-                        : 'Los consejos están ocultos'
-                      }
-                    </Typography>
-                  </Box>
-                </Box>
-              }
-              sx={{ 
-                alignItems: 'flex-start',
-                width: '100%',
-                m: 0,
-                p: 2,
-                borderRadius: 1,
-                backgroundColor: 'grey.50',
-                '&:hover': {
-                  backgroundColor: 'grey.100'
-                }
-              }}
-            />
-          </Stack>
+            }}
+          />
         </Box>
 
         <Divider sx={{ my: 2 }} />

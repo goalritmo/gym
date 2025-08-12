@@ -312,7 +312,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                   borderRadius: 2,
                   border: '1px solid',
                   borderColor: notification.read ? 'divider' : 'divider',
-                  backgroundColor: notification.read ? 'background.paper' : 'grey.50',
+                  backgroundColor: notification.read ? 'background.paper' : '#fff3e0',
                   opacity: notification.read ? 0.8 : 1,
                   transition: 'all 0.2s ease-in-out',
                   '&:hover': {
@@ -402,24 +402,13 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                     </Box>
                   )}
 
-                  {/* Prioridad para anuncios y botón marcar como leída */}
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    mt: 2 
-                  }}>
-                    <Box>
-                      {notification.type === 'announcement' && notification.priority && (
-                        <Chip 
-                          label={notification.priority === 'high' ? 'Importante' : 'Información'} 
-                          color={getNotificationColor(notification.type, notification.priority) as any}
-                          size="small"
-                        />
-                      )}
-                    </Box>
-                    
-                    {!notification.read && (
+                  {/* Botón marcar como leída */}
+                  {!notification.read && (
+                    <Box sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'center', 
+                      mt: 2 
+                    }}>
                       <Button
                         size="small"
                         variant="outlined"
@@ -442,8 +431,8 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                       >
                         Marcar como leída
                       </Button>
-                    )}
-                  </Box>
+                    </Box>
+                  )}
                 </CardContent>
               </Card>
             ))}

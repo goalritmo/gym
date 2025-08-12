@@ -3,8 +3,7 @@ import type { ReactNode } from 'react'
 
 type UserSettings = {
   socialEnabled: boolean
-  showTimer: boolean
-  showTip: boolean
+  showWorkoutSection: boolean
   favoriteExercises: number[] // IDs de ejercicios favoritos
 }
 
@@ -12,8 +11,7 @@ type UserSettingsContextType = {
   settings: UserSettings
   updateSettings: (newSettings: Partial<UserSettings>) => void
   toggleSocial: () => void
-  toggleTimer: () => void
-  toggleTip: () => void
+  toggleWorkoutSection: () => void
   toggleFavoriteExercise: (exerciseId: number) => void
   setFavoriteExercises: (exerciseIds: number[]) => void
 }
@@ -22,8 +20,7 @@ const UserSettingsContext = createContext<UserSettingsContextType | undefined>(u
 
 const defaultSettings: UserSettings = {
   socialEnabled: true, // Por defecto habilitado
-  showTimer: true, // Por defecto mostrar cronómetro
-  showTip: true, // Por defecto mostrar tip
+  showWorkoutSection: true, // Por defecto mostrar sección de registro
   favoriteExercises: [] // Sin ejercicios favoritos por defecto
 }
 
@@ -60,17 +57,10 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     }))
   }
 
-  const toggleTimer = () => {
+  const toggleWorkoutSection = () => {
     setSettings(prev => ({ 
       ...prev, 
-      showTimer: !prev.showTimer
-    }))
-  }
-
-  const toggleTip = () => {
-    setSettings(prev => ({ 
-      ...prev, 
-      showTip: !prev.showTip
+      showWorkoutSection: !prev.showWorkoutSection
     }))
   }
 
@@ -100,8 +90,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       settings, 
       updateSettings, 
       toggleSocial,
-      toggleTimer,
-      toggleTip,
+      toggleWorkoutSection,
       toggleFavoriteExercise,
       setFavoriteExercises
     }}>
