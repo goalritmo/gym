@@ -3,18 +3,28 @@ import type { ReactNode } from 'react'
 
 type UserSettings = {
   socialEnabled: boolean
+  showTimer: boolean
+  showTip: boolean
+  favoriteExercises: number[] // IDs de ejercicios favoritos
 }
 
 type UserSettingsContextType = {
   settings: UserSettings
   updateSettings: (newSettings: Partial<UserSettings>) => void
   toggleSocial: () => void
+  toggleTimer: () => void
+  toggleTip: () => void
+  toggleFavoriteExercise: (exerciseId: number) => void
+  setFavoriteExercises: (exerciseIds: number[]) => void
 }
 
 const UserSettingsContext = createContext<UserSettingsContextType | undefined>(undefined)
 
 const defaultSettings: UserSettings = {
-  socialEnabled: true // Por defecto habilitado
+  socialEnabled: true, // Por defecto habilitado
+  showTimer: true, // Por defecto mostrar cronómetro
+  showTip: true, // Por defecto mostrar tip
+  favoriteExercises: [] // Sin ejercicios favoritos por defecto
 }
 
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
@@ -50,11 +60,50 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     }))
   }
 
+  const toggleTimer = () => {
+    setSettings(prev => ({ 
+      ...prev, 
+      showTimer: !prev.showTimer
+    }))
+  }
+
+  const toggleTip = () => {
+    setSettings(prev => ({ 
+      ...prev, 
+      showTip: !prev.showTip
+    }))
+  }
+
+  const toggleFavoriteExercise = (exerciseId: number) => {
+    setSettings(prev => {
+      const isFavorite = prev.favoriteExercises.includes(exerciseId)
+      const newFavorites = isFavorite 
+        ? prev.favoriteExercises.filter(id => id !== exerciseId)
+        : [...prev.favoriteExercises, exerciseId]
+      
+      return {
+        ...prev,
+        favoriteExercises: newFavorites
+      }
+    })
+  }
+
+  const setFavoriteExercises = (exerciseIds: number[]) => {
+    setSettings(prev => ({
+      ...prev,
+      favoriteExercises: exerciseIds
+    }))
+  }
+
   return (
     <UserSettingsContext.Provider value={{ 
       settings, 
       updateSettings, 
-      toggleSocial
+      toggleSocial,
+      toggleTimer,
+      toggleTip,
+      toggleFavoriteExercise,
+      setFavoriteExercises
     }}>
       {children}
     </UserSettingsContext.Provider>

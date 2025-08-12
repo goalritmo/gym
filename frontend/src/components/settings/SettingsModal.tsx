@@ -10,18 +10,42 @@ import {
   Typography,
   Box,
   Divider,
-  Alert
+  Alert,
+  Chip,
+  Stack
 } from '@mui/material'
-import { Settings, People, PersonOff } from '@mui/icons-material'
+import { 
+  Settings, 
+  People, 
+  PersonOff, 
+  Timer, 
+  TimerOff, 
+  Lightbulb, 
+  LightbulbOutlined,
+  Star,
+  StarBorder
+} from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
+
+type Exercise = {
+  id: number
+  name: string
+}
 
 type SettingsModalProps = {
   open: boolean
   onClose: () => void
+  exercises?: Exercise[] // Lista de ejercicios disponibles
 }
 
-export default function SettingsModal({ open, onClose }: SettingsModalProps) {
-  const { settings, toggleSocial } = useUserSettings()
+export default function SettingsModal({ open, onClose, exercises = [] }: SettingsModalProps) {
+  const { 
+    settings, 
+    toggleSocial, 
+    toggleTimer, 
+    toggleTip, 
+    setFavoriteExercises 
+  } = useUserSettings()
   const [hasChanges, setHasChanges] = useState(false)
   const [tempSettings, setTempSettings] = useState(settings)
 
@@ -38,10 +62,48 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
     setHasChanges(true)
   }
 
+  const handleToggleTimer = () => {
+    setTempSettings(prev => ({ 
+      ...prev, 
+      showTimer: !prev.showTimer
+    }))
+    setHasChanges(true)
+  }
+
+  const handleToggleTip = () => {
+    setTempSettings(prev => ({ 
+      ...prev, 
+      showTip: !prev.showTip
+    }))
+    setHasChanges(true)
+  }
+
+  const handleToggleFavoriteExercise = (exerciseId: number) => {
+    const isFavorite = tempSettings.favoriteExercises.includes(exerciseId)
+    const newFavorites = isFavorite 
+      ? tempSettings.favoriteExercises.filter(id => id !== exerciseId)
+      : [...tempSettings.favoriteExercises, exerciseId]
+    
+    setTempSettings(prev => ({
+      ...prev,
+      favoriteExercises: newFavorites
+    }))
+    setHasChanges(true)
+  }
+
   const handleSave = () => {
     // Aplicar cambios
     if (tempSettings.socialEnabled !== settings.socialEnabled) {
       toggleSocial()
+    }
+    if (tempSettings.showTimer !== settings.showTimer) {
+      toggleTimer()
+    }
+    if (tempSettings.showTip !== settings.showTip) {
+      toggleTip()
+    }
+    if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
+      setFavoriteExercises(tempSettings.favoriteExercises)
     }
     setHasChanges(false)
     onClose()
@@ -53,16 +115,21 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
     onClose()
   }
 
+  const getExerciseName = (id: number) => {
+    return exercises.find(ex => ex.id === id)?.name || `Ejercicio ${id}`
+  }
+
   return (
     <Dialog 
       open={open} 
       onClose={handleCancel}
-      maxWidth="sm"
+      maxWidth="md"
       fullWidth
       PaperProps={{
         sx: {
           borderRadius: 2,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          maxHeight: '80vh'
         }
       }}
     >
@@ -79,6 +146,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       </DialogTitle>
 
       <DialogContent sx={{ pt: 2 }}>
+        {/* Sección SOCIAL */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
             SOCIAL
@@ -128,10 +196,174 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
 
         <Divider sx={{ my: 2 }} />
 
+        {/* Sección ENTRENAMIENTO */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            ENTRENAMIENTO
+          </Typography>
+          
+          <Stack spacing={2}>
+            {/* Cronómetro */}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={tempSettings.showTimer}
+                  onChange={handleToggleTimer}
+                  color="primary"
+                />
+              }
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {tempSettings.showTimer ? (
+                    <Timer sx={{ color: 'primary.main', fontSize: 20 }} />
+                  ) : (
+                    <TimerOff sx={{ color: 'text.secondary', fontSize: 20 }} />
+                  )}
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      Mostrar cronómetro
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {tempSettings.showTimer 
+                        ? 'El cronómetro aparece en el formulario de entrenamiento'
+                        : 'El cronómetro está oculto'
+                      }
+                    </Typography>
+                  </Box>
+                </Box>
+              }
+              sx={{ 
+                alignItems: 'flex-start',
+                width: '100%',
+                m: 0,
+                p: 2,
+                borderRadius: 1,
+                backgroundColor: 'grey.50',
+                '&:hover': {
+                  backgroundColor: 'grey.100'
+                }
+              }}
+            />
+
+            {/* Tip */}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={tempSettings.showTip}
+                  onChange={handleToggleTip}
+                  color="primary"
+                />
+              }
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {tempSettings.showTip ? (
+                    <Lightbulb sx={{ color: 'warning.main', fontSize: 20 }} />
+                  ) : (
+                    <LightbulbOutlined sx={{ color: 'text.secondary', fontSize: 20 }} />
+                  )}
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      Mostrar consejos
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {tempSettings.showTip 
+                        ? 'Se muestran consejos y tips durante el entrenamiento'
+                        : 'Los consejos están ocultos'
+                      }
+                    </Typography>
+                  </Box>
+                </Box>
+              }
+              sx={{ 
+                alignItems: 'flex-start',
+                width: '100%',
+                m: 0,
+                p: 2,
+                borderRadius: 1,
+                backgroundColor: 'grey.50',
+                '&:hover': {
+                  backgroundColor: 'grey.100'
+                }
+              }}
+            />
+          </Stack>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Sección EJERCICIOS FAVORITOS */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            EJERCICIOS FAVORITOS
+          </Typography>
+          
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Selecciona los ejercicios que quieres que aparezcan primero en el selector
+          </Typography>
+
+          {exercises.length > 0 ? (
+            <Box>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                Ejercicios favoritos ({tempSettings.favoriteExercises.length}):
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
+                {tempSettings.favoriteExercises.map(exerciseId => (
+                  <Chip
+                    key={exerciseId}
+                    label={getExerciseName(exerciseId)}
+                    onDelete={() => handleToggleFavoriteExercise(exerciseId)}
+                    color="primary"
+                    size="small"
+                    icon={<Star />}
+                  />
+                ))}
+                {tempSettings.favoriteExercises.length === 0 && (
+                  <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                    No hay ejercicios favoritos seleccionados
+                  </Typography>
+                )}
+              </Stack>
+
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                Todos los ejercicios:
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                {exercises.map(exercise => (
+                  <Chip
+                    key={exercise.id}
+                    label={exercise.name}
+                    onClick={() => handleToggleFavoriteExercise(exercise.id)}
+                    variant={tempSettings.favoriteExercises.includes(exercise.id) ? "filled" : "outlined"}
+                    color={tempSettings.favoriteExercises.includes(exercise.id) ? "primary" : "default"}
+                    size="small"
+                    icon={tempSettings.favoriteExercises.includes(exercise.id) ? <Star /> : <StarBorder />}
+                    sx={{ 
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: tempSettings.favoriteExercises.includes(exercise.id) 
+                          ? 'primary.dark' 
+                          : 'grey.100'
+                      }
+                    }}
+                  />
+                ))}
+              </Stack>
+            </Box>
+          ) : (
+            <Alert severity="info">
+              <Typography variant="body2">
+                Los ejercicios se cargarán automáticamente cuando estén disponibles
+              </Typography>
+            </Alert>
+          )}
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
         <Alert severity="info" sx={{ mb: 2 }}>
           <Typography variant="body2">
-            <strong>Nota:</strong> Cuando la funcionalidad social está deshabilitada, 
-            no podrás ver entrenamientos de otros usuarios ni ellos podrán ver los tuyos.
+            <strong>Nota:</strong> Los ejercicios favoritos aparecerán primero en el selector 
+            cuando registres un entrenamiento.
           </Typography>
         </Alert>
       </DialogContent>

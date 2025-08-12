@@ -332,7 +332,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
   }
 
   return (
-    <Box sx={{ p: 2, maxWidth: 600, mx: 'auto' }}>
+    <Box sx={{ p: 2, maxWidth: 800, mx: 'auto' }}>
       <Typography 
         variant="h4" 
         gutterBottom 
