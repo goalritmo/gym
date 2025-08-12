@@ -47,10 +47,8 @@ func main() {
 	api.HandleFunc("/workouts/{id}", handlers.UpdateWorkoutHandler).Methods("PUT")
 	api.HandleFunc("/workouts/{id}", handlers.DeleteWorkoutHandler).Methods("DELETE")
 
-	// Workout sessions endpoints
-	api.HandleFunc("/workout-sessions", handlers.GetWorkoutSessionsHandler).Methods("GET")
-	api.HandleFunc("/workout-sessions", handlers.CreateWorkoutSessionHandler).Methods("POST")
-	api.HandleFunc("/workout-sessions/{id}", handlers.UpdateWorkoutSessionHandler).Methods("PUT")
+	// Workout days endpoints
+	api.HandleFunc("/workout-days", handlers.GetWorkoutDaysHandler).Methods("GET")
 
 	// Exercises endpoints
 	api.HandleFunc("/exercises", handlers.GetExercisesHandler).Methods("GET")
@@ -66,6 +64,13 @@ func main() {
 
 	// Social endpoints
 	api.HandleFunc("/social/workouts", handlers.GetSocialWorkoutsHandler).Methods("GET")
+
+	// Notifications endpoints
+	api.HandleFunc("/notifications", handlers.GetNotificationsHandler).Methods("GET")
+	api.HandleFunc("/notifications/count", handlers.GetUnreadNotificationsCountHandler).Methods("GET")
+	api.HandleFunc("/notifications/{id}/read", handlers.MarkNotificationAsReadHandler).Methods("PUT")
+	api.HandleFunc("/notifications/read-all", handlers.MarkAllNotificationsAsReadHandler).Methods("PUT")
+	api.HandleFunc("/notifications/{id}", handlers.DeleteNotificationHandler).Methods("DELETE")
 
 	// Debug endpoint (temporal)
 	api.HandleFunc("/debug", handlers.DebugHandler).Methods("GET")

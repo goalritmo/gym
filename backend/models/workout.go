@@ -1,59 +1,60 @@
 package models
 
-import (
-	"time"
-)
+import "time"
 
-// Workout representa una serie individual de ejercicio
+// WorkoutDay representa un día de entrenamiento
+type WorkoutDay struct {
+	ID        int       `json:"id" db:"id"`
+	UserID    string    `json:"user_id" db:"user_id"`
+	Date      string    `json:"date" db:"date"` // Formato YYYY-MM-DD
+	Name      string    `json:"name" db:"name"`
+	Effort    int       `json:"effort" db:"effort"`
+	Mood      int       `json:"mood" db:"mood"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+}
+
+// Workout representa un ejercicio individual
 type Workout struct {
-	ID                int       `json:"id" db:"id"`
-	UserID            string    `json:"user_id" db:"user_id"`
-	ExerciseID        int       `json:"exercise_id" db:"exercise_id"`
-	ExerciseName      string    `json:"exercise_name" db:"exercise_name"`
-	Weight            float64   `json:"weight" db:"weight"`
-	Reps              int       `json:"reps" db:"reps"`
-	Serie             *int      `json:"serie" db:"serie"`
-	Seconds           *int      `json:"seconds" db:"seconds"`
-	Observations      *string   `json:"observations" db:"observations"`
-	ExerciseSessionID string    `json:"exercise_session_id" db:"exercise_session_id"`
-	CreatedAt         time.Time `json:"created_at" db:"created_at"`
+	ID           int       `json:"id" db:"id"`
+	UserID       string    `json:"user_id" db:"user_id"`
+	WorkoutDayID int       `json:"workout_day_id" db:"workout_day_id"`
+	ExerciseID   int       `json:"exercise_id" db:"exercise_id"`
+	ExerciseName string    `json:"exercise_name" db:"exercise_name"`
+	Weight       float64   `json:"weight" db:"weight"`
+	Reps         int       `json:"reps" db:"reps"`
+	Serie        int       `json:"serie" db:"serie"`
+	Seconds      *int      `json:"seconds" db:"seconds"`
+	Observations string    `json:"observations" db:"observations"`
+	CreatedAt    time.Time `json:"created_at" db:"created_at"`
 }
 
-// WorkoutSession representa una sesión de entrenamiento completa
-type WorkoutSession struct {
-	ID             int       `json:"id" db:"id"`
-	UserID         string    `json:"user_id" db:"user_id"`
-	SessionDate    time.Time `json:"session_date" db:"session_date"`
-	SessionName    string    `json:"session_name" db:"session_name"`
-	TotalExercises int       `json:"total_exercises" db:"total_exercises"`
-	Effort         int       `json:"effort" db:"effort"`
-	Mood           int       `json:"mood" db:"mood"`
-	Notes          *string   `json:"notes" db:"notes"`
-	CreatedAt      time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
-}
-
-// CreateWorkoutRequest representa la estructura para crear un workout
+// CreateWorkoutRequest representa la solicitud para crear un workout
 type CreateWorkoutRequest struct {
-	ExerciseID   int     `json:"exercise_id" validate:"required"`
+	ExerciseID   int     `json:"exercise_id" validate:"required,gt=0"`
 	Weight       float64 `json:"weight" validate:"required,gt=0"`
 	Reps         int     `json:"reps" validate:"required,gt=0"`
-	Serie        *int    `json:"serie" validate:"omitempty,gt=0"`
+	Serie        *int    `json:"serie"`
 	Seconds      *int    `json:"seconds" validate:"omitempty,gt=0"`
-	Observations *string `json:"observations"`
+	Observations string  `json:"observations"`
 }
 
-// CreateWorkoutSessionRequest representa la estructura para crear una sesión
-type CreateWorkoutSessionRequest struct {
-	SessionDate time.Time `json:"session_date" validate:"required"`
-	SessionName string    `json:"session_name"`
-	Notes       *string   `json:"notes"`
+// UpdateWorkoutDayRequest representa la solicitud para actualizar un día de entrenamiento
+type UpdateWorkoutDayRequest struct {
+	Name   string `json:"name"`
+	Effort int    `json:"effort" validate:"min=0,max=10"`
+	Mood   int    `json:"mood" validate:"min=0,max=10"`
 }
 
-// UpdateWorkoutSessionRequest representa la estructura para actualizar una sesión
-type UpdateWorkoutSessionRequest struct {
-	SessionName *string `json:"session_name"`
-	Effort      *int    `json:"effort" validate:"omitempty,gte=0,lte=5"`
-	Mood        *int    `json:"mood" validate:"omitempty,gte=0,lte=5"`
-	Notes       *string `json:"notes"`
+// ExerciseGroup representa un grupo de ejercicios del mismo tipo
+type ExerciseGroup struct {
+	ExerciseName string    `json:"exercise_name"`
+	Workouts     []Workout `json:"workouts"`
+}
+
+// WorkoutDayWithExercises representa un día de entrenamiento con sus ejercicios agrupados
+type WorkoutDayWithExercises struct {
+	WorkoutDay     WorkoutDay      `json:"workout_day"`
+	ExerciseGroups []ExerciseGroup `json:"exercise_groups"`
+	TotalWorkouts  int             `json:"total_workouts"`
 }
