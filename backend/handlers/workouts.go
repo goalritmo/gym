@@ -29,6 +29,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	userID, ok := r.Context().Value("user_id").(string)
 	if !ok || userID == "" {
+		fmt.Printf("Error: user_id no encontrado en contexto en GetWorkoutsHandler\n")
 		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
 		return
 	}
@@ -36,6 +37,8 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	// Obtener parámetros de query
 	date := r.URL.Query().Get("date")
 	exerciseSessionID := r.URL.Query().Get("exercise_session_id")
+
+	fmt.Printf("Consultando workouts para usuario: %s, fecha: %s, sessionID: %s\n", userID, date, exerciseSessionID)
 
 	query := `
 		SELECT w.id, w.user_id, w.exercise_id, e.name as exercise_name, 
@@ -62,12 +65,17 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	query += " ORDER BY w.created_at DESC"
 
+	fmt.Printf("Ejecutando query con %d parámetros\n", len(args))
+
 	rows, err := database.DB.Query(query, args...)
 	if err != nil {
+		fmt.Printf("Error consultando workouts: %v\n", err)
 		http.Error(w, "Error consultando workouts", http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
+
+	fmt.Printf("Query ejecutada exitosamente, procesando resultados...\n")
 
 	var workouts []models.Workout
 	for rows.Next() {
@@ -86,6 +94,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			&workout.CreatedAt,
 		)
 		if err != nil {
+			fmt.Printf("Error escaneando workout: %v\n", err)
 			http.Error(w, "Error escaneando workout", http.StatusInternalServerError)
 			return
 		}
@@ -96,6 +105,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		workouts = append(workouts, workout)
 	}
 
+	fmt.Printf("Encontrados %d workouts\n", len(workouts))
 	json.NewEncoder(w).Encode(workouts)
 }
 
@@ -337,9 +347,12 @@ func GetWorkoutSessionsHandler(w http.ResponseWriter, r *http.Request) {
 
 	userID, ok := r.Context().Value("user_id").(string)
 	if !ok || userID == "" {
+		fmt.Printf("Error: user_id no encontrado en contexto en GetWorkoutSessionsHandler\n")
 		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
 		return
 	}
+
+	fmt.Printf("Consultando sesiones de entrenamiento para usuario: %s\n", userID)
 
 	query := `
 		SELECT id, user_id, session_date, session_name, total_exercises, 
@@ -351,10 +364,13 @@ func GetWorkoutSessionsHandler(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := database.DB.Query(query, userID)
 	if err != nil {
+		fmt.Printf("Error consultando sesiones: %v\n", err)
 		http.Error(w, "Error consultando sesiones", http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
+
+	fmt.Printf("Query ejecutada exitosamente, procesando resultados...\n")
 
 	var sessions []models.WorkoutSession
 	for rows.Next() {
@@ -372,6 +388,7 @@ func GetWorkoutSessionsHandler(w http.ResponseWriter, r *http.Request) {
 			&session.UpdatedAt,
 		)
 		if err != nil {
+			fmt.Printf("Error escaneando sesión: %v\n", err)
 			http.Error(w, "Error escaneando sesión", http.StatusInternalServerError)
 			return
 		}
@@ -384,6 +401,7 @@ func GetWorkoutSessionsHandler(w http.ResponseWriter, r *http.Request) {
 		sessions = append(sessions, session)
 	}
 
+	fmt.Printf("Encontradas %d sesiones de entrenamiento\n", len(sessions))
 	json.NewEncoder(w).Encode(sessions)
 }
 
