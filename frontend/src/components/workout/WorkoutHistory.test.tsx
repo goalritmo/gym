@@ -43,30 +43,30 @@ describe('WorkoutHistory', () => {
     }
   ]
 
-  const mockWorkouts = [
-    {
-      id: 1,
+const mockWorkouts = [
+  {
+    id: 1,
       user_id: 'test-user-id',
       workout_day_id: 1,
       exercise_id: 1,
       exercise_name: 'Press de banca',
-      weight: 80,
-      reps: 8,
-      serie: 1,
+    weight: 80,
+    reps: 8,
+    serie: 1,
       seconds: null,
       observations: '',
       created_at: '2025-08-12T10:00:00Z'
-    },
-    {
-      id: 2,
+  },
+  {
+    id: 2,
       user_id: 'test-user-id',
       workout_day_id: 1,
       exercise_id: 2,
       exercise_name: 'Sentadillas',
-      weight: 100,
+    weight: 100,
       reps: 10,
       serie: 1,
-      seconds: null,
+    seconds: null,
       observations: '',
       created_at: '2025-08-12T10:00:00Z'
     }

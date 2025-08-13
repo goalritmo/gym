@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { 
   Box, 
   Typography, 
@@ -50,7 +50,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
   const [error, setError] = useState('')
   const [hasMore, setHasMore] = useState(true)
   const [offset, setOffset] = useState(0)
-  const limit = 10
+  const limit = 5
 
   useEffect(() => {
     loadSocialWorkouts()
@@ -235,30 +235,23 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
   
   console.log('🔍 Estado de socialWorkouts:', { socialWorkouts: safeSocialWorkouts, length: safeSocialWorkouts.length })
   
-  if (safeSocialWorkouts.length === 0) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: 4, 
-            textAlign: 'center',
-            backgroundColor: 'grey.50',
-            borderRadius: 2
-          }}
-        >
-          <TrendingUp sx={{ fontSize: 60, color: 'grey.400', mb: 2 }} />
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            No hay entrenamientos hoy
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Sé el primero en compartir tu entrenamiento del día
-          </Typography>
-        </Paper>
-      </Box>
-    )
-  }
-
+  // Agrupar workouts por día
+  const workoutsByDay = useMemo(() => {
+    const groups: { [key: string]: SocialWorkout[] } = {}
+    
+    safeSocialWorkouts.forEach(workout => {
+      const date = new Date(workout.workout_date)
+      const dayKey = date.toISOString().split('T')[0] // YYYY-MM-DD
+      
+      if (!groups[dayKey]) {
+        groups[dayKey] = []
+      }
+      groups[dayKey].push(workout)
+    })
+    
+    return groups
+  }, [safeSocialWorkouts])
+  
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto' }}>
       <Typography 
@@ -274,8 +267,32 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
         Social
       </Typography>
 
-      <Stack spacing={3}>
-        {safeSocialWorkouts.map((workout) => (
+      {safeSocialWorkouts.length === 0 ? (
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography variant="h6" color="text.secondary">
+            No hay entrenamientos registrados
+          </Typography>
+        </Box>
+      ) : (
+        <Stack spacing={3}>
+          {Object.entries(workoutsByDay).map(([dayKey, workouts]) => (
+            <Box key={dayKey}>
+              {/* Header del día */}
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  fontWeight: 'bold', 
+                  mb: 2,
+                  color: 'primary.main',
+                  textAlign: 'left'
+                }}
+              >
+                {formatWorkoutDate(workouts[0].workout_date)}
+              </Typography>
+              
+              {/* Workouts del día */}
+              <Stack spacing={2}>
+                {workouts.map((workout) => (
           <Card 
             key={workout.session_id} 
             sx={{ 
@@ -305,7 +322,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                     {workout.user_name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
-                    {formatWorkoutDate(workout.workout_date)} • {formatDate(workout.workout_date)}
+                    {formatDate(workout.workout_date)}
                   </Typography>
                 </Box>
               </Box>
@@ -374,7 +391,10 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
               </Box>
             </CardContent>
           </Card>
-        ))}
+                ))}
+              </Stack>
+            </Box>
+          ))}
         
         {/* Botón "Cargar más" */}
         {hasMore && (
@@ -390,6 +410,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
           </Box>
         )}
       </Stack>
+      )}
     </Box>
   )
 }
