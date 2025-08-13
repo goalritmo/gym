@@ -10,7 +10,7 @@ import FloatingNavButton from '../navigation/FloatingNavButton'
 import SettingsModal from '../settings/SettingsModal'
 import NotificationsModal from '../notifications/NotificationsModal'
 import { UserSettingsProvider } from '../../contexts/UserSettingsContext'
-import type { Workout, WorkoutSession } from '../../types/workout'
+import type { Workout, WorkoutDay } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { apiClient } from '../../lib/api'
@@ -20,7 +20,7 @@ function AuthenticatedAppContent() {
   const { activeTab, setActiveTab } = useTab()
   const { isLoggingOut, isSigningIn } = useAuth()
   const [workouts, setWorkouts] = useState<Workout[]>([])
-  const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
+  const [workoutDays, setWorkoutDays] = useState<WorkoutDay[]>([])
   const [exercises, setExercises] = useState<any[]>([])
   const [isSubmittingWorkout, setIsSubmittingWorkout] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -34,34 +34,32 @@ function AuthenticatedAppContent() {
   const loadData = async () => {
     setIsLoading(true)
     try {
-      // Cargar workouts, sesiones y ejercicios en paralelo
-      const [workoutsData, sessionsData, exercisesData] = await Promise.all([
+      // Cargar workouts, workout days y ejercicios en paralelo
+      const [workoutsData, workoutDaysData, exercisesData] = await Promise.all([
         apiClient.getWorkouts(),
-        apiClient.getWorkoutSessions(),
+        apiClient.getWorkoutDays(),
         apiClient.getExercises()
       ])
       
       setWorkouts(Array.isArray(workoutsData) ? workoutsData : [])
-      setWorkoutSessions(Array.isArray(sessionsData) ? sessionsData : [])
+      setWorkoutDays(Array.isArray(workoutDaysData) ? workoutDaysData : [])
       setExercises(Array.isArray(exercisesData) ? exercisesData : [])
     } catch (error) {
       console.error('Error cargando datos del backend:', error)
       
       // Fallback a localStorage si el backend falla
-
       const savedWorkouts = localStorage.getItem('gym-workouts')
-      const savedSessions = localStorage.getItem('gym-workout-sessions')
+      const savedWorkoutDays = localStorage.getItem('gym-workout-days')
       
       if (savedWorkouts) {
         setWorkouts(JSON.parse(savedWorkouts))
       }
       
-      if (savedSessions) {
-        setWorkoutSessions(JSON.parse(savedSessions))
+      if (savedWorkoutDays) {
+        setWorkoutDays(JSON.parse(savedWorkoutDays))
       }
       
       // Solo usar ejercicios por defecto si no hay ninguno cargado
-
       setExercises([])
     } finally {
       setIsLoading(false)
@@ -71,7 +69,7 @@ function AuthenticatedAppContent() {
   // Cargar datos desde el backend al montar el componente
   useEffect(() => {
     // Solo cargar datos si no están ya cargados
-    if (workouts.length === 0 && workoutSessions.length === 0 && exercises.length === 0) {
+    if (workouts.length === 0 && workoutDays.length === 0 && exercises.length === 0) {
       loadData()
     }
   }, [])
@@ -83,12 +81,12 @@ function AuthenticatedAppContent() {
     }
   }, [workouts])
 
-  // Guardar sessions cuando cambien
+  // Guardar workout days cuando cambien
   useEffect(() => {
-    if (workoutSessions.length > 0) {
-      localStorage.setItem('gym-workout-sessions', JSON.stringify(workoutSessions))
+    if (workoutDays.length > 0) {
+      localStorage.setItem('gym-workout-days', JSON.stringify(workoutDays))
     }
-  }, [workoutSessions])
+  }, [workoutDays])
 
   const handleTabChange = (newValue: TabType) => {
     setActiveTab(newValue)
@@ -114,40 +112,27 @@ function AuthenticatedAppContent() {
   const handleWorkoutSubmit = async (data: any): Promise<void> => {
     setIsSubmittingWorkout(true)
     try {
-      const today = new Date().toISOString()
-      const todayDate = today.split('T')[0] + 'T00:00:00Z'
+      const today = new Date().toISOString().split('T')[0]
 
-      // Buscar si ya existe una sesión para hoy (primero en estado local)
-      let currentSession = workoutSessions.find(session => 
-        session.session_date.split('T')[0] === today.split('T')[0]
+      // Buscar si ya existe un workout day para hoy
+      let currentWorkoutDay = workoutDays.find(day => 
+        day.date === today
       )
 
-      // Si no existe, crear una nueva sesión en el backend
-      if (!currentSession) {
-  
-        const newSessionData = {
-          session_date: todayDate,
-          session_name: 'Entrenamiento del día',
-          effort: 2,
-          mood: 2
-        }
-        
-        const newSession = await apiClient.createWorkoutSession(newSessionData) as WorkoutSession
-        currentSession = newSession
-
-        setWorkoutSessions(prev => [...prev, currentSession!])
+      // Si no existe, crear uno nuevo en el backend
+      if (!currentWorkoutDay) {
+        // Por ahora, crear el workout day directamente al crear el workout
+        // El backend se encargará de crear el workout day si no existe
       }
 
       // Crear el nuevo workout en el backend
-
       const workoutData = {
         exercise_id: data.exercise_id,
         weight: data.weight || 0,
         reps: data.reps || 0,
-        serie: data.serie || null,
-        seconds: data.seconds || null,
-        observations: data.observations || null,
-        exercise_session_id: currentSession.id
+        serie: data.serie || 1,
+        seconds: data.seconds || undefined,
+        observations: data.observations || ''
       }
 
       await apiClient.createWorkout(workoutData) as Workout
@@ -164,43 +149,7 @@ function AuthenticatedAppContent() {
     }
   }
 
-  // Función para eliminar un workout
-  const handleDeleteWorkout = async (workoutId: number) => {
-    try {
 
-      await apiClient.deleteWorkout(workoutId)
-      
-      // Actualizar estado local
-      setWorkouts(prev => prev.filter(w => w.id !== workoutId))
-
-      setDeleteMessage('Entrenamiento eliminado exitosamente')
-    } catch (error) {
-      console.error('❌ Error eliminando workout:', error)
-      setDeleteError('Error al eliminar el entrenamiento')
-    }
-  }
-
-  // Función para actualizar una sesión
-  const handleUpdateSession = async (sessionId: number, updates: Partial<WorkoutSession>) => {
-    try {
-
-      const result = await apiClient.updateWorkoutSession(sessionId, updates)
-
-      
-      // Solo actualizar estado local si el backend confirma éxito
-      setWorkoutSessions(prev => 
-        prev.map(session => 
-          session.id === sessionId 
-            ? { ...session, ...updates }
-            : session
-        )
-      )
-      return result
-    } catch (error) {
-      console.error('❌ Error actualizando sesión:', error)
-      throw error // Propagar el error para que el frontend lo maneje
-    }
-  }
 
 
 
@@ -347,13 +296,7 @@ function AuthenticatedAppContent() {
         {/* Pestaña Historial */}
         {activeTab === TABS.HISTORY && (
           <Box>
-            <WorkoutHistory 
-              workoutSessions={workoutSessions}
-              workouts={workouts}
-              onDelete={handleDeleteWorkout}
-              onUpdateSession={handleUpdateSession}
-              onTabChange={handleTabChange}
-            />
+            <WorkoutHistory />
           </Box>
         )}
 

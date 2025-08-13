@@ -1,196 +1,183 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import WorkoutHistory from './WorkoutHistory'
+import { apiClient } from '../../lib/api'
 
-const mockWorkouts = [
-  {
-    id: 1,
-    exercise_name: 'Press de Banca',
-    weight: 80,
-    reps: 8,
-    serie: 1,
-    seconds: 45,
-    observations: 'Buena técnica',
-    created_at: '2024-01-15T10:30:00Z',
-    exercise_session_id: 1
-  },
-  {
-    id: 2,
-    exercise_name: 'Sentadilla',
-    weight: 100,
-    reps: 6,
-    serie: 2,
-    seconds: null,
-    observations: null,
-    created_at: '2024-01-15T10:45:00Z',
-    exercise_session_id: 1
-  },
-  {
-    id: 3,
-    exercise_name: 'Peso Muerto',
-    weight: 120,
-    reps: 5,
-    serie: 3,
-    seconds: 60,
-    observations: 'Peso máximo',
-    created_at: '2024-01-14T09:15:00Z',
-    exercise_session_id: 2
+// Mock del API client
+vi.mock('../../lib/api', () => ({
+  apiClient: {
+    getWorkoutDays: vi.fn(),
+    getWorkouts: vi.fn(),
+    deleteWorkout: vi.fn()
   }
-]
+}))
 
-const mockWorkoutSessions = [
-  {
-    id: 1,
-    session_date: '2024-01-15T00:00:00Z',
-    session_name: 'Rutina de Fullbody',
-    effort: 2,
-    mood: 3,
-    created_at: '2024-01-15T10:00:00Z'
-  },
-  {
-    id: 2,
-    session_date: '2024-01-14T00:00:00Z',
-    session_name: 'Rutina de Fullbody',
-    effort: 3,
-    mood: 2,
-    created_at: '2024-01-14T09:00:00Z'
-  }
-]
+// Mock del contexto de autenticación
+vi.mock('../../contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 'test-user-id' },
+    isAuthenticated: true
+  })
+}))
+
+// Mock del contexto de configuración de usuario
+vi.mock('../../contexts/UserSettingsContext', () => ({
+  useUserSettings: () => ({
+    settings: {
+      socialEnabled: true
+    }
+  })
+}))
 
 describe('WorkoutHistory', () => {
-  it('muestra lista de entrenamientos', () => {
-    render(<WorkoutHistory 
-      workoutSessions={mockWorkoutSessions}
-      workouts={mockWorkouts} 
-      onDelete={vi.fn()} 
-      onUpdateSession={vi.fn()}
-    />)
-    
-    expect(screen.getByText('Press de Banca')).toBeInTheDocument()
-    expect(screen.getByText('Sentadilla')).toBeInTheDocument()
-    expect(screen.getByText('Peso Muerto')).toBeInTheDocument()
+  const mockWorkoutDays = [
+    {
+      id: 1,
+      user_id: 'test-user-id',
+      date: '2025-08-12',
+      name: 'Entrenamiento del día',
+      effort: 7,
+      mood: 8,
+      created_at: '2025-08-12T10:00:00Z',
+      updated_at: '2025-08-12T10:00:00Z'
+    }
+  ]
+
+  const mockWorkouts = [
+    {
+      id: 1,
+      user_id: 'test-user-id',
+      workout_day_id: 1,
+      exercise_id: 1,
+      exercise_name: 'Press de banca',
+      weight: 80,
+      reps: 8,
+      serie: 1,
+      seconds: null,
+      observations: '',
+      created_at: '2025-08-12T10:00:00Z'
+    },
+    {
+      id: 2,
+      user_id: 'test-user-id',
+      workout_day_id: 1,
+      exercise_id: 2,
+      exercise_name: 'Sentadillas',
+      weight: 100,
+      reps: 10,
+      serie: 1,
+      seconds: null,
+      observations: '',
+      created_at: '2025-08-12T10:00:00Z'
+    }
+  ]
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    ;(apiClient.getWorkoutDays as any).mockResolvedValue(mockWorkoutDays)
+    ;(apiClient.getWorkouts as any).mockResolvedValue(mockWorkouts)
+    ;(apiClient.deleteWorkout as any).mockResolvedValue({})
   })
 
-  it('muestra información detallada de cada entrenamiento', () => {
-    render(<WorkoutHistory 
-      workoutSessions={mockWorkoutSessions}
-      workouts={mockWorkouts} 
-      onDelete={vi.fn()} 
-      onUpdateSession={vi.fn()}
-    />)
+  it('renderiza el componente correctamente', async () => {
+    render(<WorkoutHistory />)
     
-    // Verificar peso y repeticiones
-    expect(screen.getByText('80 kg')).toBeInTheDocument()
-    expect(screen.getByText('8 reps')).toBeInTheDocument()
-    expect(screen.getByText('100 kg')).toBeInTheDocument()
-    expect(screen.getByText('6 reps')).toBeInTheDocument()
-    
-    // Verificar series
-    expect(screen.getByText('Serie 1')).toBeInTheDocument()
-    expect(screen.getByText('Serie 2')).toBeInTheDocument()
-    expect(screen.getByText('Serie 3')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Entrenamientos')).toBeInTheDocument()
+    })
   })
 
-  it('muestra tiempo cuando está disponible', () => {
-    render(<WorkoutHistory 
-      workoutSessions={mockWorkoutSessions}
-      workouts={mockWorkouts} 
-      onDelete={vi.fn()} 
-      onUpdateSession={vi.fn()}
-    />)
+  it('carga y muestra los datos de entrenamientos', async () => {
+    render(<WorkoutHistory />)
     
-    expect(screen.getByText('45s')).toBeInTheDocument()
-    expect(screen.getByText('60s')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(apiClient.getWorkoutDays).toHaveBeenCalled()
+      expect(apiClient.getWorkouts).toHaveBeenCalled()
+    })
   })
 
-  it('no muestra tiempo cuando no está disponible', () => {
-    render(<WorkoutHistory 
-      workoutSessions={mockWorkoutSessions}
-      workouts={mockWorkouts} 
-      onDelete={vi.fn()} 
-      onUpdateSession={vi.fn()}
-    />)
+  it('muestra mensaje cuando no hay entrenamientos', async () => {
+    ;(apiClient.getWorkoutDays as any).mockResolvedValue([])
+    ;(apiClient.getWorkouts as any).mockResolvedValue([])
     
-    // El segundo workout no tiene seconds, no debería aparecer
-    expect(screen.queryByText('nulls')).not.toBeInTheDocument()
+    render(<WorkoutHistory />)
+    
+    await waitFor(() => {
+      expect(screen.getByText('No hay entrenamientos registrados')).toBeInTheDocument()
+    })
   })
 
-  it('muestra observaciones cuando están disponibles', () => {
-    render(<WorkoutHistory 
-      workoutSessions={mockWorkoutSessions}
-      workouts={mockWorkouts} 
-      onDelete={vi.fn()} 
-      onUpdateSession={vi.fn()}
-    />)
+  it('maneja errores de carga correctamente', async () => {
+    ;(apiClient.getWorkoutDays as any).mockRejectedValue(new Error('Error de red'))
     
-    expect(screen.getByText('Buena técnica')).toBeInTheDocument()
-    expect(screen.getByText('Peso máximo')).toBeInTheDocument()
+    render(<WorkoutHistory />)
+    
+    await waitFor(() => {
+      expect(screen.getByText('Error cargando entrenamientos')).toBeInTheDocument()
+    })
   })
 
-  it('no muestra observaciones cuando no están disponibles', () => {
-    render(<WorkoutHistory 
-      workoutSessions={mockWorkoutSessions}
-      workouts={mockWorkouts} 
-      onDelete={vi.fn()} 
-      onUpdateSession={vi.fn()}
-    />)
+  it('permite filtrar por fecha', async () => {
+    render(<WorkoutHistory />)
     
-    // El segundo workout no tiene observaciones
-    expect(screen.queryByText('null')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Entrenamientos')).toBeInTheDocument()
+    })
+    
+    const dateInput = screen.getByDisplayValue('')
+    expect(dateInput).toBeInTheDocument()
   })
 
-  it('llama a onDelete cuando se hace click en eliminar', async () => {
-    const onDelete = vi.fn()
-    const user = userEvent.setup()
-    render(<WorkoutHistory 
-      workoutSessions={mockWorkoutSessions}
-      workouts={mockWorkouts} 
-      onDelete={onDelete} 
-      onUpdateSession={vi.fn()}
-    />)
+  it('muestra los detalles del entrenamiento al expandir', async () => {
+    render(<WorkoutHistory />)
     
-    const deleteButtons = screen.getAllByRole('button', { name: /eliminar/i })
-    await user.click(deleteButtons[0])
+    await waitFor(() => {
+      expect(screen.getByText('Lunes 12 de Agosto')).toBeInTheDocument()
+    })
     
-    // El primer botón corresponde al workout más reciente (ID 2 - Sentadilla)
-    expect(onDelete).toHaveBeenCalledWith(2)
+    const expandButton = screen.getByRole('button', { name: /expand/i })
+    fireEvent.click(expandButton)
+    
+    await waitFor(() => {
+      expect(screen.getByText('Press de banca')).toBeInTheDocument()
+      expect(screen.getByText('Sentadillas')).toBeInTheDocument()
+    })
   })
 
-  it('muestra fecha formateada para cada entrenamiento', () => {
-    render(<WorkoutHistory 
-      workoutSessions={mockWorkoutSessions}
-      workouts={mockWorkouts} 
-      onDelete={vi.fn()} 
-      onUpdateSession={vi.fn()}
-    />)
+  it('permite eliminar un workout', async () => {
+    render(<WorkoutHistory />)
     
-    // Debería mostrar las fechas en formato legible
-    expect(screen.getAllByText(/15\/1\/2024/)).toHaveLength(2) // 2 workouts del 15/1
-    expect(screen.getByText(/14\/1\/2024/)).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Lunes 12 de Agosto')).toBeInTheDocument()
+    })
+    
+    const expandButton = screen.getByRole('button', { name: /expand/i })
+    fireEvent.click(expandButton)
+    
+    await waitFor(() => {
+      const deleteButtons = screen.getAllByRole('button', { name: /delete/i })
+      fireEvent.click(deleteButtons[0])
+    })
+    
+    await waitFor(() => {
+      expect(screen.getByText('Confirmar eliminación')).toBeInTheDocument()
+    })
   })
 
-  it('muestra mensaje cuando no hay entrenamientos', () => {
-    render(<WorkoutHistory 
-      workoutSessions={[]}
-      workouts={[]} 
-      onDelete={vi.fn()} 
-      onUpdateSession={vi.fn()}
-    />)
+  it('muestra el esfuerzo y estado de ánimo', async () => {
+    render(<WorkoutHistory />)
     
-    expect(screen.getByText('No hay entrenamientos registrados')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Esfuerzo: 7/10')).toBeInTheDocument()
+      expect(screen.getByText('Estado de ánimo: 8/10')).toBeInTheDocument()
+    })
   })
 
-  it('ordena los entrenamientos por fecha más reciente', () => {
-    render(<WorkoutHistory 
-      workoutSessions={mockWorkoutSessions}
-      workouts={mockWorkouts} 
-      onDelete={vi.fn()} 
-      onUpdateSession={vi.fn()}
-    />)
+  it('muestra el número correcto de ejercicios', async () => {
+    render(<WorkoutHistory />)
     
-    // Los entrenamientos deberían estar ordenados por fecha (más reciente primero)
-    const workoutCards = screen.getAllByText(/kg/)
-    expect(workoutCards).toHaveLength(3)
+    await waitFor(() => {
+      expect(screen.getByText('2 ejercicios')).toBeInTheDocument()
+    })
   })
 })

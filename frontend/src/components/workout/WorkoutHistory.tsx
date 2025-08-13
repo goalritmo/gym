@@ -69,14 +69,7 @@ export default function WorkoutHistory() {
     return `${weekday} ${day} de ${month}`
   }
 
-  const formatDateShort = (dateString: string) => {
-    const date = normalizeDate(dateString)
-    const options: Intl.DateTimeFormatOptions = {
-      day: 'numeric',
-      month: 'long'
-    }
-    return date.toLocaleDateString('es-ES', options)
-  }
+
 
   // Agrupar workouts por día y crear días con ejercicios
   const workoutDaysWithExercises = useMemo(() => {
@@ -324,7 +317,7 @@ export default function WorkoutHistory() {
         {/* Cards de entrenamientos */}
         <Box sx={{ mx: 2 }}>
           {filteredWorkoutDays.map((day) => (
-          <Box key={day.workoutDay.date} sx={{ position: 'relative', mb: 2 }}>
+            <Box key={day.workoutDay.date} sx={{ position: 'relative', mb: 2 }}>
             <Card sx={{ 
               boxShadow: 2, 
               width: '100%',
@@ -623,8 +616,9 @@ export default function WorkoutHistory() {
               </Button>
             </DialogActions>
           </Dialog>
+            </Box>
+          ))}
         </Box>
-        ))}
 
         {filteredWorkoutDays.length === 0 && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
