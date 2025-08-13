@@ -21,7 +21,8 @@ import {
   ExpandLess as ExpandLessIcon,
   Delete as DeleteIcon,
   ModeEdit as ModeEditIcon,
-  FitnessCenter
+  Star as StarIcon,
+  StarBorder as StarBorderIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import type { Workout, WorkoutDay, ExerciseGroup, WorkoutDayWithExercises } from '../../types/workout'
@@ -67,6 +68,47 @@ export default function WorkoutHistory() {
     const month = months[date.getMonth()]
     
     return `${weekday} ${day} de ${month}`
+  }
+
+  // Componente de estrellas para rating
+  const StarRating = ({ value, maxValue = 5, size = 'small', editable = false, onChange }: { 
+    value: number; 
+    maxValue?: number; 
+    size?: 'small' | 'medium' | 'large';
+    editable?: boolean;
+    onChange?: (newValue: number) => void;
+  }) => {
+    const stars = []
+    
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <IconButton
+          key={i}
+          size={size}
+          disabled={!editable}
+          onClick={() => editable && onChange && onChange(i)}
+          sx={{ 
+            p: 0.5, 
+            color: i <= value ? 'warning.main' : 'grey.300',
+            '&:hover': { 
+              backgroundColor: editable ? 'rgba(255, 193, 7, 0.1)' : 'transparent',
+              color: editable ? 'warning.main' : (i <= value ? 'warning.main' : 'grey.300')
+            }
+          }}
+        >
+          {i <= value ? <StarIcon /> : <StarBorderIcon />}
+        </IconButton>
+      )
+    }
+    
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        {stars}
+        <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+          ({value}/{maxValue})
+        </Typography>
+      </Box>
+    )
   }
 
 
@@ -193,18 +235,38 @@ export default function WorkoutHistory() {
   };
 
   const handleDeleteWorkout = async (workoutId: number) => {
-    setLoadingWorkoutId(workoutId);
+    setLoadingWorkoutId(workoutId)
     try {
-      await apiClient.deleteWorkout(workoutId);
-      setWorkouts(prev => prev.filter(w => w.id !== workoutId));
-      setDeleteConfirmation({ show: false, workoutId: null });
-    } catch (error: any) {
-      console.error('Error eliminando workout:', error);
-      setError('Error eliminando ejercicio');
+      await apiClient.deleteWorkout(workoutId)
+      // Recargar datos después de eliminar
+      await loadData()
+    } catch (error) {
+      console.error('Error eliminando workout:', error)
+      setError('Error eliminando el ejercicio')
     } finally {
-      setLoadingWorkoutId(null);
+      setLoadingWorkoutId(null)
+      setDeleteConfirmation({ show: false, workoutId: null })
     }
-  };
+  }
+
+  const handleUpdateMood = async (workoutDayId: number, newMood: number) => {
+    try {
+      // TODO: Implementar llamada al backend para actualizar el mood
+      console.log('Actualizando mood del workout day:', workoutDayId, 'a:', newMood)
+      
+      // Por ahora, actualizar el estado local
+      setWorkoutDays(prev => 
+        prev.map(day => 
+          day.id === workoutDayId 
+            ? { ...day, mood: newMood }
+            : day
+        )
+      )
+    } catch (error) {
+      console.error('Error actualizando estado de ánimo:', error)
+      setError('Error actualizando el estado de ánimo')
+    }
+  }
 
   const handleConfirmDelete = () => {
     if (deleteConfirmation.workoutId) {
@@ -393,27 +455,8 @@ export default function WorkoutHistory() {
                 </IconButton>
               </Box>
 
-              {/* Esfuerzo y Estado de Ánimo */}
-              <Box sx={{ mb: 2 }}>
-                {/* Esfuerzo */}
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    mb: 1,
-                    p: 1,
-                    borderRadius: 1,
-                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                    border: '1px solid rgba(255, 193, 7, 0.3)'
-                  }}
-                >
-                  <FitnessCenter sx={{ mr: 1, color: 'warning.main', fontSize: '1.2rem' }} />
-                  <Typography variant="body2" sx={{ color: 'warning.dark', fontWeight: 500 }}>
-                    Esfuerzo: {day.workoutDay.effort}/10
-                  </Typography>
-                </Box>
-                
-                {/* Estado de ánimo */}
+              {/* Estado de ánimo */}
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Box 
                   sx={{ 
                     display: 'flex', 
@@ -424,9 +467,18 @@ export default function WorkoutHistory() {
                     border: '1px solid rgba(156, 39, 176, 0.3)'
                   }}
                 >
-                  <Typography variant="body2" sx={{ color: 'purple', fontWeight: 500 }}>
-                    Estado de ánimo: {day.workoutDay.mood}/10
-                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="caption" sx={{ color: 'purple', fontWeight: 500, mb: 0.5 }}>
+                      Estado de ánimo
+                    </Typography>
+                    <StarRating 
+                      value={day.workoutDay.mood} 
+                      editable={true} 
+                      onChange={(newValue) => {
+                        handleUpdateMood(day.workoutDay.id, newValue);
+                      }}
+                    />
+                  </Box>
                 </Box>
               </Box>
 
@@ -483,9 +535,22 @@ export default function WorkoutHistory() {
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'} • 
-                  Esfuerzo: {day.workoutDay.effort}/10 • 
-                  Estado de ánimo: {day.workoutDay.mood}/10
+                  Estado de ánimo: {day.workoutDay.mood}/5
                 </Typography>
+                
+                {/* Estado de ánimo editable en el modal */}
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="body2" sx={{ mr: 1, fontWeight: 500 }}>
+                    Estado de ánimo:
+                  </Typography>
+                  <StarRating 
+                    value={day.workoutDay.mood} 
+                    editable={true} 
+                    onChange={(newValue) => {
+                      handleUpdateMood(day.workoutDay.id, newValue);
+                    }}
+                  />
+                </Box>
               </Box>
 
               <Stack spacing={2}>

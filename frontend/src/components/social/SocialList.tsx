@@ -140,36 +140,56 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
   }
 
   const formatDate = (dateString: string): string => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) {
+        return 'Fecha desconocida'
+      }
+      
+      const now = new Date()
+      const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
     
-    if (diffInHours < 1) {
-      return 'Hace unos minutos'
-    } else if (diffInHours === 1) {
-      return 'Hace 1 hora'
-    } else if (diffInHours < 24) {
-      return `Hace ${diffInHours} horas`
-    } else {
-      return date.toLocaleDateString('es-ES', { 
-        day: 'numeric', 
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      if (diffInHours < 1) {
+        return 'Hace unos minutos'
+      } else if (diffInHours === 1) {
+        return 'Hace 1 hora'
+      } else if (diffInHours < 24) {
+        return `Hace ${diffInHours} horas`
+      } else {
+        return date.toLocaleDateString('es-ES', { 
+          day: 'numeric', 
+          month: 'short',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      }
+    } catch (error) {
+      console.error('Error formateando fecha:', error, dateString)
+      return 'Fecha desconocida'
     }
   }
 
+
+
   const formatWorkoutDate = (dateString: string): string => {
-    const date = new Date(dateString)
-    const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
-    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
-    
-    const weekday = weekdays[date.getDay()]
-    const day = date.getDate()
-    const month = months[date.getMonth()]
-    
-    return `${weekday} ${day} de ${month}`
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) {
+        return 'Fecha desconocida'
+      }
+      
+      const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+      const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+      
+      const weekday = weekdays[date.getDay()]
+      const day = date.getDate()
+      const month = months[date.getMonth()]
+      
+      return `${weekday} ${day} de ${month}`
+    } catch (error) {
+      console.error('Error formateando fecha:', error, dateString)
+      return 'Fecha desconocida'
+    }
   }
 
   // Si el usuario no tiene habilitada la funcionalidad social, mostrar mensaje de privacidad
@@ -241,15 +261,19 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
     
     safeSocialWorkouts.forEach(workout => {
       if (!workout || !workout.workout_date) {
+        console.log('Workout inválido:', workout)
         return // Skip invalid workouts
       }
       
       try {
+        // Usar la fecha directamente sin normalización compleja por ahora
         const date = new Date(workout.workout_date)
         if (isNaN(date.getTime())) {
+          console.log('Fecha inválida:', workout.workout_date)
           return // Skip invalid dates
         }
         
+        // Crear dayKey simple
         const dayKey = date.toISOString().split('T')[0] // YYYY-MM-DD
         
         if (!groups[dayKey]) {
@@ -261,6 +285,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
       }
     })
     
+    console.log('Workouts agrupados:', groups)
     return groups
   }, [safeSocialWorkouts])
   
