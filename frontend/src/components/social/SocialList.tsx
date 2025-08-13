@@ -20,11 +20,10 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 type SocialWorkout = {
-  id: number
+  session_id: number
   user_id: string
   user_name: string
-  user_avatar?: string
-  workout_day_id: number
+  user_avatar_url?: string
   workout_date: string
   total_exercises: number
   total_series: number
@@ -110,7 +109,7 @@ export default function SocialList() {
     if (!user) return
     
     // Solo permitir dar kudos si no se ha dado ya
-    const workout = socialWorkouts.find(w => w.id === workoutId)
+    const workout = socialWorkouts.find(w => w.session_id === workoutId)
     if (!workout || workout.has_kudos) return
     
     try {
@@ -121,7 +120,7 @@ export default function SocialList() {
       
       // Actualizar estado local
       setSocialWorkouts(prev => prev.map(workout => {
-        if (workout.id === workoutId) {
+        if (workout.session_id === workoutId) {
           return {
             ...workout,
             has_kudos: true,
@@ -149,12 +148,12 @@ export default function SocialList() {
   const groupedWorkouts = useMemo(() => {
     const groups: { [key: string]: SocialWorkout[] } = {}
     
-    console.log('🔍 Debug SocialList:', {
-      totalWorkouts: socialWorkouts.length,
-      showOwnWorkouts: settings.showOwnWorkoutsInSocial,
-      userId: user?.id,
-      workouts: socialWorkouts.map(w => ({ id: w.id, userId: w.user_id, userName: w.user_name }))
-    })
+          console.log('🔍 Debug SocialList:', {
+        totalWorkouts: socialWorkouts.length,
+        showOwnWorkouts: settings.showOwnWorkoutsInSocial,
+        userId: user?.id,
+        workouts: socialWorkouts.map(w => ({ sessionId: w.session_id, userId: w.user_id, userName: w.user_name }))
+      })
     
     // Filtrar workouts propios si la opción está desactivada
     const filteredWorkouts = settings.showOwnWorkoutsInSocial 
@@ -233,7 +232,7 @@ export default function SocialList() {
               {/* Workouts del día */}
               <Stack spacing={2}>
                 {workouts.map((workout) => (
-                  <Card key={workout.id} sx={{ 
+                  <Card key={workout.session_id} sx={{ 
                     boxShadow: 2, 
                     borderRadius: 2,
                     border: '1px solid',
@@ -248,15 +247,15 @@ export default function SocialList() {
                       {/* Header del workout */}
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                         <Avatar
-                          src={workout.user_avatar}
+                          src={workout.user_avatar_url}
                           sx={{ 
                             width: 40, 
                             height: 40, 
                             mr: 2,
-                            bgcolor: workout.user_avatar ? 'transparent' : 'primary.main'
+                            bgcolor: workout.user_avatar_url ? 'transparent' : 'primary.main'
                           }}
                         >
-                          {!workout.user_avatar && workout.user_name.charAt(0).toUpperCase()}
+                          {!workout.user_avatar_url && workout.user_name.charAt(0).toUpperCase()}
                         </Avatar>
                         <Box sx={{ flex: 1, textAlign: 'left' }}>
                           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
@@ -289,8 +288,8 @@ export default function SocialList() {
                         
                         <Tooltip title={workout.has_kudos ? 'Ya diste kudos' : workout.kudos_count === 0 ? 'Dar el primer kudos' : 'Dar kudos'}>
                           <IconButton
-                            onClick={() => handleKudos(workout.id)}
-                            disabled={loadingKudos.has(workout.id) || workout.has_kudos}
+                            onClick={() => handleKudos(workout.session_id)}
+                            disabled={loadingKudos.has(workout.session_id) || workout.has_kudos}
                             sx={{
                               color: workout.has_kudos ? 'success.main' : 'text.secondary',
                               '&:hover': {
@@ -298,7 +297,7 @@ export default function SocialList() {
                               }
                             }}
                           >
-                            {loadingKudos.has(workout.id) ? (
+                            {loadingKudos.has(workout.session_id) ? (
                               <CircularProgress size={20} />
                             ) : workout.has_kudos ? (
                               <ThumbUpIcon />
