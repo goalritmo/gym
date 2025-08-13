@@ -30,9 +30,9 @@ type AdminExercise = {
   id: number
   name: string
   muscle_group: string
+  equipment: string
   primary_muscles: string[] | null
   secondary_muscles: string[] | null
-  equipment: string
   video_url?: string
   is_active: boolean
   created_at: string
@@ -42,9 +42,9 @@ type AdminExercise = {
 type CreateExerciseForm = {
   name: string
   muscle_group: string
+  equipment: string
   primary_muscles: string[]
   secondary_muscles: string[]
-  equipment: string
   video_url: string
 }
 

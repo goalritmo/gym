@@ -22,14 +22,14 @@ type AdminNotification struct {
 
 // AdminExercise representa un ejercicio para el panel de admin
 type AdminExercise struct {
-	ID               int      `json:"id"`
-	Name             string   `json:"name"`
-	MuscleGroup      string   `json:"muscle_group"`
-	PrimaryMuscles   []string `json:"primary_muscles"`
-	SecondaryMuscles []string `json:"secondary_muscles"`
-	Equipment        string   `json:"equipment"`
-	VideoURL         *string  `json:"video_url"`
-	IsActive         bool     `json:"is_active"`
+	ID               int       `json:"id"`
+	Name             string    `json:"name"`
+	MuscleGroup      string    `json:"muscle_group"`
+	Equipment        string    `json:"equipment"`
+	PrimaryMuscles   []string  `json:"primary_muscles"`
+	SecondaryMuscles []string  `json:"secondary_muscles"`
+	VideoURL         *string   `json:"video_url"`
+	IsActive         bool      `json:"is_active"`
 	CreatedAt        time.Time `json:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at"`
 }
@@ -46,9 +46,9 @@ type CreateNotificationRequest struct {
 type CreateExerciseRequest struct {
 	Name             string   `json:"name"`
 	MuscleGroup      string   `json:"muscle_group"`
+	Equipment        string   `json:"equipment"`
 	PrimaryMuscles   []string `json:"primary_muscles"`
 	SecondaryMuscles []string `json:"secondary_muscles"`
-	Equipment        string   `json:"equipment"`
 	VideoURL         *string  `json:"video_url"`
 }
 
@@ -179,8 +179,8 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		SELECT 
-			id, name, muscle_group, primary_muscles, secondary_muscles, 
-			equipment, video_url, created_at, updated_at
+			id, name, muscle_group, equipment, primary_muscles, secondary_muscles,
+			video_url, is_active, created_at, updated_at
 		FROM exercises
 		ORDER BY name ASC
 	`
@@ -195,16 +195,16 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	var exercises []AdminExercise
 	for rows.Next() {
 		var exercise AdminExercise
-		var primaryMusclesJSON, secondaryMusclesJSON []byte
 		
 		err := rows.Scan(
 			&exercise.ID,
 			&exercise.Name,
 			&exercise.MuscleGroup,
-			&primaryMusclesJSON,
-			&secondaryMusclesJSON,
 			&exercise.Equipment,
+			&exercise.PrimaryMuscles,
+			&exercise.SecondaryMuscles,
 			&exercise.VideoURL,
+			&exercise.IsActive,
 			&exercise.CreatedAt,
 			&exercise.UpdatedAt,
 		)
@@ -212,11 +212,6 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error escaneando ejercicio", http.StatusInternalServerError)
 			return
 		}
-
-		// Parsear arrays JSON
-		json.Unmarshal(primaryMusclesJSON, &exercise.PrimaryMuscles)
-		json.Unmarshal(secondaryMusclesJSON, &exercise.SecondaryMuscles)
-		exercise.IsActive = true // Por defecto todos los ejercicios están activos
 
 		exercises = append(exercises, exercise)
 	}
@@ -240,12 +235,8 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convertir arrays a JSON
-	primaryMusclesJSON, _ := json.Marshal(req.PrimaryMuscles)
-	secondaryMusclesJSON, _ := json.Marshal(req.SecondaryMuscles)
-
 	query := `
-		INSERT INTO exercises (name, muscle_group, primary_muscles, secondary_muscles, equipment, video_url)
+		INSERT INTO exercises (name, muscle_group, equipment, primary_muscles, secondary_muscles, video_url)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id, created_at, updated_at
 	`
@@ -254,9 +245,9 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 	err := database.DB.QueryRow(query, 
 		req.Name, 
 		req.MuscleGroup, 
-		primaryMusclesJSON, 
-		secondaryMusclesJSON, 
 		req.Equipment, 
+		req.PrimaryMuscles,
+		req.SecondaryMuscles,
 		req.VideoURL,
 	).Scan(&exercise.ID, &exercise.CreatedAt, &exercise.UpdatedAt)
 
@@ -267,9 +258,9 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 
 	exercise.Name = req.Name
 	exercise.MuscleGroup = req.MuscleGroup
+	exercise.Equipment = req.Equipment
 	exercise.PrimaryMuscles = req.PrimaryMuscles
 	exercise.SecondaryMuscles = req.SecondaryMuscles
-	exercise.Equipment = req.Equipment
 	exercise.VideoURL = req.VideoURL
 	exercise.IsActive = true
 
