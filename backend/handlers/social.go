@@ -94,11 +94,11 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		WHERE 1=1
 		GROUP BY wd.id, wd.user_id, up.name, up.avatar_url, wd.created_at
 		ORDER BY wd.created_at DESC
-		LIMIT $2 OFFSET $3
+		LIMIT $1 OFFSET $2
 	`
 
 	fmt.Printf("Query: %s\n", query)
-	fmt.Printf("Ejecutando query con parámetros: userID=%s, limit=%d, offset=%d\n", userID, limit, offset)
+	fmt.Printf("Ejecutando query con parámetros: limit=%d, offset=%d\n", limit, offset)
 	
 	rows, err := database.DB.Query(query, limit, offset)
 	if err != nil {
