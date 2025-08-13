@@ -18,7 +18,6 @@ type WorkoutDay struct {
 type Workout struct {
 	ID           int       `json:"id" db:"id"`
 	UserID       string    `json:"user_id" db:"user_id"`
-	WorkoutDayID int       `json:"workout_day_id" db:"workout_day_id"`
 	ExerciseID   int       `json:"exercise_id" db:"exercise_id"`
 	ExerciseName string    `json:"exercise_name" db:"exercise_name"`
 	Weight       float64   `json:"weight" db:"weight"`

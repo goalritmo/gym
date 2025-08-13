@@ -43,7 +43,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Consultando workouts para usuario: %s, fecha: %s, workoutDayID: %s\n", userID, date, workoutDayID)
 
 	query := `
-		SELECT w.id, w.user_id, w.workout_day_id, w.exercise_id, e.name as exercise_name, 
+		SELECT w.id, w.user_id, w.exercise_id, e.name as exercise_name, 
 			   w.weight, w.reps, w.serie, w.seconds, w.observations, w.created_at
 		FROM workouts w
 		JOIN exercises e ON w.exercise_id = e.id
@@ -53,14 +53,9 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	argIndex := 2
 
 	if date != "" {
-		query += fmt.Sprintf(" AND EXISTS(SELECT 1 FROM workout_days wd WHERE wd.id = w.workout_day_id AND wd.date = $%d)", argIndex)
+		// Filtrar por fecha usando la fecha de creación del workout
+		query += fmt.Sprintf(" AND DATE(w.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Argentina/Buenos_Aires') = $%d", argIndex)
 		args = append(args, date)
-		argIndex++
-	}
-
-	if workoutDayID != "" {
-		query += fmt.Sprintf(" AND w.workout_day_id = $%d", argIndex)
-		args = append(args, workoutDayID)
 		argIndex++
 	}
 
@@ -84,7 +79,6 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(
 			&workout.ID,
 			&workout.UserID,
-			&workout.WorkoutDayID,
 			&workout.ExerciseID,
 			&workout.ExerciseName,
 			&workout.Weight,
