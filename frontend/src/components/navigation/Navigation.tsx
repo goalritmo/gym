@@ -27,10 +27,11 @@ type NavigationProps = {
   onLogout: () => void
   onOpenSettings?: () => void
   onOpenNotifications?: () => void
+  onOpenAdminPanel?: () => void
   unreadNotifications?: number
 }
 
-export default function Navigation({ activeTab, onTabChange, onOpenSettings, onOpenNotifications, unreadNotifications = 0 }: Omit<NavigationProps, 'onLogout'>) {
+export default function Navigation({ activeTab, onTabChange, onOpenSettings, onOpenNotifications, onOpenAdminPanel, unreadNotifications = 0 }: Omit<NavigationProps, 'onLogout'>) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [visibleItems, setVisibleItems] = useState<number[]>([])
   const [showToolbarElements, setShowToolbarElements] = useState(false)
@@ -326,6 +327,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                               <UserAvatar 
                   onOpenSettings={onOpenSettings} 
                   onOpenNotifications={onOpenNotifications}
+                  onOpenAdminPanel={onOpenAdminPanel}
                   unreadNotifications={unreadNotifications}
                 />
             </Box>

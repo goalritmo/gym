@@ -13,6 +13,7 @@ type SupabaseUser struct {
 	Email    *string                `json:"email"`
 	Metadata map[string]interface{} `json:"user_metadata"`
 	Role     string                 `json:"role"`
+	IsAdmin  bool                   `json:"is_admin"`
 }
 
 // GetCurrentUserHandler obtiene el usuario actual desde Supabase Auth
@@ -25,15 +26,17 @@ func GetCurrentUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Consultar información básica del usuario desde auth.users
+	// Consultar información básica del usuario desde auth.users y user_profiles
 	query := `
 		SELECT 
-			id,
-			email,
-			COALESCE(raw_user_meta_data, '{}')::jsonb as user_metadata,
-			role
-		FROM auth.users
-		WHERE id = $1
+			u.id,
+			u.email,
+			COALESCE(u.raw_user_meta_data, '{}')::jsonb as user_metadata,
+			u.role,
+			COALESCE(up.is_admin, false) as is_admin
+		FROM auth.users u
+		LEFT JOIN user_profiles up ON u.id = up.user_id
+		WHERE u.id = $1
 	`
 
 	var user SupabaseUser
@@ -44,6 +47,7 @@ func GetCurrentUserHandler(w http.ResponseWriter, r *http.Request) {
 		&user.Email,
 		&userMetadataJSON,
 		&user.Role,
+		&user.IsAdmin,
 	)
 
 	if err != nil {

@@ -11,18 +11,19 @@ import {
   IconButton,
   Badge
 } from '@mui/material'
-import { Logout as LogoutIcon, Settings as SettingsIcon, Notifications as NotificationsIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon, Settings as SettingsIcon, Notifications as NotificationsIcon, AdminPanelSettings as AdminIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 type UserAvatarProps = {
   onOpenSettings?: () => void
   onOpenNotifications?: () => void
+  onOpenAdminPanel?: () => void
   unreadNotifications?: number
 }
 
-export default function UserAvatar({ onOpenSettings, onOpenNotifications, unreadNotifications = 0 }: UserAvatarProps) {
-  const { user, logout } = useAuth()
+export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpenAdminPanel, unreadNotifications = 0 }: UserAvatarProps) {
+  const { user, logout, isAdmin } = useAuth()
   const { settings } = useUserSettings()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -51,6 +52,13 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, unread
     handleClose()
     if (onOpenNotifications) {
       onOpenNotifications()
+    }
+  }
+
+  const handleOpenAdminPanel = () => {
+    handleClose()
+    if (onOpenAdminPanel) {
+      onOpenAdminPanel()
     }
   }
 
@@ -206,6 +214,16 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, unread
           </ListItemIcon>
           <ListItemText>Configuración</ListItemText>
         </MenuItem>
+
+        {/* Opción de Panel de Admin - solo se muestra si el usuario es administrador */}
+        {isAdmin && (
+          <MenuItem onClick={handleOpenAdminPanel}>
+            <ListItemIcon>
+              <AdminIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Panel de Admin</ListItemText>
+          </MenuItem>
+        )}
 
         {/* Opción de logout */}
         <MenuItem onClick={handleLogout}>

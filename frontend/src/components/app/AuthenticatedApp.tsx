@@ -5,6 +5,7 @@ import WorkoutHistory from '../workout/WorkoutHistory'
 import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
 import SocialList from '../social/SocialList'
+import AdminPanel from '../admin/AdminPanel'
 import Navigation from '../navigation/Navigation'
 import SettingsModal from '../settings/SettingsModal'
 import NotificationsModal from '../notifications/NotificationsModal'
@@ -34,6 +35,7 @@ function AuthenticatedAppContent() {
   const [deleteError, setDeleteError] = useState('')
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [notificationsModalOpen, setNotificationsModalOpen] = useState(false)
+  const [adminPanelOpen, setAdminPanelOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
 
   // Función para cargar el contador de notificaciones no leídas
@@ -190,6 +192,7 @@ function AuthenticatedAppContent() {
           onTabChange={handleTabChange}
           onOpenSettings={handleOpenSettings}
           onOpenNotifications={handleOpenNotifications}
+          onOpenAdminPanel={() => setAdminPanelOpen(true)}
           unreadNotifications={unreadNotifications}
         />
       
@@ -459,6 +462,12 @@ function AuthenticatedAppContent() {
           // Recargar el contador real desde el backend
           await loadUnreadNotificationsCount()
         }}
+      />
+
+      {/* Modal del Panel de Administrador */}
+      <AdminPanel 
+        open={adminPanelOpen} 
+        onClose={() => setAdminPanelOpen(false)}
       />
     </Box>
   )

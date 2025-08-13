@@ -1,7 +1,16 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { auth } from '../lib/supabase'
+import { apiClient } from '../lib/api'
 import type { User, Session } from '@supabase/supabase-js'
+
+type UserInfo = {
+  id: string
+  email?: string
+  user_metadata: Record<string, any>
+  role: string
+  is_admin: boolean
+}
 
 type AuthContextType = {
   user: User | null
@@ -10,6 +19,7 @@ type AuthContextType = {
   isLoading: boolean
   isLoggingOut: boolean
   isSigningIn: boolean
+  isAdmin: boolean
   signInWithGoogle: () => Promise<{ error?: any }>
   logout: () => Promise<void>
 }
@@ -26,6 +36,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isSigningIn, setIsSigningIn] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     // Get initial session
@@ -52,6 +63,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     return () => subscription.unsubscribe()
   }, [])
+
+  // Obtener información del usuario incluyendo is_admin cuando cambie el usuario
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (user) {
+        try {
+          const userInfo = await apiClient.getCurrentUser() as UserInfo
+          setIsAdmin(userInfo.is_admin || false)
+        } catch (error) {
+          console.error('Error fetching user info:', error)
+          setIsAdmin(false)
+        }
+      } else {
+        setIsAdmin(false)
+      }
+    }
+
+    fetchUserInfo()
+  }, [user])
 
 
 
@@ -92,6 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isLoading, 
       isLoggingOut,
       isSigningIn,
+      isAdmin,
       signInWithGoogle, 
       logout 
     }}>

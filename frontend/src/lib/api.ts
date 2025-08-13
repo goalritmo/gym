@@ -215,6 +215,41 @@ class ApiClient {
       body: settings
     })
   }
+
+  // Admin API
+  async getAdminNotifications() {
+    return this.request('/admin/notifications')
+  }
+
+  async createAdminNotification(notification: {
+    title: string
+    message: string
+    type: 'info' | 'warning' | 'success' | 'error'
+    is_active: boolean
+  }) {
+    return this.request('/admin/notifications', {
+      method: 'POST',
+      body: notification
+    })
+  }
+
+  async getAdminExercises() {
+    return this.request('/admin/exercises')
+  }
+
+  async createAdminExercise(exercise: {
+    name: string
+    muscle_group: string
+    primary_muscles: string[]
+    secondary_muscles: string[]
+    equipment: string
+    video_url?: string
+  }) {
+    return this.request('/admin/exercises', {
+      method: 'POST',
+      body: exercise
+    })
+  }
 }
 
 // Export singleton instance

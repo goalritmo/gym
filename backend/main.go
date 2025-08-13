@@ -82,6 +82,12 @@ func main() {
 	
 	// Fix triggers endpoint (temporal)
 	api.HandleFunc("/fix-triggers", handlers.FixTriggersHandler).Methods("POST")
+
+	// Admin endpoints (requieren permisos de administrador)
+	api.HandleFunc("/admin/notifications", handlers.AdminMiddleware(handlers.GetAdminNotificationsHandler)).Methods("GET")
+	api.HandleFunc("/admin/notifications", handlers.AdminMiddleware(handlers.CreateNotificationHandler)).Methods("POST")
+	api.HandleFunc("/admin/exercises", handlers.AdminMiddleware(handlers.GetAdminExercisesHandler)).Methods("GET")
+	api.HandleFunc("/admin/exercises", handlers.AdminMiddleware(handlers.CreateExerciseHandler)).Methods("POST")
 	
 
 
