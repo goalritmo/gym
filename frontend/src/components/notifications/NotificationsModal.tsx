@@ -24,16 +24,18 @@ import {
   Close,
   CheckCircleOutline
 } from '@mui/icons-material'
+import { apiClient } from '../../lib/api'
 
-type NotificationType = 'general' | 'kudos' | 'announcement'
+type NotificationType = 'general' | 'kudos' | 'announcement' | 'workout_created'
 
 type Notification = {
-  id: string
+  id: number
   type: NotificationType
   title: string
   message: string
   created_at: string
-  read: boolean
+  is_read: boolean
+  data?: any
   // Para kudos agrupados
   from_users?: {
     id: string
@@ -71,20 +73,8 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     setError('')
     
     try {
-      // Datos de ejemplo - en el futuro vendrán del backend
-      const mockData: Notification[] = [
-        {
-          id: '1',
-          type: 'announcement',
-          title: 'Gimnasio de la UNC cerrado',
-          message: 'Les informamos que el día lunes 11 de agosto, la Dirección de Deportes permanecerá cerrada debido al paro del personal no docente.',
-          created_at: new Date().toISOString(),
-          read: false,
-          priority: 'high'
-        },
-      ]
-      
-      setNotifications(mockData)
+      const notificationsData = await apiClient.getNotifications() as Notification[]
+      setNotifications(notificationsData)
     } catch (error) {
       console.error('Error cargando notificaciones:', error)
       setError('Error al cargar las notificaciones')
@@ -93,17 +83,23 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     }
   }
 
-  const markAsRead = (notificationId: string) => {
-    const notification = notifications.find(n => n.id === notificationId)
-    if (notification && !notification.read) {
-      setNotifications(prev => 
-        prev.map(notif => 
-          notif.id === notificationId 
-            ? { ...notif, read: true }
-            : notif
+  const markAsRead = async (notificationId: number) => {
+    try {
+      const notification = notifications.find(n => n.id === notificationId)
+      if (notification && !notification.is_read) {
+        await apiClient.markNotificationAsRead(notificationId)
+        setNotifications(prev => 
+          prev.map(notif => 
+            notif.id === notificationId 
+              ? { ...notif, is_read: true }
+              : notif
+          )
         )
-      )
-      onMarkAsRead(1)
+        onMarkAsRead(1)
+      }
+    } catch (error) {
+      console.error('Error marcando notificación como leída:', error)
+      setError('Error al marcar la notificación como leída')
     }
   }
 
@@ -163,7 +159,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     }
   }
 
-  const unreadCount = notifications.filter(n => !n.read).length
+  const unreadCount = notifications.filter(n => !n.is_read).length
 
   return (
     <Dialog 
@@ -249,12 +245,12 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
               <Card 
                 key={notification.id} 
                 sx={{ 
-                  boxShadow: notification.read ? 1 : 3,
+                  boxShadow: notification.is_read ? 1 : 3,
                   borderRadius: 2,
                   border: '1px solid',
-                  borderColor: notification.read ? 'divider' : 'divider',
-                  backgroundColor: notification.read ? 'background.paper' : '#fff3e0',
-                  opacity: notification.read ? 0.8 : 1,
+                  borderColor: notification.is_read ? 'divider' : 'divider',
+                  backgroundColor: notification.is_read ? 'background.paper' : '#fff3e0',
+                  opacity: notification.is_read ? 0.8 : 1,
                   transition: 'all 0.2s ease-in-out',
                   '&:hover': {
                     boxShadow: 4,
@@ -344,7 +340,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                   )}
 
                   {/* Botón marcar como leída */}
-                  {!notification.read && (
+                  {!notification.is_read && (
                     <Box sx={{ 
                       display: 'flex', 
                       justifyContent: 'center', 
