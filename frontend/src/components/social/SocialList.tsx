@@ -171,10 +171,12 @@ export default function SocialList() {
       groups[dayKey].push(workout)
     })
     
-    return Object.entries(groups).map(([date, workouts]) => ({
-      date,
-      workouts: workouts.sort((a, b) => new Date(b.workout_date).getTime() - new Date(a.workout_date).getTime())
-    }))
+    return Object.entries(groups)
+      .map(([date, workouts]) => ({
+        date,
+        workouts: workouts.sort((a, b) => new Date(b.workout_date).getTime() - new Date(a.workout_date).getTime())
+      }))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Ordenar grupos por fecha
   }, [socialWorkouts, settings.showOwnWorkoutsInSocial, user?.id])
 
   useEffect(() => {
