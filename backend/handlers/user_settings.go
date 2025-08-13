@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"goalritmo/backend/database"
+	"github.com/goalritmo/gym/backend/database"
 )
 
 type UserSettings struct {
