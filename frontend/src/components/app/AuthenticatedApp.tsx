@@ -8,7 +8,7 @@ import Navigation from '../navigation/Navigation'
 import SettingsModal from '../settings/SettingsModal'
 import NotificationsModal from '../notifications/NotificationsModal'
 import { TABS, type TabType } from '../../constants/tabs'
-import { UserSettingsProvider } from '../../contexts/UserSettingsContext'
+import { UserSettingsProvider, useUserSettings } from '../../contexts/UserSettingsContext'
 import { AuthProvider, useAuth } from '../../contexts/AuthContext'
 import type { Workout, WorkoutDay } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
@@ -23,6 +23,7 @@ type Exercise = {
 function AuthenticatedAppContent() {
   const { activeTab, setActiveTab } = useTab()
   const { isLoggingOut, isSigningIn } = useAuth()
+  const { initializeAllExercisesAsFavorites } = useUserSettings()
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [workoutDays, setWorkoutDays] = useState<WorkoutDay[]>([])
   const [exercises, setExercises] = useState<Exercise[]>([])
@@ -59,6 +60,12 @@ function AuthenticatedAppContent() {
       setWorkouts(Array.isArray(workoutsData) ? workoutsData : [])
       setWorkoutDays(Array.isArray(workoutDaysData) ? workoutDaysData : [])
       setExercises(Array.isArray(exercisesData) ? exercisesData : [])
+      
+      // Inicializar todos los ejercicios como favoritos si no hay configuración previa
+      if (Array.isArray(exercisesData) && exercisesData.length > 0) {
+        const exerciseIds = exercisesData.map(ex => ex.id)
+        initializeAllExercisesAsFavorites(exerciseIds)
+      }
     } catch (error) {
       console.error('Error cargando datos del backend:', error)
       

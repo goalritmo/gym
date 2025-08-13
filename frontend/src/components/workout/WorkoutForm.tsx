@@ -150,7 +150,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       </Typography>
       
       {/* Indicador de ejercicios favoritos */}
-      {settings.favoriteExercises.length > 0 && (
+      {settings.favoriteExercises.length > 0 && filteredExercises.length !== exercises.length && (
         <Box sx={{ 
           textAlign: 'center', 
           mb: 2, 
@@ -161,7 +161,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           fontSize: '0.9rem',
           fontWeight: 500
         }}>
-          ⭐ Mostrando {filteredExercises.length} ejercicios favoritos de {exercises.length} disponibles
+          ⭐ Se ven {filteredExercises.length} de {exercises.length} ejercicios disponibles
         </Box>
       )}
       

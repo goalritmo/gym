@@ -140,6 +140,51 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       </DialogTitle>
 
       <DialogContent sx={{ pt: 2 }}>
+        {/* Sección NOTIFICACIONES UNC */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            NOTIFICACIONES
+          </Typography>
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={tempSettings.uncNotificationsEnabled}
+                onChange={handleToggleUncNotifications}
+                color="primary"
+              />
+            }
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    Notificaciones de la UNC
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {tempSettings.uncNotificationsEnabled
+                      ? 'Recibirás notificaciones sobre el gimnasio de la UNC'
+                      : 'No recibirás notificaciones sobre el gimnasio de la UNC'
+                    }
+                  </Typography>
+                </Box>
+              </Box>
+            }
+            sx={{
+              alignItems: 'flex-start',
+              width: '100%',
+              m: 0,
+              p: 2,
+              borderRadius: 1,
+              backgroundColor: 'grey.50',
+              '&:hover': {
+                backgroundColor: 'grey.100'
+              }
+            }}
+          />
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
         {/* Sección REGISTRO */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
@@ -169,51 +214,6 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                     {tempSettings.showWorkoutSection
                       ? 'El cronómetro aparece en el formulario de registro'
                       : 'La sección de tiempo de serie está oculta'
-                    }
-                  </Typography>
-                </Box>
-              </Box>
-            }
-            sx={{
-              alignItems: 'flex-start',
-              width: '100%',
-              m: 0,
-              p: 2,
-              borderRadius: 1,
-              backgroundColor: 'grey.50',
-              '&:hover': {
-                backgroundColor: 'grey.100'
-              }
-            }}
-          />
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Sección NOTIFICACIONES UNC */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            NOTIFICACIONES
-          </Typography>
-
-          <FormControlLabel
-            control={
-              <Switch
-                checked={tempSettings.uncNotificationsEnabled}
-                onChange={handleToggleUncNotifications}
-                color="primary"
-              />
-            }
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    Notificaciones de la UNC
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {tempSettings.uncNotificationsEnabled
-                      ? 'Recibirás notificaciones sobre el gimnasio de la UNC'
-                      : 'No recibirás notificaciones sobre el gimnasio de la UNC'
                     }
                   </Typography>
                 </Box>

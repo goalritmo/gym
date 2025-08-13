@@ -12,13 +12,14 @@ interface UserSettingsContextType {
   toggleWorkoutSection: () => void
   setFavoriteExercises: (exercises: number[]) => void
   toggleUncNotifications: () => void
+  initializeAllExercisesAsFavorites: (exerciseIds: number[]) => void
 }
 
 const UserSettingsContext = createContext<UserSettingsContextType | undefined>(undefined)
 
 const defaultSettings: UserSettings = {
   showWorkoutSection: true, // Por defecto mostrar sección de registro
-  favoriteExercises: [], // Sin ejercicios favoritos por defecto
+  favoriteExercises: [], // Se llenará automáticamente con todos los ejercicios
   uncNotificationsEnabled: true // Por defecto habilitadas para usuarios UNC
 }
 
@@ -31,6 +32,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     if (savedSettings) {
       try {
         const parsedSettings = JSON.parse(savedSettings)
+        console.log('🔍 Configuraciones cargadas desde localStorage:', parsedSettings)
         setSettings({ ...defaultSettings, ...parsedSettings })
       } catch (error) {
         console.error('Error parsing user settings:', error)
@@ -65,11 +67,23 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     }))
   }
 
+  const initializeAllExercisesAsFavorites = (exerciseIds: number[]) => {
+    // Solo inicializar si no hay ejercicios favoritos configurados
+    if (settings.favoriteExercises.length === 0) {
+      console.log('🔍 Inicializando todos los ejercicios como favoritos:', exerciseIds)
+      setSettings(prev => ({ 
+        ...prev, 
+        favoriteExercises: exerciseIds
+      }))
+    }
+  }
+
   const value: UserSettingsContextType = {
     settings, 
     toggleWorkoutSection,
     setFavoriteExercises,
-    toggleUncNotifications
+    toggleUncNotifications,
+    initializeAllExercisesAsFavorites
   }
 
   return (
