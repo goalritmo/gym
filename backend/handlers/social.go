@@ -66,7 +66,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("Consultando entrenamientos sociales con límite: %d, offset: %d, usuario: %s\n", limit, offset, userID)
 
-	// Query actualizada para usar workout_days
+	// Query actualizada para usar workout_days con kudos reales
 	query := `
 		SELECT 
 			wd.id as session_id,
@@ -87,11 +87,14 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 					) ORDER BY w.serie
 				) FILTER (WHERE w.id IS NOT NULL),
 				'[]'::json
-			) as exercises
+			) as exercises,
+			COALESCE(COUNT(k.id), 0) as kudos_count,
+			EXISTS(SELECT 1 FROM kudos WHERE user_id = $3 AND workout_day_id = wd.id) as has_kudos
 		FROM workout_days wd
 		LEFT JOIN user_profiles up ON wd.user_id = up.user_id
 		LEFT JOIN workouts w ON wd.id = w.workout_day_id
 		LEFT JOIN exercises e ON w.exercise_id = e.id
+		LEFT JOIN kudos k ON wd.id = k.workout_day_id
 		WHERE 1=1
 		GROUP BY wd.id, wd.user_id, up.name, up.avatar_url, wd.created_at
 		ORDER BY wd.created_at DESC
@@ -99,9 +102,9 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	`
 
 	fmt.Printf("Query: %s\n", query)
-	fmt.Printf("Ejecutando query con parámetros: limit=%d, offset=%d\n", limit, offset)
+	fmt.Printf("Ejecutando query con parámetros: limit=%d, offset=%d, userID=%s\n", limit, offset, userID)
 	
-	rows, err := database.DB.Query(query, limit, offset)
+	rows, err := database.DB.Query(query, limit, offset, userID)
 	if err != nil {
 		fmt.Printf("Error consultando entrenamientos sociales: %v\n", err)
 		http.Error(w, "Error consultando entrenamientos sociales", http.StatusInternalServerError)
@@ -126,6 +129,8 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			&workout.TotalExercises,
 			&workout.TotalSeries,
 			&exercisesJSON,
+			&workout.KudosCount,
+			&workout.HasKudos,
 		)
 		if err != nil {
 			fmt.Printf("Error escaneando entrenamiento social: %v\n", err)
@@ -145,9 +150,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		// Por ahora, kudos son mock data
-		workout.KudosCount = 0
-		workout.HasKudos = false
+		// Los kudos ahora vienen de la base de datos
 
 		socialWorkouts = append(socialWorkouts, workout)
 	}
@@ -169,16 +172,59 @@ func GiveKudosHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Extraer workout ID de la URL
 	vars := mux.Vars(r)
-	workoutID := vars["id"]
-	if workoutID == "" {
+	workoutIDStr := vars["id"]
+	if workoutIDStr == "" {
 		http.Error(w, "Workout ID is required", http.StatusBadRequest)
 		return
 	}
 
-	fmt.Printf("Usuario %s dando kudos al workout %s\n", userID, workoutID)
+	// Convertir workout ID a entero
+	workoutID, err := strconv.Atoi(workoutIDStr)
+	if err != nil {
+		http.Error(w, "Invalid workout ID", http.StatusBadRequest)
+		return
+	}
 
-	// Por ahora, solo devolver éxito (mock)
-	// TODO: Implementar lógica real de kudos en la base de datos
+	fmt.Printf("Usuario %s dando kudos al workout %d\n", userID, workoutID)
+
+	// Verificar si el workout existe
+	var exists bool
+	err = database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM workout_days WHERE id = $1)", workoutID).Scan(&exists)
+	if err != nil {
+		fmt.Printf("Error verificando existencia del workout: %v\n", err)
+		http.Error(w, "Error interno del servidor", http.StatusInternalServerError)
+		return
+	}
+
+	if !exists {
+		http.Error(w, "Workout not found", http.StatusNotFound)
+		return
+	}
+
+	// Verificar si ya dio kudos
+	var alreadyLiked bool
+	err = database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM kudos WHERE user_id = $1 AND workout_day_id = $2)", userID, workoutID).Scan(&alreadyLiked)
+	if err != nil {
+		fmt.Printf("Error verificando kudos existente: %v\n", err)
+		http.Error(w, "Error interno del servidor", http.StatusInternalServerError)
+		return
+	}
+
+	if alreadyLiked {
+		http.Error(w, "Already gave kudos to this workout", http.StatusConflict)
+		return
+	}
+
+	// Insertar el kudos
+	_, err = database.DB.Exec("INSERT INTO kudos (user_id, workout_day_id) VALUES ($1, $2)", userID, workoutID)
+	if err != nil {
+		fmt.Printf("Error insertando kudos: %v\n", err)
+		http.Error(w, "Error interno del servidor", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("Kudos insertado exitosamente para usuario %s en workout %d\n", userID, workoutID)
+
 	response := map[string]interface{}{
 		"success": true,
 		"message": "Kudos dado exitosamente",

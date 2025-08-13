@@ -307,34 +307,32 @@ export default function SocialList() {
                       
                       {/* Acciones */}
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {workout.kudos_count === 0 
-                            ? 'Dar el primer kudos' 
-                            : `${workout.kudos_count} ${workout.kudos_count === 1 ? 'kudo' : 'kudos'}`
-                          }
-                        </Typography>
+                                                  <Typography variant="body2" color="text.secondary">
+                            {workout.kudos_count === 0 
+                              ? 'Dar el primer kudos' 
+                              : `${workout.kudos_count} kudos`
+                            }
+                          </Typography>
                         
-                        <Tooltip title={workout.has_kudos ? 'Ya diste kudos' : workout.kudos_count === 0 ? 'Dar el primer kudos' : 'Dar kudos'}>
-                          <IconButton
-                            onClick={() => handleKudos(workout.session_id)}
-                            disabled={loadingKudos.has(workout.session_id) || workout.has_kudos}
-                            sx={{
-                              color: workout.has_kudos ? 'success.main' : 'text.secondary',
-                              mr: -1, // Compensar padding del CardContent
-                              '&:hover': {
-                                color: workout.has_kudos ? 'success.main' : 'primary.main'
-                              }
-                            }}
-                          >
-                            {loadingKudos.has(workout.session_id) ? (
-                              <CircularProgress size={20} />
-                            ) : workout.has_kudos ? (
-                              <ThumbUpIcon />
-                            ) : (
-                              <ThumbUpOutlinedIcon />
-                            )}
-                          </IconButton>
-                        </Tooltip>
+                        <IconButton
+                          onClick={() => handleKudos(workout.session_id)}
+                          disabled={loadingKudos.has(workout.session_id) || workout.has_kudos}
+                          sx={{
+                            color: workout.has_kudos ? 'warning.main' : 'text.secondary',
+                            mr: -1, // Compensar padding del CardContent
+                            '&:hover': {
+                              color: workout.has_kudos ? 'warning.main' : 'primary.main'
+                            }
+                          }}
+                        >
+                          {loadingKudos.has(workout.session_id) ? (
+                            <CircularProgress size={20} />
+                          ) : workout.has_kudos ? (
+                            <ThumbUpIcon />
+                          ) : (
+                            <ThumbUpOutlinedIcon />
+                          )}
+                        </IconButton>
                       </Box>
                     </CardContent>
                   </Card>
