@@ -49,6 +49,8 @@ export default function SocialList() {
   const [error, setError] = useState('')
   const [loadingKudos, setLoadingKudos] = useState<Set<number>>(new Set())
 
+  console.log('🔍 Configuración actual:', settings.showOwnWorkoutsInSocial)
+
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString)
@@ -96,7 +98,19 @@ export default function SocialList() {
       setLoading(true)
       const workouts = await apiClient.getSocialWorkouts(10, 0)
       console.log('🔍 Workouts cargados desde API:', workouts)
-      setSocialWorkouts(Array.isArray(workouts) ? workouts : [])
+      console.log('🔍 Tipo de respuesta:', typeof workouts)
+      console.log('🔍 Es array?', Array.isArray(workouts))
+      
+      if (workouts === null || workouts === undefined) {
+        console.log('🔍 API devolvió null/undefined, estableciendo array vacío')
+        setSocialWorkouts([])
+      } else if (Array.isArray(workouts)) {
+        console.log('🔍 Estableciendo workouts:', workouts.length)
+        setSocialWorkouts(workouts)
+      } else {
+        console.log('🔍 Respuesta no es array, estableciendo array vacío')
+        setSocialWorkouts([])
+      }
     } catch (error) {
       console.error('Error cargando entrenamientos sociales:', error)
       setError('Error al cargar el feed social')
@@ -156,11 +170,19 @@ export default function SocialList() {
       })
     
     // Filtrar workouts propios si la opción está desactivada
+    console.log('🔍 Filtrado - showOwnWorkoutsInSocial:', settings.showOwnWorkoutsInSocial)
+    console.log('🔍 Filtrado - userId actual:', user?.id)
+    console.log('🔍 Filtrado - total workouts antes:', socialWorkouts.length)
+    
     const filteredWorkouts = settings.showOwnWorkoutsInSocial 
       ? socialWorkouts 
-      : socialWorkouts.filter(workout => workout.user_id !== user?.id)
+      : socialWorkouts.filter(workout => {
+          console.log('🔍 Comparando workout.user_id:', workout.user_id, 'con user?.id:', user?.id)
+          return workout.user_id !== user?.id
+        })
     
     console.log('🔍 Workouts filtrados:', filteredWorkouts.length)
+    console.log('🔍 Workouts filtrados detalle:', filteredWorkouts.map(w => ({ sessionId: w.session_id, userId: w.user_id, userName: w.user_name })))
     
     filteredWorkouts.forEach(workout => {
       const dayKey = workout.workout_date
@@ -210,9 +232,14 @@ export default function SocialList() {
 
   return (
           <Box sx={{ p: 1 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
-          Feed Social
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            Feed Social
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Mostrar mis ejercicios: {settings.showOwnWorkoutsInSocial ? 'Sí' : 'No'}
+          </Typography>
+        </Box>
       
       <Stack spacing={3}>
         {groupedWorkouts.length > 0 ? (
@@ -247,15 +274,14 @@ export default function SocialList() {
                       {/* Header del workout */}
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                         <Avatar
-                          src={workout.user_avatar_url}
                           sx={{ 
                             width: 40, 
                             height: 40, 
                             mr: 2,
-                            bgcolor: workout.user_avatar_url ? 'transparent' : 'primary.main'
+                            bgcolor: 'primary.main'
                           }}
                         >
-                          {!workout.user_avatar_url && workout.user_name.charAt(0).toUpperCase()}
+                          {workout.user_name.charAt(0).toUpperCase()}
                         </Avatar>
                         <Box sx={{ flex: 1, textAlign: 'left' }}>
                           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
@@ -276,15 +302,13 @@ export default function SocialList() {
                       </Box>
                       
                       {/* Acciones */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            {workout.kudos_count === 0 
-                              ? 'Dar el primer kudos' 
-                              : `${workout.kudos_count} ${workout.kudos_count === 1 ? 'kudo' : 'kudos'}`
-                            }
-                          </Typography>
-                        </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          {workout.kudos_count === 0 
+                            ? 'Dar el primer kudos' 
+                            : `${workout.kudos_count} ${workout.kudos_count === 1 ? 'kudo' : 'kudos'}`
+                          }
+                        </Typography>
                         
                         <Tooltip title={workout.has_kudos ? 'Ya diste kudos' : workout.kudos_count === 0 ? 'Dar el primer kudos' : 'Dar kudos'}>
                           <IconButton
