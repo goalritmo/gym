@@ -13,6 +13,7 @@ import { AuthProvider, useAuth } from '../../contexts/AuthContext'
 import type { Workout, WorkoutDay } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
 import { apiClient } from '../../lib/api'
+import FloatingNavButton from '../navigation/FloatingNavButton'
 
 function AuthenticatedAppContent() {
   const { activeTab, setActiveTab } = useTab()
@@ -400,10 +401,10 @@ function AuthenticatedAppContent() {
       </Backdrop>
 
       {/* Botón flotante para navegación rápida */}
-      {/* FloatingNavButton 
+      <FloatingNavButton 
         currentTab={activeTab} 
         onTabChange={handleTabChange} 
-      /> */}
+      />
 
       {/* Modal de configuración */}
       <SettingsModal 
