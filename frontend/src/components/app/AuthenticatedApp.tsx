@@ -1,20 +1,18 @@
 import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography } from '@mui/material'
 import { useState, useEffect } from 'react'
-import Navigation from '../navigation/Navigation'
 import WorkoutForm from '../workout/WorkoutForm'
+import WorkoutHistory from '../workout/WorkoutHistory'
 import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
-import WorkoutHistory from '../workout/WorkoutHistory'
-import SocialList from '../social/SocialList'
-import FloatingNavButton from '../navigation/FloatingNavButton'
+import Navigation from '../navigation/Navigation'
 import SettingsModal from '../settings/SettingsModal'
 import NotificationsModal from '../notifications/NotificationsModal'
+import { TABS, type TabType } from '../../constants/tabs'
 import { UserSettingsProvider } from '../../contexts/UserSettingsContext'
+import { AuthProvider, useAuth } from '../../contexts/AuthContext'
 import type { Workout, WorkoutDay } from '../../types/workout'
 import { useTab } from '../../contexts/TabContext'
-import { useAuth } from '../../contexts/AuthContext'
 import { apiClient } from '../../lib/api'
-import { TABS, type TabType } from '../../constants/tabs'
 
 function AuthenticatedAppContent() {
   const { activeTab, setActiveTab } = useTab()
@@ -300,13 +298,6 @@ function AuthenticatedAppContent() {
           </Box>
         )}
 
-        {/* Pestaña Social */}
-        {activeTab === TABS.SOCIAL && (
-          <Box>
-            <SocialList onOpenSettings={handleOpenSettings} />
-          </Box>
-        )}
-
 
       </Box>
 
@@ -409,10 +400,10 @@ function AuthenticatedAppContent() {
       </Backdrop>
 
       {/* Botón flotante para navegación rápida */}
-      <FloatingNavButton 
+      {/* FloatingNavButton 
         currentTab={activeTab} 
         onTabChange={handleTabChange} 
-      />
+      /> */}
 
       {/* Modal de configuración */}
       <SettingsModal 
@@ -433,7 +424,9 @@ function AuthenticatedAppContent() {
 export default function AuthenticatedApp() {
   return (
     <UserSettingsProvider>
-      <AuthenticatedAppContent />
+      <AuthProvider>
+        <AuthenticatedAppContent />
+      </AuthProvider>
     </UserSettingsProvider>
   )
 }

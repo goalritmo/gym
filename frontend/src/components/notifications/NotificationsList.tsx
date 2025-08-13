@@ -60,8 +60,8 @@ export default function NotificationsList() {
         {
           id: '1',
           type: 'announcement',
-          title: 'Gimnasio cerrado por la tarde',
-          message: 'El gimnasio estará cerrado hoy de 14:00 a 18:00 por mantenimiento. Disculpen las molestias.',
+          title: 'Gimnasio cerrado',
+          message: 'Les informamos que el día lunes 11 de agosto, la Dirección de Deportes permanecerá cerrada debido al paro del personal no docente.',
           created_at: new Date().toISOString(),
           read: false,
           priority: 'high'
@@ -100,15 +100,6 @@ export default function NotificationsList() {
             exercise_name: 'Sentadillas'
           }
         },
-        {
-          id: '4',
-          type: 'general',
-          title: 'Nuevo equipamiento disponible',
-          message: 'Ya está disponible el nuevo rack de sentadillas en la zona de peso libre.',
-          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 día atrás
-          read: true,
-          priority: 'medium'
-        }
       ]
       
       setNotifications(mockNotifications)

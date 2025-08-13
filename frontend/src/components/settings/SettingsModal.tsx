@@ -13,12 +13,10 @@ import {
   Alert,
   IconButton
 } from '@mui/material'
-import { 
-  Settings, 
-  People, 
-  PersonOff, 
-  Timer, 
-  TimerOff, 
+import {
+  Settings,
+  Timer,
+  TimerOff,
   Close
 } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
@@ -35,11 +33,10 @@ type SettingsModalProps = {
 }
 
 export default function SettingsModal({ open, onClose, exercises = [] }: SettingsModalProps) {
-  const { 
-    settings, 
-    toggleSocial, 
-    toggleWorkoutSection, 
-    setFavoriteExercises 
+  const {
+    settings,
+    toggleWorkoutSection,
+    setFavoriteExercises
   } = useUserSettings()
   const [hasChanges, setHasChanges] = useState(false)
   const [tempSettings, setTempSettings] = useState(settings)
@@ -49,17 +46,9 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     setTempSettings(settings)
   }, [settings])
 
-  const handleToggleSocial = () => {
-    setTempSettings(prev => ({ 
-      ...prev, 
-      socialEnabled: !prev.socialEnabled
-    }))
-    setHasChanges(true)
-  }
-
   const handleToggleWorkoutSection = () => {
-    setTempSettings(prev => ({ 
-      ...prev, 
+    setTempSettings(prev => ({
+      ...prev,
       showWorkoutSection: !prev.showWorkoutSection
     }))
     setHasChanges(true)
@@ -67,10 +56,10 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
   const handleToggleFavoriteExercise = (exerciseId: number) => {
     const isFavorite = tempSettings.favoriteExercises.includes(exerciseId)
-    const newFavorites = isFavorite 
+    const newFavorites = isFavorite
       ? tempSettings.favoriteExercises.filter(id => id !== exerciseId)
       : [...tempSettings.favoriteExercises, exerciseId]
-    
+
     setTempSettings(prev => ({
       ...prev,
       favoriteExercises: newFavorites
@@ -80,9 +69,6 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
   const handleSave = () => {
     // Aplicar cambios
-    if (tempSettings.socialEnabled !== settings.socialEnabled) {
-      toggleSocial()
-    }
     if (tempSettings.showWorkoutSection !== settings.showWorkoutSection) {
       toggleWorkoutSection()
     }
@@ -102,8 +88,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={handleCancel}
       maxWidth="md"
       fullWidth
@@ -115,9 +101,9 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         }
       }}
     >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
+      <DialogTitle sx={{
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'space-between',
         pb: 1
       }}>
@@ -130,7 +116,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         <IconButton
           onClick={handleCancel}
           size="small"
-          sx={{ 
+          sx={{
             color: 'text.secondary',
             '&:hover': {
               backgroundColor: 'grey.100'
@@ -147,7 +133,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
             REGISTRO
           </Typography>
-          
+
           <FormControlLabel
             control={
               <Switch
@@ -168,7 +154,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                     Mostrar sección de tiempo de serie
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {tempSettings.showWorkoutSection 
+                    {tempSettings.showWorkoutSection
                       ? 'El cronómetro aparece en el formulario de registro'
                       : 'La sección de tiempo de serie está oculta'
                     }
@@ -176,7 +162,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                 </Box>
               </Box>
             }
-            sx={{ 
+            sx={{
               alignItems: 'flex-start',
               width: '100%',
               m: 0,
@@ -192,70 +178,20 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
         <Divider sx={{ my: 2 }} />
 
-        {/* Sección SOCIAL */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            SOCIAL
-          </Typography>
-          
-          <FormControlLabel
-            control={
-              <Switch
-                checked={tempSettings.socialEnabled}
-                onChange={handleToggleSocial}
-                color="primary"
-              />
-            }
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                {tempSettings.socialEnabled ? (
-                  <People sx={{ color: 'primary.main', fontSize: 20 }} />
-                ) : (
-                  <PersonOff sx={{ color: 'text.secondary', fontSize: 20 }} />
-                )}
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    Habilitar funcionalidad social
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {tempSettings.socialEnabled 
-                      ? 'Puedes ver y compartir entrenamientos con otros usuarios'
-                      : 'Tus entrenamientos son privados y no puedes ver otros'
-                    }
-                  </Typography>
-                </Box>
-              </Box>
-            }
-            sx={{ 
-              alignItems: 'flex-start',
-              width: '100%',
-              m: 0,
-              p: 2,
-              borderRadius: 1,
-              backgroundColor: 'grey.50',
-              '&:hover': {
-                backgroundColor: 'grey.100'
-              }
-            }}
-          />
-        </Box>
-
-
-
         {/* Sección EJERCICIOS FAVORITOS */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
             EJERCICIOS FAVORITOS
           </Typography>
-          
+
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Selecciona los ejercicios que quieres que aparezcan en el selector
           </Typography>
 
           {exercises.length > 0 ? (
             <Box>
-              <Box sx={{ 
-                maxHeight: 200, 
+              <Box sx={{
+                maxHeight: 200,
                 overflowY: 'auto',
                 border: '1px solid',
                 borderColor: 'divider',
@@ -274,7 +210,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                       />
                     }
                     label={exercise.name}
-                    sx={{ 
+                    sx={{
                       m: 0,
                       py: 0.5,
                       px: 1,
@@ -302,14 +238,14 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 3 }}>
-        <Button 
+        <Button
           onClick={handleCancel}
           variant="outlined"
           sx={{ minWidth: 100 }}
         >
           Cancelar
         </Button>
-        <Button 
+        <Button
           onClick={handleSave}
           variant="contained"
           disabled={!hasChanges}
