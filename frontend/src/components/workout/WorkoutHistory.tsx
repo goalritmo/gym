@@ -36,37 +36,26 @@ export default function WorkoutHistory() {
   const [loadingWorkoutId, setLoadingWorkoutId] = useState<number | null>(null)
   const [exerciseModal, setExerciseModal] = useState<{ show: boolean; exerciseGroup: ExerciseGroup | null; workoutDay: WorkoutDay | null }>({ show: false, exerciseGroup: null, workoutDay: null })
 
-  // Función para normalizar fecha a zona horaria de Argentina
-  const normalizeDate = (dateString: string) => {
-    console.log('🔍 normalizeDate - Input:', dateString)
-    
-    if (dateString.includes('T')) {
-      // Es un timestamp completo, ajustar a Argentina
-      const date = new Date(dateString)
-      const argentinaOffset = -3 * 60 * 60 * 1000 // -3 horas en milisegundos
-      const argentinaTime = new Date(date.getTime() + argentinaOffset)
-      console.log('🔍 normalizeDate - Adjusted to Argentina:', argentinaTime.toISOString())
-      return argentinaTime
-    } else {
-      // Es solo una fecha (YYYY-MM-DD), crear en zona horaria de Argentina
-      const [year, month, day] = dateString.split('-').map(Number)
-      // Crear fecha en UTC pero representando el día en Argentina
-      const argentinaTime = new Date(Date.UTC(year, month - 1, day, 3, 0, 0)) // 3:00 UTC = 00:00 Argentina
-      console.log('🔍 normalizeDate - Created in Argentina timezone:', argentinaTime.toISOString())
-      return argentinaTime
-    }
-  }
+
 
   const formatDate = (dateString: string) => {
-    const date = normalizeDate(dateString)
-    const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
-    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
-    
-    const weekday = weekdays[date.getDay()]
-    const day = date.getDate()
-    const month = months[date.getMonth()]
-    
-    return `${weekday} ${day} de ${month}`
+    try {
+      // Ajustar la fecha para compensar el problema del día de atraso
+      const date = new Date(dateString);
+      date.setDate(date.getDate() + 1);
+      
+      const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+      const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+      
+      const weekday = weekdays[date.getDay()]
+      const day = date.getDate()
+      const month = months[date.getMonth()]
+      
+      return `${weekday} ${day} de ${month}`
+    } catch (error) {
+      console.error('Error formateando fecha:', error);
+      return dateString;
+    }
   }
 
   // Agrupar workouts por día y crear días con ejercicios
@@ -150,8 +139,22 @@ export default function WorkoutHistory() {
   const filteredWorkoutDays = useMemo(() => {
     if (!dateFilter) return workoutDaysWithExercises;
     
-    const filterDate = dateFilter.toISOString().split('T')[0];
-    return workoutDaysWithExercises.filter(day => day.workoutDay.date === filterDate);
+    // Ajustar la fecha del filtro para compensar el problema del día de atraso
+    const adjustedFilterDate = new Date(dateFilter);
+    adjustedFilterDate.setDate(adjustedFilterDate.getDate() + 1);
+    const filterDate = adjustedFilterDate.toISOString().split('T')[0];
+    
+    console.log('🔍 Filtro de fecha:', {
+      originalDate: dateFilter.toISOString().split('T')[0],
+      adjustedDate: filterDate,
+      availableDates: workoutDaysWithExercises.map(d => d.workoutDay.date)
+    });
+    
+    return workoutDaysWithExercises.filter(day => {
+      const matches = day.workoutDay.date === filterDate;
+      console.log(`🔍 Comparando: ${day.workoutDay.date} === ${filterDate} = ${matches}`);
+      return matches;
+    });
   }, [workoutDaysWithExercises, dateFilter]);
 
   // Cargar datos
@@ -237,7 +240,7 @@ export default function WorkoutHistory() {
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: 1 }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
         Entrenamientos
       </Typography>
@@ -246,7 +249,7 @@ export default function WorkoutHistory() {
         {/* Filtro de fecha */}
         <Box sx={{ 
           p: 3, 
-          mx: 2,
+          mx: 0.5,
           bgcolor: 'primary.main', 
           borderRadius: 3, 
           boxShadow: 3,
@@ -314,7 +317,7 @@ export default function WorkoutHistory() {
       </Box>
 
         {/* Cards de entrenamientos */}
-        <Box sx={{ mx: 2 }}>
+        <Box sx={{ mx: 0.5 }}>
           {filteredWorkoutDays.map((day) => (
             <Box key={day.workoutDay.date} sx={{ position: 'relative', mb: 2 }}>
             <Card sx={{ 
@@ -490,7 +493,7 @@ export default function WorkoutHistory() {
             
             <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: 2 }}>
               <Box sx={{ mb: 3 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ margin: '8px 0px -16px' }}>
                   {exerciseModal.workoutDay ? formatDate(exerciseModal.workoutDay.date) : ''}
                 </Typography>
               </Box>
@@ -621,7 +624,7 @@ export default function WorkoutHistory() {
         {filteredWorkoutDays.length === 0 && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="h6" color="text.secondary">
-              {dateFilter ? 'No hay entrenamientos para esta fecha' : 'No hay entrenamientos registrados'}
+              {dateFilter ? 'No hay entrenamientos registrados esa fecha' : 'No hay entrenamientos registrados'}
             </Typography>
           </Box>
         )}

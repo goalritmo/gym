@@ -177,7 +177,7 @@ function AuthenticatedAppContent() {
       }}>
         {/* Pestaña Entrenamiento */}
         {activeTab === TABS.WORKOUT && (
-          <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <Box sx={{ position: 'relative', zIndex: 1, minHeight: 'calc(100vh - 200px)' }}>
             <WorkoutForm 
               exercises={exercises} 
               onSubmit={handleWorkoutSubmit}
@@ -188,8 +188,8 @@ function AuthenticatedAppContent() {
 
         {/* Pestaña Ejercicios */}
         {activeTab === TABS.EXERCISES && (
-          <Box>
-            <ExerciseList 
+          <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
+            <ExerciseList
               exercises={[
                 { 
                   id: 1, 
@@ -244,7 +244,7 @@ function AuthenticatedAppContent() {
 
         {/* Pestaña Equipamiento */}
         {activeTab === TABS.EQUIPMENT && (
-          <Box>
+          <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
             <EquipmentList 
               equipment={[
                 {
@@ -294,7 +294,7 @@ function AuthenticatedAppContent() {
 
         {/* Pestaña Historial */}
         {activeTab === TABS.HISTORY && (
-          <Box>
+          <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
             <WorkoutHistory />
           </Box>
         )}
