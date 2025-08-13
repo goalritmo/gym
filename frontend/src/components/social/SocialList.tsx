@@ -240,13 +240,25 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
     const groups: { [key: string]: SocialWorkout[] } = {}
     
     safeSocialWorkouts.forEach(workout => {
-      const date = new Date(workout.workout_date)
-      const dayKey = date.toISOString().split('T')[0] // YYYY-MM-DD
-      
-      if (!groups[dayKey]) {
-        groups[dayKey] = []
+      if (!workout || !workout.workout_date) {
+        return // Skip invalid workouts
       }
-      groups[dayKey].push(workout)
+      
+      try {
+        const date = new Date(workout.workout_date)
+        if (isNaN(date.getTime())) {
+          return // Skip invalid dates
+        }
+        
+        const dayKey = date.toISOString().split('T')[0] // YYYY-MM-DD
+        
+        if (!groups[dayKey]) {
+          groups[dayKey] = []
+        }
+        groups[dayKey].push(workout)
+      } catch (error) {
+        console.error('Error processing workout date:', error, workout)
+      }
     })
     
     return groups
@@ -287,7 +299,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                   textAlign: 'left'
                 }}
               >
-                {formatWorkoutDate(workouts[0].workout_date)}
+                {workouts[0] && workouts[0].workout_date ? formatWorkoutDate(workouts[0].workout_date) : 'Fecha desconocida'}
               </Typography>
               
               {/* Workouts del día */}
