@@ -36,7 +36,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     settings,
     toggleWorkoutSection,
     setFavoriteExercises,
-    toggleUncNotifications
+    toggleUncNotifications,
+    toggleShowOwnWorkoutsInSocial
   } = useUserSettings()
   const [hasChanges, setHasChanges] = useState(false)
   const [tempSettings, setTempSettings] = useState(settings)
@@ -63,6 +64,14 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     setHasChanges(true)
   }
 
+  const handleToggleShowOwnWorkoutsInSocial = () => {
+    setTempSettings(prev => ({
+      ...prev,
+      showOwnWorkoutsInSocial: !prev.showOwnWorkoutsInSocial
+    }))
+    setHasChanges(true)
+  }
+
   const handleToggleFavoriteExercise = (exerciseId: number) => {
     const isFavorite = tempSettings.favoriteExercises.includes(exerciseId)
     const newFavorites = isFavorite
@@ -83,6 +92,9 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     }
     if (tempSettings.uncNotificationsEnabled !== settings.uncNotificationsEnabled) {
       toggleUncNotifications()
+    }
+    if (tempSettings.showOwnWorkoutsInSocial !== settings.showOwnWorkoutsInSocial) {
+      toggleShowOwnWorkoutsInSocial()
     }
     if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
       setFavoriteExercises(tempSettings.favoriteExercises)
@@ -220,6 +232,51 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                     {tempSettings.showWorkoutSection
                       ? 'El cronómetro aparece en el formulario de registro'
                       : 'La sección de tiempo de serie está oculta'
+                    }
+                  </Typography>
+                </Box>
+              </Box>
+            }
+            sx={{
+              alignItems: 'flex-start',
+              width: '100%',
+              m: 0,
+              p: 2,
+              borderRadius: 1,
+              backgroundColor: 'grey.50',
+              '&:hover': {
+                backgroundColor: 'grey.100'
+              }
+            }}
+          />
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Sección FEED SOCIAL */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            FEED SOCIAL
+          </Typography>
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={tempSettings.showOwnWorkoutsInSocial}
+                onChange={handleToggleShowOwnWorkoutsInSocial}
+                color="primary"
+              />
+            }
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    Mostrar mis ejercicios
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {tempSettings.showOwnWorkoutsInSocial
+                      ? 'Tus entrenamientos aparecen en el feed social'
+                      : 'Tus entrenamientos están ocultos del feed social'
                     }
                   </Typography>
                 </Box>

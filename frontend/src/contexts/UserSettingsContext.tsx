@@ -5,6 +5,7 @@ interface UserSettings {
   showWorkoutSection: boolean
   favoriteExercises: number[]
   uncNotificationsEnabled: boolean
+  showOwnWorkoutsInSocial: boolean
 }
 
 interface UserSettingsContextType {
@@ -12,6 +13,7 @@ interface UserSettingsContextType {
   toggleWorkoutSection: () => void
   setFavoriteExercises: (exercises: number[]) => void
   toggleUncNotifications: () => void
+  toggleShowOwnWorkoutsInSocial: () => void
   initializeAllExercisesAsFavorites: (exerciseIds: number[]) => void
 }
 
@@ -20,7 +22,8 @@ const UserSettingsContext = createContext<UserSettingsContextType | undefined>(u
 const defaultSettings: UserSettings = {
   showWorkoutSection: true, // Por defecto mostrar sección de registro
   favoriteExercises: [], // Se llenará automáticamente con todos los ejercicios
-  uncNotificationsEnabled: true // Por defecto habilitadas para usuarios UNC
+  uncNotificationsEnabled: true, // Por defecto habilitadas para usuarios UNC
+  showOwnWorkoutsInSocial: true // Por defecto mostrar ejercicios propios en social
 }
 
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
@@ -67,6 +70,13 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     }))
   }
 
+  const toggleShowOwnWorkoutsInSocial = () => {
+    setSettings(prev => ({ 
+      ...prev, 
+      showOwnWorkoutsInSocial: !prev.showOwnWorkoutsInSocial
+    }))
+  }
+
   const initializeAllExercisesAsFavorites = (exerciseIds: number[]) => {
     // Solo inicializar si no hay ejercicios favoritos configurados
     if (settings.favoriteExercises.length === 0) {
@@ -83,6 +93,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     toggleWorkoutSection,
     setFavoriteExercises,
     toggleUncNotifications,
+    toggleShowOwnWorkoutsInSocial,
     initializeAllExercisesAsFavorites
   }
 

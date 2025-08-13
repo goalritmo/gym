@@ -10,7 +10,8 @@ import {
   Alert,
   Stack,
   IconButton,
-  Tooltip
+  Tooltip,
+  Switch
 } from '@mui/material'
 import {
   ThumbUp as ThumbUpIcon,
@@ -18,6 +19,7 @@ import {
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useAuth } from '../../contexts/AuthContext'
+import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 type SocialWorkout = {
   id: number
@@ -44,6 +46,7 @@ type SocialExercise = {
 
 export default function SocialList() {
   const { user } = useAuth()
+  const { settings } = useUserSettings()
   const [socialWorkouts, setSocialWorkouts] = useState<SocialWorkout[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -138,11 +141,16 @@ export default function SocialList() {
     }
   }
 
-  // Agrupar workouts por día
+  // Filtrar y agrupar workouts por día
   const groupedWorkouts = useMemo(() => {
     const groups: { [key: string]: SocialWorkout[] } = {}
     
-    socialWorkouts.forEach(workout => {
+    // Filtrar workouts propios si la opción está desactivada
+    const filteredWorkouts = settings.showOwnWorkoutsInSocial 
+      ? socialWorkouts 
+      : socialWorkouts.filter(workout => workout.user_id !== user?.id)
+    
+    filteredWorkouts.forEach(workout => {
       const dayKey = workout.workout_date
       if (!groups[dayKey]) {
         groups[dayKey] = []
@@ -154,7 +162,7 @@ export default function SocialList() {
       date,
       workouts: workouts.sort((a, b) => new Date(b.workout_date).getTime() - new Date(a.workout_date).getTime())
     }))
-  }, [socialWorkouts])
+  }, [socialWorkouts, settings.showOwnWorkoutsInSocial, user?.id])
 
   useEffect(() => {
     loadSocialWorkouts()
@@ -187,10 +195,10 @@ export default function SocialList() {
   }
 
   return (
-    <Box sx={{ p: 1 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
-        Feed Social
-      </Typography>
+          <Box sx={{ p: 1 }}>
+        <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
+          Feed Social
+        </Typography>
       
       <Stack spacing={3}>
         {groupedWorkouts.length > 0 ? (
@@ -202,7 +210,7 @@ export default function SocialList() {
                 color: 'text.primary', 
                 mb: 2, 
                 px: 1,
-                textAlign: 'left'
+                textAlign: 'center'
               }}>
                 {formatDate(date)}
               </Typography>
@@ -235,7 +243,7 @@ export default function SocialList() {
                         >
                           {!workout.user_avatar && workout.user_name.charAt(0).toUpperCase()}
                         </Avatar>
-                        <Box sx={{ flex: 1 }}>
+                        <Box sx={{ flex: 1, textAlign: 'left' }}>
                           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
                             {workout.user_name}
                           </Typography>
@@ -243,53 +251,14 @@ export default function SocialList() {
                             {formatRelativeTime(workout.workout_date)}
                           </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            {workout.total_exercises} {workout.total_exercises === 1 ? 'ejercicio' : 'ejercicios'}
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                          <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                            {workout.total_exercises}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                            {workout.total_exercises === 1 ? 'ejercicio' : 'ejercicios'}
                           </Typography>
                         </Box>
-                      </Box>
-                      
-                      {/* Ejercicios */}
-                      <Box sx={{ mb: 2 }}>
-                        <Stack spacing={1}>
-                          {workout.exercises.map((exercise, index) => (
-                            <Box key={index} sx={{ 
-                              display: 'flex', 
-                              justifyContent: 'space-between', 
-                              alignItems: 'center',
-                              p: 1.5,
-                              bgcolor: 'grey.50',
-                              borderRadius: 1
-                            }}>
-                              <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary' }}>
-                                {exercise.exercise_name}
-                              </Typography>
-                              <Box sx={{ display: 'flex', gap: 1 }}>
-                                <Chip 
-                                  label={`${exercise.weight}kg`} 
-                                  size="small" 
-                                  variant="outlined"
-                                  sx={{ fontSize: '0.75rem' }}
-                                />
-                                <Chip 
-                                  label={`${exercise.reps} reps`} 
-                                  size="small" 
-                                  variant="outlined"
-                                  sx={{ fontSize: '0.75rem' }}
-                                />
-                                {exercise.seconds && (
-                                  <Chip 
-                                    label={`${exercise.seconds}s`} 
-                                    size="small" 
-                                    variant="outlined"
-                                    sx={{ fontSize: '0.75rem' }}
-                                  />
-                                )}
-                              </Box>
-                            </Box>
-                          ))}
-                        </Stack>
                       </Box>
                       
                       {/* Acciones */}

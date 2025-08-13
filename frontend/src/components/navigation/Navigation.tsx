@@ -140,7 +140,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
   const menuItems = [
     { label: 'Registrar', icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
     { label: 'Entrenamientos', icon: <HistoryIcon />, value: TABS.HISTORY },
-    { label: 'Social', icon: <PeopleIcon />, value: TABS.SOCIAL },
+    { label: 'Feed Social', icon: <PeopleIcon />, value: TABS.SOCIAL },
   ]
 
   return (
