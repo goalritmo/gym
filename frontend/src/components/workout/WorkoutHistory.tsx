@@ -75,12 +75,16 @@ export default function WorkoutHistory() {
   const workoutDaysWithExercises = useMemo(() => {
     const days: WorkoutDayWithExercises[] = [];
 
+    // Verificar que los arrays no sean null/undefined
+    const safeWorkoutDays = workoutDays || [];
+    const safeWorkouts = workouts || [];
+
     console.log('🔍 Debug workoutDays:', {
-      workoutDays: workoutDays.map(d => ({ 
+      workoutDays: safeWorkoutDays.map(d => ({ 
         id: d.id, 
         date: d.date 
       })),
-      workouts: workouts.map(w => ({ 
+      workouts: safeWorkouts.map(w => ({ 
         id: w.id, 
         created_at: w.created_at, 
         workout_day_id: w.workout_day_id
@@ -89,7 +93,7 @@ export default function WorkoutHistory() {
 
     // Agrupar workouts por workout_day_id
     const workoutsByDay = new Map<number, Workout[]>();
-    workouts.forEach(workout => {
+    safeWorkouts.forEach(workout => {
       const dayId = workout.workout_day_id;
       if (!workoutsByDay.has(dayId)) {
         workoutsByDay.set(dayId, []);
@@ -99,7 +103,7 @@ export default function WorkoutHistory() {
 
     console.log('🔍 Workouts agrupados por day_id:', Object.fromEntries(workoutsByDay));
 
-    workoutDays.forEach(day => {
+    safeWorkoutDays.forEach(day => {
       // Filtrar workouts por workout_day_id
       const dayWorkouts = workoutsByDay.get(day.id) || [];
       
@@ -135,8 +139,8 @@ export default function WorkoutHistory() {
     });
 
     console.log('🔍 WorkoutHistory Debug:', {
-      workoutDaysCount: workoutDays.length,
-      workoutsCount: workouts.length,
+      workoutDaysCount: safeWorkoutDays.length,
+      workoutsCount: safeWorkouts.length,
       workoutDaysWithExercisesCount: days.length,
       dateFilter: dateFilter?.toISOString().split('T')[0]
     });
@@ -167,8 +171,8 @@ export default function WorkoutHistory() {
         apiClient.getWorkouts()
       ]);
       
-      setWorkoutDays(workoutDaysData as WorkoutDay[]);
-      setWorkouts(workoutsData as Workout[]);
+      setWorkoutDays(workoutDaysData as WorkoutDay[] || []);
+      setWorkouts(workoutsData as Workout[] || []);
     } catch (error: any) {
       console.error('Error cargando datos:', error);
       setError('Error cargando entrenamientos');
