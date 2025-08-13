@@ -68,6 +68,7 @@ func main() {
 
 	// Notifications endpoints
 	api.HandleFunc("/notifications", handlers.GetNotificationsHandler).Methods("GET")
+	api.HandleFunc("/notifications/system", handlers.GetSystemNotificationsHandler).Methods("GET")
 	api.HandleFunc("/notifications/count", handlers.GetUnreadNotificationsCountHandler).Methods("GET")
 	api.HandleFunc("/notifications/{id}/read", handlers.MarkNotificationAsReadHandler).Methods("PUT")
 	api.HandleFunc("/notifications/read-all", handlers.MarkAllNotificationsAsReadHandler).Methods("PUT")

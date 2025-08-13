@@ -15,7 +15,6 @@ type AdminNotification struct {
 	Title       string    `json:"title"`
 	Message     string    `json:"message"`
 	Type        string    `json:"type"` // 'info', 'warning', 'success', 'error'
-	IsActive    bool      `json:"is_active"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
@@ -39,7 +38,6 @@ type CreateNotificationRequest struct {
 	Title    string `json:"title"`
 	Message  string `json:"message"`
 	Type     string `json:"type"`
-	IsActive bool   `json:"is_active"`
 }
 
 // CreateExerciseRequest representa la solicitud para crear un ejercicio
@@ -146,28 +144,93 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		req.Type = "info" // Valor por defecto
 	}
 
-	query := `
-		INSERT INTO admin_notifications (title, message, type, is_active)
-		VALUES ($1, $2, $3, $4)
+	// Iniciar transacción
+	tx, err := database.DB.Begin()
+	if err != nil {
+		http.Error(w, "Error iniciando transacción", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
+
+	// 1. Crear la notificación del sistema
+	adminQuery := `
+		INSERT INTO admin_notifications (title, message, type)
+		VALUES ($1, $2, $3)
 		RETURNING id, created_at, updated_at
 	`
 
 	var notification AdminNotification
-	err := database.DB.QueryRow(query, req.Title, req.Message, req.Type, req.IsActive).Scan(
+	err = tx.QueryRow(adminQuery, req.Title, req.Message, req.Type).Scan(
 		&notification.ID,
 		&notification.CreatedAt,
 		&notification.UpdatedAt,
 	)
 
 	if err != nil {
-		http.Error(w, "Error creando notificación", http.StatusInternalServerError)
+		http.Error(w, "Error creando notificación del sistema", http.StatusInternalServerError)
+		return
+	}
+
+	// 2. Obtener todos los usuarios activos
+	usersQuery := `SELECT id FROM auth.users WHERE email_confirmed_at IS NOT NULL`
+	userRows, err := tx.Query(usersQuery)
+	if err != nil {
+		http.Error(w, "Error obteniendo usuarios", http.StatusInternalServerError)
+		return
+	}
+	defer userRows.Close()
+
+	var userIDs []string
+	for userRows.Next() {
+		var userID string
+		if err := userRows.Scan(&userID); err != nil {
+			continue
+		}
+		userIDs = append(userIDs, userID)
+	}
+
+	// 3. Crear notificaciones individuales para cada usuario
+	if len(userIDs) > 0 {
+		// Preparar datos para la notificación
+		notificationData := map[string]interface{}{
+			"admin_notification_id": notification.ID,
+			"type":                  req.Type,
+		}
+		dataJSON, _ := json.Marshal(notificationData)
+
+		// Crear notificaciones en lote
+		userNotificationsQuery := `
+			INSERT INTO notifications (user_id, type, title, message, data, is_read)
+			VALUES ($1, $2, $3, $4, $5, false)
+		`
+
+		stmt, err := tx.Prepare(userNotificationsQuery)
+		if err != nil {
+			http.Error(w, "Error preparando notificaciones de usuarios", http.StatusInternalServerError)
+			return
+		}
+		defer stmt.Close()
+
+		for _, userID := range userIDs {
+			_, err = stmt.Exec(userID, "announcement", req.Title, req.Message, string(dataJSON))
+			if err != nil {
+				fmt.Printf("Error creando notificación para usuario %s: %v\n", userID, err)
+				// Continuar con otros usuarios aunque falle uno
+			}
+		}
+	}
+
+	// Confirmar transacción
+	if err := tx.Commit(); err != nil {
+		http.Error(w, "Error confirmando transacción", http.StatusInternalServerError)
 		return
 	}
 
 	notification.Title = req.Title
 	notification.Message = req.Message
 	notification.Type = req.Type
-	notification.IsActive = req.IsActive
+
+	fmt.Printf("Notificación del sistema creada con ID %d para %d usuarios\n", notification.ID, len(userIDs))
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(notification)

@@ -17,6 +17,7 @@ import {
   ThumbUp, 
   Announcement
 } from '@mui/icons-material'
+import { apiClient } from '../../lib/api'
 
 type NotificationType = 'general' | 'kudos' | 'announcement'
 
@@ -55,20 +56,38 @@ export default function NotificationsList() {
     setError('')
     
     try {
-      // Datos de ejemplo - en el futuro vendrán del backend
-      const mockNotifications: Notification[] = [
-        {
-          id: '1',
-          type: 'announcement',
-          title: 'Gimnasio de la UNC cerrado',
-          message: 'Les informamos que el día lunes 11 de agosto, la Dirección de Deportes permanecerá cerrada debido al paro del personal no docente.',
-          created_at: new Date().toISOString(),
-          read: false,
-          priority: 'high'
-        },
+      // Cargar notificaciones del usuario
+      const userNotifications = await apiClient.getNotifications() as any[]
+      
+      // Cargar notificaciones del sistema
+      const systemNotifications = await apiClient.getSystemNotifications() as any[]
+      
+      // Combinar y transformar las notificaciones
+      const allNotifications: Notification[] = [
+        ...userNotifications.map((notif: any) => ({
+          id: notif.id.toString(),
+          type: notif.type as NotificationType,
+          title: notif.title,
+          message: notif.message,
+          created_at: notif.created_at,
+          read: notif.is_read || false,
+          priority: notif.priority || 'medium'
+        })),
+        ...systemNotifications.map((notif: any) => ({
+          id: `system_${notif.id}`,
+          type: notif.type as NotificationType,
+          title: notif.title,
+          message: notif.message,
+          created_at: notif.created_at,
+          read: notif.read || false,
+          priority: notif.priority || 'medium'
+        }))
       ]
       
-      setNotifications(mockNotifications)
+      // Ordenar por fecha de creación (más recientes primero)
+      allNotifications.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      
+      setNotifications(allNotifications)
     } catch (error) {
       console.error('Error cargando notificaciones:', error)
       setError('Error al cargar las notificaciones')
@@ -181,7 +200,7 @@ export default function NotificationsList() {
     )
   }
 
-  const unreadCount = notifications.filter(n => !n.read).length
+  const unreadCount = notifications?.filter(n => !n.read)?.length || 0
 
   return (
     <Box sx={{ p: 2, maxWidth: 600, mx: 'auto' }}>
@@ -207,7 +226,7 @@ export default function NotificationsList() {
       </Typography>
 
       <Stack spacing={2}>
-        {notifications.map((notification) => (
+        {notifications?.map((notification) => (
           <Card 
             key={notification.id} 
             sx={{ 

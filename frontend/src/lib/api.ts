@@ -182,6 +182,10 @@ class ApiClient {
     return this.request(`/notifications?${params}`)
   }
 
+  async getSystemNotifications() {
+    return this.request('/notifications/system')
+  }
+
   async getUnreadNotificationsCount() {
     return this.request('/notifications/count')
   }
@@ -225,7 +229,6 @@ class ApiClient {
     title: string
     message: string
     type: 'info' | 'warning' | 'success' | 'error'
-    is_active: boolean
   }) {
     return this.request('/admin/notifications', {
       method: 'POST',

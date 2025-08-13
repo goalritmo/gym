@@ -200,6 +200,57 @@ func GetUnreadNotificationsCountHandler(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
+// GetSystemNotificationsHandler obtiene las notificaciones del sistema (admin_notifications)
+func GetSystemNotificationsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	query := `
+		SELECT id, title, message, type, created_at
+		FROM admin_notifications 
+		ORDER BY created_at DESC
+	`
+
+	rows, err := database.DB.Query(query)
+	if err != nil {
+		fmt.Printf("Error consultando notificaciones del sistema: %v\n", err)
+		http.Error(w, "Error consultando notificaciones del sistema", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var notifications []map[string]interface{}
+	for rows.Next() {
+		var id int
+		var title, message, notificationType string
+		var isActive bool
+		var createdAt time.Time
+		
+		err := rows.Scan(&id, &title, &message, &notificationType, &createdAt)
+		if err != nil {
+			fmt.Printf("Error escaneando notificación del sistema: %v\n", err)
+			continue
+		}
+
+		// Convertir fecha a zona horaria de Argentina
+		createdAt = convertToArgentinaTime(createdAt)
+		
+		notifications = append(notifications, map[string]interface{}{
+			"id":         id,
+			"type":       "announcement",
+			"title":      title,
+			"message":    message,
+			"created_at": createdAt,
+			"read":       false, // Las notificaciones del sistema siempre se muestran como no leídas
+			"priority":   notificationType == "error" ? "high" : "medium",
+		})
+	}
+
+	fmt.Printf("Encontradas %d notificaciones del sistema\n", len(notifications))
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(notifications)
+}
+
 // DeleteNotificationHandler elimina una notificación
 func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

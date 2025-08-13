@@ -35,7 +35,6 @@ type AdminNotification = {
   title: string
   message: string
   type: 'info' | 'warning' | 'success' | 'error'
-  is_active: boolean
   created_at: string
   updated_at: string
 }
@@ -44,7 +43,6 @@ type CreateNotificationForm = {
   title: string
   message: string
   type: 'info' | 'warning' | 'success' | 'error'
-  is_active: boolean
 }
 
 const notificationTypeIcons = {
@@ -70,8 +68,7 @@ export function AdminNotifications() {
   const [form, setForm] = useState<CreateNotificationForm>({
     title: '',
     message: '',
-    type: 'info',
-    is_active: true
+    type: 'info'
   })
 
   const loadNotifications = async () => {
@@ -105,8 +102,7 @@ export function AdminNotifications() {
       setForm({
         title: '',
         message: '',
-        type: 'info',
-        is_active: true
+        type: 'info'
       })
       setOpenDialog(false)
       await loadNotifications() // Recargar lista
@@ -211,8 +207,8 @@ export function AdminNotifications() {
                         variant="outlined"
                       />
                       <Chip
-                        label={notification.is_active ? 'Activa' : 'Inactiva'}
-                        color={notification.is_active ? 'success' : 'default'}
+                        label="Sistema"
+                        color="primary"
                         size="small"
                         variant="outlined"
                       />
@@ -292,15 +288,7 @@ export function AdminNotifications() {
               </Select>
             </FormControl>
 
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={form.is_active}
-                  onChange={(e) => setForm(prev => ({ ...prev, is_active: e.target.checked }))}
-                />
-              }
-              label="Notificación activa"
-            />
+
           </Stack>
         </DialogContent>
 
