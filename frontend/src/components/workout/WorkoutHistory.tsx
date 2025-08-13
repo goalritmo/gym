@@ -20,9 +20,7 @@ import {
   ExpandMore as ExpandMoreIcon, 
   ExpandLess as ExpandLessIcon,
   Delete as DeleteIcon,
-  ModeEdit as ModeEditIcon,
-  Star as StarIcon,
-  StarBorder as StarBorderIcon
+  ModeEdit as ModeEditIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import type { Workout, WorkoutDay, ExerciseGroup, WorkoutDayWithExercises } from '../../types/workout'
@@ -69,49 +67,6 @@ export default function WorkoutHistory() {
     
     return `${weekday} ${day} de ${month}`
   }
-
-  // Componente de estrellas para rating
-  const StarRating = ({ value, maxValue = 5, size = 'small', editable = false, onChange }: { 
-    value: number; 
-    maxValue?: number; 
-    size?: 'small' | 'medium' | 'large';
-    editable?: boolean;
-    onChange?: (newValue: number) => void;
-  }) => {
-    const stars = []
-    
-    for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <IconButton
-          key={i}
-          size={size}
-          disabled={!editable}
-          onClick={() => editable && onChange && onChange(i)}
-          sx={{ 
-            p: 0.5, 
-            color: i <= value ? 'warning.main' : 'grey.300',
-            '&:hover': { 
-              backgroundColor: editable ? 'rgba(255, 193, 7, 0.1)' : 'transparent',
-              color: editable ? 'warning.main' : (i <= value ? 'warning.main' : 'grey.300')
-            }
-          }}
-        >
-          {i <= value ? <StarIcon /> : <StarBorderIcon />}
-        </IconButton>
-      )
-    }
-    
-    return (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        {stars}
-        <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
-          ({value}/{maxValue})
-        </Typography>
-      </Box>
-    )
-  }
-
-
 
   // Agrupar workouts por día y crear días con ejercicios
   const workoutDaysWithExercises = useMemo(() => {
@@ -246,25 +201,6 @@ export default function WorkoutHistory() {
     } finally {
       setLoadingWorkoutId(null)
       setDeleteConfirmation({ show: false, workoutId: null })
-    }
-  }
-
-  const handleUpdateMood = async (workoutDayId: number, newMood: number) => {
-    try {
-      // TODO: Implementar llamada al backend para actualizar el mood
-      console.log('Actualizando mood del workout day:', workoutDayId, 'a:', newMood)
-      
-      // Por ahora, actualizar el estado local
-      setWorkoutDays(prev => 
-        prev.map(day => 
-          day.id === workoutDayId 
-            ? { ...day, mood: newMood }
-            : day
-        )
-      )
-    } catch (error) {
-      console.error('Error actualizando estado de ánimo:', error)
-      setError('Error actualizando el estado de ánimo')
     }
   }
 
@@ -455,50 +391,42 @@ export default function WorkoutHistory() {
                 </IconButton>
               </Box>
 
-              {/* Estado de ánimo */}
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center',
-                    p: 1,
-                    borderRadius: 1,
-                    backgroundColor: 'rgba(156, 39, 176, 0.1)',
-                    border: '1px solid rgba(156, 39, 176, 0.3)'
-                  }}
-                >
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="caption" sx={{ color: 'purple', fontWeight: 500, mb: 0.5 }}>
-                      Estado de ánimo
-                    </Typography>
-                    <StarRating 
-                      value={day.workoutDay.mood} 
-                      editable={true} 
-                      onChange={(newValue) => {
-                        handleUpdateMood(day.workoutDay.id, newValue);
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </Box>
-
               {/* Resumen de ejercicios */}
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {day.exerciseGroups.map((group, index) => (
-                  <Chip
+                  <Card
                     key={index}
-                    label={`${group.exerciseName} (${group.workouts.length})`}
-                    variant="outlined"
-                    size="small"
                     sx={{
-                      borderColor: 'primary.main',
-                      color: 'primary.main',
-                      '&:hover': {
-                        backgroundColor: 'primary.main',
-                        color: 'white'
-                      }
+                      boxShadow: 1,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      minWidth: 200,
+                      maxWidth: 300
                     }}
-                  />
+                  >
+                    <CardContent sx={{ p: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', mb: 1 }}>
+                        {group.exerciseName}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {group.workouts.length} {group.workouts.length === 1 ? 'serie' : 'series'}
+                      </Typography>
+                      <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                        <Chip
+                          label={`${group.workouts[0]?.weight || 0}kg`}
+                          variant="outlined"
+                          size="small"
+                          sx={{ fontWeight: 'bold' }}
+                        />
+                        <Chip
+                          label={`${group.workouts[0]?.reps || 0} reps`}
+                          variant="outlined"
+                          size="small"
+                          sx={{ fontWeight: 'bold' }}
+                        />
+                      </Stack>
+                    </CardContent>
+                  </Card>
                 ))}
               </Box>
             </CardContent>
@@ -534,23 +462,8 @@ export default function WorkoutHistory() {
                   {day.workoutDay.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'} • 
-                  Estado de ánimo: {day.workoutDay.mood}/5
+                  {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'}
                 </Typography>
-                
-                {/* Estado de ánimo editable en el modal */}
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="body2" sx={{ mr: 1, fontWeight: 500 }}>
-                    Estado de ánimo:
-                  </Typography>
-                  <StarRating 
-                    value={day.workoutDay.mood} 
-                    editable={true} 
-                    onChange={(newValue) => {
-                      handleUpdateMood(day.workoutDay.id, newValue);
-                    }}
-                  />
-                </Box>
               </Box>
 
               <Stack spacing={2}>
