@@ -389,51 +389,53 @@ export default function WorkoutHistory() {
               </Box>
 
               {/* Resumen de ejercicios */}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {day.exerciseGroups.map((group, index) => (
-                  <Card
-                    key={index}
-                    onClick={() => setExerciseModal({ show: true, exerciseGroup: group, workoutDay: day.workoutDay })}
-                    sx={{
-                      boxShadow: 1,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      minWidth: 200,
-                      maxWidth: 300,
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease-in-out',
-                      '&:hover': {
-                        boxShadow: 3,
-                        transform: 'translateY(-2px)',
-                        borderColor: 'primary.main'
-                      }
-                    }}
-                  >
-                    <CardContent sx={{ p: 2 }}>
-                      <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', mb: 1 }}>
-                        {group.exerciseName}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {group.workouts.length} {group.workouts.length === 1 ? 'serie' : 'series'}
-                      </Typography>
-                      <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                        <Chip
-                          label={`${group.workouts[0]?.weight || 0}kg`}
-                          variant="outlined"
-                          size="small"
-                          sx={{ fontWeight: 'bold' }}
-                        />
-                        <Chip
-                          label={`${group.workouts[0]?.reps || 0} reps`}
-                          variant="outlined"
-                          size="small"
-                          sx={{ fontWeight: 'bold' }}
-                        />
-                      </Stack>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Box>
+              {expandedDays.has(day.workoutDay.date) && (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+                  {day.exerciseGroups.map((group, index) => (
+                    <Card
+                      key={index}
+                      onClick={() => setExerciseModal({ show: true, exerciseGroup: group, workoutDay: day.workoutDay })}
+                      sx={{
+                        boxShadow: 1,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        minWidth: 200,
+                        maxWidth: 300,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease-in-out',
+                        '&:hover': {
+                          boxShadow: 3,
+                          transform: 'translateY(-2px)',
+                          borderColor: 'primary.main'
+                        }
+                      }}
+                    >
+                      <CardContent sx={{ p: 2 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', mb: 1 }}>
+                          {group.exerciseName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {group.workouts.length} {group.workouts.length === 1 ? 'serie' : 'series'}
+                        </Typography>
+                        <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                          <Chip
+                            label={`${group.workouts[0]?.weight || 0}kg`}
+                            variant="outlined"
+                            size="small"
+                            sx={{ fontWeight: 'bold' }}
+                          />
+                          <Chip
+                            label={`${group.workouts[0]?.reps || 0} reps`}
+                            variant="outlined"
+                            size="small"
+                            sx={{ fontWeight: 'bold' }}
+                          />
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </Box>
+              )}
             </CardContent>
           </Card>
 
@@ -489,7 +491,7 @@ export default function WorkoutHistory() {
               alignItems: 'center'
             }}>
               <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                {exerciseModal.exerciseGroup?.exerciseName} del {exerciseModal.workoutDay ? formatDate(exerciseModal.workoutDay.date) : ''}
+                {exerciseModal.exerciseGroup?.exerciseName}
               </Typography>
               <IconButton 
                 onClick={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
@@ -502,7 +504,7 @@ export default function WorkoutHistory() {
             <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: 2 }}>
               <Box sx={{ mb: 3 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {exerciseModal.exerciseGroup?.workouts.length} {exerciseModal.exerciseGroup?.workouts.length === 1 ? 'serie' : 'series'}
+                  {exerciseModal.workoutDay ? formatDate(exerciseModal.workoutDay.date) : ''}
                 </Typography>
               </Box>
 
@@ -517,10 +519,62 @@ export default function WorkoutHistory() {
                     transition: 'filter 0.2s ease-in-out'
                   }}>
                     <CardContent sx={{ p: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                        <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                          Serie {workout.serie}
-                        </Typography>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                            Serie {workout.serie}
+                          </Typography>
+                          
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Chip 
+                              label={`${workout.weight}kg`} 
+                              variant="outlined" 
+                              size="small"
+                              sx={{ 
+                                fontWeight: 'bold',
+                                borderColor: '#2196f3',
+                                color: '#2196f3',
+                                minWidth: '60px',
+                                '&:hover': {
+                                  backgroundColor: '#2196f3',
+                                  color: 'white'
+                                }
+                              }}
+                            />
+                            <Chip 
+                              label={`${workout.reps} reps`} 
+                              variant="outlined" 
+                              size="small"
+                              sx={{ 
+                                fontWeight: 'bold',
+                                borderColor: '#4caf50',
+                                color: '#4caf50',
+                                minWidth: '60px',
+                                '&:hover': {
+                                  backgroundColor: '#4caf50',
+                                  color: 'white'
+                                }
+                              }}
+                            />
+                            {workout.seconds && (
+                              <Chip 
+                                label={`${workout.seconds}s`} 
+                                variant="outlined" 
+                                size="small"
+                                sx={{ 
+                                  fontWeight: 'bold',
+                                  borderColor: '#4caf50',
+                                  color: '#4caf50',
+                                  minWidth: '50px',
+                                  '&:hover': {
+                                    backgroundColor: '#4caf50',
+                                    color: 'white'
+                                  }
+                                }}
+                              />
+                            )}
+                          </Stack>
+                        </Box>
                         
                         <IconButton
                           onClick={(e) => {
@@ -540,56 +594,6 @@ export default function WorkoutHistory() {
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Box>
-                      
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <Chip 
-                          label={`${workout.weight}kg`} 
-                          variant="outlined" 
-                          size="small"
-                          sx={{ 
-                            fontWeight: 'bold',
-                            borderColor: '#2196f3',
-                            color: '#2196f3',
-                            minWidth: '60px',
-                            '&:hover': {
-                              backgroundColor: '#2196f3',
-                              color: 'white'
-                            }
-                          }}
-                        />
-                        <Chip 
-                          label={`${workout.reps} reps`} 
-                          variant="outlined" 
-                          size="small"
-                          sx={{ 
-                            fontWeight: 'bold',
-                            borderColor: '#4caf50',
-                            color: '#4caf50',
-                            minWidth: '60px',
-                            '&:hover': {
-                              backgroundColor: '#4caf50',
-                              color: 'white'
-                            }
-                          }}
-                        />
-                        {workout.seconds && (
-                          <Chip 
-                            label={`${workout.seconds}s`} 
-                            variant="outlined" 
-                            size="small"
-                            sx={{ 
-                              fontWeight: 'bold',
-                              borderColor: '#4caf50',
-                              color: '#4caf50',
-                              minWidth: '50px',
-                              '&:hover': {
-                                backgroundColor: '#4caf50',
-                                color: 'white'
-                              }
-                            }}
-                          />
-                        )}
-                      </Stack>
                       
                       {workout.observations && (
                         <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', pt: 1, borderTop: 1, borderColor: 'divider' }}>
