@@ -4,19 +4,22 @@ import type { ReactNode } from 'react'
 interface UserSettings {
   showWorkoutSection: boolean
   favoriteExercises: number[]
+  uncNotificationsEnabled: boolean
 }
 
 interface UserSettingsContextType {
   settings: UserSettings
   toggleWorkoutSection: () => void
   setFavoriteExercises: (exercises: number[]) => void
+  toggleUncNotifications: () => void
 }
 
 const UserSettingsContext = createContext<UserSettingsContextType | undefined>(undefined)
 
 const defaultSettings: UserSettings = {
   showWorkoutSection: true, // Por defecto mostrar sección de registro
-  favoriteExercises: [] // Sin ejercicios favoritos por defecto
+  favoriteExercises: [], // Sin ejercicios favoritos por defecto
+  uncNotificationsEnabled: true // Por defecto habilitadas para usuarios UNC
 }
 
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
@@ -55,10 +58,18 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     }))
   }
 
+  const toggleUncNotifications = () => {
+    setSettings(prev => ({ 
+      ...prev, 
+      uncNotificationsEnabled: !prev.uncNotificationsEnabled
+    }))
+  }
+
   const value: UserSettingsContextType = {
     settings, 
     toggleWorkoutSection,
-    setFavoriteExercises
+    setFavoriteExercises,
+    toggleUncNotifications
   }
 
   return (

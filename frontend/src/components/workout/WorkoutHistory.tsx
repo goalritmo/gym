@@ -31,7 +31,6 @@ export default function WorkoutHistory() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; workoutId: number | null }>({ show: false, workoutId: null })
   const [loadingWorkoutId, setLoadingWorkoutId] = useState<number | null>(null)
@@ -135,14 +134,18 @@ export default function WorkoutHistory() {
     return days;
   }, [workoutDays, workouts]);
 
-  // Filtrar y ordenar días
-  const filteredAndSortedWorkoutDays = useMemo(() => {
+  // Filtrar días
+  const filteredWorkoutDays = useMemo(() => {
     let filtered = workoutDaysWithExercises;
     
     // Filtrar por término de búsqueda
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(day => {
+        // Buscar en fecha formateada (ej: "Lunes 12 de Agosto")
+        const formattedDate = formatDate(day.workoutDay.date);
+        const dateMatch = formattedDate.toLowerCase().includes(searchLower);
+        
         // Buscar en nombre de ejercicios
         const exerciseMatch = day.exerciseGroups.some(group => 
           group.exerciseName.toLowerCase().includes(searchLower)
@@ -155,7 +158,7 @@ export default function WorkoutHistory() {
           )
         );
         
-        // Buscar en peso, reps, etc.
+        // Buscador
         const workoutDataMatch = day.exerciseGroups.some(group =>
           group.workouts.some(workout => 
             workout.weight.toString().includes(searchLower) ||
@@ -164,24 +167,19 @@ export default function WorkoutHistory() {
           )
         );
         
-        return exerciseMatch || observationMatch || workoutDataMatch;
+        return dateMatch || exerciseMatch || observationMatch || workoutDataMatch;
       });
     }
     
-    // Ordenar por fecha
+    // Ordenar por fecha (más recientes primero)
     filtered.sort((a, b) => {
       const dateA = new Date(a.workoutDay.date);
       const dateB = new Date(b.workoutDay.date);
-      
-      if (sortOrder === 'newest') {
-        return dateB.getTime() - dateA.getTime();
-      } else {
-        return dateA.getTime() - dateB.getTime();
-      }
+      return dateB.getTime() - dateA.getTime();
     });
     
     return filtered;
-  }, [workoutDaysWithExercises, searchTerm, sortOrder]);
+  }, [workoutDaysWithExercises, searchTerm]);
 
   // Cargar datos
   useEffect(() => {
@@ -284,7 +282,7 @@ export default function WorkoutHistory() {
         }}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <TextField
-            placeholder="Buscar ejercicios, peso, reps..."
+            placeholder="Buscar por fecha, ejercicios, etc..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{
@@ -317,26 +315,13 @@ export default function WorkoutHistory() {
             }}
           />
           
-          <Button
-            variant="outlined"
-            onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
-            sx={{
-              borderColor: 'white',
-              color: 'white',
-              '&:hover': {
-                borderColor: 'white',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)'
-              }
-            }}
-          >
-            {sortOrder === 'newest' ? 'Más recientes' : 'Más antiguos'}
-          </Button>
+
         </Box>
       </Box>
 
         {/* Cards de entrenamientos */}
         <Box sx={{ mx: 0.5 }}>
-          {filteredAndSortedWorkoutDays.map((day) => (
+          {filteredWorkoutDays.map((day) => (
             <Box key={day.workoutDay.date} sx={{ position: 'relative', mb: 2 }}>
             <Card sx={{ 
               boxShadow: 2, 
@@ -431,13 +416,18 @@ export default function WorkoutHistory() {
                       }}
                     >
                       <CardContent sx={{ p: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
                             {group.exerciseName}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            {group.workouts.length} {group.workouts.length === 1 ? 'serie' : 'series'}
-                          </Typography>
+                          <Box sx={{ textAlign: 'right' }}>
+                            <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '1.1rem', lineHeight: 1 }}>
+                              {group.workouts.length}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 400, fontSize: '0.8rem', lineHeight: 1 }}>
+                              {group.workouts.length === 1 ? 'serie' : 'series'}
+                            </Typography>
+                          </Box>
                         </Box>
                       </CardContent>
                     </Card>
@@ -639,7 +629,7 @@ export default function WorkoutHistory() {
           ))}
         </Box>
 
-        {filteredAndSortedWorkoutDays.length === 0 && (
+        {filteredWorkoutDays.length === 0 && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="h6" color="text.secondary">
               {searchTerm ? 'No se encontraron entrenamientos con esa búsqueda' : 'No hay entrenamientos registrados'}
