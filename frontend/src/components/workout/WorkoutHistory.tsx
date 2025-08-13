@@ -390,7 +390,7 @@ export default function WorkoutHistory() {
 
               {/* Resumen de ejercicios */}
               {expandedDays.has(day.workoutDay.date) && (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
                   {day.exerciseGroups.map((group, index) => (
                     <Card
                       key={index}
@@ -399,8 +399,7 @@ export default function WorkoutHistory() {
                         boxShadow: 1,
                         border: '1px solid',
                         borderColor: 'divider',
-                        minWidth: 200,
-                        maxWidth: 300,
+                        width: '100%',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease-in-out',
                         '&:hover': {
@@ -411,26 +410,14 @@ export default function WorkoutHistory() {
                       }}
                     >
                       <CardContent sx={{ p: 2 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', mb: 1 }}>
-                          {group.exerciseName}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {group.workouts.length} {group.workouts.length === 1 ? 'serie' : 'series'}
-                        </Typography>
-                        <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                          <Chip
-                            label={`${group.workouts[0]?.weight || 0}kg`}
-                            variant="outlined"
-                            size="small"
-                            sx={{ fontWeight: 'bold' }}
-                          />
-                          <Chip
-                            label={`${group.workouts[0]?.reps || 0} reps`}
-                            variant="outlined"
-                            size="small"
-                            sx={{ fontWeight: 'bold' }}
-                          />
-                        </Stack>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                            {group.exerciseName}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                            {group.workouts.length} {group.workouts.length === 1 ? 'serie' : 'series'}
+                          </Typography>
+                        </Box>
                       </CardContent>
                     </Card>
                   ))}

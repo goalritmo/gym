@@ -76,61 +76,11 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
         {
           id: '1',
           type: 'announcement',
-          title: 'Gimnasio cerrado',
+          title: 'Gimnasio de la UNC cerrado',
           message: 'Les informamos que el día lunes 11 de agosto, la Dirección de Deportes permanecerá cerrada debido al paro del personal no docente.',
           created_at: new Date().toISOString(),
           read: false,
           priority: 'high'
-        },
-        {
-          id: '2',
-          type: 'kudos',
-          title: 'Nuevos kudos en tu entrenamiento',
-          message: '3 personas dieron kudos a tu entrenamiento de Press de Banca del lunes 10 de agosto',
-          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 horas atrás
-          read: false,
-          from_users: [
-            {
-              id: '1',
-              name: 'María',
-              avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
-            },
-            {
-              id: '2',
-              name: 'Carlos',
-              avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-            },
-            {
-              id: '3',
-              name: 'Ana',
-              avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
-            }
-          ],
-          workout: {
-            id: 1,
-            exercise_name: 'Press de Banca',
-            date: '2025-08-10'
-          }
-        },
-        {
-          id: '3',
-          type: 'kudos',
-          title: 'Kudos en tu entrenamiento',
-          message: 'Carlos dio kudos a tu entrenamiento de Sentadillas del domingo 9 de agosto',
-          created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 horas atrás
-          read: true,
-          from_users: [
-            {
-              id: '2',
-              name: 'Carlos',
-              avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-            }
-          ],
-          workout: {
-            id: 2,
-            exercise_name: 'Sentadillas',
-            date: '2025-08-09'
-          }
         },
       ]
       
@@ -294,7 +244,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
             </Typography>
           </Paper>
         ) : (
-          <Stack spacing={2} sx={{ maxWidth: 600, mx: 'auto' }}>
+          <Stack spacing={2} sx={{ maxWidth: 600, mx: 'auto', mt: 2 }}>
             {notifications.map((notification) => (
               <Card 
                 key={notification.id} 
