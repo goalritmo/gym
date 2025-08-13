@@ -30,8 +30,8 @@ type AdminExercise = {
   id: number
   name: string
   muscle_group: string
-  primary_muscles: string[]
-  secondary_muscles: string[]
+  primary_muscles: string[] | null
+  secondary_muscles: string[] | null
   equipment: string
   video_url?: string
   is_active: boolean
@@ -77,11 +77,12 @@ export function AdminExercises() {
     try {
       setLoading(true)
       const data = await apiClient.getAdminExercises() as AdminExercise[]
-      setExercises(data)
+      setExercises(data || [])
       setError('')
     } catch (error) {
       console.error('Error cargando ejercicios:', error)
       setError('Error al cargar los ejercicios')
+      setExercises([])
     } finally {
       setLoading(false)
     }
@@ -222,7 +223,7 @@ export function AdminExercises() {
                     </Box>
                     
                     <Box sx={{ mb: 2 }}>
-                      {exercise.primary_muscles.length > 0 && (
+                      {exercise.primary_muscles && exercise.primary_muscles.length > 0 && (
                         <Box sx={{ mb: 1 }}>
                           <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                             Músculos principales:
@@ -241,7 +242,7 @@ export function AdminExercises() {
                         </Box>
                       )}
 
-                      {exercise.secondary_muscles.length > 0 && (
+                      {exercise.secondary_muscles && exercise.secondary_muscles.length > 0 && (
                         <Box>
                           <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                             Músculos secundarios:

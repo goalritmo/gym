@@ -78,11 +78,12 @@ export function AdminNotifications() {
     try {
       setLoading(true)
       const data = await apiClient.getAdminNotifications() as AdminNotification[]
-      setNotifications(data)
+      setNotifications(data || [])
       setError('')
     } catch (error) {
       console.error('Error cargando notificaciones:', error)
       setError('Error al cargar las notificaciones')
+      setNotifications([])
     } finally {
       setLoading(false)
     }
@@ -158,7 +159,7 @@ export function AdminNotifications() {
           onClick={() => setOpenDialog(true)}
           sx={{ fontWeight: 600 }}
         >
-          Nueva Notificación
+          Agregar
         </Button>
       </Box>
 
@@ -252,7 +253,7 @@ export function AdminNotifications() {
           fontWeight: 'bold'
         }}>
           <AddIcon sx={{ color: 'primary.main' }} />
-          Crear Nueva Notificación
+          Agregar Notificación
         </DialogTitle>
         
         <DialogContent>
