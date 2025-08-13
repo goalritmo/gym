@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Fab, Zoom } from '@mui/material'
-import { History, AllInclusive } from '@mui/icons-material'
+import { History, AllInclusive, People } from '@mui/icons-material'
 
 import { TABS, type TabType } from '../../constants/tabs'
 
@@ -13,15 +13,15 @@ export default function FloatingNavButton({ currentTab, onTabChange }: FloatingN
   const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
-    // Solo mostrar el botón en WORKOUT e HISTORY
-    if (currentTab === TABS.WORKOUT || currentTab === TABS.HISTORY) {
-      // En historial, siempre mostrar el botón
-      if (currentTab === TABS.HISTORY) {
+    // Mostrar el botón en WORKOUT, HISTORY y SOCIAL
+    if (currentTab === TABS.WORKOUT || currentTab === TABS.HISTORY || currentTab === TABS.SOCIAL) {
+      // En historial y social, siempre mostrar el botón
+      if (currentTab === TABS.HISTORY || currentTab === TABS.SOCIAL) {
         setIsVisible(true)
         return
       }
 
-      // En el formulario de registro, ocultar después de 5 segundos
+      // En el formulario de registro, ocultar después de 3 segundos
       if (currentTab === TABS.WORKOUT) {
         setIsVisible(true)
         const timer = setTimeout(() => {
@@ -41,7 +41,9 @@ export default function FloatingNavButton({ currentTab, onTabChange }: FloatingN
   const handleClick = () => {
     if (currentTab === TABS.WORKOUT) {
       onTabChange(TABS.HISTORY)
-    } else {
+    } else if (currentTab === TABS.HISTORY) {
+      onTabChange(TABS.SOCIAL)
+    } else if (currentTab === TABS.SOCIAL) {
       onTabChange(TABS.WORKOUT)
     }
   }
@@ -49,17 +51,23 @@ export default function FloatingNavButton({ currentTab, onTabChange }: FloatingN
   const getIcon = () => {
     if (currentTab === TABS.WORKOUT) {
       return <History />
-    } else {
+    } else if (currentTab === TABS.HISTORY) {
+      return <People />
+    } else if (currentTab === TABS.SOCIAL) {
       return <AllInclusive />
     }
+    return <AllInclusive />
   }
 
   const getTooltip = () => {
     if (currentTab === TABS.WORKOUT) {
       return 'Ver historial'
-    } else {
+    } else if (currentTab === TABS.HISTORY) {
+      return 'Ver social'
+    } else if (currentTab === TABS.SOCIAL) {
       return 'Registrar entrenamiento'
     }
+    return 'Registrar entrenamiento'
   }
 
   return (

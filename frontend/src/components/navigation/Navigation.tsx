@@ -17,6 +17,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import CloseIcon from '@mui/icons-material/Close'
 import HistoryIcon from '@mui/icons-material/History'
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
+import PeopleIcon from '@mui/icons-material/People'
 import UserAvatar from '../user/UserAvatar'
 import { TABS, type TabType } from '../../constants/tabs'
 
@@ -139,6 +140,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
   const menuItems = [
     { label: 'Registrar', icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
     { label: 'Entrenamientos', icon: <HistoryIcon />, value: TABS.HISTORY },
+    { label: 'Social', icon: <PeopleIcon />, value: TABS.SOCIAL },
   ]
 
   return (

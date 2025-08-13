@@ -4,6 +4,7 @@ import WorkoutForm from '../workout/WorkoutForm'
 import WorkoutHistory from '../workout/WorkoutHistory'
 import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
+import SocialList from '../social/SocialList'
 import Navigation from '../navigation/Navigation'
 import SettingsModal from '../settings/SettingsModal'
 import NotificationsModal from '../notifications/NotificationsModal'
@@ -326,6 +327,13 @@ function AuthenticatedAppContent() {
         {activeTab === TABS.HISTORY && (
           <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
             <WorkoutHistory />
+          </Box>
+        )}
+
+        {/* Pestaña Social */}
+        {activeTab === TABS.SOCIAL && (
+          <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
+            <SocialList />
           </Box>
         )}
 
