@@ -14,7 +14,8 @@ import {
   IconButton,
   TextField,
   CircularProgress,
-  Alert
+  Alert,
+  Snackbar
 } from '@mui/material'
 import { 
   ExpandMore as ExpandMoreIcon, 
@@ -30,6 +31,7 @@ export default function WorkoutHistory() {
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; workoutId: number | null }>({ show: false, workoutId: null })
@@ -227,9 +229,10 @@ export default function WorkoutHistory() {
       // Recargar datos después de eliminar
       await loadData()
       console.log('🔍 Datos recargados')
+      setSuccessMessage('Ejercicio eliminado exitosamente')
     } catch (error) {
       console.error('❌ Error eliminando workout:', error)
-      setError('Error eliminando el ejercicio')
+      setError('Error al eliminar el ejercicio. Inténtalo de nuevo.')
     } finally {
       setLoadingWorkoutId(null)
       setDeleteConfirmation({ show: false, workoutId: null })
@@ -378,9 +381,11 @@ export default function WorkoutHistory() {
                         }}
                       />
                     </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
-                      {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'}
-                    </Typography>
+                    {!expandedDays.has(day.workoutDay.date) && (
+                      <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
+                        {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'}
+                      </Typography>
+                    )}
                   </Box>
                 
                 <IconButton 
@@ -416,18 +421,13 @@ export default function WorkoutHistory() {
                       }}
                     >
                       <CardContent sx={{ p: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', textAlign: 'left' }}>
                             {group.exerciseName}
                           </Typography>
-                          <Box sx={{ textAlign: 'right' }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '1.1rem', lineHeight: 1 }}>
-                              {group.workouts.length}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 400, fontSize: '0.8rem', lineHeight: 1 }}>
-                              {group.workouts.length === 1 ? 'serie' : 'series'}
-                            </Typography>
-                          </Box>
+                          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, fontSize: '0.9rem' }}>
+                            (x{group.workouts.length})
+                          </Typography>
                         </Box>
                       </CardContent>
                     </Card>
@@ -636,6 +636,72 @@ export default function WorkoutHistory() {
             </Typography>
           </Box>
         )}
+
+        {/* Snackbar para mensajes de éxito */}
+        <Snackbar
+          open={!!successMessage}
+          autoHideDuration={3000}
+          onClose={() => setSuccessMessage('')}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          sx={{ 
+            mt: 6,
+            width: { xs: '95%', sm: '90%', md: '70%' },
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 99998
+          }}
+        >
+          <Alert 
+            severity="success" 
+            sx={{ 
+              width: '100%',
+              minWidth: '300px',
+              fontSize: '0.95rem',
+              fontWeight: 500,
+              backgroundColor: '#e8f5e8',
+              color: '#2e7d32',
+              border: '1px solid #4caf50',
+              '& .MuiAlert-icon': {
+                color: '#2e7d32'
+              }
+            }}
+          >
+            ✅ {successMessage}
+          </Alert>
+        </Snackbar>
+
+        {/* Snackbar para mensajes de error */}
+        <Snackbar
+          open={!!error}
+          autoHideDuration={4000}
+          onClose={() => setError('')}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          sx={{ 
+            mt: 6,
+            width: { xs: '95%', sm: '90%', md: '70%' },
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 99999
+          }}
+        >
+          <Alert 
+            severity="error" 
+            sx={{ 
+              width: '100%',
+              minWidth: '300px',
+              fontSize: '0.95rem',
+              fontWeight: 500,
+              backgroundColor: '#ffebee',
+              color: '#c62828',
+              border: '1px solid #f44336',
+              '& .MuiAlert-icon': {
+                color: '#c62828'
+              }
+            }}
+          >
+            ❌ {error}
+          </Alert>
+        </Snackbar>
       </Stack>
     </Box>
   )

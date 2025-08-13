@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import { Logout as LogoutIcon, Settings as SettingsIcon, Notifications as NotificationsIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
+import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 type UserAvatarProps = {
   onOpenSettings?: () => void
@@ -22,6 +23,7 @@ type UserAvatarProps = {
 
 export default function UserAvatar({ onOpenSettings, onOpenNotifications, unreadNotifications = 0 }: UserAvatarProps) {
   const { user, logout } = useAuth()
+  const { settings } = useUserSettings()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 
@@ -92,7 +94,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, unread
               color: 'white'
             }
           }}
-          invisible={unreadNotifications === 0}
+          invisible={unreadNotifications === 0 || !settings.uncNotificationsEnabled}
         >
           <Avatar
             sx={{ 
@@ -171,29 +173,31 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, unread
 
         <Divider />
 
-        {/* Opción de notificaciones */}
-        <MenuItem onClick={handleOpenNotifications}>
-          <ListItemIcon>
-            <Badge 
-              badgeContent={unreadNotifications} 
-              sx={{
-                '& .MuiBadge-badge': {
-                  fontSize: '0.6rem',
-                  minWidth: '16px',
-                  height: '16px',
-                  backgroundColor: '#ff9800',
-                  color: 'white'
-                }
-              }}
-              invisible={unreadNotifications === 0}
-            >
-              <NotificationsIcon fontSize="small" />
-            </Badge>
-          </ListItemIcon>
-          <ListItemText>
-            Notificaciones
-          </ListItemText>
-        </MenuItem>
+        {/* Opción de notificaciones - solo se muestra si están habilitadas */}
+        {settings.uncNotificationsEnabled && (
+          <MenuItem onClick={handleOpenNotifications}>
+            <ListItemIcon>
+              <Badge 
+                badgeContent={unreadNotifications} 
+                sx={{
+                  '& .MuiBadge-badge': {
+                    fontSize: '0.6rem',
+                    minWidth: '16px',
+                    height: '16px',
+                    backgroundColor: '#ff9800',
+                    color: 'white'
+                  }
+                }}
+                invisible={unreadNotifications === 0}
+              >
+                <NotificationsIcon fontSize="small" />
+              </Badge>
+            </ListItemIcon>
+            <ListItemText>
+              Notificaciones
+            </ListItemText>
+          </MenuItem>
+        )}
 
         {/* Opción de configuración */}
         <MenuItem onClick={handleOpenSettings}>
