@@ -284,9 +284,6 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	
 	fmt.Printf("Workout creado exitosamente con ID: %d\n", workout.ID)
 
-	// Crear notificación de nuevo workout
-	createWorkoutNotification(userID, workout.ID, req.ExerciseID)
-
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(workout)
 }
@@ -390,29 +387,4 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// createWorkoutNotification crea una notificación cuando se crea un nuevo workout
-func createWorkoutNotification(userID string, workoutID int, exerciseID int) {
-	// Obtener nombre del ejercicio
-	var exerciseName string
-	err := database.DB.QueryRow("SELECT name FROM exercises WHERE id = $1", exerciseID).Scan(&exerciseName)
-	if err != nil {
-		fmt.Printf("Error obteniendo nombre del ejercicio: %v\n", err)
-		return
-	}
 
-	// Crear notificación
-	notificationQuery := `
-		INSERT INTO notifications (user_id, type, title, message, data)
-		VALUES ($1, $2, $3, $4, $5)
-	`
-	
-	notificationType := "workout_created"
-	title := "Nuevo ejercicio agregado"
-	message := fmt.Sprintf("Agregaste %s a tu entrenamiento", exerciseName)
-	data := fmt.Sprintf(`{"workout_id": %d, "exercise_id": %d}`, workoutID, exerciseID)
-	
-	_, err = database.DB.Exec(notificationQuery, userID, notificationType, title, message, data)
-	if err != nil {
-		fmt.Printf("Error creando notificación: %v\n", err)
-	}
-}
