@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/goalritmo/gym/backend/database"
+	"github.com/gorilla/mux"
 )
 
 // SocialWorkout representa un entrenamiento para la vista social
@@ -20,8 +21,8 @@ type SocialWorkout struct {
 	TotalExercises int      `json:"total_exercises"`
 	TotalSeries   int       `json:"total_series"`
 	Exercises     []SocialExercise `json:"exercises"`
-	Likes         int       `json:"likes"`
-	IsLiked       bool      `json:"is_liked"`
+	KudosCount    int       `json:"kudos_count"`
+	HasKudos      bool      `json:"has_kudos"`
 }
 
 // SocialExercise representa un ejercicio en la vista social
@@ -144,15 +145,46 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		// Por ahora, likes y isLiked son mock data
-		workout.Likes = 0
-		workout.IsLiked = false
+		// Por ahora, kudos son mock data
+		workout.KudosCount = 0
+		workout.HasKudos = false
 
 		socialWorkouts = append(socialWorkouts, workout)
 	}
 
 	fmt.Printf("Encontrados %d entrenamientos sociales\n", len(socialWorkouts))
 	json.NewEncoder(w).Encode(socialWorkouts)
+}
+
+// GiveKudosHandler maneja dar kudos a un workout
+func GiveKudosHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		fmt.Printf("Error: user_id no encontrado en contexto\n")
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
+
+	// Extraer workout ID de la URL
+	vars := mux.Vars(r)
+	workoutID := vars["id"]
+	if workoutID == "" {
+		http.Error(w, "Workout ID is required", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Printf("Usuario %s dando kudos al workout %s\n", userID, workoutID)
+
+	// Por ahora, solo devolver éxito (mock)
+	// TODO: Implementar lógica real de kudos en la base de datos
+	response := map[string]interface{}{
+		"success": true,
+		"message": "Kudos dado exitosamente",
+	}
+
+	json.NewEncoder(w).Encode(response)
 }
 
 // DebugHandler es un endpoint temporal para debug
