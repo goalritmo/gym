@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -11,7 +11,8 @@ import {
   Box,
   Divider,
   Alert,
-  IconButton
+  IconButton,
+  TextField
 } from '@mui/material'
 import {
   Settings,
@@ -41,6 +42,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   } = useUserSettings()
   const [hasChanges, setHasChanges] = useState(false)
   const [tempSettings, setTempSettings] = useState(settings)
+  const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
 
   // Actualizar configuraciones temporales cuando cambien las reales
   useEffect(() => {
@@ -91,9 +93,20 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     onClose()
   }
 
+  // Filtrar ejercicios por término de búsqueda
+  const filteredExercises = useMemo(() => {
+    if (!exerciseSearchTerm.trim()) {
+      return exercises
+    }
+    return exercises.filter(exercise =>
+      exercise.name.toLowerCase().includes(exerciseSearchTerm.toLowerCase())
+    )
+  }, [exercises, exerciseSearchTerm])
+
   const handleCancel = () => {
     setTempSettings(settings)
     setHasChanges(false)
+    setExerciseSearchTerm('')
     onClose()
   }
 
@@ -201,11 +214,6 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
             }
             label={
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                {tempSettings.showWorkoutSection ? (
-                  <Timer sx={{ color: 'primary.main', fontSize: 20 }} />
-                ) : (
-                  <TimerOff sx={{ color: 'text.secondary', fontSize: 20 }} />
-                )}
                 <Box>
                   <Typography variant="body1" sx={{ fontWeight: 500 }}>
                     Mostrar sección de tiempo de serie
@@ -245,6 +253,16 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
             Selecciona los ejercicios que quieres que aparezcan en el selector
           </Typography>
 
+          {/* Buscador de ejercicios */}
+          <TextField
+            placeholder="Buscar ejercicios..."
+            value={exerciseSearchTerm}
+            onChange={(e) => setExerciseSearchTerm(e.target.value)}
+            size="small"
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+
           {exercises.length > 0 ? (
             <Box>
               <Box sx={{
@@ -255,7 +273,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
                 borderRadius: 1,
                 p: 1
               }}>
-                {exercises.map(exercise => (
+                {filteredExercises.map(exercise => (
                   <FormControlLabel
                     key={exercise.id}
                     control={
