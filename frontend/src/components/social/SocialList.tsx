@@ -132,7 +132,9 @@ export default function SocialList() {
       
     } catch (error) {
       console.error('Error dando kudos:', error)
-      setError('Error al dar kudos')
+      // Mostrar error más específico
+      const errorMessage = error instanceof Error ? error.message : 'Error al dar kudos'
+      setError(`Error al dar kudos: ${errorMessage}`)
     } finally {
       setLoadingKudos(prev => {
         const newSet = new Set(prev)
@@ -252,7 +254,7 @@ export default function SocialList() {
                             {formatRelativeTime(workout.workout_date)}
                           </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right' }}>
                           <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
                             {workout.total_exercises}
                           </Typography>
@@ -266,11 +268,14 @@ export default function SocialList() {
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Typography variant="body2" color="text.secondary">
-                            {workout.kudos_count} {workout.kudos_count === 1 ? 'kudo' : 'kudos'}
+                            {workout.kudos_count === 0 
+                              ? 'Dar el primer kudos' 
+                              : `${workout.kudos_count} ${workout.kudos_count === 1 ? 'kudo' : 'kudos'}`
+                            }
                           </Typography>
                         </Box>
                         
-                        <Tooltip title={workout.has_kudos ? 'Ya diste kudos' : 'Dar kudos'}>
+                        <Tooltip title={workout.has_kudos ? 'Ya diste kudos' : workout.kudos_count === 0 ? 'Dar el primer kudos' : 'Dar kudos'}>
                           <IconButton
                             onClick={() => handleKudos(workout.id)}
                             disabled={loadingKudos.has(workout.id) || workout.has_kudos}
