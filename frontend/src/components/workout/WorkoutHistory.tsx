@@ -432,7 +432,7 @@ export default function WorkoutHistory() {
                     >
                       <CardContent sx={{ p: 2 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', textAlign: 'left' }}>
+                          <Typography variant="body1" sx={{ fontWeight: 600, color: 'primary.main', textAlign: 'left', fontSize: '0.88rem' }}>
                             {group.exerciseName}
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.9rem' }}>
@@ -476,11 +476,8 @@ export default function WorkoutHistory() {
             }}>
               ⚠️ Confirmar eliminación
             </DialogTitle>
-            <DialogContent sx={{ py: 3, px: 3 }}>
-              <Box sx={{ textAlign: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
-                  ¿Eliminar ejercicio?
-                </Typography>
+            <DialogContent sx={{ py: 2, px: 3 }}>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="body1" color="text.secondary">
                   Esta acción no se puede deshacer. El ejercicio será eliminado permanentemente.
                 </Typography>

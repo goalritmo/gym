@@ -33,6 +33,11 @@ type WorkoutFormProps = {
 
 export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: WorkoutFormProps) {
   const { settings } = useUserSettings()
+  
+  // Filtrar ejercicios favoritos si están configurados
+  const filteredExercises = settings.favoriteExercises.length > 0 
+    ? exercises.filter(exercise => settings.favoriteExercises.includes(exercise.id))
+    : exercises
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
@@ -53,7 +58,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   
   // Estado para detectar si los ejercicios están cargando
-  const isLoadingExercises = exercises.length === 0
+  const isLoadingExercises = filteredExercises.length === 0
 
   // Función para validar y limitar valores en tiempo real
   const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {
@@ -144,11 +149,25 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         Registrar
       </Typography>
       
-
+      {/* Indicador de ejercicios favoritos */}
+      {settings.favoriteExercises.length > 0 && (
+        <Box sx={{ 
+          textAlign: 'center', 
+          mb: 2, 
+          p: 1.5, 
+          bgcolor: 'primary.light', 
+          borderRadius: 2,
+          color: 'white',
+          fontSize: '0.9rem',
+          fontWeight: 500
+        }}>
+          ⭐ Mostrando {filteredExercises.length} ejercicios favoritos de {exercises.length} disponibles
+        </Box>
+      )}
       
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
-        <FormControl fullWidth error={Boolean(errors.exercise_id)} disabled={isLoading || exercises.length === 0}>
+        <FormControl fullWidth error={Boolean(errors.exercise_id)} disabled={isLoading || filteredExercises.length === 0}>
           <InputLabel id="exercise-select-label">Ejercicio</InputLabel>
           <Select
             labelId="exercise-select-label"
@@ -170,9 +189,9 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             }}
           >
             <MenuItem value="" disabled>
-              {exercises.length === 0 ? 'Cargando ejercicios...' : 'Seleccionar ejercicio...'}
+              {filteredExercises.length === 0 ? 'Cargando ejercicios...' : 'Seleccionar ejercicio...'}
             </MenuItem>
-            {exercises.map((ex) => (
+                          {filteredExercises.map((ex) => (
               <MenuItem key={ex.id} value={ex.id}>
                 {ex.name}
               </MenuItem>

@@ -15,12 +15,17 @@ import { useTab } from '../../contexts/TabContext'
 import { apiClient } from '../../lib/api'
 import FloatingNavButton from '../navigation/FloatingNavButton'
 
+type Exercise = {
+  id: number
+  name: string
+}
+
 function AuthenticatedAppContent() {
   const { activeTab, setActiveTab } = useTab()
   const { isLoggingOut, isSigningIn } = useAuth()
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [workoutDays, setWorkoutDays] = useState<WorkoutDay[]>([])
-  const [exercises, setExercises] = useState<any[]>([])
+  const [exercises, setExercises] = useState<Exercise[]>([])
   const [isSubmittingWorkout, setIsSubmittingWorkout] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [deleteMessage, setDeleteMessage] = useState('')
@@ -427,7 +432,8 @@ function AuthenticatedAppContent() {
       {/* Modal de configuración */}
       <SettingsModal 
         open={settingsModalOpen} 
-        onClose={handleCloseSettings} 
+        onClose={handleCloseSettings}
+        exercises={exercises}
       />
 
       {/* Modal de notificaciones */}
