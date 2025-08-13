@@ -16,8 +16,6 @@ import {
 } from '@mui/material'
 import {
   Settings,
-  Timer,
-  TimerOff,
   Close
 } from '@mui/icons-material'
 import { useUserSettings } from '../../contexts/UserSettingsContext'

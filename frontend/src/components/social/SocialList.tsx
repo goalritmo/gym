@@ -6,17 +6,13 @@ import {
   CardContent,
   Avatar,
   Chip,
-  Button,
   CircularProgress,
   Alert,
   Stack,
-  Divider,
   IconButton,
   Tooltip
 } from '@mui/material'
 import {
-  Favorite as FavoriteIcon,
-  FavoriteBorder as FavoriteBorderIcon,
   ThumbUp as ThumbUpIcon,
   ThumbUpOutlined as ThumbUpOutlinedIcon
 } from '@mui/icons-material'
