@@ -181,6 +181,16 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
 
         <Divider />
 
+        {/* Opción de Panel de Admin - solo se muestra si el usuario es administrador */}
+        {isAdmin && (
+          <MenuItem onClick={handleOpenAdminPanel}>
+            <ListItemIcon>
+              <AdminIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Panel de Admin</ListItemText>
+          </MenuItem>
+        )}
+
         {/* Opción de notificaciones - solo se muestra si están habilitadas */}
         {settings.uncNotificationsEnabled && (
           <MenuItem onClick={handleOpenNotifications}>
@@ -214,16 +224,6 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
           </ListItemIcon>
           <ListItemText>Configuración</ListItemText>
         </MenuItem>
-
-        {/* Opción de Panel de Admin - solo se muestra si el usuario es administrador */}
-        {isAdmin && (
-          <MenuItem onClick={handleOpenAdminPanel}>
-            <ListItemIcon>
-              <AdminIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Panel de Admin</ListItemText>
-          </MenuItem>
-        )}
 
         {/* Opción de logout */}
         <MenuItem onClick={handleLogout}>

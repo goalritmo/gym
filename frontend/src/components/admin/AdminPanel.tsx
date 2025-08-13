@@ -5,7 +5,6 @@ import {
   Tabs,
   Tab,
   CircularProgress,
-  Alert,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -14,7 +13,6 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material'
 import { AdminNotifications } from './AdminNotifications'
 import { AdminExercises } from './AdminExercises'
-import { apiClient } from '../../lib/api'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -50,29 +48,14 @@ type AdminPanelProps = {
 export default function AdminPanel({ open, onClose }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue)
   }
 
   useEffect(() => {
-    // Verificar permisos de administrador al cargar
-    const checkAdminPermissions = async () => {
-      try {
-        setLoading(true)
-        // Intentar acceder a un endpoint de admin para verificar permisos
-        await apiClient.getAdminNotifications()
-        setError('')
-      } catch (error) {
-        console.error('Error verificando permisos de administrador:', error)
-        setError('No tienes permisos de administrador para acceder a este panel.')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    checkAdminPermissions()
+    // No necesitamos verificar permisos aquí porque el usuario ya pasó la verificación del menú
+    setLoading(false)
   }, [])
 
   return (
@@ -130,12 +113,6 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
             <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
               Verificando permisos de administrador...
             </Typography>
-          </Box>
-        ) : error ? (
-          <Box sx={{ p: 3 }}>
-            <Alert severity="error" sx={{ fontSize: '1rem' }}>
-              {error}
-            </Alert>
           </Box>
         ) : (
           <Box sx={{ height: '100%' }}>
