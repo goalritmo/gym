@@ -27,7 +27,18 @@ function AuthenticatedAppContent() {
   const [deleteError, setDeleteError] = useState('')
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [notificationsModalOpen, setNotificationsModalOpen] = useState(false)
-  const [unreadNotifications, setUnreadNotifications] = useState(2) // Ejemplo: 2 notificaciones no leídas
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
+
+  // Función para cargar el contador de notificaciones no leídas
+  const loadUnreadNotificationsCount = async () => {
+    try {
+      const response = await apiClient.getUnreadNotificationsCount() as { unread_count: number }
+      setUnreadNotifications(response.unread_count || 0)
+    } catch (error) {
+      console.error('Error cargando contador de notificaciones:', error)
+      setUnreadNotifications(0)
+    }
+  }
 
   // Función para cargar datos desde el backend
   const loadData = async () => {
@@ -73,6 +84,11 @@ function AuthenticatedAppContent() {
     }
   }, [])
 
+  // Cargar contador de notificaciones no leídas al montar el componente
+  useEffect(() => {
+    loadUnreadNotificationsCount()
+  }, [])
+
   // Guardar workouts cuando cambien
   useEffect(() => {
     if (workouts.length > 0) {
@@ -99,7 +115,9 @@ function AuthenticatedAppContent() {
     setSettingsModalOpen(false)
   }
 
-  const handleOpenNotifications = () => {
+  const handleOpenNotifications = async () => {
+    // Recargar contador antes de abrir el modal
+    await loadUnreadNotificationsCount()
     setNotificationsModalOpen(true)
   }
 
@@ -416,7 +434,10 @@ function AuthenticatedAppContent() {
       <NotificationsModal 
         open={notificationsModalOpen} 
         onClose={handleCloseNotifications}
-        onMarkAsRead={(count) => setUnreadNotifications(Math.max(0, unreadNotifications - count))}
+        onMarkAsRead={async () => {
+          // Recargar el contador real desde el backend
+          await loadUnreadNotificationsCount()
+        }}
       />
     </Box>
   )
