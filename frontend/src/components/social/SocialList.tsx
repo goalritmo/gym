@@ -96,6 +96,7 @@ export default function SocialList() {
     try {
       setLoading(true)
       const workouts = await apiClient.getSocialWorkouts(10, 0)
+      console.log('🔍 Workouts cargados desde API:', workouts)
       setSocialWorkouts(Array.isArray(workouts) ? workouts : [])
     } catch (error) {
       console.error('Error cargando entrenamientos sociales:', error)
@@ -148,10 +149,19 @@ export default function SocialList() {
   const groupedWorkouts = useMemo(() => {
     const groups: { [key: string]: SocialWorkout[] } = {}
     
+    console.log('🔍 Debug SocialList:', {
+      totalWorkouts: socialWorkouts.length,
+      showOwnWorkouts: settings.showOwnWorkoutsInSocial,
+      userId: user?.id,
+      workouts: socialWorkouts.map(w => ({ id: w.id, userId: w.user_id, userName: w.user_name }))
+    })
+    
     // Filtrar workouts propios si la opción está desactivada
     const filteredWorkouts = settings.showOwnWorkoutsInSocial 
       ? socialWorkouts 
       : socialWorkouts.filter(workout => workout.user_id !== user?.id)
+    
+    console.log('🔍 Workouts filtrados:', filteredWorkouts.length)
     
     filteredWorkouts.forEach(workout => {
       const dayKey = workout.workout_date
