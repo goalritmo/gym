@@ -8,8 +8,7 @@ import {
   CircularProgress,
   Alert,
   Stack,
-  IconButton,
-  Tooltip
+  IconButton
 } from '@mui/material'
 import {
   ThumbUp as ThumbUpIcon,
