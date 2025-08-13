@@ -190,13 +190,17 @@ export default function WorkoutHistory() {
   };
 
   const handleDeleteWorkout = async (workoutId: number) => {
+    console.log('🔍 handleDeleteWorkout llamado con ID:', workoutId)
     setLoadingWorkoutId(workoutId)
     try {
+      console.log('🔍 Llamando a apiClient.deleteWorkout...')
       await apiClient.deleteWorkout(workoutId)
+      console.log('🔍 Workout eliminado exitosamente')
       // Recargar datos después de eliminar
       await loadData()
+      console.log('🔍 Datos recargados')
     } catch (error) {
-      console.error('Error eliminando workout:', error)
+      console.error('❌ Error eliminando workout:', error)
       setError('Error eliminando el ejercicio')
     } finally {
       setLoadingWorkoutId(null)
@@ -206,21 +210,13 @@ export default function WorkoutHistory() {
 
   const handleConfirmDelete = () => {
     if (deleteConfirmation.workoutId) {
-      handleDeleteWorkout(deleteConfirmation.workoutId);
+      handleDeleteWorkout(deleteConfirmation.workoutId)
     }
-  };
-
-  const handleCancelDelete = () => {
-    setDeleteConfirmation({ show: false, workoutId: null });
-  };
+  }
 
   const handleEditSessionName = (dayId: number, currentName: string) => {
     // TODO: Implementar edición de nombre de sesión
     console.log('Editar nombre de sesión:', dayId, currentName);
-  };
-
-  const handleCloseModal = () => {
-    setExpandedDays(new Set());
   };
 
   if (loading) {
@@ -429,172 +425,159 @@ export default function WorkoutHistory() {
                   </Card>
                 ))}
               </Box>
+
+              {/* Ejercicios expandidos */}
+              {expandedDays.has(day.workoutDay.date) && (
+                <Box sx={{ mt: 2 }}>
+                  <Stack spacing={2}>
+                    {day.exerciseGroups.map((group, groupIndex) => (
+                      <Box key={groupIndex}>
+                        <Typography variant="h6" sx={{ 
+                          fontWeight: 600, 
+                          color: 'primary.main', 
+                          mb: 2,
+                          pb: 1,
+                          borderBottom: 2,
+                          borderColor: 'primary.main'
+                        }}>
+                          {group.exerciseName} del {formatDate(day.workoutDay.date)}
+                        </Typography>
+                        
+                        <Stack spacing={1}>
+                          {group.workouts.map((workout, workoutIndex) => (
+                            <Card key={workoutIndex} sx={{ 
+                              boxShadow: 1, 
+                              border: '1px solid',
+                              borderColor: 'divider',
+                              position: 'relative',
+                              filter: loadingWorkoutId === workout.id ? 'blur(1px)' : 'none',
+                              transition: 'filter 0.2s ease-in-out'
+                            }}>
+                              <CardContent sx={{ p: 2 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                  <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                                    Serie {workout.serie}
+                                  </Typography>
+                                  
+                                  <IconButton
+                                    onClick={(e) => {
+                                      console.log('🔍 Botón eliminar clickeado para workout ID:', workout.id)
+                                      e.stopPropagation();
+                                      // Cerrar la sección expandida para enfocarse en el modal de eliminación
+                                      setExpandedDays(new Set());
+                                      setDeleteConfirmation({ show: true, workoutId: workout.id });
+                                    }}
+                                    size="small"
+                                    sx={{ 
+                                      color: 'error.main',
+                                      opacity: 0.7,
+                                      '&:hover': { opacity: 1 }
+                                    }}
+                                    disabled={loadingWorkoutId === workout.id}
+                                  >
+                                    <DeleteIcon fontSize="small" />
+                                  </IconButton>
+                                </Box>
+                                
+                                <Stack direction="row" spacing={2} alignItems="center">
+                                  <Chip 
+                                    label={`${workout.weight}kg`} 
+                                    variant="outlined" 
+                                    size="small"
+                                    sx={{ 
+                                      fontWeight: 'bold',
+                                      borderColor: '#2196f3',
+                                      color: '#2196f3',
+                                      minWidth: '60px',
+                                      '&:hover': {
+                                        backgroundColor: '#2196f3',
+                                        color: 'white'
+                                      }
+                                    }}
+                                  />
+                                  <Chip 
+                                    label={`${workout.reps} reps`} 
+                                    variant="outlined" 
+                                    size="small"
+                                    sx={{ 
+                                      fontWeight: 'bold',
+                                      borderColor: '#4caf50',
+                                      color: '#4caf50',
+                                      minWidth: '60px',
+                                      '&:hover': {
+                                        backgroundColor: '#4caf50',
+                                        color: 'white'
+                                      }
+                                    }}
+                                  />
+                                  {workout.seconds && (
+                                    <Chip 
+                                      label={`${workout.seconds}s`} 
+                                      variant="outlined" 
+                                      size="small"
+                                      sx={{ 
+                                        fontWeight: 'bold',
+                                        borderColor: '#4caf50',
+                                        color: '#4caf50',
+                                        minWidth: '50px',
+                                        '&:hover': {
+                                          backgroundColor: '#4caf50',
+                                          color: 'white'
+                                        }
+                                      }}
+                                    />
+                                  )}
+                                </Stack>
+                                
+                                {workout.observations && (
+                                  <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', pt: 1, borderTop: 1, borderColor: 'divider' }}>
+                                    "{workout.observations}"
+                                  </Typography>
+                                )}
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </Stack>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+              )}
             </CardContent>
           </Card>
 
-          {/* Modal con detalles */}
+          {/* Modal de confirmación de eliminación */}
           <Dialog
-            open={expandedDays.has(day.workoutDay.date)}
-            onClose={handleCloseModal}
-            maxWidth="md"
+            open={deleteConfirmation.show}
+            onClose={() => {
+              setDeleteConfirmation({ show: false, workoutId: null });
+              // Mantener cerrada la sección expandida
+              setExpandedDays(new Set());
+            }}
+            maxWidth="xs"
             fullWidth
-            sx={{ zIndex: 99998 }}
           >
-            <DialogTitle sx={{ 
-              pb: 1, 
-              borderBottom: 1, 
-              borderColor: 'divider',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                {formatDate(day.workoutDay.date)}
+            <DialogTitle>Confirmar eliminación</DialogTitle>
+            <DialogContent>
+              <Typography>
+                ¿Estás seguro de que quieres eliminar este ejercicio? Esta acción no se puede deshacer.
               </Typography>
-              <IconButton onClick={handleCloseModal} size="small">
-                <ExpandLessIcon />
-              </IconButton>
-            </DialogTitle>
-            
-            <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: 2 }}>
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  {day.workoutDay.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'}
-                </Typography>
-              </Box>
-
-              <Stack spacing={2}>
-                {day.exerciseGroups.map((group, groupIndex) => (
-                  <Box key={groupIndex}>
-                    <Typography variant="h6" sx={{ 
-                      fontWeight: 600, 
-                      color: 'primary.main', 
-                      mb: 2,
-                      pb: 1,
-                      borderBottom: 2,
-                      borderColor: 'primary.main'
-                    }}>
-                      {group.exerciseName}
-                    </Typography>
-                    
-                    <Stack spacing={1}>
-                      {group.workouts.map((workout, workoutIndex) => (
-                        <Card key={workoutIndex} sx={{ 
-                          boxShadow: 1, 
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          position: 'relative',
-                          filter: loadingWorkoutId === workout.id ? 'blur(1px)' : 'none',
-                          transition: 'filter 0.2s ease-in-out'
-                        }}>
-                          <CardContent sx={{ p: 2 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                                Serie {workout.serie}
-                              </Typography>
-                              
-                              <IconButton
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteConfirmation({ show: true, workoutId: workout.id });
-                                }}
-                                size="small"
-                                sx={{ 
-                                  color: 'error.main',
-                                  opacity: 0.7,
-                                  '&:hover': { opacity: 1 }
-                                }}
-                                disabled={loadingWorkoutId === workout.id}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Box>
-                            
-                            <Stack direction="row" spacing={2} alignItems="center">
-                              <Chip 
-                                label={`${workout.weight}kg`} 
-                                variant="outlined" 
-                                size="small"
-                                sx={{ 
-                                  fontWeight: 'bold',
-                                  borderColor: '#2196f3',
-                                  color: '#2196f3',
-                                  minWidth: '60px',
-                                  '&:hover': {
-                                    backgroundColor: '#2196f3',
-                                    color: 'white'
-                                  }
-                                }}
-                              />
-                              <Chip 
-                                label={`${workout.reps} reps`} 
-                                variant="outlined" 
-                                size="small"
-                                sx={{ 
-                                  fontWeight: 'bold',
-                                  borderColor: '#4caf50',
-                                  color: '#4caf50',
-                                  minWidth: '60px',
-                                  '&:hover': {
-                                    backgroundColor: '#4caf50',
-                                    color: 'white'
-                                  }
-                                }}
-                              />
-                              {workout.seconds && (
-                                <Chip 
-                                  label={`${workout.seconds}s`} 
-                                  variant="outlined" 
-                                  size="small"
-                                  sx={{ 
-                                    fontWeight: 'bold',
-                                    borderColor: '#4caf50',
-                                    color: '#4caf50',
-                                    minWidth: '50px',
-                                    '&:hover': {
-                                      backgroundColor: '#4caf50',
-                                      color: 'white'
-                                    }
-                                  }}
-                                />
-                              )}
-                            </Stack>
-                            
-                            {workout.observations && (
-                              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', pt: 1, borderTop: 1, borderColor: 'divider' }}>
-                                "{workout.observations}"
-                              </Typography>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </Stack>
-                  </Box>
-                ))}
-              </Stack>
             </DialogContent>
-            
-            <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, justifyContent: 'center' }}>
+            <DialogActions>
+              <Button onClick={() => {
+                setDeleteConfirmation({ show: false, workoutId: null });
+                // Mantener cerrada la sección expandida
+                setExpandedDays(new Set());
+              }}>
+                Cancelar
+              </Button>
               <Button 
-                onClick={handleCloseModal}
+                onClick={handleConfirmDelete} 
+                color="error" 
                 variant="contained"
-                sx={{
-                  px: 4,
-                  py: 1,
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  fontSize: '0.95rem',
-                  backgroundColor: '#1976d2',
-                  '&:hover': {
-                    backgroundColor: '#1565c0'
-                  }
-                }}
+                disabled={loadingWorkoutId !== null}
               >
-                Cerrar
+                Eliminar
               </Button>
             </DialogActions>
           </Dialog>
@@ -610,62 +593,6 @@ export default function WorkoutHistory() {
           </Box>
         )}
       </Stack>
-
-      {/* Confirmación de eliminación */}
-      <Dialog
-        open={deleteConfirmation.show}
-        onClose={handleCancelDelete}
-        aria-labelledby="delete-dialog-title"
-        aria-describedby="delete-dialog-description"
-        sx={{ zIndex: 99997 }}
-      >
-        <DialogTitle id="delete-dialog-title">Confirmar eliminación</DialogTitle>
-        <DialogContent sx={{ pb: 1 }}>
-          <Typography id="delete-dialog-description">
-            ¿Estás seguro de que quieres eliminar esta serie? Esta acción no se puede deshacer.
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, gap: 2 }}>
-          <Button 
-            onClick={handleCancelDelete}
-            sx={{
-              px: 3,
-              py: 1,
-              borderRadius: 2,
-              fontWeight: 600,
-              textTransform: 'none',
-              fontSize: '0.95rem',
-              color: '#666',
-              backgroundColor: 'transparent',
-              border: '1px solid #ddd',
-              '&:hover': {
-                backgroundColor: '#f5f5f5',
-                borderColor: '#bbb'
-              }
-            }}
-          >
-            Cancelar
-          </Button>
-          <Button 
-            onClick={handleConfirmDelete}
-            variant="contained"
-            sx={{
-              px: 3,
-              py: 1,
-              borderRadius: 2,
-              fontWeight: 600,
-              textTransform: 'none',
-              fontSize: '0.95rem',
-              backgroundColor: '#d32f2f',
-              '&:hover': {
-                backgroundColor: '#c62828'
-              }
-            }}
-          >
-            Eliminar
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   )
 }
