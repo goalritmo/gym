@@ -16,6 +16,7 @@ import {
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useAuth } from '../../contexts/AuthContext'
+import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 
 type SocialWorkout = {
@@ -42,6 +43,7 @@ type SocialExercise = {
 
 export default function SocialList() {
   const { user } = useAuth()
+  const { setOnSocialSettingsChange } = useUserSettings()
   const [socialWorkouts, setSocialWorkouts] = useState<SocialWorkout[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -192,6 +194,16 @@ export default function SocialList() {
   useEffect(() => {
     loadSocialWorkouts()
   }, [])
+
+  // Registrar callback para recargar cuando cambien las configuraciones sociales
+  useEffect(() => {
+    setOnSocialSettingsChange(() => loadSocialWorkouts)
+    
+    // Cleanup: remover callback cuando se desmonte el componente
+    return () => {
+      setOnSocialSettingsChange(() => {})
+    }
+  }, [setOnSocialSettingsChange])
 
   if (loading) {
     return (

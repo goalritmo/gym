@@ -21,6 +21,8 @@ interface UserSettingsContextType {
   toggleUncNotifications: () => void
   toggleShowOwnWorkoutsInSocial: () => void
   initializeAllExercisesAsFavorites: (exerciseIds: number[]) => void
+  onSocialSettingsChange?: () => void
+  setOnSocialSettingsChange: (callback: () => void) => void
 }
 
 const UserSettingsContext = createContext<UserSettingsContextType | undefined>(undefined)
@@ -34,6 +36,7 @@ const defaultSettings: UserSettings = {
 
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings)
+  const [onSocialSettingsChange, setOnSocialSettingsChange] = useState<(() => void) | undefined>(undefined)
 
   // Cargar configuraciones desde la API al montar
   useEffect(() => {
@@ -128,6 +131,10 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     
     try {
       await apiClient.updateUserSettings({ show_own_workouts_in_social: newValue })
+      // Ejecutar callback para recargar social si existe
+      if (onSocialSettingsChange) {
+        onSocialSettingsChange()
+      }
     } catch (error) {
       console.error('Error updating show own workouts setting:', error)
     }
@@ -150,7 +157,9 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     setFavoriteExercises,
     toggleUncNotifications,
     toggleShowOwnWorkoutsInSocial,
-    initializeAllExercisesAsFavorites
+    initializeAllExercisesAsFavorites,
+    onSocialSettingsChange,
+    setOnSocialSettingsChange
   }
 
   return (
