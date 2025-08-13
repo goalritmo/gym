@@ -101,6 +101,15 @@ export default function SocialList() {
       console.log('🔍 Tipo de respuesta:', typeof workouts)
       console.log('🔍 Es array?', Array.isArray(workouts))
       
+      if (Array.isArray(workouts) && workouts.length > 0) {
+        console.log('🔍 Primer workout detalle:', {
+          sessionId: workouts[0].session_id,
+          kudosCount: workouts[0].kudos_count,
+          hasKudos: workouts[0].has_kudos,
+          totalExercises: workouts[0].total_exercises
+        })
+      }
+      
       if (workouts === null || workouts === undefined) {
         console.log('🔍 API devolvió null/undefined, estableciendo array vacío')
         setSocialWorkouts([])
@@ -232,14 +241,9 @@ export default function SocialList() {
 
   return (
           <Box sx={{ p: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-            Feed Social
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Mostrar mis ejercicios: {settings.showOwnWorkoutsInSocial ? 'Sí' : 'No'}
-          </Typography>
-        </Box>
+        <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
+          Feed Social
+        </Typography>
       
       <Stack spacing={3}>
         {groupedWorkouts.length > 0 ? (
@@ -302,7 +306,7 @@ export default function SocialList() {
                       </Box>
                       
                       {/* Acciones */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Typography variant="body2" color="text.secondary">
                           {workout.kudos_count === 0 
                             ? 'Dar el primer kudos' 
@@ -316,6 +320,7 @@ export default function SocialList() {
                             disabled={loadingKudos.has(workout.session_id) || workout.has_kudos}
                             sx={{
                               color: workout.has_kudos ? 'success.main' : 'text.secondary',
+                              mr: -1, // Compensar padding del CardContent
                               '&:hover': {
                                 color: workout.has_kudos ? 'success.main' : 'primary.main'
                               }

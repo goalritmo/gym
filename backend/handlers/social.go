@@ -91,7 +91,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		LEFT JOIN user_profiles up ON wd.user_id = up.user_id
 		LEFT JOIN workouts w ON wd.id = w.workout_day_id
 		LEFT JOIN exercises e ON w.exercise_id = e.id
-		WHERE wd.user_id != $1
+		WHERE 1=1
 		GROUP BY wd.id, wd.user_id, up.name, up.avatar_url, wd.created_at
 		ORDER BY wd.created_at DESC
 		LIMIT $2 OFFSET $3
@@ -100,7 +100,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Query: %s\n", query)
 	fmt.Printf("Ejecutando query con parámetros: userID=%s, limit=%d, offset=%d\n", userID, limit, offset)
 	
-	rows, err := database.DB.Query(query, userID, limit, offset)
+	rows, err := database.DB.Query(query, limit, offset)
 	if err != nil {
 		fmt.Printf("Error consultando entrenamientos sociales: %v\n", err)
 		http.Error(w, "Error consultando entrenamientos sociales", http.StatusInternalServerError)
