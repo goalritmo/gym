@@ -1,42 +1,73 @@
-export type Workout = {
-  id: number
-  exercise_name: string
-  weight: number
-  reps: number
-  serie: number | null
-  seconds: number | null
-  observations: string | null
-  exercise_session_id: number
-  created_at: string
-}
+// Tipos para la nueva estructura de workout_days
 
-export type WorkoutSession = {
+export interface WorkoutDay {
   id: number
-  session_date: string
-  session_name: string
+  user_id: string
+  date: string // Formato YYYY-MM-DD
+  name: string
   effort: number
   mood: number
   created_at: string
+  updated_at: string
 }
 
-export type WorkoutDay = {
-  date: string
-  session: WorkoutSession
-  workouts: Workout[]
-  exerciseGroups: ExerciseGroup[]
+export interface Workout {
+  id: number
+  user_id: string
+  workout_day_id: number
+  exercise_id: number
+  exercise_name: string
+  weight: number
+  reps: number
+  serie: number
+  seconds?: number
+  observations: string
+  created_at: string
 }
 
-export type ExerciseGroup = {
+export interface CreateWorkoutRequest {
+  exercise_id: number
+  weight: number
+  reps: number
+  serie?: number
+  seconds?: number
+  observations?: string
+}
+
+export interface UpdateWorkoutDayRequest {
+  name?: string
+  effort?: number
+  mood?: number
+}
+
+export interface ExerciseGroup {
   exerciseName: string
   workouts: Workout[]
 }
 
-import type { TabType } from '../constants/tabs'
+export interface WorkoutDayWithExercises {
+  workoutDay: WorkoutDay
+  exerciseGroups: ExerciseGroup[]
+  totalWorkouts: number
+}
 
-export type WorkoutHistoryProps = {
-  workoutSessions: WorkoutSession[]
-  workouts: Workout[]
-  onDelete: (id: number) => void
-  onUpdateSession: (sessionId: number, updates: Partial<WorkoutSession>) => void
-  onTabChange?: (tab: TabType) => void
+// Tipos para notificaciones
+export interface Notification {
+  id: number
+  user_id: string
+  type: string
+  title: string
+  message: string
+  data: string
+  is_read: boolean
+  created_at: string
+}
+
+export interface UnreadCountResponse {
+  unread_count: number
+}
+
+export interface MarkAllReadResponse {
+  message: string
+  count: number
 }

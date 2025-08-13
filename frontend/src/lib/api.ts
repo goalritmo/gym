@@ -96,8 +96,14 @@ class ApiClient {
   }
 
   // Workouts API
-  async getWorkouts() {
-    return this.request('/workouts')
+  async getWorkouts(date?: string, workoutDayId?: string) {
+    const params = new URLSearchParams()
+    if (date) params.append('date', date)
+    if (workoutDayId) params.append('workout_day_id', workoutDayId)
+    
+    const query = params.toString()
+    const endpoint = query ? `/workouts?${query}` : '/workouts'
+    return this.request(endpoint)
   }
 
   async createWorkout(workout: any) {
@@ -120,23 +126,9 @@ class ApiClient {
     })
   }
 
-  // Workout Sessions API
-  async getWorkoutSessions() {
-    return this.request('/workout-sessions')
-  }
-
-  async createWorkoutSession(session: any) {
-    return this.request('/workout-sessions', {
-      method: 'POST',
-      body: session
-    })
-  }
-
-  async updateWorkoutSession(id: number, session: any) {
-    return this.request(`/workout-sessions/${id}`, {
-      method: 'PUT',
-      body: session
-    })
+  // Workout Days API
+  async getWorkoutDays() {
+    return this.request('/workout-days')
   }
 
   // Exercises API
@@ -173,6 +165,37 @@ class ApiClient {
       offset: offset.toString()
     })
     return this.request(`/social/workouts?${params}`)
+  }
+
+  // Notifications API
+  async getNotifications(limit: number = 20, offset: number = 0) {
+    const params = new URLSearchParams({
+      limit: limit.toString(),
+      offset: offset.toString()
+    })
+    return this.request(`/notifications?${params}`)
+  }
+
+  async getUnreadNotificationsCount() {
+    return this.request('/notifications/count')
+  }
+
+  async markNotificationAsRead(id: number) {
+    return this.request(`/notifications/${id}/read`, {
+      method: 'PUT'
+    })
+  }
+
+  async markAllNotificationsAsRead() {
+    return this.request('/notifications/read-all', {
+      method: 'PUT'
+    })
+  }
+
+  async deleteNotification(id: number) {
+    return this.request(`/notifications/${id}`, {
+      method: 'DELETE'
+    })
   }
 }
 

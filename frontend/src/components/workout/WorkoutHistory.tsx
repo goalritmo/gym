@@ -1,54 +1,40 @@
-import { useState, useMemo } from 'react'
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  Stack,
-  Chip,
-  IconButton,
-  Collapse,
-  Rating,
+import { useState, useEffect, useMemo } from 'react'
+import { 
+  Box, 
+  Typography, 
+  Card, 
+  CardContent, 
+  Stack, 
+  Chip, 
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
-  Paper,
+  IconButton,
   TextField,
-  Snackbar,
-  Backdrop,
   CircularProgress,
-  Alert,
+  Alert
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import DeleteIcon from '@mui/icons-material/Delete'
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
-import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
-import ModeEditIcon from '@mui/icons-material/ModeEdit'
+import { 
+  ExpandMore as ExpandMoreIcon, 
+  ExpandLess as ExpandLessIcon,
+  Delete as DeleteIcon,
+  ModeEdit as ModeEditIcon,
+  FitnessCenter
+} from '@mui/icons-material'
+import { apiClient } from '../../lib/api'
+import type { Workout, WorkoutDay, ExerciseGroup, WorkoutDayWithExercises } from '../../types/workout'
 
-import { TABS } from '../../constants/tabs'
-import type { Workout, WorkoutDay, ExerciseGroup, WorkoutHistoryProps } from '../../types/workout'
-
-export default function WorkoutHistory({ workoutSessions, workouts, onDelete, onUpdateSession, onTabChange }: WorkoutHistoryProps) {
-  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
-  const [selectedExercise, setSelectedExercise] = useState<Workout[] | null>(null);
+export default function WorkoutHistory() {
+  const [workoutDays, setWorkoutDays] = useState<WorkoutDay[]>([])
+  const [workouts, setWorkouts] = useState<Workout[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [dateFilter, setDateFilter] = useState<Date | null>(null)
-  const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; workoutId: number | null }>({
-    show: false,
-    workoutId: null
-  })
-  const [editSessionModal, setEditSessionModal] = useState<{ show: boolean; sessionId: number | null; currentName: string }>({
-    show: false,
-    sessionId: null,
-    currentName: ''
-  })
-  const [newSessionName, setNewSessionName] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
-  const [loadingSessionId, setLoadingSessionId] = useState<number | null>(null)
-  const [deletingWorkoutId, setDeletingWorkoutId] = useState<number | null>(null)
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; workoutId: number | null }>({ show: false, workoutId: null })
+  const [loadingWorkoutId, setLoadingWorkoutId] = useState<number | null>(null)
 
   // Función para normalizar fecha a zona horaria de Argentina
   const normalizeDate = (dateString: string) => {
@@ -92,58 +78,45 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
     return date.toLocaleDateString('es-ES', options)
   }
 
-  // Agrupar workouts por sesión y crear días
-  const workoutDays = useMemo(() => {
-    const days: WorkoutDay[] = [];
+  // Agrupar workouts por día y crear días con ejercicios
+  const workoutDaysWithExercises = useMemo(() => {
+    const days: WorkoutDayWithExercises[] = [];
 
     console.log('🔍 Debug workoutDays:', {
-      sessions: workoutSessions.map(s => ({ 
-        id: s.id, 
-        idType: typeof s.id,
-        session_date: s.session_date 
+      workoutDays: workoutDays.map(d => ({ 
+        id: d.id, 
+        date: d.date 
       })),
       workouts: workouts.map(w => ({ 
         id: w.id, 
         created_at: w.created_at, 
-        exercise_session_id: w.exercise_session_id,
-        sessionIdType: typeof w.exercise_session_id
+        workout_day_id: w.workout_day_id
       }))
     });
 
-    // Agrupar workouts por exercise_session_id en lugar de fecha
-    const workoutsBySession = new Map<string, Workout[]>();
+    // Agrupar workouts por workout_day_id
+    const workoutsByDay = new Map<number, Workout[]>();
     workouts.forEach(workout => {
-      const sessionId = workout.exercise_session_id.toString();
-      if (!workoutsBySession.has(sessionId)) {
-        workoutsBySession.set(sessionId, []);
+      const dayId = workout.workout_day_id;
+      if (!workoutsByDay.has(dayId)) {
+        workoutsByDay.set(dayId, []);
       }
-      workoutsBySession.get(sessionId)!.push(workout);
+      workoutsByDay.get(dayId)!.push(workout);
     });
 
-    console.log('🔍 Workouts agrupados por session_id:', Object.fromEntries(workoutsBySession));
+    console.log('🔍 Workouts agrupados por day_id:', Object.fromEntries(workoutsByDay));
 
-    workoutSessions.forEach(session => {
-
-      // Filtrar workouts por exercise_session_id
-      const sessionWorkouts = workouts.filter(w => {
-        // Extraer el número de sesión del UUID (formato: 00000000-0000-0000-0000-000000000XXX)
-        const workoutSessionId = w.exercise_session_id.toString();
-        const sessionNumber = workoutSessionId.split('-')[4];
-        // Convertir a número para eliminar ceros a la izquierda
-        const sessionNumberInt = parseInt(sessionNumber, 10);
-        const sessionId = session.id.toString();
-        const matches = sessionNumberInt.toString() === sessionId;
-        console.log(`🔍 Comparando: workout ${w.id} (session_id: ${workoutSessionId}, number: ${sessionNumber}) vs session ${sessionId} = ${matches}`)
-        return matches
-      })
+    workoutDays.forEach(day => {
+      // Filtrar workouts por workout_day_id
+      const dayWorkouts = workoutsByDay.get(day.id) || [];
       
-      console.log(`🔍 Sesión ${session.id}: encontró ${sessionWorkouts.length} workouts`)
+      console.log(`🔍 Día ${day.id}: encontró ${dayWorkouts.length} workouts`)
       
       // Agrupar ejercicios por nombre
       const exerciseGroups: ExerciseGroup[] = [];
       const exerciseMap = new Map<string, Workout[]>();
 
-      sessionWorkouts.forEach(workout => {
+      dayWorkouts.forEach(workout => {
         const exerciseName = workout.exercise_name;
         if (!exerciseMap.has(exerciseName)) {
           exerciseMap.set(exerciseName, []);
@@ -159,229 +132,120 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
       });
 
       // Solo agregar días que tengan workouts
-      if (sessionWorkouts.length > 0) {
+      if (dayWorkouts.length > 0) {
         days.push({
-          date: session.session_date,
-          session,
-          workouts: sessionWorkouts,
-          exerciseGroups
+          workoutDay: day,
+          exerciseGroups,
+          totalWorkouts: dayWorkouts.length
         });
       }
     });
 
-    return days.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [workoutSessions, workouts]);
+    console.log('🔍 WorkoutHistory Debug:', {
+      workoutDaysCount: workoutDays.length,
+      workoutsCount: workouts.length,
+      workoutDaysWithExercisesCount: days.length,
+      dateFilter: dateFilter?.toISOString().split('T')[0]
+    });
 
+    return days;
+  }, [workoutDays, workouts, dateFilter]);
+
+  // Filtrar días por fecha si hay filtro
+  const filteredWorkoutDays = useMemo(() => {
+    if (!dateFilter) return workoutDaysWithExercises;
+    
+    const filterDate = dateFilter.toISOString().split('T')[0];
+    return workoutDaysWithExercises.filter(day => day.workoutDay.date === filterDate);
+  }, [workoutDaysWithExercises, dateFilter]);
+
+  // Cargar datos
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const [workoutDaysData, workoutsData] = await Promise.all([
+        apiClient.getWorkoutDays(),
+        apiClient.getWorkouts()
+      ]);
+      
+      setWorkoutDays(workoutDaysData as WorkoutDay[]);
+      setWorkouts(workoutsData as Workout[]);
+    } catch (error: any) {
+      console.error('Error cargando datos:', error);
+      setError('Error cargando entrenamientos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Funciones de UI
   const toggleDayExpansion = (date: string) => {
-    const newExpanded = new Set(expandedDays)
+    const newExpanded = new Set(expandedDays);
     if (newExpanded.has(date)) {
-      newExpanded.delete(date)
+      newExpanded.delete(date);
     } else {
-      newExpanded.add(date)
+      newExpanded.add(date);
     }
-    setExpandedDays(newExpanded)
-  }
+    setExpandedDays(newExpanded);
+  };
 
-  const handleEffortChange = async (sessionId: number, newValue: number) => {
-    setLoadingSessionId(sessionId);
+  const handleDeleteWorkout = async (workoutId: number) => {
+    setLoadingWorkoutId(workoutId);
     try {
-      await onUpdateSession(sessionId, { effort: newValue });
-      setSuccessMessage('Esfuerzo actualizado exitosamente');
-    } catch (error) {
-      console.error('❌ Error actualizando esfuerzo:', error);
-      setErrorMessage('Error al actualizar el esfuerzo');
+      await apiClient.deleteWorkout(workoutId);
+      setWorkouts(prev => prev.filter(w => w.id !== workoutId));
+      setDeleteConfirmation({ show: false, workoutId: null });
+    } catch (error: any) {
+      console.error('Error eliminando workout:', error);
+      setError('Error eliminando ejercicio');
     } finally {
-      setLoadingSessionId(null);
+      setLoadingWorkoutId(null);
     }
-  }
+  };
 
-  const handleMoodChange = async (sessionId: number, newValue: number) => {
-    setLoadingSessionId(sessionId);
-    try {
-      await onUpdateSession(sessionId, { mood: newValue });
-      setSuccessMessage('Ánimo actualizado exitosamente');
-    } catch (error) {
-      console.error('❌ Error actualizando ánimo:', error);
-      setErrorMessage('Error al actualizar el ánimo');
-    } finally {
-      setLoadingSessionId(null);
+  const handleConfirmDelete = () => {
+    if (deleteConfirmation.workoutId) {
+      handleDeleteWorkout(deleteConfirmation.workoutId);
     }
-  }
+  };
 
-  const handleEditSessionName = (sessionId: number, currentName: string) => {
-    setEditSessionModal({ show: true, sessionId, currentName })
-    setNewSessionName(currentName)
-  }
+  const handleCancelDelete = () => {
+    setDeleteConfirmation({ show: false, workoutId: null });
+  };
 
-  const handleSaveSessionName = async () => {
-    if (editSessionModal.sessionId && newSessionName.trim()) {
-      setLoadingSessionId(editSessionModal.sessionId);
-      try {
-        await onUpdateSession(editSessionModal.sessionId, { session_name: newSessionName.trim() });
-        setEditSessionModal({ show: false, sessionId: null, currentName: '' })
-        setNewSessionName('')
-        setSuccessMessage('Nombre actualizado exitosamente')
-      } catch (error) {
-        console.error('❌ Error actualizando nombre de sesión:', error);
-        setErrorMessage('Error al actualizar el nombre');
-        // No cerrar modal ni mostrar éxito si hay error
-      } finally {
-        setLoadingSessionId(null);
-      }
-    }
-  }
-
-  const handleCancelEditSession = () => {
-    setEditSessionModal({ show: false, sessionId: null, currentName: '' })
-    setNewSessionName('')
-  }
-
-  const handleExerciseClick = (exerciseGroup: ExerciseGroup) => {
-    setSelectedExercise(exerciseGroup.workouts);
+  const handleEditSessionName = (dayId: number, currentName: string) => {
+    // TODO: Implementar edición de nombre de sesión
+    console.log('Editar nombre de sesión:', dayId, currentName);
   };
 
   const handleCloseModal = () => {
-    setSelectedExercise(null);
+    setExpandedDays(new Set());
   };
 
-  const handleDeleteClick = (workoutId: number) => {
-    setDeleteConfirmation({ show: true, workoutId })
-  }
-
-  const handleConfirmDelete = async () => {
-    if (deleteConfirmation.workoutId) {
-      // Cerrar todos los modales inmediatamente
-      setDeleteConfirmation({ show: false, workoutId: null })
-      setEditSessionModal({ show: false, sessionId: null, currentName: '' })
-      setSelectedExercise(null) // Cerrar el modal de detalles del ejercicio
-      setDeletingWorkoutId(deleteConfirmation.workoutId)
-      
-      try {
-        await onDelete(deleteConfirmation.workoutId)
-      } catch (error) {
-        console.error('❌ Error eliminando workout:', error)
-        setErrorMessage('Error al eliminar el entrenamiento')
-      } finally {
-        setDeletingWorkoutId(null)
-      }
-    }
-  }
-
-  const handleCancelDelete = () => {
-    setDeleteConfirmation({ show: false, workoutId: null })
-    setEditSessionModal({ show: false, sessionId: null, currentName: '' })
-    setSelectedExercise(null) // Cerrar el modal de detalles del ejercicio
-  }
-
-  // Filtrar días por fecha
-  const filteredWorkoutDays = workoutDays.filter(day => {
-    if (!dateFilter) return true;
-    try {
-      // Extraer solo la fecha (YYYY-MM-DD) de la fecha de la sesión
-      const dayString = day.date.split('T')[0];
-      const filterString = dateFilter.toISOString().split('T')[0];
-      
-      console.log('🔍 Comparando fechas:', {
-        dayDate: dayString,
-        filterDate: filterString,
-        match: dayString === filterString
-      });
-      
-      return dayString === filterString;
-    } catch (error) {
-      console.error('❌ Error filtrando por fecha:', error);
-      return true;
-    }
-  });
-
-
-
-
-
-
-
-  // Debug logs
-  console.log('🔍 WorkoutHistory Debug:', {
-    workoutSessionsCount: workoutSessions.length,
-    workoutsCount: workouts.length,
-    workoutDaysCount: workoutDays.length,
-    dateFilter: dateFilter ? dateFilter.toISOString().split('T')[0] : null
-  });
-
-  if (workoutDays.length === 0) {
+  if (loading) {
     return (
-      <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 2, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
-          Entrenamientos
-        </Typography>
-        
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          minHeight: '40vh'
-        }}>
-          <Paper sx={{ 
-            p: 5, 
-            textAlign: 'center',
-            width: '100%',
-            borderRadius: 3,
-            boxShadow: 3,
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-          }}>
-          <Box sx={{ mb: 1 }}>
-            <FitnessCenterIcon sx={{ 
-              fontSize: 80, 
-              color: 'primary.main',
-              opacity: 0.7,
-            }} />
-          </Box>
-          
-          <Typography variant="h5" sx={{ 
-            fontWeight: 'bold', 
-            color: 'text.primary',
-            mb: 1
-          }}>
-            ¡Comienza tu entrenamiento!
-          </Typography>
-          
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
-            No hay entrenamientos registrados aún
-          </Typography>
-          
-          <Box 
-            onClick={() => onTabChange?.(TABS.WORKOUT)} // Cambiar a tab Registrar
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              gap: 1,
-              p: 2,
-              mb: 2,
-              bgcolor: 'rgba(25, 118, 210, 0.1)',
-              borderRadius: 2,
-              border: '1px solid rgba(25, 118, 210, 0.2)',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                bgcolor: 'rgba(25, 118, 210, 0.2)',
-                transform: 'translateY(-1px)',
-                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)'
-              }
-            }}>
-            <AllInclusiveIcon sx={{ color: 'primary.main' }} />
-            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-              Registrar
-            </Typography>
-          </Box>
-        </Paper>
-        </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+        <CircularProgress />
       </Box>
-    )
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <Box sx={{ p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
         Entrenamientos
       </Typography>
@@ -460,7 +324,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
         {/* Cards de entrenamientos */}
         <Box sx={{ mx: 2 }}>
           {filteredWorkoutDays.map((day) => (
-          <Box key={day.date} sx={{ position: 'relative', mb: 2 }}>
+          <Box key={day.workoutDay.date} sx={{ position: 'relative', mb: 2 }}>
             <Card sx={{ 
               boxShadow: 2, 
               width: '100%',
@@ -468,7 +332,7 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
               borderRadius: 2,
               border: '1px solid',
               borderColor: 'divider',
-              filter: loadingSessionId === day.session.id ? 'blur(1px)' : 'none',
+              filter: loadingWorkoutId === day.workoutDay.id ? 'blur(1px)' : 'none',
               transition: 'filter 0.2s ease-in-out',
               '&:hover': {
                 boxShadow: 4,
@@ -476,14 +340,14 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                 transition: 'all 0.2s ease-in-out'
               }
             }}
-            onClick={() => toggleDayExpansion(day.date)}
+            onClick={() => toggleDayExpansion(day.workoutDay.date)}
             >
             <CardContent sx={{ pl: 2, pr: 2, pt: 2, pb: 2 }}>
               {/* Header del día */}
                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Box sx={{ pl: 0, ml: 0 }}>
                     <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left' }}>
-                      {formatDate(day.date)}
+                      {formatDate(day.workoutDay.date)}
                     </Typography>
                     <Box 
                       sx={{ 
@@ -501,11 +365,11 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleEditSessionName(day.session.id, day.session.session_name);
+                        handleEditSessionName(day.workoutDay.id, day.workoutDay.name);
                       }}
                     >
                       <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
-                        {day.session.session_name}
+                        {day.workoutDay.name}
                       </Typography>
                       <ModeEditIcon 
                         sx={{ 
@@ -517,18 +381,18 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                       />
                     </Box>
                     <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
-                      {day.workouts.length} {day.workouts.length === 1 ? 'ejercicio' : 'ejercicios'}
+                      {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'}
                     </Typography>
                   </Box>
                 
                 <IconButton 
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleDayExpansion(day.date);
+                    toggleDayExpansion(day.workoutDay.date);
                   }}
                   size="small"
                 >
-                  {expandedDays.has(day.date) ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  {expandedDays.has(day.workoutDay.date) ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </IconButton>
               </Box>
 
@@ -539,272 +403,237 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
                   sx={{ 
                     display: 'flex', 
                     alignItems: 'center', 
-                    justifyContent: 'space-between',
-                    mb: 1 
+                    mb: 1,
+                    p: 1,
+                    borderRadius: 1,
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    border: '1px solid rgba(255, 193, 7, 0.3)'
                   }}
-                  onClick={(e) => e.stopPropagation()}
                 >
-                  <Typography variant="body2" color="text.secondary">
-                    Esfuerzo
+                  <FitnessCenter sx={{ mr: 1, color: 'warning.main', fontSize: '1.2rem' }} />
+                  <Typography variant="body2" sx={{ color: 'warning.dark', fontWeight: 500 }}>
+                    Esfuerzo: {day.workoutDay.effort}/10
                   </Typography>
-                  <Rating 
-                    value={day.session.effort} 
-                    onChange={(_, newValue) => handleEffortChange(day.session.id, newValue || 0)}
-                    size="small"
-                    max={5}
-                    sx={{ '& .MuiRating-iconFilled': { color: '#ffc107' } }}
-                  />
                 </Box>
                 
-                {/* Ánimo */}
+                {/* Estado de ánimo */}
                 <Box 
                   sx={{ 
                     display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between' 
+                    alignItems: 'center',
+                    p: 1,
+                    borderRadius: 1,
+                    backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                    border: '1px solid rgba(156, 39, 176, 0.3)'
                   }}
-                  onClick={(e) => e.stopPropagation()}
                 >
-                  <Typography variant="body2" color="text.secondary">
-                    Ánimo
+                  <Typography variant="body2" sx={{ color: 'purple', fontWeight: 500 }}>
+                    Estado de ánimo: {day.workoutDay.mood}/10
                   </Typography>
-                  <Rating 
-                    value={day.session.mood} 
-                    onChange={(_, newValue) => handleMoodChange(day.session.id, newValue || 0)}
-                    size="small"
-                    max={5}
-                    sx={{ '& .MuiRating-iconFilled': { color: '#ff9800' } }}
-                  />
                 </Box>
               </Box>
 
-              {/* Ejercicios del día */}
-              <Collapse in={expandedDays.has(day.date)}>
-                <Stack spacing={2} sx={{ pt: 2, borderTop: 1, borderColor: 'divider' }}>
-                  {day.exerciseGroups.map((exerciseGroup) => (
-                    <Card 
-                      key={exerciseGroup.exerciseName} 
-                      sx={{ 
-                        cursor: 'pointer',
-                        borderRadius: 2,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        '&:hover': {
-                          backgroundColor: 'action.hover',
-                          transform: 'translateY(-1px)',
-                          transition: 'all 0.2s ease-in-out'
-                        }
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleExerciseClick(exerciseGroup);
-                      }}
-                    >
-                      <CardContent sx={{ py: 2, px: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>
-                            {exerciseGroup.exerciseName}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {exerciseGroup.workouts.length} {exerciseGroup.workouts.length === 1 ? 'serie' : 'series'}
-                          </Typography>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </Stack>
-              </Collapse>
+              {/* Resumen de ejercicios */}
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {day.exerciseGroups.map((group, index) => (
+                  <Chip
+                    key={index}
+                    label={`${group.exerciseName} (${group.workouts.length})`}
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      borderColor: 'primary.main',
+                      color: 'primary.main',
+                      '&:hover': {
+                        backgroundColor: 'primary.main',
+                        color: 'white'
+                      }
+                    }}
+                  />
+                ))}
+              </Box>
             </CardContent>
           </Card>
-          
-          {/* Loader overlay */}
-          {loadingSessionId === day.session.id && (
-            <Backdrop
-              sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                borderRadius: 2,
-                zIndex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              open={true}
-            >
-              <CircularProgress size={40} sx={{ color: 'primary.main' }} />
-            </Backdrop>
-          )}
-          </Box>
-                  ))}
-        </Box>
-      </Stack>
 
-      {/* Modal para mostrar series del ejercicio */}
-      <Dialog 
-        open={!!selectedExercise} 
-        onClose={handleCloseModal}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            maxWidth: { xs: '330px' },
-            maxHeight: { xs: '90vh' },
-            m: { xs: 1, sm: 2 },
-            width: { xs: '330px' },
-            height: { xs: 'auto' }
-          }
-        }}
-      >
-        <DialogTitle 
-          sx={{ 
-            background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-            color: 'white',
-            px: { xs: 2, sm: 4 },
-            pb: 2,
-            pt: 3
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
-            {selectedExercise?.[0]?.exercise_name}
-          </Typography>
-        </DialogTitle>
-        
-        <DialogContent sx={{ p: { xs: 2, sm: 4 }, pt: 4 }}>
-          <Box sx={{ mt: 2 }}>
-            <Stack spacing={3}>
-              {selectedExercise?.map((workout, index) => (
-                <Card key={index} sx={{ 
-                  boxShadow: 2,
-                  borderRadius: 2,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  position: 'relative'
-                }}>
-                  {/* Loader para eliminación */}
-                  {deletingWorkoutId === workout.id && (
-                    <Backdrop
-                      sx={{
-                        color: '#fff',
-                        zIndex: (theme) => theme.zIndex.modal + 1,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        position: 'absolute',
-                        borderRadius: 2
-                      }}
-                      open={true}
-                    >
-                      <CircularProgress color="inherit" size={24} />
-                    </Backdrop>
-                  )}
-                  <CardContent sx={{ py: 2, px: 2 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                      <Typography variant="h6" component="h4" sx={{ fontWeight: 'bold' }}>
-                        Serie {workout.serie || index + 1}
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {formatDateShort(workout.created_at)}
-                        </Typography>
-                        <IconButton
-                          onClick={() => handleDeleteClick(workout.id)}
-                          color="error"
-                          size="small"
-                          aria-label="eliminar serie"
-                          sx={{ 
-                            '&:hover': { 
-                              backgroundColor: 'error.light',
-                              color: 'white'
-                            }
-                          }}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                    
-                    <Stack direction="row" spacing={0.5} flexWrap="wrap" gap={0.5} sx={{ width: '100%', mb: 2 }}>
-                      <Chip 
-                        label={`${workout.weight} kg`} 
-                        color="primary" 
-                        size="small"
-                        sx={{ 
-                          fontWeight: 'bold',
-                          backgroundColor: 'primary.main',
-                          color: 'white',
-                          minWidth: '60px',
-                          '&:hover': {
-                            backgroundColor: 'primary.dark'
-                          }
-                        }}
-                      />
-                      <Chip 
-                        label={`${workout.reps} reps`} 
-                        size="small"
-                        sx={{ 
-                          fontWeight: 'bold',
-                          backgroundColor: '#4caf50',
-                          color: 'white',
-                          minWidth: '60px',
-                          '&:hover': {
-                            backgroundColor: '#388e3c'
-                          }
-                        }}
-                      />
-                      {workout.seconds && (
-                        <Chip 
-                          label={`${workout.seconds}s`} 
-                          variant="outlined" 
-                          size="small"
-                          sx={{ 
-                            fontWeight: 'bold',
-                            borderColor: '#4caf50',
-                            color: '#4caf50',
-                            minWidth: '50px',
-                            '&:hover': {
-                              backgroundColor: '#4caf50',
-                              color: 'white'
-                            }
-                          }}
-                        />
-                      )}
-                    </Stack>
-                    
-                    {workout.observations && (
-                      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', pt: 1, borderTop: 1, borderColor: 'divider' }}>
-                        "{workout.observations}"
-                      </Typography>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </Stack>
-          </Box>
-        </DialogContent>
-        
-        <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, justifyContent: 'center' }}>
-          <Button 
-            onClick={handleCloseModal}
-            variant="contained"
-            sx={{
-              px: 4,
-              py: 1,
-              borderRadius: 2,
-              fontWeight: 600,
-              textTransform: 'none',
-              fontSize: '0.95rem',
-              backgroundColor: '#1976d2',
-              '&:hover': {
-                backgroundColor: '#1565c0'
-              }
-            }}
+          {/* Modal con detalles */}
+          <Dialog
+            open={expandedDays.has(day.workoutDay.date)}
+            onClose={handleCloseModal}
+            maxWidth="md"
+            fullWidth
+            sx={{ zIndex: 99998 }}
           >
-            Cerrar
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <DialogTitle sx={{ 
+              pb: 1, 
+              borderBottom: 1, 
+              borderColor: 'divider',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                {formatDate(day.workoutDay.date)}
+              </Typography>
+              <IconButton onClick={handleCloseModal} size="small">
+                <ExpandLessIcon />
+              </IconButton>
+            </DialogTitle>
+            
+            <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: 2 }}>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
+                  {day.workoutDay.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'} • 
+                  Esfuerzo: {day.workoutDay.effort}/10 • 
+                  Estado de ánimo: {day.workoutDay.mood}/10
+                </Typography>
+              </Box>
+
+              <Stack spacing={2}>
+                {day.exerciseGroups.map((group, groupIndex) => (
+                  <Box key={groupIndex}>
+                    <Typography variant="h6" sx={{ 
+                      fontWeight: 600, 
+                      color: 'primary.main', 
+                      mb: 2,
+                      pb: 1,
+                      borderBottom: 2,
+                      borderColor: 'primary.main'
+                    }}>
+                      {group.exerciseName}
+                    </Typography>
+                    
+                    <Stack spacing={1}>
+                      {group.workouts.map((workout, workoutIndex) => (
+                        <Card key={workoutIndex} sx={{ 
+                          boxShadow: 1, 
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          position: 'relative',
+                          filter: loadingWorkoutId === workout.id ? 'blur(1px)' : 'none',
+                          transition: 'filter 0.2s ease-in-out'
+                        }}>
+                          <CardContent sx={{ p: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                              <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                                Serie {workout.serie}
+                              </Typography>
+                              
+                              <IconButton
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeleteConfirmation({ show: true, workoutId: workout.id });
+                                }}
+                                size="small"
+                                sx={{ 
+                                  color: 'error.main',
+                                  opacity: 0.7,
+                                  '&:hover': { opacity: 1 }
+                                }}
+                                disabled={loadingWorkoutId === workout.id}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Box>
+                            
+                            <Stack direction="row" spacing={2} alignItems="center">
+                              <Chip 
+                                label={`${workout.weight}kg`} 
+                                variant="outlined" 
+                                size="small"
+                                sx={{ 
+                                  fontWeight: 'bold',
+                                  borderColor: '#2196f3',
+                                  color: '#2196f3',
+                                  minWidth: '60px',
+                                  '&:hover': {
+                                    backgroundColor: '#2196f3',
+                                    color: 'white'
+                                  }
+                                }}
+                              />
+                              <Chip 
+                                label={`${workout.reps} reps`} 
+                                variant="outlined" 
+                                size="small"
+                                sx={{ 
+                                  fontWeight: 'bold',
+                                  borderColor: '#4caf50',
+                                  color: '#4caf50',
+                                  minWidth: '60px',
+                                  '&:hover': {
+                                    backgroundColor: '#4caf50',
+                                    color: 'white'
+                                  }
+                                }}
+                              />
+                              {workout.seconds && (
+                                <Chip 
+                                  label={`${workout.seconds}s`} 
+                                  variant="outlined" 
+                                  size="small"
+                                  sx={{ 
+                                    fontWeight: 'bold',
+                                    borderColor: '#4caf50',
+                                    color: '#4caf50',
+                                    minWidth: '50px',
+                                    '&:hover': {
+                                      backgroundColor: '#4caf50',
+                                      color: 'white'
+                                    }
+                                  }}
+                                />
+                              )}
+                            </Stack>
+                            
+                            {workout.observations && (
+                              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', pt: 1, borderTop: 1, borderColor: 'divider' }}>
+                                "{workout.observations}"
+                              </Typography>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </Stack>
+                  </Box>
+                ))}
+              </Stack>
+            </DialogContent>
+            
+            <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, justifyContent: 'center' }}>
+              <Button 
+                onClick={handleCloseModal}
+                variant="contained"
+                sx={{
+                  px: 4,
+                  py: 1,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontSize: '0.95rem',
+                  backgroundColor: '#1976d2',
+                  '&:hover': {
+                    backgroundColor: '#1565c0'
+                  }
+                }}
+              >
+                Cerrar
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Box>
+        ))}
+
+        {filteredWorkoutDays.length === 0 && (
+          <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Typography variant="h6" color="text.secondary">
+              {dateFilter ? 'No hay entrenamientos para esta fecha' : 'No hay entrenamientos registrados'}
+            </Typography>
+          </Box>
+        )}
+      </Stack>
 
       {/* Confirmación de eliminación */}
       <Dialog
@@ -861,145 +690,6 @@ export default function WorkoutHistory({ workoutSessions, workouts, onDelete, on
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Modal de edición del nombre de sesión */}
-      <Dialog
-        open={editSessionModal.show}
-        onClose={handleCancelEditSession}
-        maxWidth="sm"
-        fullWidth
-        sx={{ zIndex: 99997 }}
-      >
-        <DialogTitle>Editar nombre</DialogTitle>
-        <DialogContent sx={{ pb: 1 }}>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Nombre de la sesión"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={newSessionName}
-            onChange={(e) => setNewSessionName(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                handleSaveSessionName();
-              }
-            }}
-            sx={{ mt: 1 }}
-          />
-        </DialogContent>
-        <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, gap: 2 }}>
-          <Button 
-            onClick={handleCancelEditSession}
-            sx={{
-              px: 3,
-              py: 1,
-              borderRadius: 2,
-              fontWeight: 600,
-              textTransform: 'none',
-              fontSize: '0.95rem',
-              color: '#666',
-              backgroundColor: 'transparent',
-              border: '1px solid #ddd',
-              '&:hover': {
-                backgroundColor: '#f5f5f5',
-                borderColor: '#bbb'
-              }
-            }}
-          >
-            Cancelar
-          </Button>
-          <Button 
-            onClick={handleSaveSessionName}
-            variant="contained"
-            disabled={!newSessionName.trim()}
-            sx={{
-              px: 3,
-              py: 1,
-              borderRadius: 2,
-              fontWeight: 600,
-              textTransform: 'none',
-              fontSize: '0.95rem',
-              backgroundColor: '#1976d2',
-              '&:hover': {
-                backgroundColor: '#1565c0'
-              },
-              '&:disabled': {
-                backgroundColor: '#e0e0e0',
-                color: '#9e9e9e'
-              }
-            }}
-          >
-            Guardar
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Notificación de éxito para edición de sesión */}
-      <Snackbar
-        open={!!successMessage}
-        autoHideDuration={3000}
-        onClose={() => setSuccessMessage('')}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{ 
-          mt: 6,
-          width: { xs: '95%', sm: '90%', md: '70%' },
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 99998
-        }}
-      >
-        <Alert 
-          severity="success" 
-          sx={{ 
-            width: '100%',
-            minWidth: '300px',
-            fontSize: '0.95rem',
-            fontWeight: 500,
-            backgroundColor: '#e8f5e8',
-            color: '#2e7d32',
-            border: '1px solid #4caf50',
-            '& .MuiAlert-icon': {
-              color: '#2e7d32'
-            }
-          }}
-        >
-          ✅ {successMessage}
-        </Alert>
-      </Snackbar>
-      
-      <Snackbar
-        open={!!errorMessage}
-        autoHideDuration={4000}
-        onClose={() => setErrorMessage('')}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{ 
-          mt: 6,
-          width: { xs: '95%', sm: '90%', md: '70%' },
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 99999
-        }}
-      >
-        <Alert 
-          severity="error" 
-          sx={{ 
-            width: '100%',
-            minWidth: '300px',
-            fontSize: '0.95rem',
-            fontWeight: 500,
-            backgroundColor: '#ffebee',
-            color: '#c62828',
-            border: '1px solid #f44336',
-            '& .MuiAlert-icon': {
-              color: '#c62828'
-            }
-          }}
-        >
-          ❌ {errorMessage}
-        </Alert>
-      </Snackbar>
     </Box>
-  );
-};
+  )
+}

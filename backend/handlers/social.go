@@ -12,11 +12,11 @@ import (
 
 // SocialWorkout representa un entrenamiento para la vista social
 type SocialWorkout struct {
-	ID            string    `json:"id"`
+	SessionID     int       `json:"session_id"`
 	UserID        string    `json:"user_id"`
 	UserName      string    `json:"user_name"`
 	UserAvatarURL string    `json:"user_avatar_url"`
-	Date          string    `json:"date"`
+	WorkoutDate   string    `json:"workout_date"`
 	TotalExercises int      `json:"total_exercises"`
 	TotalSeries   int       `json:"total_series"`
 	Exercises     []SocialExercise `json:"exercises"`
@@ -65,21 +65,35 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("Consultando entrenamientos sociales con límite: %d, offset: %d, usuario: %s\n", limit, offset, userID)
 
-	// Query muy simplificada para diagnosticar el error 500
+	// Query actualizada para usar workout_days
 	query := `
 		SELECT 
-			ws.id as session_id,
-			ws.user_id,
+			wd.id as session_id,
+			wd.user_id,
 			COALESCE(up.name, 'Usuario') as user_name,
 			COALESCE(up.avatar_url, '') as user_avatar_url,
-			ws.created_at as workout_date,
-			0 as total_exercises,
-			0 as total_series,
-			'[]'::json as exercises
-		FROM workout_sessions ws
-		LEFT JOIN user_profiles up ON ws.user_id = up.user_id
-		WHERE ws.user_id != $1
-		ORDER BY ws.created_at DESC
+			wd.created_at as workout_date,
+			COALESCE(COUNT(DISTINCT w.exercise_id), 0) as total_exercises,
+			COALESCE(COUNT(w.id), 0) as total_series,
+			COALESCE(
+				json_agg(
+					json_build_object(
+						'exercise_name', e.name,
+						'weight', w.weight,
+						'reps', w.reps,
+						'seconds', w.seconds,
+						'serie', w.serie
+					) ORDER BY w.serie
+				) FILTER (WHERE w.id IS NOT NULL),
+				'[]'::json
+			) as exercises
+		FROM workout_days wd
+		LEFT JOIN user_profiles up ON wd.user_id = up.user_id
+		LEFT JOIN workouts w ON wd.id = w.workout_day_id
+		LEFT JOIN exercises e ON w.exercise_id = e.id
+		WHERE wd.user_id != $1
+		GROUP BY wd.id, wd.user_id, up.name, up.avatar_url, wd.created_at
+		ORDER BY wd.created_at DESC
 		LIMIT $2 OFFSET $3
 	`
 
@@ -103,7 +117,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		
 		var workoutDate time.Time
 		err := rows.Scan(
-			&workout.ID,
+			&workout.SessionID,
 			&workout.UserID,
 			&workout.UserName,
 			&workout.UserAvatarURL,
@@ -122,7 +136,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			loc = time.FixedZone("UTC-3", -3*60*60)
 		}
-		workout.Date = workoutDate.In(loc).Format(time.RFC3339)
+		workout.WorkoutDate = workoutDate.In(loc).Format(time.RFC3339)
 
 		// Parsear el JSON de ejercicios
 		if err := json.Unmarshal([]byte(exercisesJSON), &workout.Exercises); err != nil {
@@ -164,7 +178,7 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Verificar si las tablas existen
-	tables := []string{"workout_sessions", "workouts", "exercises", "users", "auth.users", "public.users"}
+	tables := []string{"workout_days", "workouts", "exercises", "users", "auth.users", "public.users"}
 	tableInfo := make(map[string]interface{})
 
 	for _, table := range tables {
@@ -183,12 +197,12 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Verificar estructura de workout_sessions
-	var sessionColumns []string
+	// Verificar estructura de workout_days
+	var workoutDaysColumns []string
 	rows, err = database.DB.Query(`
 		SELECT column_name, data_type 
 		FROM information_schema.columns 
-		WHERE table_name = 'workout_sessions' 
+		WHERE table_name = 'workout_days' 
 		ORDER BY ordinal_position
 	`)
 	if err == nil {
@@ -196,7 +210,7 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 		for rows.Next() {
 			var colName, dataType string
 			if err := rows.Scan(&colName, &dataType); err == nil {
-				sessionColumns = append(sessionColumns, fmt.Sprintf("%s (%s)", colName, dataType))
+				workoutDaysColumns = append(workoutDaysColumns, fmt.Sprintf("%s (%s)", colName, dataType))
 			}
 		}
 	}
@@ -241,21 +255,30 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Verificar triggers específicos de workouts
-	var workoutTriggers []string
-	workoutTriggerRows, err := database.DB.Query(`
-		SELECT trigger_name, event_manipulation, action_statement 
-		FROM information_schema.triggers 
-		WHERE trigger_schema = 'public' 
-		AND event_object_table = 'workouts'
-		ORDER BY trigger_name
+	// Verificar datos de workout_days
+	var workoutDays []map[string]interface{}
+	workoutDaysRows, err := database.DB.Query(`
+		SELECT id, user_id, date, name, effort, mood, created_at 
+		FROM workout_days 
+		ORDER BY created_at DESC
+		LIMIT 5
 	`)
 	if err == nil {
-		defer workoutTriggerRows.Close()
-		for workoutTriggerRows.Next() {
-			var triggerName, eventManipulation, actionStatement string
-			if err := workoutTriggerRows.Scan(&triggerName, &eventManipulation, &actionStatement); err == nil {
-				workoutTriggers = append(workoutTriggers, fmt.Sprintf("%s (%s): %s", triggerName, eventManipulation, actionStatement))
+		defer workoutDaysRows.Close()
+		for workoutDaysRows.Next() {
+			var id int
+			var userID, date, name, createdAt string
+			var effort, mood int
+			if err := workoutDaysRows.Scan(&id, &userID, &date, &name, &effort, &mood, &createdAt); err == nil {
+				workoutDays = append(workoutDays, map[string]interface{}{
+					"id": id,
+					"user_id": userID,
+					"date": date,
+					"name": name,
+					"effort": effort,
+					"mood": mood,
+					"created_at": createdAt,
+				})
 			}
 		}
 	}
@@ -263,10 +286,10 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 	response := map[string]interface{}{
 		"all_tables": allTables,
 		"tables": tableInfo,
-		"workout_sessions_columns": sessionColumns,
+		"workout_days_columns": workoutDaysColumns,
 		"workouts_columns": workoutColumns,
 		"user_profiles": userProfiles,
-		"workout_triggers": workoutTriggers,
+		"workout_days_sample": workoutDays,
 	}
 
 	json.NewEncoder(w).Encode(response)

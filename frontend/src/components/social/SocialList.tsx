@@ -20,11 +20,11 @@ import { useUserSettings } from '../../contexts/UserSettingsContext'
 import { apiClient } from '../../lib/api'
 
 type SocialWorkout = {
-  id: string
+  session_id: number
   user_id: string
   user_name: string
   user_avatar_url?: string
-  date: string
+  workout_date: string
   exercises: {
     exercise_name: string
     weight: number
@@ -104,12 +104,12 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
     }
   }
 
-  const handleLike = async (workoutId: string) => {
+  const handleLike = async (workoutId: number) => {
     try {
       // Simular llamada al backend
       setSocialWorkouts(prev => 
         prev.map(workout => 
-          workout.id === workoutId 
+          workout.session_id === workoutId 
             ? { 
                 ...workout, 
                 likes: workout.is_liked ? workout.likes - 1 : workout.likes + 1,
@@ -120,26 +120,24 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
       )
 
       // En el futuro, aquí se enviaría la notificación al usuario del workout
-      const currentWorkout = socialWorkouts.find(w => w.id === workoutId)
+      const currentWorkout = socialWorkouts.find(w => w.session_id === workoutId)
       console.log(`Kudos ${currentWorkout?.is_liked ? 'removido' : 'agregado'} al workout ${workoutId}`)
     } catch (error) {
       console.error('Error al dar kudos:', error)
       // Revertir el cambio si hay error
       setSocialWorkouts(prev => 
         prev.map(workout => 
-          workout.id === workoutId 
+          workout.session_id === workoutId 
             ? { 
                 ...workout, 
-                        likes: workout.is_liked ? workout.likes + 1 : workout.likes - 1,
-        is_liked: !workout.is_liked 
+                likes: workout.is_liked ? workout.likes + 1 : workout.likes - 1,
+                is_liked: !workout.is_liked 
               }
             : workout
         )
       )
     }
   }
-
-
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
@@ -164,11 +162,14 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
 
   const formatWorkoutDate = (dateString: string): string => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('es-ES', { 
-      weekday: 'long',
-      day: 'numeric', 
-      month: 'long'
-    })
+    const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    
+    const weekday = weekdays[date.getDay()]
+    const day = date.getDate()
+    const month = months[date.getMonth()]
+    
+    return `${weekday} ${day} de ${month}`
   }
 
   // Si el usuario no tiene habilitada la funcionalidad social, mostrar mensaje de privacidad
@@ -276,7 +277,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
       <Stack spacing={3}>
         {safeSocialWorkouts.map((workout) => (
           <Card 
-            key={workout.id} 
+            key={workout.session_id} 
             sx={{ 
               boxShadow: 2,
               borderRadius: 2,
@@ -304,7 +305,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                     {workout.user_name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {formatWorkoutDate(workout.date)} • {formatDate(workout.date)}
+                    {formatWorkoutDate(workout.workout_date)} • {formatDate(workout.workout_date)}
                   </Typography>
                 </Box>
               </Box>
@@ -339,7 +340,41 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                   />
                 </Stack>
 
-
+                {/* Mostrar ejercicios si están disponibles */}
+                {workout.exercises && workout.exercises.length > 0 && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+                      Ejercicios:
+                    </Typography>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                      {workout.exercises.slice(0, 3).map((exercise, index) => (
+                        <Chip
+                          key={index}
+                          label={`${exercise.exercise_name} (${exercise.weight}kg x ${exercise.reps})`}
+                          variant="outlined"
+                          size="small"
+                          sx={{
+                            borderColor: 'primary.main',
+                            color: 'primary.main',
+                            fontSize: '0.75rem'
+                          }}
+                        />
+                      ))}
+                      {workout.exercises.length > 3 && (
+                        <Chip
+                          label={`+${workout.exercises.length - 3} más`}
+                          variant="outlined"
+                          size="small"
+                          sx={{
+                            borderColor: 'text.secondary',
+                            color: 'text.secondary',
+                            fontSize: '0.75rem'
+                          }}
+                        />
+                      )}
+                    </Stack>
+                  </Box>
+                )}
               </Box>
 
               <Divider sx={{ my: 2 }} />
@@ -358,7 +393,7 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                 
                 <Tooltip title={workout.is_liked ? 'Quitar kudos' : 'Dar kudos'}>
                   <IconButton
-                    onClick={() => handleLike(workout.id)}
+                    onClick={() => handleLike(workout.session_id)}
                     sx={{ 
                       color: workout.is_liked ? 'success.main' : 'text.secondary',
                       '&:hover': {
