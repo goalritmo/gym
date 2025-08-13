@@ -73,6 +73,10 @@ func main() {
 	api.HandleFunc("/notifications/read-all", handlers.MarkAllNotificationsAsReadHandler).Methods("PUT")
 	api.HandleFunc("/notifications/{id}", handlers.DeleteNotificationHandler).Methods("DELETE")
 
+	// User settings endpoints
+	api.HandleFunc("/user-settings", handlers.GetUserSettingsHandler).Methods("GET")
+	api.HandleFunc("/user-settings", handlers.UpdateUserSettingsHandler).Methods("PUT")
+
 	// Debug endpoint (temporal)
 	api.HandleFunc("/debug", handlers.DebugHandler).Methods("GET")
 	

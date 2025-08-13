@@ -1,5 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
+import { apiClient } from '../lib/api'
+
+interface ApiUserSettings {
+  show_own_workouts_in_social: boolean
+  unc_notifications_enabled: boolean
+}
 
 interface UserSettings {
   showWorkoutSection: boolean
@@ -29,25 +35,61 @@ const defaultSettings: UserSettings = {
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings)
 
-  // Cargar configuraciones desde localStorage al montar
+  // Cargar configuraciones desde la API al montar
   useEffect(() => {
-    const savedSettings = localStorage.getItem('user-settings')
-    if (savedSettings) {
+    const loadSettings = async () => {
       try {
-        const parsedSettings = JSON.parse(savedSettings)
-        console.log('🔍 Configuraciones cargadas desde localStorage:', parsedSettings)
-        setSettings({ ...defaultSettings, ...parsedSettings })
+        const apiSettings = await apiClient.getUserSettings()
+        console.log('🔍 Configuraciones cargadas desde API:', apiSettings)
+        
+        // Combinar configuraciones de API con localStorage para ejercicios favoritos
+        const savedSettings = localStorage.getItem('user-settings')
+        let localSettings: Partial<UserSettings> = {}
+        if (savedSettings) {
+          try {
+            localSettings = JSON.parse(savedSettings)
+          } catch (error) {
+            console.error('Error parsing local settings:', error)
+          }
+        }
+        
+        const apiSettingsTyped = apiSettings as ApiUserSettings
+        setSettings({ 
+          ...defaultSettings, 
+          showOwnWorkoutsInSocial: apiSettingsTyped.show_own_workouts_in_social,
+          uncNotificationsEnabled: apiSettingsTyped.unc_notifications_enabled,
+          favoriteExercises: localSettings.favoriteExercises || [],
+          showWorkoutSection: localSettings.showWorkoutSection !== undefined ? localSettings.showWorkoutSection : defaultSettings.showWorkoutSection
+        })
       } catch (error) {
-        console.error('Error parsing user settings:', error)
-        setSettings(defaultSettings)
+        console.error('Error loading user settings from API:', error)
+        // Fallback a localStorage
+        const savedSettings = localStorage.getItem('user-settings')
+        if (savedSettings) {
+          try {
+            const parsedSettings = JSON.parse(savedSettings)
+            setSettings({ ...defaultSettings, ...parsedSettings })
+          } catch (error) {
+            console.error('Error parsing user settings:', error)
+            setSettings(defaultSettings)
+          }
+        } else {
+          setSettings(defaultSettings)
+        }
       }
     }
+    
+    loadSettings()
   }, [])
 
-  // Guardar configuraciones en localStorage cuando cambien
+  // Guardar configuraciones en localStorage (solo ejercicios favoritos y showWorkoutSection)
   useEffect(() => {
-    localStorage.setItem('user-settings', JSON.stringify(settings))
-  }, [settings])
+    const settingsToSave = {
+      favoriteExercises: settings.favoriteExercises,
+      showWorkoutSection: settings.showWorkoutSection
+    }
+    localStorage.setItem('user-settings', JSON.stringify(settingsToSave))
+  }, [settings.favoriteExercises, settings.showWorkoutSection])
 
   const toggleWorkoutSection = () => {
     setSettings(prev => ({ 
@@ -63,18 +105,32 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     }))
   }
 
-  const toggleUncNotifications = () => {
+  const toggleUncNotifications = async () => {
+    const newValue = !settings.uncNotificationsEnabled
     setSettings(prev => ({ 
       ...prev, 
-      uncNotificationsEnabled: !prev.uncNotificationsEnabled
+      uncNotificationsEnabled: newValue
     }))
+    
+    try {
+      await apiClient.updateUserSettings({ unc_notifications_enabled: newValue })
+    } catch (error) {
+      console.error('Error updating UNC notifications setting:', error)
+    }
   }
 
-  const toggleShowOwnWorkoutsInSocial = () => {
+  const toggleShowOwnWorkoutsInSocial = async () => {
+    const newValue = !settings.showOwnWorkoutsInSocial
     setSettings(prev => ({ 
       ...prev, 
-      showOwnWorkoutsInSocial: !prev.showOwnWorkoutsInSocial
+      showOwnWorkoutsInSocial: newValue
     }))
+    
+    try {
+      await apiClient.updateUserSettings({ show_own_workouts_in_social: newValue })
+    } catch (error) {
+      console.error('Error updating show own workouts setting:', error)
+    }
   }
 
   const initializeAllExercisesAsFavorites = (exerciseIds: number[]) => {

@@ -16,7 +16,7 @@ import {
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useAuth } from '../../contexts/AuthContext'
-import { useUserSettings } from '../../contexts/UserSettingsContext'
+
 
 type SocialWorkout = {
   session_id: number
@@ -42,18 +42,16 @@ type SocialExercise = {
 
 export default function SocialList() {
   const { user } = useAuth()
-  const { settings } = useUserSettings()
   const [socialWorkouts, setSocialWorkouts] = useState<SocialWorkout[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [loadingKudos, setLoadingKudos] = useState<Set<number>>(new Set())
 
-  console.log('🔍 Configuración actual:', settings.showOwnWorkoutsInSocial)
+  
 
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString)
-      date.setDate(date.getDate() + 1) // Compensar offset de timezone
       
       const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
       const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
@@ -170,29 +168,12 @@ export default function SocialList() {
   const groupedWorkouts = useMemo(() => {
     const groups: { [key: string]: SocialWorkout[] } = {}
     
-          console.log('🔍 Debug SocialList:', {
-        totalWorkouts: socialWorkouts.length,
-        showOwnWorkouts: settings.showOwnWorkoutsInSocial,
-        userId: user?.id,
-        workouts: socialWorkouts.map(w => ({ sessionId: w.session_id, userId: w.user_id, userName: w.user_name }))
-      })
+    console.log('🔍 Debug SocialList:', {
+      totalWorkouts: socialWorkouts.length,
+      workouts: socialWorkouts.map(w => ({ sessionId: w.session_id, userId: w.user_id, userName: w.user_name }))
+    })
     
-    // Filtrar workouts propios si la opción está desactivada
-    console.log('🔍 Filtrado - showOwnWorkoutsInSocial:', settings.showOwnWorkoutsInSocial)
-    console.log('🔍 Filtrado - userId actual:', user?.id)
-    console.log('🔍 Filtrado - total workouts antes:', socialWorkouts.length)
-    
-    const filteredWorkouts = settings.showOwnWorkoutsInSocial 
-      ? socialWorkouts 
-      : socialWorkouts.filter(workout => {
-          console.log('🔍 Comparando workout.user_id:', workout.user_id, 'con user?.id:', user?.id)
-          return workout.user_id !== user?.id
-        })
-    
-    console.log('🔍 Workouts filtrados:', filteredWorkouts.length)
-    console.log('🔍 Workouts filtrados detalle:', filteredWorkouts.map(w => ({ sessionId: w.session_id, userId: w.user_id, userName: w.user_name })))
-    
-    filteredWorkouts.forEach(workout => {
+    socialWorkouts.forEach(workout => {
       const dayKey = workout.workout_date
       if (!groups[dayKey]) {
         groups[dayKey] = []
@@ -206,7 +187,7 @@ export default function SocialList() {
         workouts: workouts.sort((a, b) => new Date(b.workout_date).getTime() - new Date(a.workout_date).getTime())
       }))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Ordenar grupos por fecha
-  }, [socialWorkouts, settings.showOwnWorkoutsInSocial, user?.id])
+  }, [socialWorkouts])
 
   useEffect(() => {
     loadSocialWorkouts()

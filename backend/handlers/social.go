@@ -66,7 +66,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("Consultando entrenamientos sociales con límite: %d, offset: %d, usuario: %s\n", limit, offset, userID)
 
-	// Query actualizada para usar workout_days con kudos reales
+	// Query actualizada para usar workout_days con kudos reales y filtrar por configuración de usuario
 	query := `
 		SELECT 
 			wd.id as session_id,
@@ -94,7 +94,8 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		LEFT JOIN user_profiles up ON wd.user_id = up.user_id
 		LEFT JOIN workouts w ON wd.id = w.workout_day_id
 		LEFT JOIN exercises e ON w.exercise_id = e.id
-		WHERE 1=1
+		LEFT JOIN user_settings us ON wd.user_id = us.user_id
+		WHERE (us.show_own_workouts_in_social IS NULL OR us.show_own_workouts_in_social = true)
 		GROUP BY wd.id, wd.user_id, up.name, up.avatar_url, wd.created_at
 		ORDER BY wd.created_at DESC
 		LIMIT $1 OFFSET $2

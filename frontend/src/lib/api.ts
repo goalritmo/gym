@@ -203,6 +203,18 @@ class ApiClient {
       method: 'DELETE'
     })
   }
+
+  // User Settings API
+  async getUserSettings() {
+    return this.request('/user-settings')
+  }
+
+  async updateUserSettings(settings: { show_own_workouts_in_social?: boolean; unc_notifications_enabled?: boolean }) {
+    return this.request('/user-settings', {
+      method: 'PUT',
+      body: settings
+    })
+  }
 }
 
 // Export singleton instance
