@@ -34,6 +34,7 @@ export default function WorkoutHistory() {
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; workoutId: number | null }>({ show: false, workoutId: null })
   const [loadingWorkoutId, setLoadingWorkoutId] = useState<number | null>(null)
+  const [exerciseModal, setExerciseModal] = useState<{ show: boolean; exerciseGroup: ExerciseGroup | null; workoutDay: WorkoutDay | null }>({ show: false, exerciseGroup: null, workoutDay: null })
 
   // Función para normalizar fecha a zona horaria de Argentina
   const normalizeDate = (dateString: string) => {
@@ -392,12 +393,20 @@ export default function WorkoutHistory() {
                 {day.exerciseGroups.map((group, index) => (
                   <Card
                     key={index}
+                    onClick={() => setExerciseModal({ show: true, exerciseGroup: group, workoutDay: day.workoutDay })}
                     sx={{
                       boxShadow: 1,
                       border: '1px solid',
                       borderColor: 'divider',
                       minWidth: 200,
-                      maxWidth: 300
+                      maxWidth: 300,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        boxShadow: 3,
+                        transform: 'translateY(-2px)',
+                        borderColor: 'primary.main'
+                      }
                     }}
                   >
                     <CardContent sx={{ p: 2 }}>
@@ -425,124 +434,6 @@ export default function WorkoutHistory() {
                   </Card>
                 ))}
               </Box>
-
-              {/* Ejercicios expandidos */}
-              {expandedDays.has(day.workoutDay.date) && (
-                <Box sx={{ mt: 2 }}>
-                  <Stack spacing={2}>
-                    {day.exerciseGroups.map((group, groupIndex) => (
-                      <Box key={groupIndex}>
-                        <Typography variant="h6" sx={{ 
-                          fontWeight: 600, 
-                          color: 'primary.main', 
-                          mb: 2,
-                          pb: 1,
-                          borderBottom: 2,
-                          borderColor: 'primary.main'
-                        }}>
-                          {group.exerciseName} del {formatDate(day.workoutDay.date)}
-                        </Typography>
-                        
-                        <Stack spacing={1}>
-                          {group.workouts.map((workout, workoutIndex) => (
-                            <Card key={workoutIndex} sx={{ 
-                              boxShadow: 1, 
-                              border: '1px solid',
-                              borderColor: 'divider',
-                              position: 'relative',
-                              filter: loadingWorkoutId === workout.id ? 'blur(1px)' : 'none',
-                              transition: 'filter 0.2s ease-in-out'
-                            }}>
-                              <CardContent sx={{ p: 2 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                  <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                                    Serie {workout.serie}
-                                  </Typography>
-                                  
-                                  <IconButton
-                                    onClick={(e) => {
-                                      console.log('🔍 Botón eliminar clickeado para workout ID:', workout.id)
-                                      e.stopPropagation();
-                                      // Cerrar la sección expandida para enfocarse en el modal de eliminación
-                                      setExpandedDays(new Set());
-                                      setDeleteConfirmation({ show: true, workoutId: workout.id });
-                                    }}
-                                    size="small"
-                                    sx={{ 
-                                      color: 'error.main',
-                                      opacity: 0.7,
-                                      '&:hover': { opacity: 1 }
-                                    }}
-                                    disabled={loadingWorkoutId === workout.id}
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </Box>
-                                
-                                <Stack direction="row" spacing={2} alignItems="center">
-                                  <Chip 
-                                    label={`${workout.weight}kg`} 
-                                    variant="outlined" 
-                                    size="small"
-                                    sx={{ 
-                                      fontWeight: 'bold',
-                                      borderColor: '#2196f3',
-                                      color: '#2196f3',
-                                      minWidth: '60px',
-                                      '&:hover': {
-                                        backgroundColor: '#2196f3',
-                                        color: 'white'
-                                      }
-                                    }}
-                                  />
-                                  <Chip 
-                                    label={`${workout.reps} reps`} 
-                                    variant="outlined" 
-                                    size="small"
-                                    sx={{ 
-                                      fontWeight: 'bold',
-                                      borderColor: '#4caf50',
-                                      color: '#4caf50',
-                                      minWidth: '60px',
-                                      '&:hover': {
-                                        backgroundColor: '#4caf50',
-                                        color: 'white'
-                                      }
-                                    }}
-                                  />
-                                  {workout.seconds && (
-                                    <Chip 
-                                      label={`${workout.seconds}s`} 
-                                      variant="outlined" 
-                                      size="small"
-                                      sx={{ 
-                                        fontWeight: 'bold',
-                                        borderColor: '#4caf50',
-                                        color: '#4caf50',
-                                        minWidth: '50px',
-                                        '&:hover': {
-                                          backgroundColor: '#4caf50',
-                                          color: 'white'
-                                        }
-                                      }}
-                                    />
-                                  )}
-                                </Stack>
-                                
-                                {workout.observations && (
-                                  <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', pt: 1, borderTop: 1, borderColor: 'divider' }}>
-                                    "{workout.observations}"
-                                  </Typography>
-                                )}
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </Stack>
-                      </Box>
-                    ))}
-                  </Stack>
-                </Box>
-              )}
             </CardContent>
           </Card>
 
@@ -578,6 +469,157 @@ export default function WorkoutHistory() {
                 disabled={loadingWorkoutId !== null}
               >
                 Eliminar
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {/* Modal de ejercicio individual */}
+          <Dialog
+            open={exerciseModal.show}
+            onClose={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
+            maxWidth="md"
+            fullWidth
+          >
+            <DialogTitle sx={{ 
+              pb: 1, 
+              borderBottom: 1, 
+              borderColor: 'divider',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                {exerciseModal.exerciseGroup?.exerciseName} del {exerciseModal.workoutDay ? formatDate(exerciseModal.workoutDay.date) : ''}
+              </Typography>
+              <IconButton 
+                onClick={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
+                size="small"
+              >
+                <ExpandLessIcon />
+              </IconButton>
+            </DialogTitle>
+            
+            <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: 2 }}>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {exerciseModal.exerciseGroup?.workouts.length} {exerciseModal.exerciseGroup?.workouts.length === 1 ? 'serie' : 'series'}
+                </Typography>
+              </Box>
+
+              <Stack spacing={2}>
+                {exerciseModal.exerciseGroup?.workouts.map((workout, workoutIndex) => (
+                  <Card key={workoutIndex} sx={{ 
+                    boxShadow: 1, 
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    position: 'relative',
+                    filter: loadingWorkoutId === workout.id ? 'blur(1px)' : 'none',
+                    transition: 'filter 0.2s ease-in-out'
+                  }}>
+                    <CardContent sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                          Serie {workout.serie}
+                        </Typography>
+                        
+                        <IconButton
+                          onClick={(e) => {
+                            console.log('🔍 Botón eliminar clickeado para workout ID:', workout.id)
+                            e.stopPropagation();
+                            setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null });
+                            setDeleteConfirmation({ show: true, workoutId: workout.id });
+                          }}
+                          size="small"
+                          sx={{ 
+                            color: 'error.main',
+                            opacity: 0.7,
+                            '&:hover': { opacity: 1 }
+                          }}
+                          disabled={loadingWorkoutId === workout.id}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                      
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Chip 
+                          label={`${workout.weight}kg`} 
+                          variant="outlined" 
+                          size="small"
+                          sx={{ 
+                            fontWeight: 'bold',
+                            borderColor: '#2196f3',
+                            color: '#2196f3',
+                            minWidth: '60px',
+                            '&:hover': {
+                              backgroundColor: '#2196f3',
+                              color: 'white'
+                            }
+                          }}
+                        />
+                        <Chip 
+                          label={`${workout.reps} reps`} 
+                          variant="outlined" 
+                          size="small"
+                          sx={{ 
+                            fontWeight: 'bold',
+                            borderColor: '#4caf50',
+                            color: '#4caf50',
+                            minWidth: '60px',
+                            '&:hover': {
+                              backgroundColor: '#4caf50',
+                              color: 'white'
+                            }
+                          }}
+                        />
+                        {workout.seconds && (
+                          <Chip 
+                            label={`${workout.seconds}s`} 
+                            variant="outlined" 
+                            size="small"
+                            sx={{ 
+                              fontWeight: 'bold',
+                              borderColor: '#4caf50',
+                              color: '#4caf50',
+                              minWidth: '50px',
+                              '&:hover': {
+                                backgroundColor: '#4caf50',
+                                color: 'white'
+                              }
+                            }}
+                          />
+                        )}
+                      </Stack>
+                      
+                      {workout.observations && (
+                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', pt: 1, borderTop: 1, borderColor: 'divider' }}>
+                          "{workout.observations}"
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </Stack>
+            </DialogContent>
+            
+            <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, justifyContent: 'center' }}>
+              <Button 
+                onClick={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
+                variant="contained"
+                sx={{
+                  px: 4,
+                  py: 1,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontSize: '0.95rem',
+                  backgroundColor: '#1976d2',
+                  '&:hover': {
+                    backgroundColor: '#1565c0'
+                  }
+                }}
+              >
+                Cerrar
               </Button>
             </DialogActions>
           </Dialog>
