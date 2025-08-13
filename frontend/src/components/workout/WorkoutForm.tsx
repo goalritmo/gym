@@ -149,21 +149,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         Registrar
       </Typography>
       
-      {/* Indicador de ejercicios favoritos */}
-      {settings.favoriteExercises.length > 0 && filteredExercises.length !== exercises.length && (
-        <Box sx={{ 
-          textAlign: 'center', 
-          mb: 2, 
-          p: 1.5, 
-          bgcolor: 'primary.light', 
-          borderRadius: 2,
-          color: 'white',
-          fontSize: '0.9rem',
-          fontWeight: 500
-        }}>
-          ⭐ Se ven {filteredExercises.length} de {exercises.length} ejercicios disponibles
-        </Box>
-      )}
+
       
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
