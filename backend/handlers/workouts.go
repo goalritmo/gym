@@ -43,7 +43,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Consultando workouts para usuario: %s, fecha: %s, workoutDayID: %s\n", userID, date, workoutDayID)
 
 	query := `
-		SELECT w.id, w.user_id, w.exercise_id, e.name as exercise_name, 
+		SELECT w.id, w.user_id, w.workout_day_id, w.exercise_id, e.name as exercise_name, 
 			   w.weight, w.reps, w.serie, w.seconds, w.observations, w.created_at
 		FROM workouts w
 		JOIN exercises e ON w.exercise_id = e.id
@@ -79,6 +79,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(
 			&workout.ID,
 			&workout.UserID,
+			&workout.WorkoutDayID,
 			&workout.ExerciseID,
 			&workout.ExerciseName,
 			&workout.Weight,
