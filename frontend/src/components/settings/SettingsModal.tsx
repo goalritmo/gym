@@ -85,22 +85,27 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     setHasChanges(true)
   }
 
-  const handleSave = () => {
-    // Aplicar cambios
-    if (tempSettings.showWorkoutSection !== settings.showWorkoutSection) {
-      toggleWorkoutSection()
+  const handleSave = async () => {
+    try {
+      // Aplicar cambios
+      if (tempSettings.showWorkoutSection !== settings.showWorkoutSection) {
+        toggleWorkoutSection()
+      }
+      if (tempSettings.uncNotificationsEnabled !== settings.uncNotificationsEnabled) {
+        await toggleUncNotifications()
+      }
+      if (tempSettings.showOwnWorkoutsInSocial !== settings.showOwnWorkoutsInSocial) {
+        await toggleShowOwnWorkoutsInSocial()
+      }
+      if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
+        setFavoriteExercises(tempSettings.favoriteExercises)
+      }
+      setHasChanges(false)
+      onClose()
+    } catch (error) {
+      console.error('Error saving settings:', error)
+      // Aquí podrías mostrar un mensaje de error al usuario
     }
-    if (tempSettings.uncNotificationsEnabled !== settings.uncNotificationsEnabled) {
-      toggleUncNotifications()
-    }
-    if (tempSettings.showOwnWorkoutsInSocial !== settings.showOwnWorkoutsInSocial) {
-      toggleShowOwnWorkoutsInSocial()
-    }
-    if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
-      setFavoriteExercises(tempSettings.favoriteExercises)
-    }
-    setHasChanges(false)
-    onClose()
   }
 
   // Filtrar ejercicios por término de búsqueda
