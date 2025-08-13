@@ -317,10 +317,10 @@ export default function SocialList() {
                           onClick={() => handleKudos(workout.session_id)}
                           disabled={loadingKudos.has(workout.session_id) || workout.has_kudos}
                           sx={{
-                            color: workout.has_kudos ? 'warning.main' : 'text.secondary',
+                            color: workout.has_kudos ? '#FF9800' : 'text.secondary',
                             mr: -1, // Compensar padding del CardContent
                             '&:hover': {
-                              color: workout.has_kudos ? 'warning.main' : 'primary.main'
+                              color: workout.has_kudos ? '#FF9800' : 'primary.main'
                             }
                           }}
                         >
