@@ -252,8 +252,18 @@ export default function WorkoutHistory() {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
-        <CircularProgress />
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: 'calc(100vh - 200px)',
+        flexDirection: 'column',
+        gap: 2
+      }}>
+        <CircularProgress size={60} thickness={4} sx={{ color: 'primary.main' }} />
+        <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
+          Cargando entrenamientos...
+        </Typography>
       </Box>
     );
   }
@@ -425,8 +435,8 @@ export default function WorkoutHistory() {
                           <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', textAlign: 'left' }}>
                             {group.exerciseName}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, fontSize: '0.9rem' }}>
-                            (x{group.workouts.length})
+                          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                            {group.workouts.length}
                           </Typography>
                         </Box>
                       </CardContent>
@@ -445,21 +455,60 @@ export default function WorkoutHistory() {
               // Mantener cerrada la sección expandida
               setExpandedDays(new Set());
             }}
-            maxWidth="xs"
+            maxWidth="sm"
             fullWidth
+            PaperProps={{
+              sx: {
+                borderRadius: 3,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                border: '1px solid',
+                borderColor: 'divider'
+              }
+            }}
           >
-            <DialogTitle>Confirmar eliminación</DialogTitle>
-            <DialogContent>
-              <Typography>
-                ¿Estás seguro de que quieres eliminar este ejercicio? Esta acción no se puede deshacer.
-              </Typography>
+            <DialogTitle sx={{ 
+              pb: 2, 
+              borderBottom: 1, 
+              borderColor: 'divider',
+              textAlign: 'center',
+              fontWeight: 600,
+              color: 'error.main'
+            }}>
+              ⚠️ Confirmar eliminación
+            </DialogTitle>
+            <DialogContent sx={{ py: 3, px: 3 }}>
+              <Box sx={{ textAlign: 'center', mb: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
+                  ¿Eliminar ejercicio?
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Esta acción no se puede deshacer. El ejercicio será eliminado permanentemente.
+                </Typography>
+              </Box>
             </DialogContent>
-            <DialogActions>
-              <Button onClick={() => {
-                setDeleteConfirmation({ show: false, workoutId: null });
-                // Mantener cerrada la sección expandida
-                setExpandedDays(new Set());
-              }}>
+            <DialogActions sx={{ p: 3, pt: 1, gap: 2, justifyContent: 'center' }}>
+              <Button 
+                onClick={() => {
+                  setDeleteConfirmation({ show: false, workoutId: null });
+                  // Mantener cerrada la sección expandida
+                  setExpandedDays(new Set());
+                }}
+                variant="outlined"
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontSize: '0.95rem',
+                  borderColor: 'grey.400',
+                  color: 'text.primary',
+                  '&:hover': {
+                    borderColor: 'grey.600',
+                    backgroundColor: 'grey.50'
+                  }
+                }}
+              >
                 Cancelar
               </Button>
               <Button 
@@ -467,8 +516,31 @@ export default function WorkoutHistory() {
                 color="error" 
                 variant="contained"
                 disabled={loadingWorkoutId !== null}
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontSize: '0.95rem',
+                  backgroundColor: '#d32f2f',
+                  '&:hover': {
+                    backgroundColor: '#c62828'
+                  },
+                  '&:disabled': {
+                    backgroundColor: '#ffcdd2',
+                    color: '#c62828'
+                  }
+                }}
               >
-                Eliminar
+                {loadingWorkoutId !== null ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <CircularProgress size={16} color="inherit" />
+                    Eliminando...
+                  </Box>
+                ) : (
+                  'Eliminar'
+                )}
               </Button>
             </DialogActions>
           </Dialog>
@@ -513,9 +585,27 @@ export default function WorkoutHistory() {
                     border: '1px solid',
                     borderColor: 'divider',
                     position: 'relative',
-                    filter: loadingWorkoutId === workout.id ? 'blur(1px)' : 'none',
-                    transition: 'filter 0.2s ease-in-out'
+                    filter: loadingWorkoutId === workout.id ? 'blur(2px)' : 'none',
+                    transition: 'all 0.3s ease-in-out'
                   }}>
+                    {/* Loader overlay cuando se está eliminando */}
+                    {loadingWorkoutId === workout.id && (
+                      <Box sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: 1,
+                        zIndex: 10
+                      }}>
+                        <CircularProgress size={40} sx={{ color: 'primary.main' }} />
+                      </Box>
+                    )}
                     <CardContent sx={{ p: 2 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
