@@ -108,24 +108,27 @@ export default function SocialList() {
   const handleKudos = async (workoutId: number) => {
     if (!user) return
     
+    // Solo permitir dar kudos si no se ha dado ya
+    const workout = socialWorkouts.find(w => w.id === workoutId)
+    if (!workout || workout.has_kudos) return
+    
     try {
       setLoadingKudos(prev => new Set(prev).add(workoutId))
       
-      // Aquí iría la llamada a la API para dar/quitar kudos
-      // Por ahora simulamos la funcionalidad
+      // Llamada a la API para dar kudos
+      await apiClient.giveKudos(workoutId)
+      
+      // Actualizar estado local
       setSocialWorkouts(prev => prev.map(workout => {
         if (workout.id === workoutId) {
           return {
             ...workout,
-            has_kudos: !workout.has_kudos,
-            kudos_count: workout.has_kudos ? workout.kudos_count - 1 : workout.kudos_count + 1
+            has_kudos: true,
+            kudos_count: workout.kudos_count + 1
           }
         }
         return workout
       }))
-      
-      // TODO: Implementar API call cuando esté lista
-      // await apiClient.toggleKudos(workoutId)
       
     } catch (error) {
       console.error('Error dando kudos:', error)
@@ -267,14 +270,14 @@ export default function SocialList() {
                           </Typography>
                         </Box>
                         
-                        <Tooltip title={workout.has_kudos ? 'Quitar kudo' : 'Dar kudo'}>
+                        <Tooltip title={workout.has_kudos ? 'Ya diste kudos' : 'Dar kudos'}>
                           <IconButton
                             onClick={() => handleKudos(workout.id)}
-                            disabled={loadingKudos.has(workout.id)}
+                            disabled={loadingKudos.has(workout.id) || workout.has_kudos}
                             sx={{
-                              color: workout.has_kudos ? 'error.main' : 'text.secondary',
+                              color: workout.has_kudos ? 'success.main' : 'text.secondary',
                               '&:hover': {
-                                color: workout.has_kudos ? 'error.dark' : 'primary.main'
+                                color: workout.has_kudos ? 'success.main' : 'primary.main'
                               }
                             }}
                           >

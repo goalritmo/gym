@@ -167,6 +167,12 @@ class ApiClient {
     return this.request(`/social/workouts?${params}`)
   }
 
+  async giveKudos(workoutId: number) {
+    return this.request(`/social/workouts/${workoutId}/kudos`, {
+      method: 'POST'
+    })
+  }
+
   // Notifications API
   async getNotifications(limit: number = 20, offset: number = 0) {
     const params = new URLSearchParams({
