@@ -287,9 +287,9 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
           >
             <CardContent sx={{ p: 3 }}>
               {/* Header con usuario y fecha */}
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
                 <Avatar 
-                  src={workout.user_avatar_url}
+                  src={workout.user_avatar_url && workout.user_avatar_url.trim() !== '' ? workout.user_avatar_url : undefined}
                   sx={{ 
                     width: 48, 
                     height: 48, 
@@ -300,11 +300,11 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                 >
                   {workout.user_name.charAt(0)}
                 </Avatar>
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <Box sx={{ flex: 1, textAlign: 'left' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', textAlign: 'left' }}>
                     {workout.user_name}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
                     {formatWorkoutDate(workout.workout_date)} • {formatDate(workout.workout_date)}
                   </Typography>
                 </Box>
@@ -340,41 +340,6 @@ export default function SocialList({ onOpenSettings }: SocialListProps) {
                   />
                 </Stack>
 
-                {/* Mostrar ejercicios si están disponibles */}
-                {workout.exercises && workout.exercises.length > 0 && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
-                      Ejercicios:
-                    </Typography>
-                    <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                      {workout.exercises.slice(0, 3).map((exercise, index) => (
-                        <Chip
-                          key={index}
-                          label={`${exercise.exercise_name} (${exercise.weight}kg x ${exercise.reps})`}
-                          variant="outlined"
-                          size="small"
-                          sx={{
-                            borderColor: 'primary.main',
-                            color: 'primary.main',
-                            fontSize: '0.75rem'
-                          }}
-                        />
-                      ))}
-                      {workout.exercises.length > 3 && (
-                        <Chip
-                          label={`+${workout.exercises.length - 3} más`}
-                          variant="outlined"
-                          size="small"
-                          sx={{
-                            borderColor: 'text.secondary',
-                            color: 'text.secondary',
-                            fontSize: '0.75rem'
-                          }}
-                        />
-                      )}
-                    </Stack>
-                  </Box>
-                )}
               </Box>
 
               <Divider sx={{ my: 2 }} />
