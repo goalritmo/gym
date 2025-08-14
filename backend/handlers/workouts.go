@@ -39,7 +39,6 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Obtener parámetros de query
 	date := r.URL.Query().Get("date")
-	workoutDayID := r.URL.Query().Get("workout_day_id")
 
 
 
