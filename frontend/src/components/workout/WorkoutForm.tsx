@@ -123,6 +123,11 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         data.seconds = currentTimerTime
       }
       
+      // Limpiar peso si es 0 o undefined
+      if (data.weight === 0 || data.weight === undefined) {
+        data.weight = undefined
+      }
+      
       await onSubmit(data)
       setShowSuccess(true)
       reset({
