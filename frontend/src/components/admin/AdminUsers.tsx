@@ -100,16 +100,13 @@ export function AdminUsers() {
       {/* Header */}
       <Box sx={{ 
         display: 'flex', 
+        justifyContent: 'space-between', 
         alignItems: 'center', 
-        justifyContent: 'space-between',
-        mb: 3,
-        flexWrap: 'wrap',
-        gap: 2
+        mb: 3 
       }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-          👥 Usuarios Registrados
+        <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
+          Usuarios Registrados
         </Typography>
-        
         <Typography variant="body2" color="text.secondary">
           {filteredUsers.length} de {users.length} usuarios
         </Typography>
@@ -157,43 +154,45 @@ export function AdminUsers() {
                     </Avatar>
                     
                     <Box sx={{ flex: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          {user.name || 'Sin nombre'}
-                        </Typography>
-                        {user.is_admin && (
-                          <Chip 
-                            label="Admin" 
-                            size="small" 
-                            color="primary" 
-                            sx={{ fontSize: '0.75rem' }}
-                          />
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            {user.name || 'Sin nombre'}
+                          </Typography>
+                          {user.is_admin && (
+                            <Chip 
+                              label="Admin" 
+                              size="small" 
+                              color="primary" 
+                              sx={{ fontSize: '0.75rem' }}
+                            />
+                          )}
+                        </Box>
+                        
+                        {/* User Settings */}
+                        {user.settings && (
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Chip 
+                              label={user.settings.show_own_workouts_in_social ? "Social activado" : "Social desactivado"}
+                              size="small"
+                              color={user.settings.show_own_workouts_in_social ? "success" : "default"}
+                              variant="outlined"
+                              sx={{ fontSize: '0.7rem' }}
+                            />
+                            <Chip 
+                              label={user.settings.unc_notifications_enabled ? "Notificaciones activadas" : "Notificaciones desactivadas"}
+                              size="small"
+                              color={user.settings.unc_notifications_enabled ? "success" : "default"}
+                              variant="outlined"
+                              sx={{ fontSize: '0.7rem' }}
+                            />
+                          </Box>
                         )}
                       </Box>
                       
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         {user.email}
                       </Typography>
-
-                      {/* User Settings */}
-                      {user.settings && (
-                        <Box sx={{ display: 'flex', gap: 2, mb: 1 }}>
-                          <Chip 
-                            label={user.settings.show_own_workouts_in_social ? "Social activado" : "Social desactivado"}
-                            size="small"
-                            color={user.settings.show_own_workouts_in_social ? "success" : "default"}
-                            variant="outlined"
-                            sx={{ fontSize: '0.7rem' }}
-                          />
-                          <Chip 
-                            label={user.settings.unc_notifications_enabled ? "Notificaciones activadas" : "Notificaciones desactivadas"}
-                            size="small"
-                            color={user.settings.unc_notifications_enabled ? "success" : "default"}
-                            variant="outlined"
-                            sx={{ fontSize: '0.7rem' }}
-                          />
-                        </Box>
-                      )}
                     </Box>
                   </Box>
 
