@@ -62,6 +62,9 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 		WHERE id = $2
 	`, req.Name, req.UserID).Scan(&fullName)
 	
+	fmt.Printf("DEBUG: Query ejecutada para obtener nombre de Google\n")
+	fmt.Printf("DEBUG: req.Name = %s, req.UserID = %s\n", req.Name, req.UserID)
+	
 	if err != nil {
 		fmt.Printf("Error obteniendo nombre de Google: %v\n", err)
 		// Fallback al nombre proporcionado o email
@@ -77,6 +80,7 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Configurando usuario: %s (%s) con nombre completo: %s, nombre: %s\n", req.UserID, req.Email, fullName, userName)
 
 	// 1. Crear perfil de usuario
+	fmt.Printf("DEBUG: Intentando crear perfil para user_id = %s, name = %s\n", req.UserID, userName)
 	_, err = tx.Exec(`
 		INSERT INTO user_profiles (user_id, name, is_admin, role)
 		VALUES ($1, $2, $3, $4)
@@ -91,6 +95,7 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error creating user profile", http.StatusInternalServerError)
 		return
 	}
+	fmt.Printf("DEBUG: Perfil creado exitosamente\n")
 
 	// 2. Crear configuración de usuario
 	_, err = tx.Exec(`

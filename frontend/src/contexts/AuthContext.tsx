@@ -86,15 +86,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
           
           // Configurar usuario solo si no tiene perfil (usuario nuevo)
+          console.log('DEBUG: Verificando si necesita setup. profile_name:', userInfo.profile_name, 'is_admin:', userInfo.is_admin)
           if (!userInfo.profile_name && !userInfo.is_admin) {
+            console.log('DEBUG: Usuario necesita setup, ejecutando setupUser...')
             try {
               const userName = user.user_metadata?.name || user.user_metadata?.full_name
+              console.log('DEBUG: Llamando setupUser con:', { userId: user.id, email: user.email, userName })
               await apiClient.setupUser(user.id, user.email || '', userName)
               console.log('Usuario configurado exitosamente')
             } catch (error) {
               console.log('Error configurando usuario:', error)
               // No es crítico si falla, solo log
             }
+          } else {
+            console.log('DEBUG: Usuario no necesita setup')
           }
         } catch (error) {
           console.error('Error fetching user info:', error)
