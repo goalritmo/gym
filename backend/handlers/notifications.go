@@ -33,6 +33,8 @@ func GetNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Printf("GetNotificationsHandler llamado para usuario: %s\n", userID)
+
 	// Obtener parámetros de paginación
 	limit := 20
 	offset := 0
@@ -63,6 +65,7 @@ func GetNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error consultando notificaciones", http.StatusInternalServerError)
 		return
 	}
+	fmt.Printf("Query ejecutada exitosamente para usuario %s\n", userID)
 	defer rows.Close()
 
 	var notifications []Notification
@@ -86,6 +89,7 @@ func GetNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		// Convertir fecha a zona horaria de Argentina
 		notification.CreatedAt = convertToArgentinaTime(notification.CreatedAt)
 		notifications = append(notifications, notification)
+		fmt.Printf("Notificación encontrada: ID=%d, Type=%s, Title=%s\n", notification.ID, notification.Type, notification.Title)
 	}
 
 	fmt.Printf("Encontradas %d notificaciones para usuario %s\n", len(notifications), userID)
