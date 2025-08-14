@@ -32,7 +32,7 @@ type AdminUser = {
   is_admin: boolean
   role: string
   created_at: string
-  last_sign_in_at: string | null
+  last_login: string | null
   settings: {
     show_own_workouts_in_social: boolean
     unc_notifications_enabled: boolean
@@ -189,10 +189,34 @@ export function AdminUsers() {
       />
 
       {/* Users List */}
-      <Box sx={{ maxHeight: '600px', overflowY: 'auto' }}>
+      <Box sx={{ 
+        minHeight: '400px',
+        maxHeight: '600px', 
+        overflowY: 'auto',
+        '&::-webkit-scrollbar': {
+          width: '8px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: '#f1f1f1',
+          borderRadius: '4px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: '#c1c1c1',
+          borderRadius: '4px',
+          '&:hover': {
+            background: '#a8a8a8',
+          },
+        },
+      }}>
         <Stack spacing={2}>
           {filteredUsers.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              minHeight: '300px',
+              textAlign: 'center'
+            }}>
               <Typography variant="body1" color="text.secondary">
                 {filterText ? 'No se encontraron usuarios que coincidan con la búsqueda' : 'No hay usuarios registrados'}
               </Typography>
@@ -283,19 +307,20 @@ export function AdminUsers() {
                           )}
                         </IconButton>
                       </Box>
-                    </Box>
-                  </Box>
 
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                    <Typography variant="caption" color="text.secondary">
-                      Registrado el {formatDate(user.created_at)}
-                    </Typography>
-                    
-                    {user.last_sign_in_at && (
-                      <Typography variant="caption" color="text.secondary">
-                        Último acceso: {formatDate(user.last_sign_in_at)}
-                      </Typography>
-                    )}
+                      {/* Registration and Last Login Info */}
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 2 }}>
+                        <Typography variant="caption" color="text.secondary">
+                          Registrado el {formatDate(user.created_at)}
+                        </Typography>
+                        
+                        {user.last_login && (
+                          <Typography variant="caption" color="text.secondary">
+                            Último acceso: {formatDate(user.last_login)}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
                   </Box>
                 </CardContent>
               </Card>

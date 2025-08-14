@@ -123,35 +123,57 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
           <Box sx={{ height: '100%' }}>
             {/* Tabs */}
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs 
-                value={activeTab} 
-                onChange={handleTabChange} 
-                aria-label="admin tabs"
-                sx={{
-                  '& .MuiTab-root': {
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    textTransform: 'none',
-                    minHeight: 64
-                  }
-                }}
-              >
-                <Tab 
-                  label="📢 Notificaciones" 
-                  id="admin-tab-0"
-                  aria-controls="admin-tabpanel-0"
-                />
-                <Tab 
-                  label="💪 Ejercicios" 
-                  id="admin-tab-1"
-                  aria-controls="admin-tabpanel-1"
-                />
-                <Tab 
-                  label="👥 Usuarios" 
-                  id="admin-tab-2"
-                  aria-controls="admin-tabpanel-2"
-                />
-              </Tabs>
+              <Box sx={{ 
+                overflowX: 'auto',
+                '&::-webkit-scrollbar': {
+                  height: '8px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  background: '#f1f1f1',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: '#c1c1c1',
+                  borderRadius: '4px',
+                  '&:hover': {
+                    background: '#a8a8a8',
+                  },
+                },
+              }}>
+                <Tabs 
+                  value={activeTab} 
+                  onChange={handleTabChange} 
+                  aria-label="admin tabs"
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  sx={{
+                    '& .MuiTab-root': {
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      textTransform: 'none',
+                      minHeight: 64,
+                      minWidth: 'auto',
+                      px: 3
+                    }
+                  }}
+                >
+                  <Tab 
+                    label="📢 Notificaciones" 
+                    id="admin-tab-0"
+                    aria-controls="admin-tabpanel-0"
+                  />
+                  <Tab 
+                    label="💪 Ejercicios" 
+                    id="admin-tab-1"
+                    aria-controls="admin-tabpanel-1"
+                  />
+                  <Tab 
+                    label="👥 Usuarios" 
+                    id="admin-tab-2"
+                    aria-controls="admin-tabpanel-2"
+                  />
+                </Tabs>
+              </Box>
             </Box>
 
             {/* Tab Panels */}

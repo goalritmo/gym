@@ -297,6 +297,7 @@ export function AdminNotifications() {
 
       {/* Notifications List */}
       <Box sx={{ 
+        minHeight: '400px',
         maxHeight: '60vh', 
         overflowY: 'auto',
         pr: 1,
