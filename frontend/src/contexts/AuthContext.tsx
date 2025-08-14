@@ -10,6 +10,7 @@ type UserInfo = {
   user_metadata: Record<string, any>
   is_admin: boolean
   role: string
+  profile_name?: string
 }
 
 type AuthContextType = {
@@ -84,15 +85,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
             // No es crítico si falla, solo log
           }
           
-                              // Configurar usuario después del registro
-                    try {
-                      const userName = user.user_metadata?.name || user.user_metadata?.full_name
-                      await apiClient.setupUser(user.id, user.email || '', userName)
-                      console.log('Usuario configurado exitosamente')
-                    } catch (error) {
-                      console.log('Error configurando usuario:', error)
-                      // No es crítico si falla, solo log
-                    }
+          // Configurar usuario solo si no tiene perfil (usuario nuevo)
+          if (!userInfo.profile_name && !userInfo.is_admin) {
+            try {
+              const userName = user.user_metadata?.name || user.user_metadata?.full_name
+              await apiClient.setupUser(user.id, user.email || '', userName)
+              console.log('Usuario configurado exitosamente')
+            } catch (error) {
+              console.log('Error configurando usuario:', error)
+              // No es crítico si falla, solo log
+            }
+          }
         } catch (error) {
           console.error('Error fetching user info:', error)
           setIsAdmin(false)
