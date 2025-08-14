@@ -292,6 +292,10 @@ class ApiClient {
       body: exercise
     })
   }
+
+  async getAdminUsers() {
+    return this.request('/admin/users')
+  }
 }
 
 // Export singleton instance

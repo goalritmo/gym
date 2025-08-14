@@ -98,6 +98,7 @@ func main() {
 	api.HandleFunc("/admin/notifications/{id}/history", handlers.AdminMiddleware(handlers.GetNotificationHistoryHandler)).Methods("GET")
 	api.HandleFunc("/admin/exercises", handlers.AdminMiddleware(handlers.GetAdminExercisesHandler)).Methods("GET")
 	api.HandleFunc("/admin/exercises", handlers.AdminMiddleware(handlers.CreateExerciseHandler)).Methods("POST")
+	api.HandleFunc("/admin/users", handlers.AdminMiddleware(handlers.GetAdminUsersHandler)).Methods("GET")
 	
 
 

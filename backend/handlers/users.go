@@ -111,3 +111,73 @@ func GetUserStatsHandler(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(stats)
 }
+
+// AdminUser representa información de usuario para el panel de administrador
+type AdminUser struct {
+	ID        string  `json:"id"`
+	Email     *string `json:"email"`
+	Name      *string `json:"name"`
+	IsAdmin   bool    `json:"is_admin"`
+	CreatedAt string  `json:"created_at"`
+	LastLogin *string `json:"last_login"`
+}
+
+// GetAdminUsersHandler obtiene todos los usuarios para el panel de administrador
+func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Consultar todos los usuarios con información básica
+	query := `
+		SELECT 
+			u.id,
+			u.email,
+			COALESCE(up.name, 'Sin nombre') as name,
+			COALESCE(up.is_admin, false) as is_admin,
+			u.created_at,
+			u.last_sign_in_at
+		FROM auth.users u
+		LEFT JOIN user_profiles up ON u.id = up.user_id
+		WHERE u.email_confirmed_at IS NOT NULL
+		ORDER BY u.created_at DESC
+	`
+
+	rows, err := database.DB.Query(query)
+	if err != nil {
+		http.Error(w, "Error obteniendo usuarios", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var users []AdminUser
+	for rows.Next() {
+		var user AdminUser
+		var lastSignInAt *string
+		
+		err := rows.Scan(
+			&user.ID,
+			&user.Email,
+			&user.Name,
+			&user.IsAdmin,
+			&user.CreatedAt,
+			&lastSignInAt,
+		)
+		
+		if err != nil {
+			continue // Saltar usuarios con errores
+		}
+		
+		// Formatear last_login
+		if lastSignInAt != nil {
+			user.LastLogin = lastSignInAt
+		}
+		
+		users = append(users, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		http.Error(w, "Error procesando usuarios", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(users)
+}

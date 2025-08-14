@@ -13,6 +13,7 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material'
 import { AdminNotifications } from './AdminNotifications'
 import { AdminExercises } from './AdminExercises'
+import { AdminUsers } from './AdminUsers'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -141,6 +142,11 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
                   id="admin-tab-1"
                   aria-controls="admin-tabpanel-1"
                 />
+                <Tab 
+                  label="👥 Usuarios" 
+                  id="admin-tab-2"
+                  aria-controls="admin-tabpanel-2"
+                />
               </Tabs>
             </Box>
 
@@ -151,6 +157,9 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
               </TabPanel>
               <TabPanel value={activeTab} index={1}>
                 <AdminExercises />
+              </TabPanel>
+              <TabPanel value={activeTab} index={2}>
+                <AdminUsers />
               </TabPanel>
             </Box>
           </Box>
