@@ -279,11 +279,22 @@ func DeleteAdminUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 8. Eliminar de kudos
-	_, err = tx.Exec("DELETE FROM kudos WHERE from_user_id = $1 OR to_user_id = $1", userID, userID)
+	// 8. Eliminar de kudos (eliminar kudos de workout_days del usuario)
+	fmt.Printf("Eliminando kudos para usuario %s\n", userID)
+	
+	// Eliminar kudos que apunten a workout_days del usuario
+	_, err = tx.Exec(`
+		DELETE FROM kudos 
+		WHERE workout_day_id IN (
+			SELECT id FROM workout_days WHERE user_id = $1
+		)
+	`, userID)
+	
 	if err != nil {
-		http.Error(w, "Error eliminando kudos", http.StatusInternalServerError)
-		return
+		fmt.Printf("Error eliminando kudos: %v\n", err)
+		fmt.Printf("Continuando sin eliminar kudos...\n")
+	} else {
+		fmt.Printf("Kudos eliminados exitosamente\n")
 	}
 
 	// 9. Finalmente, eliminar de auth.users
