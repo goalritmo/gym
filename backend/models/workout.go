@@ -31,12 +31,12 @@ type Workout struct {
 
 // CreateWorkoutRequest representa la solicitud para crear un workout
 type CreateWorkoutRequest struct {
-	ExerciseID   int     `json:"exercise_id" validate:"required,gt=0"`
-	Weight       float64 `json:"weight" validate:"required,gt=0"`
-	Reps         int     `json:"reps" validate:"required,gt=0"`
-	Serie        *int    `json:"serie"`
-	Seconds      *int    `json:"seconds" validate:"omitempty,gt=0"`
-	Observations string  `json:"observations"`
+	ExerciseID   int      `json:"exercise_id" validate:"required,gt=0"`
+	Weight       *float64 `json:"weight" validate:"omitempty,gt=0"`
+	Reps         int      `json:"reps" validate:"required,gt=0"`
+	Serie        *int     `json:"serie"`
+	Seconds      *int     `json:"seconds" validate:"omitempty,gt=0"`
+	Observations string   `json:"observations"`
 }
 
 // UpdateWorkoutDayRequest representa la solicitud para actualizar un día de entrenamiento

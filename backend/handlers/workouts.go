@@ -188,12 +188,19 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("CreateWorkoutHandler: Request recibida - ExerciseID: %d, Weight: %f, Reps: %d\n", req.ExerciseID, req.Weight, req.Reps)
+	fmt.Printf("CreateWorkoutHandler: Request recibida - ExerciseID: %d, Weight: %v, Reps: %d\n", req.ExerciseID, req.Weight, req.Reps)
 
 	// Validaciones
-	if req.Weight <= 0 || req.Reps <= 0 {
-		fmt.Printf("Error: Validación fallida - Weight: %f, Reps: %d\n", req.Weight, req.Reps)
-		http.Error(w, "Peso y repeticiones deben ser mayores a 0", http.StatusBadRequest)
+	if req.Reps <= 0 {
+		fmt.Printf("Error: Validación fallida - Reps: %d\n", req.Reps)
+		http.Error(w, "Repeticiones deben ser mayores a 0", http.StatusBadRequest)
+		return
+	}
+	
+	// Validar peso si se proporciona
+	if req.Weight != nil && *req.Weight <= 0 {
+		fmt.Printf("Error: Validación fallida - Weight: %f\n", *req.Weight)
+		http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
 		return
 	}
 
@@ -262,7 +269,12 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	workout.UserID = userID
 	workout.WorkoutDayID = workoutDayID
 	workout.ExerciseID = req.ExerciseID
-	workout.Weight = req.Weight
+	// Manejar peso opcional
+	if req.Weight != nil {
+		workout.Weight = *req.Weight
+	} else {
+		workout.Weight = 0 // Valor por defecto cuando no se proporciona peso
+	}
 	workout.Reps = req.Reps
 	workout.Observations = req.Observations
 
@@ -272,10 +284,16 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		serieValue = *req.Serie
 	}
 
-	fmt.Printf("Insertando workout con workoutDayID: %d\n", workoutDayID)
+	// Obtener valor de peso de forma segura
+	var weightValue float64 = 0
+	if req.Weight != nil {
+		weightValue = *req.Weight
+	}
+	
+	fmt.Printf("Insertando workout con workoutDayID: %d, weight: %f\n", workoutDayID, weightValue)
 	err = database.DB.QueryRow(
 		query,
-		userID, workoutDayID, req.ExerciseID, req.Weight, req.Reps,
+		userID, workoutDayID, req.ExerciseID, weightValue, req.Reps,
 		serieValue, req.Seconds, req.Observations,
 	).Scan(&workout.ID, &workout.WorkoutDayID, &workout.CreatedAt)
 
