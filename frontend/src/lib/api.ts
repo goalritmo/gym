@@ -260,6 +260,21 @@ class ApiClient {
     })
   }
 
+  async updateAdminNotification(id: number, notification: {
+    title: string
+    message: string
+    type: 'info' | 'warning' | 'success' | 'error'
+  }) {
+    return this.request(`/admin/notifications/${id}`, {
+      method: 'PUT',
+      body: notification
+    })
+  }
+
+  async getNotificationHistory(id: number) {
+    return this.request(`/admin/notifications/${id}/history`)
+  }
+
   async getAdminExercises() {
     return this.request('/admin/exercises')
   }

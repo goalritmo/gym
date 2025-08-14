@@ -19,6 +19,8 @@ type AdminNotification struct {
 	Type        string    `json:"type"` // 'info', 'warning', 'success', 'error'
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedBy   string    `json:"created_by"`
+	UpdatedBy   string    `json:"updated_by"`
 }
 
 // AdminExercise representa un ejercicio para el panel de admin
@@ -38,6 +40,28 @@ type CreateNotificationRequest struct {
 	Title    string `json:"title"`
 	Message  string `json:"message"`
 	Type     string `json:"type"`
+}
+
+// UpdateNotificationRequest representa la solicitud para actualizar una notificación
+type UpdateNotificationRequest struct {
+	Title    string `json:"title"`
+	Message  string `json:"message"`
+	Type     string `json:"type"`
+}
+
+// NotificationHistory representa un registro en el historial de cambios
+type NotificationHistory struct {
+	ID          int       `json:"id"`
+	NotificationID int    `json:"notification_id"`
+	Action      string    `json:"action"` // 'created', 'updated'
+	OldTitle    *string   `json:"old_title"`
+	NewTitle    *string   `json:"new_title"`
+	OldMessage  *string   `json:"old_message"`
+	NewMessage  *string   `json:"new_message"`
+	OldType     *string   `json:"old_type"`
+	NewType     *string   `json:"new_type"`
+	ChangedBy   string    `json:"changed_by"`
+	ChangedAt   time.Time `json:"changed_at"`
 }
 
 // CreateExerciseRequest representa la solicitud para crear un ejercicio
@@ -88,9 +112,13 @@ func GetAdminNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		SELECT 
-			id, title, message, type, created_at, updated_at
-		FROM admin_notifications
-		ORDER BY created_at DESC
+			an.id, an.title, an.message, an.type, an.created_at, an.updated_at,
+			COALESCE(up_created.name, 'Usuario') as created_by,
+			COALESCE(up_updated.name, 'Usuario') as updated_by
+		FROM admin_notifications an
+		LEFT JOIN user_profiles up_created ON an.created_by = up_created.user_id
+		LEFT JOIN user_profiles up_updated ON an.updated_by = up_updated.user_id
+		ORDER BY an.created_at DESC
 	`
 
 	rows, err := database.DB.Query(query)
@@ -110,6 +138,8 @@ func GetAdminNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 			&notification.Type,
 			&notification.CreatedAt,
 			&notification.UpdatedAt,
+			&notification.CreatedBy,
+			&notification.UpdatedBy,
 		)
 		if err != nil {
 			http.Error(w, "Error escaneando notificación", http.StatusInternalServerError)
@@ -119,6 +149,187 @@ func GetAdminNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(notifications)
+}
+
+// UpdateAdminNotificationHandler actualiza una notificación del sistema
+func UpdateAdminNotificationHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "ID inválido", http.StatusBadRequest)
+		return
+	}
+
+	var req UpdateNotificationRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		return
+	}
+
+	// Validaciones
+	if req.Title == "" || req.Message == "" {
+		http.Error(w, "Título y mensaje son requeridos", http.StatusBadRequest)
+		return
+	}
+
+	// Iniciar transacción
+	tx, err := database.DB.Begin()
+	if err != nil {
+		http.Error(w, "Error iniciando transacción", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
+
+	// Obtener la notificación actual para el historial
+	var currentNotification AdminNotification
+	err = tx.QueryRow(`
+		SELECT id, title, message, type, created_at, updated_at
+		FROM admin_notifications WHERE id = $1
+	`, id).Scan(
+		&currentNotification.ID,
+		&currentNotification.Title,
+		&currentNotification.Message,
+		&currentNotification.Type,
+		&currentNotification.CreatedAt,
+		&currentNotification.UpdatedAt,
+	)
+	if err != nil {
+		http.Error(w, "Notificación no encontrada", http.StatusNotFound)
+		return
+	}
+
+	// Registrar en el historial
+	_, err = tx.Exec(`
+		INSERT INTO notification_history (
+			notification_id, action, old_title, new_title, old_message, new_message, 
+			old_type, new_type, changed_by, changed_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+	`, id, "updated", currentNotification.Title, req.Title, currentNotification.Message, req.Message,
+		currentNotification.Type, req.Type, userID, time.Now())
+	if err != nil {
+		http.Error(w, "Error registrando historial", http.StatusInternalServerError)
+		return
+	}
+
+	// Actualizar la notificación
+	_, err = tx.Exec(`
+		UPDATE admin_notifications 
+		SET title = $1, message = $2, type = $3, updated_at = $4, updated_by = $5
+		WHERE id = $6
+	`, req.Title, req.Message, req.Type, time.Now(), userID, id)
+	if err != nil {
+		http.Error(w, "Error actualizando notificación", http.StatusInternalServerError)
+		return
+	}
+
+	// Actualizar las notificaciones individuales
+	_, err = tx.Exec(`
+		UPDATE notifications 
+		SET title = $1, message = $2, updated_at = $3
+		WHERE data::jsonb->>'admin_notification_id' = $4
+	`, req.Title, req.Message, time.Now(), id)
+	if err != nil {
+		http.Error(w, "Error actualizando notificaciones individuales", http.StatusInternalServerError)
+		return
+	}
+
+	// Confirmar transacción
+	if err = tx.Commit(); err != nil {
+		http.Error(w, "Error confirmando transacción", http.StatusInternalServerError)
+		return
+	}
+
+	// Obtener la notificación actualizada
+	var updatedNotification AdminNotification
+	err = database.DB.QueryRow(`
+		SELECT 
+			an.id, an.title, an.message, an.type, an.created_at, an.updated_at,
+			COALESCE(up_created.name, 'Usuario') as created_by,
+			COALESCE(up_updated.name, 'Usuario') as updated_by
+		FROM admin_notifications an
+		LEFT JOIN user_profiles up_created ON an.created_by = up_created.user_id
+		LEFT JOIN user_profiles up_updated ON an.updated_by = up_updated.user_id
+		WHERE an.id = $1
+	`, id).Scan(
+		&updatedNotification.ID,
+		&updatedNotification.Title,
+		&updatedNotification.Message,
+		&updatedNotification.Type,
+		&updatedNotification.CreatedAt,
+		&updatedNotification.UpdatedAt,
+		&updatedNotification.CreatedBy,
+		&updatedNotification.UpdatedBy,
+	)
+	if err != nil {
+		http.Error(w, "Error obteniendo notificación actualizada", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(updatedNotification)
+}
+
+// GetNotificationHistoryHandler obtiene el historial de cambios de una notificación
+func GetNotificationHistoryHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "ID inválido", http.StatusBadRequest)
+		return
+	}
+
+	query := `
+		SELECT 
+			nh.id, nh.notification_id, nh.action, nh.old_title, nh.new_title,
+			nh.old_message, nh.new_message, nh.old_type, nh.new_type,
+			COALESCE(up.name, 'Usuario') as changed_by, nh.changed_at
+		FROM notification_history nh
+		LEFT JOIN user_profiles up ON nh.changed_by = up.user_id
+		WHERE nh.notification_id = $1
+		ORDER BY nh.changed_at DESC
+	`
+
+	rows, err := database.DB.Query(query, id)
+	if err != nil {
+		http.Error(w, "Error obteniendo historial", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var history []NotificationHistory
+	for rows.Next() {
+		var record NotificationHistory
+		err := rows.Scan(
+			&record.ID,
+			&record.NotificationID,
+			&record.Action,
+			&record.OldTitle,
+			&record.NewTitle,
+			&record.OldMessage,
+			&record.NewMessage,
+			&record.OldType,
+			&record.NewType,
+			&record.ChangedBy,
+			&record.ChangedAt,
+		)
+		if err != nil {
+			http.Error(w, "Error escaneando historial", http.StatusInternalServerError)
+			return
+		}
+		history = append(history, record)
+	}
+
+	json.NewEncoder(w).Encode(history)
 }
 
 // DeleteAdminNotificationHandler elimina una notificación del sistema
@@ -187,6 +398,12 @@ func DeleteAdminNotificationHandler(w http.ResponseWriter, r *http.Request) {
 func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
+
 	var req CreateNotificationRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Error decodificando solicitud", http.StatusBadRequest)
@@ -215,13 +432,13 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Crear la notificación del sistema
 	adminQuery := `
-		INSERT INTO admin_notifications (title, message, type)
-		VALUES ($1, $2, $3)
+		INSERT INTO admin_notifications (title, message, type, created_by, updated_by)
+		VALUES ($1, $2, $3, $4, $4)
 		RETURNING id, created_at, updated_at
 	`
 
 	var notification AdminNotification
-	err = tx.QueryRow(adminQuery, req.Title, req.Message, req.Type).Scan(
+	err = tx.QueryRow(adminQuery, req.Title, req.Message, req.Type, userID).Scan(
 		&notification.ID,
 		&notification.CreatedAt,
 		&notification.UpdatedAt,
@@ -229,6 +446,17 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, "Error creando notificación del sistema", http.StatusInternalServerError)
+		return
+	}
+
+	// Registrar en el historial
+	_, err = tx.Exec(`
+		INSERT INTO notification_history (
+			notification_id, action, new_title, new_message, new_type, changed_by, changed_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`, notification.ID, "created", req.Title, req.Message, req.Type, userID, time.Now())
+	if err != nil {
+		http.Error(w, "Error registrando historial", http.StatusInternalServerError)
 		return
 	}
 

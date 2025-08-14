@@ -26,7 +26,9 @@ import {
   CheckCircle as SuccessIcon,
   Error as ErrorIcon,
   Delete as DeleteIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  Edit as EditIcon,
+  History as HistoryIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 
@@ -37,6 +39,22 @@ type AdminNotification = {
   type: 'info' | 'warning' | 'success' | 'error'
   created_at: string
   updated_at: string
+  created_by: string
+  updated_by: string
+}
+
+type NotificationHistory = {
+  id: number
+  notification_id: number
+  action: 'created' | 'updated'
+  old_title?: string
+  new_title?: string
+  old_message?: string
+  new_message?: string
+  old_type?: string
+  new_type?: string
+  changed_by: string
+  changed_at: string
 }
 
 type CreateNotificationForm = {
@@ -63,6 +81,11 @@ export function AdminNotifications() {
   const [deleting, setDeleting] = useState<number | null>(null)
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; id: number | null }>({ show: false, id: null })
   const [filterText, setFilterText] = useState('')
+  const [editingNotification, setEditingNotification] = useState<AdminNotification | null>(null)
+  const [updating, setUpdating] = useState(false)
+  const [historyModal, setHistoryModal] = useState<{ show: boolean; notificationId: number | null }>({ show: false, notificationId: null })
+  const [history, setHistory] = useState<NotificationHistory[]>([])
+  const [loadingHistory, setLoadingHistory] = useState(false)
   const [form, setForm] = useState<CreateNotificationForm>({
     title: '',
     message: '',
@@ -154,6 +177,57 @@ export function AdminNotifications() {
 
   const handleCancelDelete = () => {
     setDeleteConfirmation({ show: false, id: null })
+  }
+
+  const handleEditClick = (notification: AdminNotification) => {
+    setEditingNotification(notification)
+  }
+
+  const handleUpdateNotification = async () => {
+    if (!editingNotification) return
+
+    try {
+      setUpdating(true)
+      const updatedNotification = await apiClient.updateAdminNotification(editingNotification.id, {
+        title: editingNotification.title,
+        message: editingNotification.message,
+        type: editingNotification.type
+      })
+      
+      // Actualizar la lista local
+      setNotifications(prev => 
+        prev.map(n => n.id === editingNotification.id ? updatedNotification as AdminNotification : n)
+      )
+      setEditingNotification(null)
+    } catch (error) {
+      console.error('Error actualizando notificación:', error)
+      setError('Error al actualizar la notificación')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setEditingNotification(null)
+  }
+
+  const handleViewHistory = async (notificationId: number) => {
+    try {
+      setLoadingHistory(true)
+      const historyData = await apiClient.getNotificationHistory(notificationId)
+      setHistory(historyData as NotificationHistory[])
+      setHistoryModal({ show: true, notificationId })
+    } catch (error) {
+      console.error('Error cargando historial:', error)
+      setError('Error al cargar el historial')
+    } finally {
+      setLoadingHistory(false)
+    }
+  }
+
+  const handleCloseHistory = () => {
+    setHistoryModal({ show: false, notificationId: null })
+    setHistory([])
   }
 
   if (loading) {
@@ -279,26 +353,69 @@ export function AdminNotifications() {
                         ` • Actualizada: ${formatDate(notification.updated_at)}`
                       }
                     </Typography>
+                    
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                      Creada por: {notification.created_by}
+                      {notification.updated_by !== notification.created_by && 
+                        ` • Actualizada por: ${notification.updated_by}`
+                      }
+                    </Typography>
                   </Box>
 
-                  {/* Delete Button */}
-                  <IconButton
-                    onClick={() => handleDeleteClick(notification.id)}
-                    disabled={deleting === notification.id}
-                    sx={{
-                      color: 'error.main',
-                      '&:hover': {
-                        backgroundColor: 'error.light',
-                        color: 'white'
-                      }
-                    }}
-                  >
-                    {deleting === notification.id ? (
-                      <CircularProgress size={20} />
-                    ) : (
-                      <DeleteIcon />
-                    )}
-                  </IconButton>
+                  {/* Action Buttons */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <IconButton
+                      onClick={() => handleViewHistory(notification.id)}
+                      disabled={loadingHistory}
+                      size="small"
+                      sx={{
+                        color: 'info.main',
+                        '&:hover': {
+                          backgroundColor: 'info.light',
+                          color: 'white'
+                        }
+                      }}
+                    >
+                      {loadingHistory ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        <HistoryIcon />
+                      )}
+                    </IconButton>
+                    
+                    <IconButton
+                      onClick={() => handleEditClick(notification)}
+                      size="small"
+                      sx={{
+                        color: 'primary.main',
+                        '&:hover': {
+                          backgroundColor: 'primary.light',
+                          color: 'white'
+                        }
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+
+                    <IconButton
+                      onClick={() => handleDeleteClick(notification.id)}
+                      disabled={deleting === notification.id}
+                      size="small"
+                      sx={{
+                        color: 'error.main',
+                        '&:hover': {
+                          backgroundColor: 'error.light',
+                          color: 'white'
+                        }
+                      }}
+                    >
+                      {deleting === notification.id ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        <DeleteIcon />
+                      )}
+                    </IconButton>
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
@@ -451,6 +568,167 @@ export function AdminNotifications() {
             }}
           >
             {deleting !== null ? 'Eliminando...' : 'Eliminar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modal de edición */}
+      <Dialog
+        open={!!editingNotification}
+        onClose={handleCancelEdit}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 2 }
+        }}
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1,
+          fontWeight: 'bold'
+        }}>
+          <EditIcon sx={{ color: 'primary.main' }} />
+          Editar Notificación
+        </DialogTitle>
+        
+        <DialogContent>
+          <Stack spacing={3} sx={{ mt: 1 }}>
+            <TextField
+              label="Título"
+              value={editingNotification?.title || ''}
+              onChange={(e) => setEditingNotification(prev => prev ? { ...prev, title: e.target.value } : null)}
+              fullWidth
+              required
+              placeholder="Ej: Mantenimiento programado"
+            />
+
+            <TextField
+              label="Mensaje"
+              value={editingNotification?.message || ''}
+              onChange={(e) => setEditingNotification(prev => prev ? { ...prev, message: e.target.value } : null)}
+              fullWidth
+              required
+              multiline
+              rows={4}
+              placeholder="Describe el mensaje de la notificación..."
+            />
+
+            <FormControl fullWidth>
+              <InputLabel>Tipo de Notificación</InputLabel>
+              <Select
+                value={editingNotification?.type || 'info'}
+                onChange={(e) => setEditingNotification(prev => prev ? { ...prev, type: e.target.value as any } : null)}
+                label="Tipo de Notificación"
+              >
+                <MenuItem value="info">Información</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button 
+            onClick={handleCancelEdit}
+            disabled={updating}
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleUpdateNotification}
+            disabled={updating || !editingNotification?.title.trim() || !editingNotification?.message.trim()}
+            startIcon={updating ? <CircularProgress size={16} /> : undefined}
+          >
+            {updating ? 'Actualizando...' : 'Confirmar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modal de historial */}
+      <Dialog
+        open={historyModal.show}
+        onClose={handleCloseHistory}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 2 }
+        }}
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1,
+          fontWeight: 'bold'
+        }}>
+          <HistoryIcon sx={{ color: 'info.main' }} />
+          Historial de Cambios
+        </DialogTitle>
+        
+        <DialogContent>
+          {loadingHistory ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress size={40} />
+            </Box>
+          ) : history.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="body1" color="text.secondary">
+                No hay historial de cambios disponible
+              </Typography>
+            </Box>
+          ) : (
+            <Stack spacing={2} sx={{ mt: 1 }}>
+              {history.map((record) => (
+                <Card key={record.id} sx={{ border: '1px solid', borderColor: 'divider' }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        {record.action === 'created' ? 'Creada' : 'Actualizada'}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        por {record.changed_by}
+                      </Typography>
+                    </Box>
+                    
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                      {formatDate(record.changed_at)}
+                    </Typography>
+
+                    {record.action === 'updated' && (
+                      <Box sx={{ mt: 2 }}>
+                        {record.old_title !== record.new_title && (
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Título:</strong> {record.old_title} → {record.new_title}
+                            </Typography>
+                          </Box>
+                        )}
+                        {record.old_message !== record.new_message && (
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Mensaje:</strong> {record.old_message} → {record.new_message}
+                            </Typography>
+                          </Box>
+                        )}
+                        {record.old_type !== record.new_type && (
+                          <Box>
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Tipo:</strong> {record.old_type} → {record.new_type}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button onClick={handleCloseHistory}>
+            Cerrar
           </Button>
         </DialogActions>
       </Dialog>
