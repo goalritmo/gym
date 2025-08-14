@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/goalritmo/gym/backend/database"
+	"github.com/gorilla/mux"
 )
 
 // AdminNotification representa una notificación del administrador

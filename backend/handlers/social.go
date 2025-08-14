@@ -215,6 +215,15 @@ func GiveKudosHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Obtener el user_id del workout para la notificación
+	var workoutUserID string
+	err = database.DB.QueryRow("SELECT user_id FROM workout_days WHERE id = $1", workoutID).Scan(&workoutUserID)
+	if err != nil {
+		fmt.Printf("Error obteniendo user_id del workout: %v\n", err)
+		http.Error(w, "Error interno del servidor", http.StatusInternalServerError)
+		return
+	}
+
 	// Insertar el kudos
 	_, err = database.DB.Exec("INSERT INTO kudos (user_id, workout_day_id) VALUES ($1, $2)", userID, workoutID)
 	if err != nil {
@@ -224,6 +233,12 @@ func GiveKudosHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Printf("Kudos insertado exitosamente para usuario %s en workout %d\n", userID, workoutID)
+
+	// Crear notificación de kudos (solo si no es el mismo usuario)
+	if userID != workoutUserID {
+		// Llamar internamente a la función de notificación
+		createKudosNotification(workoutID, userID, workoutUserID)
+	}
 
 	response := map[string]interface{}{
 		"success": true,
@@ -399,4 +414,187 @@ func FixTriggersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(response)
+}
+
+// createKudosNotification crea una notificación de kudos internamente
+func createKudosNotification(workoutDayID int, fromUserID, toUserID string) {
+	// Verificar que el usuario que da kudos existe
+	var fromUserName string
+	err := database.DB.QueryRow("SELECT COALESCE(up.name, u.email) FROM auth.users u LEFT JOIN user_profiles up ON u.id = up.user_id WHERE u.id = $1", fromUserID).Scan(&fromUserName)
+	if err != nil {
+		fmt.Printf("Error obteniendo nombre del usuario que da kudos: %v\n", err)
+		return
+	}
+
+	// Verificar que existe el workout day
+	var workoutDate time.Time
+	err = database.DB.QueryRow("SELECT created_at FROM workout_days WHERE id = $1 AND user_id = $2", workoutDayID, toUserID).Scan(&workoutDate)
+	if err != nil {
+		fmt.Printf("Error obteniendo fecha del workout: %v\n", err)
+		return
+	}
+
+	// Buscar si ya existe una notificación de kudos para este workout
+	var existingNotificationID int
+	var existingData map[string]interface{}
+	
+	checkQuery := `
+		SELECT id, data 
+		FROM notifications 
+		WHERE user_id = $1 AND type = 'kudos' AND data::jsonb->>'workout_day_id' = $2
+	`
+	
+	err = database.DB.QueryRow(checkQuery, toUserID, fmt.Sprintf("%d", workoutDayID)).Scan(&existingNotificationID, &existingData)
+	
+	if err != nil {
+		// No existe notificación, crear una nueva
+		notificationData := map[string]interface{}{
+			"workout_day_id": workoutDayID,
+			"from_users": []map[string]interface{}{
+				{
+					"id":   fromUserID,
+					"name": fromUserName,
+				},
+			},
+			"workout_date": workoutDate.Format("2006-01-02"),
+		}
+		
+		dataJSON, _ := json.Marshal(notificationData)
+		
+		insertQuery := `
+			INSERT INTO notifications (user_id, type, title, message, data, created_at)
+			VALUES ($1, $2, $3, $4, $5, $6)
+			RETURNING id
+		`
+		
+		var notificationID int
+		err = database.DB.QueryRow(
+			insertQuery,
+			toUserID,
+			"kudos",
+			"¡Felicidades! 🎉",
+			fmt.Sprintf("Recibiste kudos de %s por tu entrenamiento del %s", fromUserName, formatDate(workoutDate)),
+			string(dataJSON),
+			time.Now(),
+		).Scan(&notificationID)
+		
+		if err != nil {
+			fmt.Printf("Error creando notificación de kudos: %v\n", err)
+			return
+		}
+		
+		fmt.Printf("Notificación de kudos creada con ID %d\n", notificationID)
+		
+	} else {
+		// Existe notificación, actualizarla
+		var currentData map[string]interface{}
+		if existingData != nil {
+			currentData = existingData
+		} else {
+			currentData = make(map[string]interface{})
+		}
+		
+		// Obtener usuarios existentes
+		fromUsers, ok := currentData["from_users"].([]interface{})
+		if !ok {
+			fromUsers = []interface{}{}
+		}
+		
+		// Verificar si el usuario ya dio kudos
+		userAlreadyExists := false
+		for _, user := range fromUsers {
+			if userMap, ok := user.(map[string]interface{}); ok {
+				if userMap["id"] == fromUserID {
+					userAlreadyExists = true
+					break
+				}
+			}
+		}
+		
+		if !userAlreadyExists {
+			// Agregar nuevo usuario
+			fromUsers = append(fromUsers, map[string]interface{}{
+				"id":   fromUserID,
+				"name": fromUserName,
+			})
+			
+			currentData["from_users"] = fromUsers
+			
+			// Actualizar mensaje
+			userNames := make([]string, len(fromUsers))
+			for i, user := range fromUsers {
+				if userMap, ok := user.(map[string]interface{}); ok {
+					userNames[i] = userMap["name"].(string)
+				}
+			}
+			
+			message := fmt.Sprintf("Recibiste kudos de %s por tu entrenamiento del %s", formatUserList(userNames), formatDate(workoutDate))
+			
+			dataJSON, _ := json.Marshal(currentData)
+			
+			updateQuery := `
+				UPDATE notifications 
+				SET message = $1, data = $2, updated_at = $3
+				WHERE id = $4
+			`
+			
+			_, err = database.DB.Exec(updateQuery, message, string(dataJSON), time.Now(), existingNotificationID)
+			if err != nil {
+				fmt.Printf("Error actualizando notificación de kudos: %v\n", err)
+				return
+			}
+			
+			fmt.Printf("Notificación de kudos actualizada con ID %d\n", existingNotificationID)
+		}
+	}
+}
+
+// formatDate formatea una fecha en español
+func formatDate(date time.Time) string {
+	weekdays := []string{"Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"}
+	months := []string{"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"}
+	
+	weekday := weekdays[date.Weekday()]
+	day := date.Day()
+	month := months[date.Month()-1]
+	
+	return fmt.Sprintf("%s %d de %s", weekday, day, month)
+}
+
+// formatUserList formatea una lista de nombres de usuarios
+func formatUserList(names []string) string {
+	if len(names) == 0 {
+		return ""
+	}
+	if len(names) == 1 {
+		return names[0]
+	}
+	if len(names) == 2 {
+		return fmt.Sprintf("%s y %s", names[0], names[1])
+	}
+	
+	// Para 3 o más usuarios: "Nadia, Gonzalo y María"
+	last := names[len(names)-1]
+	others := names[:len(names)-1]
+	
+	return fmt.Sprintf("%s y %s", formatList(others), last)
+}
+
+// formatList formatea una lista con comas
+func formatList(items []string) string {
+	if len(items) == 0 {
+		return ""
+	}
+	if len(items) == 1 {
+		return items[0]
+	}
+	
+	result := ""
+	for i, item := range items {
+		if i > 0 {
+			result += ", "
+		}
+		result += item
+	}
+	return result
 }
