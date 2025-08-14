@@ -150,7 +150,7 @@ export function AdminNotifications() {
   }
 
   // Filtrar notificaciones por título o mensaje
-  const filteredNotifications = notifications.filter(notification =>
+  const filteredNotifications = (notifications || []).filter(notification =>
     notification.title.toLowerCase().includes(filterText.toLowerCase()) ||
     notification.message.toLowerCase().includes(filterText.toLowerCase())
   )
@@ -214,12 +214,14 @@ export function AdminNotifications() {
   const handleViewHistory = async (notificationId: number) => {
     try {
       setLoadingHistory(true)
+      setError('') // Limpiar errores anteriores
       const historyData = await apiClient.getNotificationHistory(notificationId)
-      setHistory(historyData as NotificationHistory[])
+      setHistory(Array.isArray(historyData) ? historyData : [])
       setHistoryModal({ show: true, notificationId })
     } catch (error) {
       console.error('Error cargando historial:', error)
       setError('Error al cargar el historial')
+      setHistory([]) // Asegurar que history sea un array vacío en caso de error
     } finally {
       setLoadingHistory(false)
     }
@@ -348,16 +350,9 @@ export function AdminNotifications() {
                     </Typography>
 
                     <Typography variant="caption" color="text.secondary">
-                      {formatDate(notification.created_at)}
-                      {notification.updated_at !== notification.created_at && 
-                        ` • Actualizada: ${formatDate(notification.updated_at)}`
-                      }
-                    </Typography>
-                    
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                      Creada por: {notification.created_by}
-                      {notification.updated_by !== notification.created_by && 
-                        ` • Actualizada por: ${notification.updated_by}`
+                      {notification.updated_at !== notification.created_at 
+                        ? `Actualizada el ${formatDate(notification.updated_at)} por ${notification.updated_by}`
+                        : `Creada el ${formatDate(notification.created_at)} por ${notification.created_by}`
                       }
                     </Typography>
                   </Box>
@@ -617,8 +612,8 @@ export function AdminNotifications() {
             <FormControl fullWidth>
               <InputLabel>Tipo de Notificación</InputLabel>
               <Select
-                value={editingNotification?.type || 'info'}
-                onChange={(e) => setEditingNotification(prev => prev ? { ...prev, type: e.target.value as any } : null)}
+                value="info"
+                disabled
                 label="Tipo de Notificación"
               >
                 <MenuItem value="info">Información</MenuItem>
@@ -670,7 +665,7 @@ export function AdminNotifications() {
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <CircularProgress size={40} />
             </Box>
-          ) : history.length === 0 ? (
+          ) : !history || history.length === 0 ? (
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <Typography variant="body1" color="text.secondary">
                 No hay historial de cambios disponible
@@ -678,7 +673,7 @@ export function AdminNotifications() {
             </Box>
           ) : (
             <Stack spacing={2} sx={{ mt: 1 }}>
-              {history.map((record) => (
+              {history?.map((record) => (
                 <Card key={record.id} sx={{ border: '1px solid', borderColor: 'divider' }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>

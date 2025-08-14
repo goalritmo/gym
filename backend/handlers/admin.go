@@ -113,8 +113,8 @@ func GetAdminNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 	query := `
 		SELECT 
 			an.id, an.title, an.message, an.type, an.created_at, an.updated_at,
-			COALESCE(up_created.name, 'Usuario') as created_by,
-			COALESCE(up_updated.name, 'Usuario') as updated_by
+			COALESCE(up_created.name, 'Supabase') as created_by,
+			COALESCE(up_updated.name, 'Supabase') as updated_by
 		FROM admin_notifications an
 		LEFT JOIN user_profiles up_created ON an.created_by = up_created.user_id
 		LEFT JOIN user_profiles up_updated ON an.updated_by = up_updated.user_id
@@ -252,8 +252,8 @@ func UpdateAdminNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	err = database.DB.QueryRow(`
 		SELECT 
 			an.id, an.title, an.message, an.type, an.created_at, an.updated_at,
-			COALESCE(up_created.name, 'Usuario') as created_by,
-			COALESCE(up_updated.name, 'Usuario') as updated_by
+			COALESCE(up_created.name, 'Supabase') as created_by,
+			COALESCE(up_updated.name, 'Supabase') as updated_by
 		FROM admin_notifications an
 		LEFT JOIN user_profiles up_created ON an.created_by = up_created.user_id
 		LEFT JOIN user_profiles up_updated ON an.updated_by = up_updated.user_id
@@ -292,7 +292,7 @@ func GetNotificationHistoryHandler(w http.ResponseWriter, r *http.Request) {
 		SELECT 
 			nh.id, nh.notification_id, nh.action, nh.old_title, nh.new_title,
 			nh.old_message, nh.new_message, nh.old_type, nh.new_type,
-			COALESCE(up.name, 'Usuario') as changed_by, nh.changed_at
+			COALESCE(up.name, 'Supabase') as changed_by, nh.changed_at
 		FROM notification_history nh
 		LEFT JOIN user_profiles up ON nh.changed_by = up.user_id
 		WHERE nh.notification_id = $1
