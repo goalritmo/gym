@@ -301,6 +301,27 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	fmt.Printf("GetAdminExercisesHandler: Iniciando consulta de ejercicios\n")
+
+	// Primero verificar si la tabla existe
+	var tableExists bool
+	err := database.DB.QueryRow("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'exercises')").Scan(&tableExists)
+	if err != nil {
+		fmt.Printf("Error verificando existencia de tabla exercises: %v\n", err)
+		http.Error(w, "Error verificando estructura de base de datos", http.StatusInternalServerError)
+		return
+	}
+
+	if !tableExists {
+		fmt.Printf("Tabla 'exercises' no existe\n")
+		// Devolver array vacío en lugar de error
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode([]AdminExercise{})
+		return
+	}
+
+	fmt.Printf("Tabla 'exercises' existe, procediendo con consulta\n")
+
 	query := `
 		SELECT 
 			id, name, muscle_group, equipment_id, video_url, created_at
@@ -310,12 +331,14 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := database.DB.Query(query)
 	if err != nil {
+		fmt.Printf("Error en consulta SQL: %v\n", err)
 		http.Error(w, "Error obteniendo ejercicios", http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
 	var exercises []AdminExercise
+	count := 0
 	for rows.Next() {
 		var exercise AdminExercise
 		var equipmentID *int
@@ -329,6 +352,7 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 			&exercise.CreatedAt,
 		)
 		if err != nil {
+			fmt.Printf("Error escaneando ejercicio %d: %v\n", count+1, err)
 			http.Error(w, "Error escaneando ejercicio", http.StatusInternalServerError)
 			return
 		}
@@ -345,7 +369,10 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 		exercise.SecondaryMuscles = []string{}
 		
 		exercises = append(exercises, exercise)
+		count++
 	}
+
+	fmt.Printf("Se escanearon %d ejercicios exitosamente\n", count)
 
 	json.NewEncoder(w).Encode(exercises)
 }
