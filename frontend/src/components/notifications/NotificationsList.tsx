@@ -19,6 +19,7 @@ import {
   Celebration
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
+import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 type NotificationType = 'general' | 'kudos' | 'announcement' | 'welcome'
 
@@ -44,13 +45,14 @@ type Notification = {
 }
 
 export default function NotificationsList() {
+  const { settings } = useUserSettings()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
     loadNotifications()
-  }, [])
+  }, [settings.showOwnWorkoutsInSocial, settings.uncNotificationsEnabled])
 
   const loadNotifications = async () => {
     setIsLoading(true)
@@ -68,6 +70,7 @@ export default function NotificationsList() {
       
       // Combinar y transformar las notificaciones
       const allNotifications: Notification[] = [
+        // Notificaciones del usuario (filtradas por configuración)
         ...(userNotifications || []).map((notif: any) => {
           console.log('Transformando notificación del usuario:', notif)
           return {
@@ -79,7 +82,14 @@ export default function NotificationsList() {
             read: notif.is_read || false,
             priority: notif.priority || 'medium'
           }
+        }).filter((notif: Notification) => {
+          // Ocultar notificaciones de kudos si el social está deshabilitado
+          if (notif.type === 'kudos' && !settings.showOwnWorkoutsInSocial) {
+            return false
+          }
+          return true
         }),
+        // Notificaciones del sistema (filtradas por configuración)
         ...(systemNotifications || []).map((notif: any) => {
           console.log('Transformando notificación del sistema:', notif)
           return {
@@ -91,6 +101,12 @@ export default function NotificationsList() {
             read: notif.read || false,
             priority: notif.priority || 'medium'
           }
+        }).filter((notif: Notification) => {
+          // Ocultar notificaciones del sistema si están deshabilitadas
+          if (notif.type === 'announcement' && !settings.uncNotificationsEnabled) {
+            return false
+          }
+          return true
         })
       ]
       

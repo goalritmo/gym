@@ -191,31 +191,29 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
           </MenuItem>
         )}
 
-        {/* Opción de notificaciones - solo se muestra si están habilitadas */}
-        {settings.uncNotificationsEnabled && (
-          <MenuItem onClick={handleOpenNotifications}>
-            <ListItemIcon>
-              <Badge 
-                badgeContent={unreadNotifications} 
-                sx={{
-                  '& .MuiBadge-badge': {
-                    fontSize: '0.6rem',
-                    minWidth: '16px',
-                    height: '16px',
-                    backgroundColor: '#ff9800',
-                    color: 'white'
-                  }
-                }}
-                invisible={unreadNotifications === 0}
-              >
-                <NotificationsIcon fontSize="small" />
-              </Badge>
-            </ListItemIcon>
-            <ListItemText>
-              Notificaciones
-            </ListItemText>
-          </MenuItem>
-        )}
+        {/* Opción de notificaciones - siempre visible */}
+        <MenuItem onClick={handleOpenNotifications}>
+          <ListItemIcon>
+            <Badge 
+              badgeContent={unreadNotifications} 
+              sx={{
+                '& .MuiBadge-badge': {
+                  fontSize: '0.6rem',
+                  minWidth: '16px',
+                  height: '16px',
+                  backgroundColor: '#ff9800',
+                  color: 'white'
+                }
+              }}
+              invisible={unreadNotifications === 0}
+            >
+              <NotificationsIcon fontSize="small" />
+            </Badge>
+          </ListItemIcon>
+          <ListItemText>
+            Notificaciones
+          </ListItemText>
+        </MenuItem>
 
         {/* Opción de configuración */}
         <MenuItem onClick={handleOpenSettings}>

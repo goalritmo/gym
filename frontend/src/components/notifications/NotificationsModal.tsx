@@ -26,6 +26,7 @@ import {
   Celebration
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
+import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 type NotificationType = 'general' | 'kudos' | 'announcement' | 'workout_created' | 'welcome'
 
@@ -59,6 +60,7 @@ type NotificationsModalProps = {
 }
 
 export default function NotificationsModal({ open, onClose, onMarkAsRead }: NotificationsModalProps) {
+  const { settings } = useUserSettings()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -67,7 +69,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     if (open) {
       loadNotifications()
     }
-  }, [open])
+  }, [open, settings.showOwnWorkoutsInSocial, settings.uncNotificationsEnabled])
 
   const loadNotifications = async () => {
     setIsLoading(true)
@@ -75,7 +77,21 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     
     try {
       const notificationsData = await apiClient.getNotifications() as Notification[]
-      setNotifications(notificationsData || [])
+      
+      // Filtrar notificaciones basándose en la configuración del usuario
+      const filteredNotifications = (notificationsData || []).filter((notif: Notification) => {
+        // Ocultar notificaciones de kudos si el social está deshabilitado
+        if (notif.type === 'kudos' && !settings.showOwnWorkoutsInSocial) {
+          return false
+        }
+        // Ocultar notificaciones del sistema si están deshabilitadas
+        if (notif.type === 'announcement' && !settings.uncNotificationsEnabled) {
+          return false
+        }
+        return true
+      })
+      
+      setNotifications(filteredNotifications)
     } catch (error) {
       console.error('Error cargando notificaciones:', error)
       setError('Error al cargar las notificaciones')
