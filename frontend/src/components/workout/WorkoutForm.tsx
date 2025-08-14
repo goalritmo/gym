@@ -16,7 +16,7 @@ type Exercise = {
 // Esquema de validación con Zod
 const workoutFormSchema = z.object({
   exercise_id: z.coerce.number().refine(val => val > 0, ' '),
-  weight: z.coerce.number().refine(val => val > 0 && val <= 1000, ' '), // Máximo 1000 kg
+  weight: z.coerce.number().refine(val => val > 0 && val <= 1000, ' ').optional(), // Máximo 1000 kg, opcional
   reps: z.coerce.number().int().refine(val => val > 0 && val <= 100, ' '), // Máximo 100 reps
   serie: z.coerce.number().int().min(1, ' '),
   seconds: z.coerce.number().min(0).max(3600).optional(), // Máximo 1 hora (3600 segundos)
@@ -84,6 +84,11 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       case 'weight':
         maxLimit = 1000
         minLimit = 0.1
+        // Permitir valores vacíos para peso opcional
+        if (value === '') {
+          setValue(field, '')
+          return
+        }
         break
       case 'reps':
         maxLimit = 100
