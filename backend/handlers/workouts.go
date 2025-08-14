@@ -212,7 +212,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Printf("Ejercicio verificado correctamente\n")
 
-	// Obtener fecha actual en Argentina
+	// Obtener fecha actual en zona horaria de Argentina
 	argentinaLocation, err := time.LoadLocation("America/Argentina/Buenos_Aires")
 	if err != nil {
 		argentinaLocation = time.FixedZone("UTC-3", -3*60*60)
@@ -222,6 +222,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	var workoutDayID int
 
+	fmt.Printf("🔍 DEBUG: Fecha actual en Argentina: %s\n", now.Format("2006-01-02 15:04:05"))
 	fmt.Printf("🔍 DEBUG: Buscando día de entrenamiento para fecha: %s, userID: %s\n", today, userID)
 
 	// Verificar si ya existe un día de entrenamiento para hoy
