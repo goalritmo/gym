@@ -146,7 +146,7 @@ export function AdminNotifications() {
     const hours = date.getHours().toString().padStart(2, '0')
     const minutes = date.getMinutes().toString().padStart(2, '0')
     
-    return `Creada el ${weekday} ${day} de ${month} a las ${hours}:${minutes}`
+    return `${weekday} ${day} de ${month} a las ${hours}:${minutes}`
   }
 
   // Filtrar notificaciones por título o mensaje
@@ -371,7 +371,7 @@ export function AdminNotifications() {
                         }
                       }}
                     >
-                      {loadingHistory ? (
+                      {loadingHistory && historyModal.notificationId === notification.id ? (
                         <CircularProgress size={16} />
                       ) : (
                         <HistoryIcon />
@@ -672,52 +672,72 @@ export function AdminNotifications() {
               </Typography>
             </Box>
           ) : (
-            <Stack spacing={2} sx={{ mt: 1 }}>
-              {history?.map((record) => (
-                <Card key={record.id} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                        {record.action === 'created' ? 'Creada' : 'Actualizada'}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        por {record.changed_by}
-                      </Typography>
-                    </Box>
-                    
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                      {formatDate(record.changed_at)}
-                    </Typography>
-
-                    {record.action === 'updated' && (
-                      <Box sx={{ mt: 2 }}>
-                        {record.old_title !== record.new_title && (
-                          <Box sx={{ mb: 1 }}>
-                            <Typography variant="body2" color="text.secondary">
-                              <strong>Título:</strong> {record.old_title} → {record.new_title}
-                            </Typography>
-                          </Box>
-                        )}
-                        {record.old_message !== record.new_message && (
-                          <Box sx={{ mb: 1 }}>
-                            <Typography variant="body2" color="text.secondary">
-                              <strong>Mensaje:</strong> {record.old_message} → {record.new_message}
-                            </Typography>
-                          </Box>
-                        )}
-                        {record.old_type !== record.new_type && (
-                          <Box>
-                            <Typography variant="body2" color="text.secondary">
-                              <strong>Tipo:</strong> {record.old_type} → {record.new_type}
-                            </Typography>
-                          </Box>
-                        )}
+            <Box sx={{ maxHeight: '400px', overflowY: 'auto' }}>
+              <Stack spacing={2} sx={{ mt: 1 }}>
+                {history?.map((record) => (
+                  <Card key={record.id} sx={{ border: '1px solid', borderColor: 'divider' }}>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          {record.action === 'created' ? 'Creada' : 'Actualizada'}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          por {record.changed_by}
+                        </Typography>
                       </Box>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </Stack>
+                      
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                        {formatDate(record.changed_at)}
+                      </Typography>
+
+                      {record.action === 'updated' && (
+                        <Box sx={{ mt: 2 }}>
+                          {record.old_title !== record.new_title && (
+                            <Box sx={{ mb: 2 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                                Se editó el Título
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                                Antes: {record.old_title}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                                Después: {record.new_title}
+                              </Typography>
+                            </Box>
+                          )}
+                          {record.old_message !== record.new_message && (
+                            <Box sx={{ mb: 2 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                                Se editó el Mensaje
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                                Antes: {record.old_message}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                                Después: {record.new_message}
+                              </Typography>
+                            </Box>
+                          )}
+                          {record.old_type !== record.new_type && (
+                            <Box sx={{ mb: 2 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                                Se editó el Tipo
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                                Antes: {record.old_type}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                                Después: {record.new_type}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </Stack>
+            </Box>
           )}
         </DialogContent>
 
