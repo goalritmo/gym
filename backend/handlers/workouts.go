@@ -170,16 +170,11 @@ func GetWorkoutDaysHandler(w http.ResponseWriter, r *http.Request) {
 func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	fmt.Printf("CreateWorkoutHandler: Iniciando creación de workout\n")
-
 	userID, ok := r.Context().Value("user_id").(string)
 	if !ok || userID == "" {
-		fmt.Printf("Error: user_id no encontrado en contexto\n")
 		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
 		return
 	}
-
-	fmt.Printf("CreateWorkoutHandler: UserID: %s\n", userID)
 
 	var req models.CreateWorkoutRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -188,25 +183,16 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("CreateWorkoutHandler: Request recibida - ExerciseID: %d, Weight: %v (tipo: %T), Reps: %d\n", req.ExerciseID, req.Weight, req.Weight, req.Reps)
-
 	// Validaciones
 	if req.Reps <= 0 {
-		fmt.Printf("Error: Validación fallida - Reps: %d\n", req.Reps)
 		http.Error(w, "Repeticiones deben ser mayores a 0", http.StatusBadRequest)
 		return
 	}
 	
 	// Validar peso si se proporciona
-	if req.Weight != nil {
-		fmt.Printf("🔍 DEBUG: Weight no es nil, valor: %f\n", *req.Weight)
-		if *req.Weight <= 0 {
-			fmt.Printf("Error: Validación fallida - Weight: %f\n", *req.Weight)
-			http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
-			return
-		}
-	} else {
-		fmt.Printf("🔍 DEBUG: Weight es nil (opcional)\n")
+	if req.Weight != nil && *req.Weight <= 0 {
+		http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
+		return
 	}
 
 	// Verificar que el ejercicio existe

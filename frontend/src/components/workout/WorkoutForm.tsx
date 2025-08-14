@@ -123,22 +123,23 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         data.seconds = currentTimerTime
       }
       
-      // Limpiar peso si es 0 o undefined
-      if (data.weight === 0 || data.weight === undefined) {
-        data.weight = undefined
-      }
-      
-      console.log('🔍 DEBUG - Datos a enviar:', {
+      // Crear objeto de datos sin el campo weight si está vacío
+      const workoutData: any = {
         exercise_id: data.exercise_id,
-        weight: data.weight,
-        weightType: typeof data.weight,
         reps: data.reps,
         serie: data.serie,
         seconds: data.seconds,
         observations: data.observations
-      })
+      }
       
-      await onSubmit(data)
+      // Solo incluir weight si tiene un valor válido
+      if (data.weight !== undefined && data.weight !== 0) {
+        workoutData.weight = data.weight
+      }
+      
+      console.log('🔍 DEBUG - Datos a enviar:', workoutData)
+      
+      await onSubmit(workoutData)
       setShowSuccess(true)
       reset({
         exercise_id: '',
