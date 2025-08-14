@@ -222,7 +222,6 @@ func GetSystemNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var id int
 		var title, message, notificationType string
-		var isActive bool
 		var createdAt time.Time
 		
 		err := rows.Scan(&id, &title, &message, &notificationType, &createdAt)
@@ -234,6 +233,12 @@ func GetSystemNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		// Convertir fecha a zona horaria de Argentina
 		createdAt = convertToArgentinaTime(createdAt)
 		
+		// Determinar prioridad basada en el tipo
+		priority := "medium"
+		if notificationType == "error" {
+			priority = "high"
+		}
+		
 		notifications = append(notifications, map[string]interface{}{
 			"id":         id,
 			"type":       "announcement",
@@ -241,7 +246,7 @@ func GetSystemNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 			"message":    message,
 			"created_at": createdAt,
 			"read":       false, // Las notificaciones del sistema siempre se muestran como no leídas
-			"priority":   notificationType == "error" ? "high" : "medium",
+			"priority":   priority,
 		})
 	}
 

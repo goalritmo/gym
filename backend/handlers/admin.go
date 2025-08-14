@@ -88,7 +88,7 @@ func GetAdminNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		SELECT 
-			id, title, message, type, is_active, created_at, updated_at
+			id, title, message, type, created_at, updated_at
 		FROM admin_notifications
 		ORDER BY created_at DESC
 	`
@@ -108,7 +108,6 @@ func GetAdminNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 			&notification.Title,
 			&notification.Message,
 			&notification.Type,
-			&notification.IsActive,
 			&notification.CreatedAt,
 			&notification.UpdatedAt,
 		)
