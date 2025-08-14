@@ -826,11 +826,12 @@ export default function WorkoutHistory() {
             <TextField
               autoFocus
               fullWidth
-              label="Nombre del entrenamiento"
+              placeholder="Nombre del entrenamiento"
               value={editNameModal.newName}
               onChange={(e) => setEditNameModal(prev => ({ ...prev, newName: e.target.value }))}
               variant="outlined"
               sx={{
+                mt: 2,
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
                   '&:hover': {

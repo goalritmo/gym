@@ -14,17 +14,18 @@ import {
   MenuItem,
   Card,
   CardContent,
-  Chip,
   Alert,
   CircularProgress,
-  Stack
+  Stack,
+  IconButton
 } from '@mui/material'
 import {
   Add as AddIcon,
   Info as InfoIcon,
   Warning as WarningIcon,
   CheckCircle as SuccessIcon,
-  Error as ErrorIcon
+  Error as ErrorIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 
@@ -50,12 +51,7 @@ const notificationTypeIcons = {
   error: <ErrorIcon sx={{ color: 'error.main' }} />
 }
 
-const notificationTypeColors = {
-  info: 'info',
-  warning: 'warning',
-  success: 'success',
-  error: 'error'
-} as const
+
 
 export function AdminNotifications() {
   const [notifications, setNotifications] = useState<AdminNotification[]>([])
@@ -63,6 +59,7 @@ export function AdminNotifications() {
   const [error, setError] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
   const [creating, setCreating] = useState(false)
+  const [deleting, setDeleting] = useState<number | null>(null)
   const [form, setForm] = useState<CreateNotificationForm>({
     title: '',
     message: '',
@@ -122,6 +119,19 @@ export function AdminNotifications() {
     })
   }
 
+  const handleDeleteNotification = async (id: number) => {
+    try {
+      setDeleting(id)
+      await apiClient.deleteAdminNotification(id)
+      await loadNotifications() // Recargar lista
+    } catch (error) {
+      console.error('Error eliminando notificación:', error)
+      setError('Error al eliminar la notificación')
+    } finally {
+      setDeleting(null)
+    }
+  }
+
   if (loading) {
     return (
       <Box sx={{ 
@@ -149,7 +159,6 @@ export function AdminNotifications() {
         </Typography>
         <Button
           variant="contained"
-          startIcon={<AddIcon />}
           onClick={() => setOpenDialog(true)}
           sx={{ fontWeight: 600 }}
         >
@@ -198,18 +207,6 @@ export function AdminNotifications() {
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
                         {notification.title}
                       </Typography>
-                      <Chip
-                        label={notification.type}
-                        color={notificationTypeColors[notification.type]}
-                        size="small"
-                        variant="outlined"
-                      />
-                      <Chip
-                        label="Sistema"
-                        color="primary"
-                        size="small"
-                        variant="outlined"
-                      />
                     </Box>
                     
                     <Typography variant="body1" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
@@ -223,6 +220,25 @@ export function AdminNotifications() {
                       }
                     </Typography>
                   </Box>
+
+                  {/* Delete Button */}
+                  <IconButton
+                    onClick={() => handleDeleteNotification(notification.id)}
+                    disabled={deleting === notification.id}
+                    sx={{
+                      color: 'error.main',
+                      '&:hover': {
+                        backgroundColor: 'error.light',
+                        color: 'white'
+                      }
+                    }}
+                  >
+                    {deleting === notification.id ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <DeleteIcon />
+                    )}
+                  </IconButton>
                 </Box>
               </CardContent>
             </Card>
@@ -275,14 +291,11 @@ export function AdminNotifications() {
             <FormControl fullWidth>
               <InputLabel>Tipo de Notificación</InputLabel>
               <Select
-                value={form.type}
-                onChange={(e) => setForm(prev => ({ ...prev, type: e.target.value as any }))}
+                value="info"
+                disabled
                 label="Tipo de Notificación"
               >
                 <MenuItem value="info">Información</MenuItem>
-                <MenuItem value="warning">Advertencia</MenuItem>
-                <MenuItem value="success">Éxito</MenuItem>
-                <MenuItem value="error">Error</MenuItem>
               </Select>
             </FormControl>
 
