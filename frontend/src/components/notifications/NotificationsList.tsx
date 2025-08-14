@@ -63,31 +63,41 @@ export default function NotificationsList() {
       // Cargar notificaciones del sistema
       const systemNotifications = await apiClient.getSystemNotifications() as any[]
       
+      console.log('Notificaciones del usuario:', userNotifications)
+      console.log('Notificaciones del sistema:', systemNotifications)
+      
       // Combinar y transformar las notificaciones
       const allNotifications: Notification[] = [
-        ...(userNotifications || []).map((notif: any) => ({
-          id: notif.id.toString(),
-          type: notif.type as NotificationType,
-          title: notif.title,
-          message: notif.message,
-          created_at: notif.created_at,
-          read: notif.is_read || false,
-          priority: notif.priority || 'medium'
-        })),
-        ...(systemNotifications || []).map((notif: any) => ({
-          id: `system_${notif.id}`,
-          type: notif.type as NotificationType,
-          title: notif.title,
-          message: notif.message,
-          created_at: notif.created_at,
-          read: notif.read || false,
-          priority: notif.priority || 'medium'
-        }))
+        ...(userNotifications || []).map((notif: any) => {
+          console.log('Transformando notificación del usuario:', notif)
+          return {
+            id: notif.id.toString(),
+            type: notif.type as NotificationType,
+            title: notif.title,
+            message: notif.message,
+            created_at: notif.created_at,
+            read: notif.is_read || false,
+            priority: notif.priority || 'medium'
+          }
+        }),
+        ...(systemNotifications || []).map((notif: any) => {
+          console.log('Transformando notificación del sistema:', notif)
+          return {
+            id: `system_${notif.id}`,
+            type: notif.type as NotificationType,
+            title: notif.title,
+            message: notif.message,
+            created_at: notif.created_at,
+            read: notif.read || false,
+            priority: notif.priority || 'medium'
+          }
+        })
       ]
       
       // Ordenar por fecha de creación (más recientes primero)
       allNotifications.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       
+      console.log('Notificaciones finales:', allNotifications)
       setNotifications(allNotifications)
     } catch (error) {
       console.error('Error cargando notificaciones:', error)
