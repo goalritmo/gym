@@ -49,14 +49,32 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer tx.Rollback()
 
-	// Extraer nombre del email si no se proporciona
-	userName := req.Name
-	if userName == "" {
-		// Extraer nombre del email (parte antes del @)
-		userName = extractNameFromEmail(req.Email)
+	// Obtener nombre de Google desde la base de datos
+	var fullName string
+	err = tx.QueryRow(`
+		SELECT COALESCE(
+			raw_user_meta_data->>'name',
+			raw_user_meta_data->>'given_name',
+			raw_user_meta_data->>'display_name',
+			$1
+		) as user_name
+		FROM auth.users 
+		WHERE id = $2
+	`, req.Name, req.UserID).Scan(&fullName)
+	
+	if err != nil {
+		fmt.Printf("Error obteniendo nombre de Google: %v\n", err)
+		// Fallback al nombre proporcionado o email
+		fullName = req.Name
+		if fullName == "" {
+			fullName = extractNameFromEmail(req.Email)
+		}
 	}
 
-	fmt.Printf("Configurando usuario: %s (%s) con nombre: %s\n", req.UserID, req.Email, userName)
+	// Extraer solo el primer nombre
+	userName := extractFirstName(fullName)
+
+	fmt.Printf("Configurando usuario: %s (%s) con nombre completo: %s, nombre: %s\n", req.UserID, req.Email, fullName, userName)
 
 	// 1. Crear perfil de usuario
 	_, err = tx.Exec(`
@@ -127,4 +145,15 @@ func extractNameFromEmail(email string) string {
 		}
 	}
 	return email
+}
+
+// extractFirstName extrae solo el primer nombre de un nombre completo
+func extractFirstName(fullName string) string {
+	// Buscar el primer espacio y tomar solo la primera parte
+	for i, char := range fullName {
+		if char == ' ' {
+			return fullName[:i]
+		}
+	}
+	return fullName
 }

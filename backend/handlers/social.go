@@ -96,8 +96,8 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		LEFT JOIN exercises e ON w.exercise_id = e.id
 		LEFT JOIN user_settings us ON wd.user_id = us.user_id
 		WHERE (us.show_own_workouts_in_social IS NULL OR us.show_own_workouts_in_social = true)
-		GROUP BY wd.id, wd.user_id, up.name, up.avatar_url, wd.date
-		ORDER BY wd.date DESC
+		GROUP BY wd.id, wd.user_id, up.name, up.avatar_url, wd.date, wd.created_at
+		ORDER BY wd.date DESC, wd.created_at DESC
 		LIMIT $1 OFFSET $2
 	`
 
