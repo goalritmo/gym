@@ -198,10 +198,15 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Validar peso si se proporciona
-	if req.Weight != nil && *req.Weight <= 0 {
-		fmt.Printf("Error: Validación fallida - Weight: %f\n", *req.Weight)
-		http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
-		return
+	if req.Weight != nil {
+		fmt.Printf("🔍 DEBUG: Weight no es nil, valor: %f\n", *req.Weight)
+		if *req.Weight <= 0 {
+			fmt.Printf("Error: Validación fallida - Weight: %f\n", *req.Weight)
+			http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
+			return
+		}
+	} else {
+		fmt.Printf("🔍 DEBUG: Weight es nil (opcional)\n")
 	}
 
 	// Verificar que el ejercicio existe

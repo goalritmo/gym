@@ -43,7 +43,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     const loadSettings = async () => {
       try {
         const apiSettings = await apiClient.getUserSettings()
-        console.log('🔍 Configuraciones cargadas desde API:', apiSettings)
+
         
         // Combinar configuraciones de API con localStorage para ejercicios favoritos
         const savedSettings = localStorage.getItem('user-settings')
@@ -143,7 +143,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
   const initializeAllExercisesAsFavorites = (exerciseIds: number[]) => {
     // Solo inicializar si no hay ejercicios favoritos configurados
     if (settings.favoriteExercises.length === 0) {
-      console.log('🔍 Inicializando todos los ejercicios como favoritos:', exerciseIds)
+      
       setSettings(prev => ({ 
         ...prev, 
         favoriteExercises: exerciseIds
