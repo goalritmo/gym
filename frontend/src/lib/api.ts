@@ -120,6 +120,13 @@ class ApiClient {
     })
   }
 
+  async updateWorkoutDayName(id: number, name: string) {
+    return this.request(`/workout-days/${id}/name`, {
+      method: 'PUT',
+      body: { name }
+    })
+  }
+
   async deleteWorkout(id: number) {
     return this.request(`/workouts/${id}`, {
       method: 'DELETE'

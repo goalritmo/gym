@@ -245,9 +245,49 @@ export default function WorkoutHistory() {
     }
   }
 
+  const [editNameModal, setEditNameModal] = useState<{
+    show: boolean;
+    dayId: number | null;
+    currentName: string;
+    newName: string;
+  }>({
+    show: false,
+    dayId: null,
+    currentName: '',
+    newName: ''
+  });
+
   const handleEditSessionName = (dayId: number, currentName: string) => {
-    // TODO: Implementar edición de nombre de sesión
-    console.log('Editar nombre de sesión:', dayId, currentName);
+    setEditNameModal({
+      show: true,
+      dayId,
+      currentName,
+      newName: currentName
+    });
+  };
+
+  const handleSaveSessionName = async () => {
+    if (!editNameModal.dayId || !editNameModal.newName.trim()) {
+      return;
+    }
+
+    try {
+      await apiClient.updateWorkoutDayName(editNameModal.dayId, editNameModal.newName.trim());
+      
+      // Actualizar el estado local
+      setWorkoutDays(prevDays => 
+        prevDays.map(day => 
+          day.id === editNameModal.dayId 
+            ? { ...day, name: editNameModal.newName.trim() }
+            : day
+        )
+      );
+
+      setEditNameModal({ show: false, dayId: null, currentName: '', newName: '' });
+    } catch (error) {
+      console.error('Error actualizando nombre del entrenamiento:', error);
+      alert('Error al actualizar el nombre del entrenamiento');
+    }
   };
 
   if (loading) {
@@ -756,6 +796,93 @@ export default function WorkoutHistory() {
             ✅ {successMessage}
           </Alert>
         </Snackbar>
+
+        {/* Modal de edición de nombre */}
+        <Dialog
+          open={editNameModal.show}
+          onClose={() => setEditNameModal({ show: false, dayId: null, currentName: '', newName: '' })}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid',
+              borderColor: 'divider'
+            }
+          }}
+        >
+          <DialogTitle sx={{ 
+            pb: 1,
+            fontWeight: 600,
+            fontSize: '1.2rem',
+            color: 'primary.main',
+            borderBottom: '1px solid',
+            borderColor: 'divider'
+          }}>
+            Editar nombre del entrenamiento
+          </DialogTitle>
+          <DialogContent sx={{ pt: 3 }}>
+            <TextField
+              autoFocus
+              fullWidth
+              label="Nombre del entrenamiento"
+              value={editNameModal.newName}
+              onChange={(e) => setEditNameModal(prev => ({ ...prev, newName: e.target.value }))}
+              variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&:hover': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main'
+                    }
+                  }
+                }
+              }}
+            />
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1 }}>
+            <Button
+              onClick={() => setEditNameModal({ show: false, dayId: null, currentName: '', newName: '' })}
+              sx={{
+                px: 3,
+                py: 1,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.95rem',
+                color: 'text.secondary',
+                border: '1px solid',
+                borderColor: 'divider',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                }
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSaveSessionName}
+              disabled={!editNameModal.newName.trim() || editNameModal.newName.trim() === editNameModal.currentName}
+              variant="contained"
+              sx={{
+                px: 4,
+                py: 1,
+                borderRadius: 2,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.95rem',
+                backgroundColor: '#1976d2',
+                '&:hover': {
+                  backgroundColor: '#1565c0'
+                }
+              }}
+            >
+              Guardar
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {/* Snackbar para mensajes de error */}
         <Snackbar

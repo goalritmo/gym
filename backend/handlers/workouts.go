@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -343,6 +344,77 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	workout.UserID = userID
 	workout.CreatedAt = convertToArgentinaTime(workout.CreatedAt)
 	json.NewEncoder(w).Encode(workout)
+}
+
+// UpdateWorkoutDayNameHandler actualiza el nombre de un día de entrenamiento
+func UpdateWorkoutDayNameHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "ID inválido", http.StatusBadRequest)
+		return
+	}
+
+	userID, ok := r.Context().Value("user_id").(string)
+	if !ok || userID == "" {
+		http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+		return
+	}
+
+	var req struct {
+		Name string `json:"name"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		return
+	}
+
+	// Validaciones
+	if req.Name == "" {
+		http.Error(w, "El nombre no puede estar vacío", http.StatusBadRequest)
+		return
+	}
+
+	if len(req.Name) > 100 {
+		http.Error(w, "El nombre no puede tener más de 100 caracteres", http.StatusBadRequest)
+		return
+	}
+
+	query := `
+		UPDATE workout_days 
+		SET name = $1
+		WHERE id = $2 AND user_id = $3
+		RETURNING id, user_id, date, name, effort, mood, created_at
+	`
+
+	var workoutDay struct {
+		ID        int       `json:"id"`
+		UserID    string    `json:"user_id"`
+		Date      time.Time `json:"date"`
+		Name      string    `json:"name"`
+		Effort    *int      `json:"effort"`
+		Mood      *int      `json:"mood"`
+		CreatedAt time.Time `json:"created_at"`
+	}
+
+	err = database.DB.QueryRow(query, req.Name, id, userID).Scan(
+		&workoutDay.ID, &workoutDay.UserID, &workoutDay.Date,
+		&workoutDay.Name, &workoutDay.Effort, &workoutDay.Mood, &workoutDay.CreatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Día de entrenamiento no encontrado", http.StatusNotFound)
+		} else {
+			http.Error(w, "Error actualizando el día de entrenamiento", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	workoutDay.CreatedAt = convertToArgentinaTime(workoutDay.CreatedAt)
+	json.NewEncoder(w).Encode(workoutDay)
 }
 
 // DeleteWorkoutHandler elimina un workout

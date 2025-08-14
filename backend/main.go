@@ -46,6 +46,7 @@ func main() {
 	api.HandleFunc("/workouts", handlers.CreateWorkoutHandler).Methods("POST")
 	api.HandleFunc("/workouts/{id}", handlers.UpdateWorkoutHandler).Methods("PUT")
 	api.HandleFunc("/workouts/{id}", handlers.DeleteWorkoutHandler).Methods("DELETE")
+	api.HandleFunc("/workout-days/{id}/name", handlers.UpdateWorkoutDayNameHandler).Methods("PUT")
 
 	// Workout days endpoints
 	api.HandleFunc("/workout-days", handlers.GetWorkoutDaysHandler).Methods("GET")
