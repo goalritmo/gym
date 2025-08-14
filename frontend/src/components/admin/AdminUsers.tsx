@@ -43,6 +43,7 @@ export function AdminUsers() {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [filterText, setFilterText] = useState('')
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ open: boolean; user: AdminUser | null }>({ open: false, user: null })
   const [updatingRole, setUpdatingRole] = useState<string | null>(null)
@@ -90,9 +91,16 @@ export function AdminUsers() {
     
     try {
       setDeleting(deleteConfirmation.user.id)
+      setError('') // Limpiar errores anteriores
       await apiClient.deleteAdminUser(deleteConfirmation.user.id)
       setUsers(users.filter(u => u.id !== deleteConfirmation.user!.id))
       setDeleteConfirmation({ open: false, user: null })
+      setSuccess(`Usuario "${deleteConfirmation.user.name || deleteConfirmation.user.email}" eliminado exitosamente`)
+      
+      // Limpiar mensaje de éxito después de 5 segundos
+      setTimeout(() => {
+        setSuccess('')
+      }, 5000)
     } catch (error) {
       console.error('Error eliminando usuario:', error)
       setError('Error al eliminar el usuario')
@@ -108,10 +116,19 @@ export function AdminUsers() {
   const handleUpdateRole = async (userId: string, newRole: string) => {
     try {
       setUpdatingRole(userId)
+      setError('') // Limpiar errores anteriores
       await apiClient.updateAdminUserRole(userId, newRole)
       setUsers(users.map(user => 
         user.id === userId ? { ...user, role: newRole } : user
       ))
+      
+      const user = users.find(u => u.id === userId)
+      setSuccess(`Rol de "${user?.name || user?.email}" actualizado a "${newRole}"`)
+      
+      // Limpiar mensaje de éxito después de 5 segundos
+      setTimeout(() => {
+        setSuccess('')
+      }, 5000)
     } catch (error) {
       console.error('Error actualizando rol:', error)
       setError('Error al actualizar el rol del usuario')
@@ -172,6 +189,13 @@ export function AdminUsers() {
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}
+        </Alert>
+      )}
+
+      {/* Success Alert */}
+      {success && (
+        <Alert severity="success" sx={{ mb: 3 }}>
+          {success}
         </Alert>
       )}
 

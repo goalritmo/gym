@@ -177,15 +177,21 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
             </Box>
 
             {/* Tab Panels */}
-            <Box sx={{ height: 'calc(100% - 64px)', overflow: 'auto' }}>
+            <Box sx={{ height: 'calc(100% - 64px)', overflow: 'hidden' }}>
               <TabPanel value={activeTab} index={0}>
-                <AdminNotifications />
+                <Box sx={{ height: '100%' }}>
+                  <AdminNotifications />
+                </Box>
               </TabPanel>
               <TabPanel value={activeTab} index={1}>
-                <AdminExercises />
+                <Box sx={{ height: '100%' }}>
+                  <AdminExercises />
+                </Box>
               </TabPanel>
               <TabPanel value={activeTab} index={2}>
-                <AdminUsers />
+                <Box sx={{ height: '100%' }}>
+                  <AdminUsers />
+                </Box>
               </TabPanel>
             </Box>
           </Box>
