@@ -60,6 +60,7 @@ export function AdminNotifications() {
   const [openDialog, setOpenDialog] = useState(false)
   const [creating, setCreating] = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; id: number | null }>({ show: false, id: null })
   const [form, setForm] = useState<CreateNotificationForm>({
     title: '',
     message: '',
@@ -119,17 +120,28 @@ export function AdminNotifications() {
     })
   }
 
-  const handleDeleteNotification = async (id: number) => {
+  const handleDeleteClick = (id: number) => {
+    setDeleteConfirmation({ show: true, id })
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmation.id) return
+
     try {
-      setDeleting(id)
-      await apiClient.deleteAdminNotification(id)
+      setDeleting(deleteConfirmation.id)
+      await apiClient.deleteAdminNotification(deleteConfirmation.id)
       await loadNotifications() // Recargar lista
     } catch (error) {
       console.error('Error eliminando notificación:', error)
       setError('Error al eliminar la notificación')
     } finally {
       setDeleting(null)
+      setDeleteConfirmation({ show: false, id: null })
     }
+  }
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmation({ show: false, id: null })
   }
 
   if (loading) {
@@ -224,7 +236,7 @@ export function AdminNotifications() {
 
                   {/* Delete Button */}
                   <IconButton
-                    onClick={() => handleDeleteNotification(notification.id)}
+                    onClick={() => handleDeleteClick(notification.id)}
                     disabled={deleting === notification.id}
                     sx={{
                       color: 'error.main',
@@ -318,6 +330,79 @@ export function AdminNotifications() {
             startIcon={creating ? <CircularProgress size={16} /> : undefined}
           >
             {creating ? 'Creando...' : 'Confirmar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modal de confirmación de eliminación */}
+      <Dialog
+        open={deleteConfirmation.show}
+        onClose={handleCancelDelete}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            border: '1px solid',
+            borderColor: 'divider'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          pb: 1,
+          fontWeight: 600,
+          fontSize: '1.2rem',
+          color: 'error.main',
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}>
+          Confirmar eliminación
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Typography variant="body1">
+            ¿Estás seguro de que quieres eliminar esta notificación? Esta acción no se puede deshacer.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button
+            onClick={handleCancelDelete}
+            disabled={deleting !== null}
+            sx={{
+              px: 3,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              color: 'text.secondary',
+              border: '1px solid',
+              borderColor: 'divider',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+              }
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            disabled={deleting !== null}
+            variant="contained"
+            color="error"
+            sx={{
+              px: 4,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              '&:hover': {
+                backgroundColor: '#d32f2f'
+              }
+            }}
+          >
+            {deleting !== null ? 'Eliminando...' : 'Eliminar'}
           </Button>
         </DialogActions>
       </Dialog>

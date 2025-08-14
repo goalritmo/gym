@@ -9,7 +9,6 @@ import (
 
 	"github.com/goalritmo/gym/backend/database"
 	"github.com/gorilla/mux"
-	"github.com/lib/pq"
 )
 
 // AdminNotification representa una notificación del administrador
@@ -304,18 +303,9 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		SELECT 
-			e.id, e.name, e.muscle_group,
-			COALESCE(array_agg(DISTINCT mp.name) FILTER (WHERE mp.name IS NOT NULL AND emg_p.role = 'primary'), '{}') as primary_muscles,
-			COALESCE(array_agg(DISTINCT ms.name) FILTER (WHERE ms.name IS NOT NULL AND emg_s.role = 'secondary'), '{}') as secondary_muscles,
-			eq.name as equipment, e.video_url, e.created_at
-		FROM exercises e
-		LEFT JOIN equipment eq ON e.equipment_id = eq.id
-		LEFT JOIN exercise_muscle_groups emg_p ON e.id = emg_p.exercise_id AND emg_p.role = 'primary'
-		LEFT JOIN muscle_groups mp ON emg_p.muscle_group_id = mp.id
-		LEFT JOIN exercise_muscle_groups emg_s ON e.id = emg_s.exercise_id AND emg_s.role = 'secondary'
-		LEFT JOIN muscle_groups ms ON emg_s.muscle_group_id = ms.id
-		GROUP BY e.id, e.name, e.muscle_group, eq.name, e.video_url, e.created_at
-		ORDER BY e.name ASC
+			id, name, muscle_group, equipment_id, video_url, created_at
+		FROM exercises
+		ORDER BY name ASC
 	`
 
 	rows, err := database.DB.Query(query)
@@ -328,15 +318,13 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	var exercises []AdminExercise
 	for rows.Next() {
 		var exercise AdminExercise
-		var primaryMuscles, secondaryMuscles pq.StringArray
+		var equipmentID *int
 		
 		err := rows.Scan(
 			&exercise.ID,
 			&exercise.Name,
 			&exercise.MuscleGroup,
-			&primaryMuscles,
-			&secondaryMuscles,
-			&exercise.Equipment,
+			&equipmentID,
 			&exercise.VideoURL,
 			&exercise.CreatedAt,
 		)
@@ -345,8 +333,17 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		exercise.PrimaryMuscles = []string(primaryMuscles)
-		exercise.SecondaryMuscles = []string(secondaryMuscles)
+		// Por ahora, usar el ID del equipo como nombre
+		if equipmentID != nil {
+			exercise.Equipment = fmt.Sprintf("Equipo %d", *equipmentID)
+		} else {
+			exercise.Equipment = "Sin equipo"
+		}
+		
+		// Arrays vacíos por defecto
+		exercise.PrimaryMuscles = []string{}
+		exercise.SecondaryMuscles = []string{}
+		
 		exercises = append(exercises, exercise)
 	}
 
