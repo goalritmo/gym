@@ -226,7 +226,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Ejercicio verificado correctamente\n")
 
 	// Obtener fecha actual en zona horaria de Argentina
-	argentinaLocation, err := time.LoadLocation("America/Argentina/Buenos_Aires")
+	argentinaLocation, err = time.LoadLocation("America/Argentina/Buenos_Aires")
 	if err != nil {
 		argentinaLocation = time.FixedZone("UTC-3", -3*60*60)
 	}
