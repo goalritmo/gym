@@ -176,7 +176,13 @@ func DeleteAdminNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("Notificación del sistema eliminada con ID %d\n", id)
 
-	w.WriteHeader(http.StatusNoContent)
+	response := map[string]interface{}{
+		"message": "Notificación eliminada exitosamente",
+		"id":      id,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }
 
 // CreateNotificationHandler crea una nueva notificación del administrador

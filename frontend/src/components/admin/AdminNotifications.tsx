@@ -159,6 +159,7 @@ export function AdminNotifications() {
         </Typography>
         <Button
           variant="contained"
+          startIcon={<AddIcon />}
           onClick={() => setOpenDialog(true)}
           sx={{ fontWeight: 600 }}
         >
@@ -314,9 +315,9 @@ export function AdminNotifications() {
             variant="contained"
             onClick={handleCreateNotification}
             disabled={creating || !form.title.trim() || !form.message.trim()}
-            startIcon={creating ? <CircularProgress size={16} /> : <AddIcon />}
+            startIcon={creating ? <CircularProgress size={16} /> : undefined}
           >
-            {creating ? 'Creando...' : 'Crear Notificación'}
+            {creating ? 'Creando...' : 'Confirmar'}
           </Button>
         </DialogActions>
       </Dialog>
