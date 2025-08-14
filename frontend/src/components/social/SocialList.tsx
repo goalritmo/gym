@@ -76,9 +76,11 @@ export default function SocialList() {
       const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
       
       if (diffInMinutes < 1) return 'Hace un momento'
+      if (diffInMinutes === 1) return 'Hace 1 minuto'
       if (diffInMinutes < 60) return `Hace ${diffInMinutes} minutos`
       
       const diffInHours = Math.floor(diffInMinutes / 60)
+      if (diffInHours === 1) return 'Hace 1 hora'
       if (diffInHours < 24) return `Hace ${diffInHours} horas`
       
       const diffInDays = Math.floor(diffInHours / 24)

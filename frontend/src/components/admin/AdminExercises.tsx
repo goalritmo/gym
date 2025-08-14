@@ -163,7 +163,7 @@ export function AdminExercises() {
           onClick={() => setOpenDialog(true)}
           sx={{ fontWeight: 600 }}
         >
-          Nuevo Ejercicio
+          Agregar
         </Button>
       </Box>
 
@@ -299,7 +299,7 @@ export function AdminExercises() {
           fontWeight: 'bold'
         }}>
           <AddIcon sx={{ color: 'primary.main' }} />
-          Crear Nuevo Ejercicio
+          Crear Ejercicio
         </DialogTitle>
         
         <DialogContent>

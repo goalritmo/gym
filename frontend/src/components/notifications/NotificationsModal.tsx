@@ -107,10 +107,15 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
     const now = new Date()
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
     
-    if (diffInHours < 1) {
-      return 'Hace unos minutos'
+    if (diffInMinutes < 1) {
+      return 'Hace un momento'
+    } else if (diffInMinutes === 1) {
+      return 'Hace 1 minuto'
+    } else if (diffInMinutes < 60) {
+      return `Hace ${diffInMinutes} minutos`
     } else if (diffInHours === 1) {
       return 'Hace 1 hora'
     } else if (diffInHours < 24) {

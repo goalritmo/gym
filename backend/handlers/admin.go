@@ -121,6 +121,62 @@ func GetAdminNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(notifications)
 }
 
+// DeleteAdminNotificationHandler elimina una notificación del sistema
+func DeleteAdminNotificationHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "ID inválido", http.StatusBadRequest)
+		return
+	}
+
+	// Verificar que la notificación existe
+	var notificationExists bool
+	err = database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM admin_notifications WHERE id = $1)", id).Scan(&notificationExists)
+	if err != nil {
+		http.Error(w, "Error verificando notificación", http.StatusInternalServerError)
+		return
+	}
+	if !notificationExists {
+		http.Error(w, "Notificación no encontrada", http.StatusNotFound)
+		return
+	}
+
+	// Iniciar transacción
+	tx, err := database.DB.Begin()
+	if err != nil {
+		http.Error(w, "Error iniciando transacción", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
+
+	// 1. Eliminar la notificación del sistema
+	_, err = tx.Exec("DELETE FROM admin_notifications WHERE id = $1", id)
+	if err != nil {
+		http.Error(w, "Error eliminando notificación del sistema", http.StatusInternalServerError)
+		return
+	}
+
+	// 2. Eliminar todas las notificaciones individuales asociadas
+	_, err = tx.Exec("DELETE FROM notifications WHERE data::jsonb->>'admin_notification_id' = $1", id)
+	if err != nil {
+		http.Error(w, "Error eliminando notificaciones individuales", http.StatusInternalServerError)
+		return
+	}
+
+	// Confirmar transacción
+	if err = tx.Commit(); err != nil {
+		http.Error(w, "Error confirmando transacción", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("Notificación del sistema eliminada con ID %d\n", id)
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 // CreateNotificationHandler crea una nueva notificación del administrador
 func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")

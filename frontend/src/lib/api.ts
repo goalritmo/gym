@@ -247,6 +247,12 @@ class ApiClient {
     })
   }
 
+  async deleteAdminNotification(id: number) {
+    return this.request(`/admin/notifications/${id}`, {
+      method: 'DELETE'
+    })
+  }
+
   async getAdminExercises() {
     return this.request('/admin/exercises')
   }
