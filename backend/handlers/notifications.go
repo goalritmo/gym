@@ -55,7 +55,6 @@ func GetNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		SELECT id, user_id, type, title, message, data, is_read, created_at
 		FROM notifications 
 		WHERE user_id = $1 
-		AND (data IS NULL OR data::jsonb->>'admin_notification_id' IS NULL)
 		ORDER BY created_at DESC
 		LIMIT $2 OFFSET $3
 	`
