@@ -336,8 +336,14 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validaciones
-	if req.Weight <= 0 || req.Reps <= 0 {
-		http.Error(w, "Peso y repeticiones deben ser mayores a 0", http.StatusBadRequest)
+	if req.Reps <= 0 {
+		http.Error(w, "Repeticiones deben ser mayores a 0", http.StatusBadRequest)
+		return
+	}
+	
+	// Validar peso si se proporciona
+	if req.Weight != nil && *req.Weight <= 0 {
+		http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
 		return
 	}
 
@@ -353,10 +359,16 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		serieValue = *req.Serie
 	}
 
+	// Obtener valor de peso de forma segura
+	var weightValue float64 = 0
+	if req.Weight != nil {
+		weightValue = *req.Weight
+	}
+
 	var workout models.Workout
 	err = database.DB.QueryRow(
 		query,
-		req.Weight, req.Reps, serieValue, req.Seconds, req.Observations,
+		weightValue, req.Reps, serieValue, req.Seconds, req.Observations,
 		id, userID,
 	).Scan(
 		&workout.ID, &workout.ExerciseID, &workout.Weight, &workout.Reps,

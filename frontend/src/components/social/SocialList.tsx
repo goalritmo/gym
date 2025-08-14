@@ -181,13 +181,11 @@ export default function SocialList() {
     socialWorkouts.forEach(workout => {
       // Agrupar por fecha de creación (created_at) en zona horaria local
       const workoutDate = new Date(workout.created_at)
-      // Agregar un día para corregir el offset de zona horaria
-      workoutDate.setDate(workoutDate.getDate() + 1)
-      
+      // Usar zona horaria local en lugar de UTC
       const year = workoutDate.getFullYear()
       const month = String(workoutDate.getMonth() + 1).padStart(2, '0')
       const day = String(workoutDate.getDate()).padStart(2, '0')
-      const dayKey = `${year}-${month}-${day}` // YYYY-MM-DD con día agregado
+      const dayKey = `${year}-${month}-${day}` // YYYY-MM-DD en zona horaria local
       
       console.log('🔍 Debug agrupamiento:', {
         sessionId: workout.session_id,
