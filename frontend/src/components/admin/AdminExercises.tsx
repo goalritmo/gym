@@ -8,21 +8,16 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Card,
   CardContent,
-  Chip,
   Alert,
   CircularProgress,
-  Stack,
-  Autocomplete
+  Stack
 } from '@mui/material'
 import {
   Add as AddIcon,
-  FitnessCenter as ExerciseIcon
+  FitnessCenter as ExerciseIcon,
+  Search as SearchIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 
@@ -41,22 +36,9 @@ type AdminExercise = {
 
 type CreateExerciseForm = {
   name: string
-  muscle_group: string
-  equipment: string
-  primary_muscles: string[]
-  secondary_muscles: string[]
-  video_url: string
 }
 
-const muscleGroups = [
-  'Pecho', 'Espalda', 'Hombros', 'Bíceps', 'Tríceps', 
-  'Piernas', 'Glúteos', 'Abdominales', 'Cardio', 'Flexibilidad'
-]
 
-const equipmentOptions = [
-  'Peso libre', 'Máquina', 'Cuerpo', 'Bandas de resistencia', 
-  'Pesas rusas', 'Pelota medicinal', 'TRX', 'Otro'
-]
 
 export function AdminExercises() {
   const [exercises, setExercises] = useState<AdminExercise[]>([])
@@ -64,13 +46,9 @@ export function AdminExercises() {
   const [error, setError] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
   const [creating, setCreating] = useState(false)
+  const [filterText, setFilterText] = useState('')
   const [form, setForm] = useState<CreateExerciseForm>({
-    name: '',
-    muscle_group: '',
-    primary_muscles: [],
-    secondary_muscles: [],
-    equipment: '',
-    video_url: ''
+    name: ''
   })
 
   const loadExercises = async () => {
@@ -93,24 +71,23 @@ export function AdminExercises() {
   }, [])
 
   const handleCreateExercise = async () => {
-    if (!form.name.trim() || !form.muscle_group || !form.equipment) {
-      setError('El nombre, grupo muscular y equipo son requeridos')
+    if (!form.name.trim()) {
+      setError('El nombre del ejercicio es requerido')
       return
     }
 
     try {
       setCreating(true)
       await apiClient.createAdminExercise({
-        ...form,
-        video_url: form.video_url || undefined
-      })
-      setForm({
-        name: '',
-        muscle_group: '',
+        name: form.name,
+        muscle_group: 'General',
+        equipment: 'Peso libre',
         primary_muscles: [],
         secondary_muscles: [],
-        equipment: '',
-        video_url: ''
+        video_url: undefined
+      })
+      setForm({
+        name: ''
       })
       setOpenDialog(false)
       await loadExercises() // Recargar lista
@@ -135,6 +112,11 @@ export function AdminExercises() {
     
     return `${weekday} ${day} de ${month} a las ${hours}:${minutes}`
   }
+
+  // Filtrar ejercicios por nombre
+  const filteredExercises = exercises.filter(exercise =>
+    exercise.name.toLowerCase().includes(filterText.toLowerCase())
+  )
 
   if (loading) {
     return (
@@ -171,6 +153,18 @@ export function AdminExercises() {
         </Button>
       </Box>
 
+      {/* Filter */}
+      <TextField
+        fullWidth
+        placeholder="Buscar ejercicios por nombre..."
+        value={filterText}
+        onChange={(e) => setFilterText(e.target.value)}
+        sx={{ mb: 3 }}
+        InputProps={{
+          startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+        }}
+      />
+
       {/* Error Alert */}
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -179,17 +173,36 @@ export function AdminExercises() {
       )}
 
       {/* Exercises List */}
-      <Stack spacing={2}>
-        {exercises.length === 0 ? (
-          <Card>
-            <CardContent sx={{ textAlign: 'center', py: 4 }}>
-              <Typography variant="body1" color="text.secondary">
-                No hay ejercicios creados
-              </Typography>
-            </CardContent>
-          </Card>
-        ) : (
-          exercises.map((exercise) => (
+      <Box sx={{ 
+        maxHeight: '60vh', 
+        overflowY: 'auto',
+        pr: 1,
+        '&::-webkit-scrollbar': {
+          width: '8px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: '#f1f1f1',
+          borderRadius: '4px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: '#c1c1c1',
+          borderRadius: '4px',
+          '&:hover': {
+            background: '#a8a8a8',
+          },
+        },
+      }}>
+        <Stack spacing={2}>
+          {filteredExercises.length === 0 ? (
+            <Card>
+              <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                <Typography variant="body1" color="text.secondary">
+                  {filterText ? 'No se encontraron ejercicios con ese nombre' : 'No hay ejercicios creados'}
+                </Typography>
+              </CardContent>
+            </Card>
+          ) : (
+            filteredExercises.map((exercise) => (
             <Card key={exercise.id} sx={{ 
               border: '1px solid',
               borderColor: 'divider',
@@ -208,75 +221,14 @@ export function AdminExercises() {
 
                   {/* Content */}
                   <Box sx={{ flex: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {exercise.name}
-                      </Typography>
-                      <Chip
-                        label={exercise.muscle_group}
-                        color="primary"
-                        size="small"
-                        variant="outlined"
-                      />
-                      <Chip
-                        label={exercise.equipment}
-                        color="secondary"
-                        size="small"
-                        variant="outlined"
-                      />
-                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {exercise.name}
+                    </Typography>
                     
-                    <Box sx={{ mb: 2 }}>
-                      {exercise.primary_muscles && exercise.primary_muscles.length > 0 && (
-                        <Box sx={{ mb: 1 }}>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                            Músculos principales:
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                            {exercise.primary_muscles.map((muscle, index) => (
-                              <Chip
-                                key={index}
-                                label={muscle}
-                                size="small"
-                                variant="outlined"
-                                color="primary"
-                              />
-                            ))}
-                          </Box>
-                        </Box>
-                      )}
 
-                      {exercise.secondary_muscles && exercise.secondary_muscles.length > 0 && (
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                            Músculos secundarios:
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                            {exercise.secondary_muscles.map((muscle, index) => (
-                              <Chip
-                                key={index}
-                                label={muscle}
-                                size="small"
-                                variant="outlined"
-                                color="secondary"
-                              />
-                            ))}
-                          </Box>
-                        </Box>
-                      )}
-                    </Box>
-
-                    {exercise.video_url && (
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        Video: {exercise.video_url}
-                      </Typography>
-                    )}
 
                     <Typography variant="caption" color="text.secondary">
-                      Creado: {formatDate(exercise.created_at)}
-                      {exercise.updated_at !== exercise.created_at && 
-                        ` • Actualizado: ${formatDate(exercise.updated_at)}`
-                      }
+                      Creado el {formatDate(exercise.created_at)}
                     </Typography>
                   </Box>
                 </Box>
@@ -285,6 +237,7 @@ export function AdminExercises() {
           ))
         )}
       </Stack>
+      </Box>
 
       {/* Create Exercise Dialog */}
       <Dialog 
@@ -315,95 +268,7 @@ export function AdminExercises() {
               fullWidth
               required
               placeholder="Ej: Press de banca"
-            />
-
-            <FormControl fullWidth required>
-              <InputLabel>Grupo Muscular</InputLabel>
-              <Select
-                value={form.muscle_group}
-                onChange={(e) => setForm(prev => ({ ...prev, muscle_group: e.target.value }))}
-                label="Grupo Muscular"
-              >
-                {muscleGroups.map((group) => (
-                  <MenuItem key={group} value={group}>
-                    {group}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <Autocomplete
-              multiple
-              options={muscleGroups}
-              value={form.primary_muscles}
-              onChange={(_, newValue) => setForm(prev => ({ ...prev, primary_muscles: newValue }))}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Músculos Principales"
-                  placeholder="Seleccionar músculos..."
-                />
-              )}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    {...getTagProps({ index })}
-                    key={option}
-                    label={option}
-                    size="small"
-                    color="primary"
-                  />
-                ))
-              }
-            />
-
-            <Autocomplete
-              multiple
-              options={muscleGroups}
-              value={form.secondary_muscles}
-              onChange={(_, newValue) => setForm(prev => ({ ...prev, secondary_muscles: newValue }))}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Músculos Secundarios"
-                  placeholder="Seleccionar músculos..."
-                />
-              )}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    {...getTagProps({ index })}
-                    key={option}
-                    label={option}
-                    size="small"
-                    color="secondary"
-                  />
-                ))
-              }
-            />
-
-            <FormControl fullWidth required>
-              <InputLabel>Equipo</InputLabel>
-              <Select
-                value={form.equipment}
-                onChange={(e) => setForm(prev => ({ ...prev, equipment: e.target.value }))}
-                label="Equipo"
-              >
-                {equipmentOptions.map((equipment) => (
-                  <MenuItem key={equipment} value={equipment}>
-                    {equipment}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <TextField
-              label="URL del Video (opcional)"
-              value={form.video_url}
-              onChange={(e) => setForm(prev => ({ ...prev, video_url: e.target.value }))}
-              fullWidth
-              placeholder="https://ejemplo.com/video"
-              helperText="Enlace a un video demostrativo del ejercicio"
+              autoFocus
             />
           </Stack>
         </DialogContent>
@@ -418,7 +283,7 @@ export function AdminExercises() {
           <Button
             variant="contained"
             onClick={handleCreateExercise}
-            disabled={creating || !form.name.trim() || !form.muscle_group || !form.equipment}
+            disabled={creating || !form.name.trim()}
             startIcon={creating ? <CircularProgress size={16} /> : <AddIcon />}
           >
             {creating ? 'Creando...' : 'Crear Ejercicio'}

@@ -25,7 +25,8 @@ import {
   Warning as WarningIcon,
   CheckCircle as SuccessIcon,
   Error as ErrorIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  Search as SearchIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 
@@ -61,6 +62,7 @@ export function AdminNotifications() {
   const [creating, setCreating] = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; id: number | null }>({ show: false, id: null })
+  const [filterText, setFilterText] = useState('')
   const [form, setForm] = useState<CreateNotificationForm>({
     title: '',
     message: '',
@@ -124,6 +126,12 @@ export function AdminNotifications() {
     return `Creada el ${weekday} ${day} de ${month} a las ${hours}:${minutes}`
   }
 
+  // Filtrar notificaciones por título o mensaje
+  const filteredNotifications = notifications.filter(notification =>
+    notification.title.toLowerCase().includes(filterText.toLowerCase()) ||
+    notification.message.toLowerCase().includes(filterText.toLowerCase())
+  )
+
   const handleDeleteClick = (id: number) => {
     setDeleteConfirmation({ show: true, id })
   }
@@ -183,6 +191,18 @@ export function AdminNotifications() {
         </Button>
       </Box>
 
+      {/* Filter */}
+      <TextField
+        fullWidth
+        placeholder="Buscar notificaciones por título o mensaje..."
+        value={filterText}
+        onChange={(e) => setFilterText(e.target.value)}
+        sx={{ mb: 3 }}
+        InputProps={{
+          startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+        }}
+      />
+
       {/* Error Alert */}
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -191,17 +211,36 @@ export function AdminNotifications() {
       )}
 
       {/* Notifications List */}
-      <Stack spacing={2}>
-        {notifications.length === 0 ? (
-          <Card>
-            <CardContent sx={{ textAlign: 'center', py: 4 }}>
-              <Typography variant="body1" color="text.secondary">
-                No hay notificaciones creadas
-              </Typography>
-            </CardContent>
-          </Card>
-        ) : (
-          notifications.map((notification) => (
+      <Box sx={{ 
+        maxHeight: '60vh', 
+        overflowY: 'auto',
+        pr: 1,
+        '&::-webkit-scrollbar': {
+          width: '8px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: '#f1f1f1',
+          borderRadius: '4px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: '#c1c1c1',
+          borderRadius: '4px',
+          '&:hover': {
+            background: '#a8a8a8',
+          },
+        },
+      }}>
+        <Stack spacing={2}>
+          {filteredNotifications.length === 0 ? (
+            <Card>
+              <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                <Typography variant="body1" color="text.secondary">
+                  {filterText ? 'No se encontraron notificaciones con ese texto' : 'No hay notificaciones creadas'}
+                </Typography>
+              </CardContent>
+            </Card>
+          ) : (
+            filteredNotifications.map((notification) => (
             <Card key={notification.id} sx={{ 
               border: '1px solid',
               borderColor: 'divider',
@@ -262,6 +301,7 @@ export function AdminNotifications() {
           ))
         )}
       </Stack>
+      </Box>
 
       {/* Create Notification Dialog */}
       <Dialog 
