@@ -120,13 +120,14 @@ type AdminUser struct {
 	IsAdmin   bool    `json:"is_admin"`
 	CreatedAt string  `json:"created_at"`
 	LastLogin *string `json:"last_login"`
+	Settings  *UserSettings `json:"settings"`
 }
 
 // GetAdminUsersHandler obtiene todos los usuarios para el panel de administrador
 func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Consultar todos los usuarios con información básica
+	// Consultar todos los usuarios con información básica y configuraciones
 	query := `
 		SELECT 
 			u.id,
@@ -134,11 +135,14 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			COALESCE(up.name, 'Sin nombre') as name,
 			COALESCE(up.is_admin, false) as is_admin,
 			u.created_at,
-			u.last_sign_in_at
+			u.last_sign_in_at,
+			COALESCE(us.show_own_workouts_in_social, true) as show_own_workouts_in_social,
+			COALESCE(us.unc_notifications_enabled, true) as unc_notifications_enabled
 		FROM auth.users u
 		LEFT JOIN user_profiles up ON u.id = up.user_id
+		LEFT JOIN user_settings us ON u.id = us.user_id
 		WHERE u.email_confirmed_at IS NOT NULL
-		ORDER BY u.created_at DESC
+		ORDER BY u.last_sign_in_at DESC NULLS LAST, u.created_at DESC
 	`
 
 	rows, err := database.DB.Query(query)
@@ -152,6 +156,8 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var user AdminUser
 		var lastSignInAt *string
+		var showOwnWorkoutsInSocial bool
+		var uncNotificationsEnabled bool
 		
 		err := rows.Scan(
 			&user.ID,
@@ -160,6 +166,8 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			&user.IsAdmin,
 			&user.CreatedAt,
 			&lastSignInAt,
+			&showOwnWorkoutsInSocial,
+			&uncNotificationsEnabled,
 		)
 		
 		if err != nil {
@@ -169,6 +177,12 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 		// Formatear last_login
 		if lastSignInAt != nil {
 			user.LastLogin = lastSignInAt
+		}
+		
+		// Agregar configuraciones
+		user.Settings = &UserSettings{
+			ShowOwnWorkoutsInSocial: showOwnWorkoutsInSocial,
+			UncNotificationsEnabled: uncNotificationsEnabled,
 		}
 		
 		users = append(users, user)

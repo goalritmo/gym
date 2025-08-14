@@ -22,6 +22,10 @@ type AdminUser = {
   is_admin: boolean
   created_at: string
   last_login: string | null
+  settings: {
+    show_own_workouts_in_social: boolean
+    unc_notifications_enabled: boolean
+  } | null
 }
 
 export function AdminUsers() {
@@ -147,8 +151,8 @@ export function AdminUsers() {
             filteredUsers.map((user) => (
               <Card key={user.id} sx={{ border: '1px solid', borderColor: 'divider' }}>
                 <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Avatar sx={{ bgcolor: user.is_admin ? 'primary.main' : 'grey.500' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                    <Avatar sx={{ bgcolor: user.is_admin ? 'primary.main' : 'grey.500', mt: 0.5 }}>
                       <PersonIcon />
                     </Avatar>
                     
@@ -167,13 +171,33 @@ export function AdminUsers() {
                         )}
                       </Box>
                       
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         {user.email}
                       </Typography>
+
+                      {/* User Settings */}
+                      {user.settings && (
+                        <Box sx={{ display: 'flex', gap: 2, mb: 1 }}>
+                          <Chip 
+                            label={user.settings.show_own_workouts_in_social ? "Social activado" : "Social desactivado"}
+                            size="small"
+                            color={user.settings.show_own_workouts_in_social ? "success" : "default"}
+                            variant="outlined"
+                            sx={{ fontSize: '0.7rem' }}
+                          />
+                          <Chip 
+                            label={user.settings.unc_notifications_enabled ? "Notificaciones activadas" : "Notificaciones desactivadas"}
+                            size="small"
+                            color={user.settings.unc_notifications_enabled ? "success" : "default"}
+                            variant="outlined"
+                            sx={{ fontSize: '0.7rem' }}
+                          />
+                        </Box>
+                      )}
                     </Box>
                   </Box>
 
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                     <Typography variant="caption" color="text.secondary">
                       Registrado el {formatDate(user.created_at)}
                     </Typography>
