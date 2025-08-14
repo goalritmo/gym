@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -15,15 +16,12 @@ import (
 
 // convertToArgentinaTime convierte una fecha UTC a la zona horaria de Argentina
 func convertToArgentinaTime(utcTime time.Time) time.Time {
-	fmt.Printf("🔍 convertToArgentinaTime - Antes: %s (UTC: %v)\n", utcTime.Format(time.RFC3339), utcTime.Location())
 	loc, err := time.LoadLocation("America/Argentina/Buenos_Aires")
 	if err != nil {
 		// Fallback a UTC-3 si no se puede cargar la zona horaria
 		loc = time.FixedZone("UTC-3", -3*60*60)
 	}
-	result := utcTime.In(loc)
-	fmt.Printf("🔍 convertToArgentinaTime - Después: %s (Location: %v)\n", result.Format(time.RFC3339), result.Location())
-	return result
+	return utcTime.In(loc)
 }
 
 // GetWorkoutsHandler obtiene la lista de workouts
@@ -176,7 +174,18 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req models.CreateWorkoutRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	// Leer el body completo para debug
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Printf("Error leyendo body: %v\n", err)
+		http.Error(w, "Error leyendo request", http.StatusBadRequest)
+		return
+	}
+	
+	fmt.Printf("🔍 DEBUG - JSON raw recibido: %s\n", string(bodyBytes))
+	
+	// Decodificar JSON
+	if err := json.Unmarshal(bodyBytes, &req); err != nil {
 		fmt.Printf("Error decodificando JSON: %v\n", err)
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return

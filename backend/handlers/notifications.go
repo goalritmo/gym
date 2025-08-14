@@ -89,10 +89,10 @@ func GetNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		// Convertir fecha a zona horaria de Argentina
 		notification.CreatedAt = convertToArgentinaTime(notification.CreatedAt)
 		notifications = append(notifications, notification)
-		fmt.Printf("Notificación encontrada: ID=%d, Type=%s, Title=%s\n", notification.ID, notification.Type, notification.Title)
+
 	}
 
-	fmt.Printf("Encontradas %d notificaciones para usuario %s\n", len(notifications), userID)
+
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(notifications)
@@ -254,7 +254,7 @@ func GetSystemNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	fmt.Printf("Encontradas %d notificaciones del sistema\n", len(notifications))
+
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(notifications)
