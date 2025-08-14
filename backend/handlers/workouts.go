@@ -212,7 +212,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Verificar que el ejercicio existe
 	var exerciseExists bool
-	err := database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM exercises WHERE id = $1)", req.ExerciseID).Scan(&exerciseExists)
+	err = database.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM exercises WHERE id = $1)", req.ExerciseID).Scan(&exerciseExists)
 	if err != nil {
 		fmt.Printf("Error verificando ejercicio: %v\n", err)
 		http.Error(w, "Error verificando ejercicio", http.StatusInternalServerError)
@@ -226,6 +226,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Ejercicio verificado correctamente\n")
 
 	// Obtener fecha actual en zona horaria de Argentina
+	var argentinaLocation *time.Location
 	argentinaLocation, err = time.LoadLocation("America/Argentina/Buenos_Aires")
 	if err != nil {
 		argentinaLocation = time.FixedZone("UTC-3", -3*60*60)
