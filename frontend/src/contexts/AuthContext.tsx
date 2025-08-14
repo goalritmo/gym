@@ -84,14 +84,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
             // No es crítico si falla, solo log
           }
           
-          // Crear notificación de bienvenida para nuevos usuarios
-          try {
-            await apiClient.createWelcomeNotification()
-            console.log('Notificación de bienvenida creada o ya existía')
-          } catch (error) {
-            console.log('Error creando notificación de bienvenida:', error)
-            // No es crítico si falla, solo log
-          }
+                              // Configurar usuario después del registro
+                    try {
+                      const userName = user.user_metadata?.name || user.user_metadata?.full_name
+                      await apiClient.setupUser(user.id, user.email || '', userName)
+                      console.log('Usuario configurado exitosamente')
+                    } catch (error) {
+                      console.log('Error configurando usuario:', error)
+                      // No es crítico si falla, solo log
+                    }
         } catch (error) {
           console.error('Error fetching user info:', error)
           setIsAdmin(false)

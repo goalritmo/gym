@@ -63,6 +63,7 @@ func main() {
 	api.HandleFunc("/me", handlers.GetCurrentUserHandler).Methods("GET")
 	api.HandleFunc("/me/stats", handlers.GetUserStatsHandler).Methods("GET")
 	api.HandleFunc("/me/last-signin", handlers.UpdateLastSignInHandler).Methods("POST")
+	api.HandleFunc("/me/setup", handlers.UserSetupHandler).Methods("POST")
 
 	// Social endpoints
 	api.HandleFunc("/social/workouts", handlers.GetSocialWorkoutsHandler).Methods("GET")
@@ -90,6 +91,9 @@ func main() {
 	
 	// Fix triggers endpoint (temporal)
 	api.HandleFunc("/fix-triggers", handlers.FixTriggersHandler).Methods("POST")
+	
+	// Debug endpoint (temporal)
+	api.HandleFunc("/debug/user-registration", handlers.DebugUserRegistrationHandler).Methods("POST")
 
 	// Admin endpoints (requieren permisos de administrador)
 	api.HandleFunc("/admin/notifications", handlers.AdminStaffOrTeacherMiddleware(handlers.GetAdminNotificationsHandler)).Methods("GET")

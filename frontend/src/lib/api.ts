@@ -100,6 +100,14 @@ class ApiClient {
     return this.request('/me/last-signin', { method: 'POST' })
   }
 
+  // Setup user after registration
+  async setupUser(userId: string, email: string, name?: string) {
+    return this.request('/me/setup', {
+      method: 'POST',
+      body: JSON.stringify({ user_id: userId, email, name })
+    })
+  }
+
   // Workouts API
   async getWorkouts(date?: string, workoutDayId?: string) {
     const params = new URLSearchParams()
