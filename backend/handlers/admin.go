@@ -9,6 +9,7 @@ import (
 
 	"github.com/goalritmo/gym/backend/database"
 	"github.com/gorilla/mux"
+	"github.com/lib/pq"
 )
 
 // AdminNotification representa una notificación del administrador
@@ -30,9 +31,7 @@ type AdminExercise struct {
 	PrimaryMuscles   []string  `json:"primary_muscles"`
 	SecondaryMuscles []string  `json:"secondary_muscles"`
 	VideoURL         *string   `json:"video_url"`
-	IsActive         bool      `json:"is_active"`
 	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 // CreateNotificationRequest representa la solicitud para crear una notificación
@@ -305,10 +304,18 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		SELECT 
-			id, name, muscle_group, equipment, primary_muscles, secondary_muscles,
-			video_url, is_active, created_at, updated_at
-		FROM exercises
-		ORDER BY name ASC
+			e.id, e.name, e.muscle_group,
+			COALESCE(array_agg(DISTINCT mp.name) FILTER (WHERE mp.name IS NOT NULL AND emg_p.role = 'primary'), '{}') as primary_muscles,
+			COALESCE(array_agg(DISTINCT ms.name) FILTER (WHERE ms.name IS NOT NULL AND emg_s.role = 'secondary'), '{}') as secondary_muscles,
+			eq.name as equipment, e.video_url, e.created_at
+		FROM exercises e
+		LEFT JOIN equipment eq ON e.equipment_id = eq.id
+		LEFT JOIN exercise_muscle_groups emg_p ON e.id = emg_p.exercise_id AND emg_p.role = 'primary'
+		LEFT JOIN muscle_groups mp ON emg_p.muscle_group_id = mp.id
+		LEFT JOIN exercise_muscle_groups emg_s ON e.id = emg_s.exercise_id AND emg_s.role = 'secondary'
+		LEFT JOIN muscle_groups ms ON emg_s.muscle_group_id = ms.id
+		GROUP BY e.id, e.name, e.muscle_group, eq.name, e.video_url, e.created_at
+		ORDER BY e.name ASC
 	`
 
 	rows, err := database.DB.Query(query)
@@ -321,24 +328,25 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	var exercises []AdminExercise
 	for rows.Next() {
 		var exercise AdminExercise
+		var primaryMuscles, secondaryMuscles pq.StringArray
 		
 		err := rows.Scan(
 			&exercise.ID,
 			&exercise.Name,
 			&exercise.MuscleGroup,
+			&primaryMuscles,
+			&secondaryMuscles,
 			&exercise.Equipment,
-			&exercise.PrimaryMuscles,
-			&exercise.SecondaryMuscles,
 			&exercise.VideoURL,
-			&exercise.IsActive,
 			&exercise.CreatedAt,
-			&exercise.UpdatedAt,
 		)
 		if err != nil {
 			http.Error(w, "Error escaneando ejercicio", http.StatusInternalServerError)
 			return
 		}
 
+		exercise.PrimaryMuscles = []string(primaryMuscles)
+		exercise.SecondaryMuscles = []string(secondaryMuscles)
 		exercises = append(exercises, exercise)
 	}
 
@@ -375,7 +383,7 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 		req.PrimaryMuscles,
 		req.SecondaryMuscles,
 		req.VideoURL,
-	).Scan(&exercise.ID, &exercise.CreatedAt, &exercise.UpdatedAt)
+	).Scan(&exercise.ID, &exercise.CreatedAt)
 
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error creando ejercicio: %v", err), http.StatusInternalServerError)
@@ -388,7 +396,6 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 	exercise.PrimaryMuscles = req.PrimaryMuscles
 	exercise.SecondaryMuscles = req.SecondaryMuscles
 	exercise.VideoURL = req.VideoURL
-	exercise.IsActive = true
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(exercise)
