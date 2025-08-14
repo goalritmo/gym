@@ -112,7 +112,7 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 		INSERT INTO notifications (user_id, title, message, type, created_at)
 		VALUES ($1, $2, $3, $4, $5)
 		ON CONFLICT (user_id, type) DO NOTHING
-	`, req.UserID, "¡Bienvenido a GoalRitmo!", "Gracias por unirte a nuestra comunidad fitness. ¡Comienza tu viaje hacia una vida más saludable!", "welcome", time.Now())
+	`, req.UserID, "¡Te damos la bienvenida! 🎉", "¡Estamos emocionados de que te unas a nuestra comunidad fitness! Aquí podrás registrar tus entrenamientos, ver tu progreso y conectar con otros usuarios de la UNC. Te recomendamos explorar las Configuraciones. ¡Buen entrenamiento!", "welcome", time.Now())
 
 	if err != nil {
 		fmt.Printf("Error creando notificación: %v\n", err)

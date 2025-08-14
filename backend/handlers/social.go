@@ -18,6 +18,7 @@ type SocialWorkout struct {
 	UserName      string    `json:"user_name"`
 	UserAvatarURL string    `json:"user_avatar_url"`
 	WorkoutDate   string    `json:"workout_date"`
+	CreatedAt     string    `json:"created_at"`
 	TotalExercises int      `json:"total_exercises"`
 	TotalSeries   int       `json:"total_series"`
 	Exercises     []SocialExercise `json:"exercises"`
@@ -74,6 +75,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			COALESCE(up.name, 'Usuario') as user_name,
 			COALESCE(up.avatar_url, '') as user_avatar_url,
 			wd.date as workout_date,
+			wd.created_at as workout_created_at,
 			COALESCE(COUNT(DISTINCT w.exercise_id), 0) as total_exercises,
 			COALESCE(COUNT(w.id), 0) as total_series,
 			COALESCE(
@@ -120,12 +122,14 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		var exercisesJSON string
 		
 		var workoutDate time.Time
+		var createdAt time.Time
 		err := rows.Scan(
 			&workout.SessionID,
 			&workout.UserID,
 			&workout.UserName,
 			&workout.UserAvatarURL,
 			&workoutDate,
+			&createdAt,
 			&workout.TotalExercises,
 			&workout.TotalSeries,
 			&exercisesJSON,
@@ -143,6 +147,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			loc = time.FixedZone("UTC-3", -3*60*60)
 		}
 		workout.WorkoutDate = workoutDate.In(loc).Format(time.RFC3339)
+		workout.CreatedAt = createdAt.In(loc).Format(time.RFC3339)
 
 		// Parsear el JSON de ejercicios
 		if err := json.Unmarshal([]byte(exercisesJSON), &workout.Exercises); err != nil {

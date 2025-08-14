@@ -25,6 +25,7 @@ type SocialWorkout = {
   user_name: string
   user_avatar_url?: string
   workout_date: string
+  created_at: string
   total_exercises: number
   total_series: number
   exercises: SocialExercise[]
@@ -289,7 +290,7 @@ export default function SocialList() {
                             {workout.user_name}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {formatRelativeTime(workout.workout_date)}
+                            {formatRelativeTime(workout.created_at)}
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right' }}>
