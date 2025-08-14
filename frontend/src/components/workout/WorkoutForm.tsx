@@ -133,7 +133,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       }
       
       // Solo incluir weight si tiene un valor válido
-      if (data.weight !== undefined && data.weight !== 0) {
+      if (data.weight !== undefined && data.weight !== 0 && data.weight !== null) {
         workoutData.weight = data.weight
       }
       
