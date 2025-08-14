@@ -128,6 +128,16 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         data.weight = undefined
       }
       
+      console.log('🔍 DEBUG - Datos a enviar:', {
+        exercise_id: data.exercise_id,
+        weight: data.weight,
+        weightType: typeof data.weight,
+        reps: data.reps,
+        serie: data.serie,
+        seconds: data.seconds,
+        observations: data.observations
+      })
+      
       await onSubmit(data)
       setShowSuccess(true)
       reset({

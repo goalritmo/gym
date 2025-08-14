@@ -188,7 +188,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("CreateWorkoutHandler: Request recibida - ExerciseID: %d, Weight: %v, Reps: %d\n", req.ExerciseID, req.Weight, req.Reps)
+	fmt.Printf("CreateWorkoutHandler: Request recibida - ExerciseID: %d, Weight: %v (tipo: %T), Reps: %d\n", req.ExerciseID, req.Weight, req.Weight, req.Reps)
 
 	// Validaciones
 	if req.Reps <= 0 {
