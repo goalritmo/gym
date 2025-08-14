@@ -179,8 +179,8 @@ export default function SocialList() {
     })
     
     socialWorkouts.forEach(workout => {
-      // Agrupar solo por fecha (sin hora)
-      const workoutDate = new Date(workout.workout_date)
+      // Agrupar por fecha de creación (created_at)
+      const workoutDate = new Date(workout.created_at)
       const dayKey = workoutDate.toISOString().split('T')[0] // YYYY-MM-DD
       
       if (!groups[dayKey]) {
@@ -192,7 +192,7 @@ export default function SocialList() {
     return Object.entries(groups)
       .map(([date, workouts]) => ({
         date,
-        workouts: workouts.sort((a, b) => new Date(b.workout_date).getTime() - new Date(a.workout_date).getTime())
+        workouts: workouts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       }))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Ordenar grupos por fecha
   }, [socialWorkouts])

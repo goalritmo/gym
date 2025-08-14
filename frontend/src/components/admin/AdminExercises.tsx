@@ -141,7 +141,7 @@ export function AdminExercises() {
       maxWidth: '900px', 
       mx: 'auto',
       px: { xs: 2, sm: 3, md: 4 },
-      height: '100%',
+      height: 'calc(100vh - 200px)',
       display: 'flex',
       flexDirection: 'column'
     }}>
