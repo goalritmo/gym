@@ -73,6 +73,10 @@ func main() {
 	api.HandleFunc("/notifications/{id}/read", handlers.MarkNotificationAsReadHandler).Methods("PUT")
 	api.HandleFunc("/notifications/read-all", handlers.MarkAllNotificationsAsReadHandler).Methods("PUT")
 	api.HandleFunc("/notifications/{id}", handlers.DeleteNotificationHandler).Methods("DELETE")
+	
+	// Welcome notification endpoints
+	api.HandleFunc("/welcome-notification", handlers.CreateWelcomeNotificationHandler).Methods("POST")
+	api.HandleFunc("/welcome-notification", handlers.GetWelcomeNotificationHandler).Methods("GET")
 
 	// User settings endpoints
 	api.HandleFunc("/user-settings", handlers.GetUserSettingsHandler).Methods("GET")

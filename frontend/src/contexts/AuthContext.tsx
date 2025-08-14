@@ -71,6 +71,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         try {
           const userInfo = await apiClient.getCurrentUser() as UserInfo
           setIsAdmin(userInfo.is_admin || false)
+          
+          // Crear notificación de bienvenida para nuevos usuarios
+          try {
+            await apiClient.createWelcomeNotification()
+            console.log('Notificación de bienvenida creada o ya existía')
+          } catch (error) {
+            console.log('Error creando notificación de bienvenida:', error)
+            // No es crítico si falla, solo log
+          }
         } catch (error) {
           console.error('Error fetching user info:', error)
           setIsAdmin(false)

@@ -22,11 +22,12 @@ import {
   ThumbUp, 
   Announcement,
   Close,
-  CheckCircleOutline
+  CheckCircleOutline,
+  Celebration
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 
-type NotificationType = 'general' | 'kudos' | 'announcement' | 'workout_created'
+type NotificationType = 'general' | 'kudos' | 'announcement' | 'workout_created' | 'welcome'
 
 type Notification = {
   id: number
@@ -135,6 +136,8 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
 
   const getNotificationIcon = (type: NotificationType, priority?: string) => {
     switch (type) {
+      case 'welcome':
+        return <Celebration sx={{ color: 'primary.main' }} />
       case 'announcement':
         return <Announcement sx={{ color: priority === 'high' ? 'error.main' : 'warning.main' }} />
       case 'kudos':
@@ -148,6 +151,8 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
 
   const getNotificationColor = (type: NotificationType, priority?: string) => {
     switch (type) {
+      case 'welcome':
+        return 'primary'
       case 'announcement':
         return priority === 'high' ? 'error' : 'warning'
       case 'kudos':

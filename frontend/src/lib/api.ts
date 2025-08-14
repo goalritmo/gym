@@ -208,6 +208,17 @@ class ApiClient {
     })
   }
 
+  // Welcome notification API
+  async createWelcomeNotification() {
+    return this.request('/welcome-notification', {
+      method: 'POST'
+    })
+  }
+
+  async getWelcomeNotification() {
+    return this.request('/welcome-notification')
+  }
+
   // User Settings API
   async getUserSettings() {
     return this.request('/user-settings')

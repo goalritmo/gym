@@ -15,11 +15,12 @@ import {
   Notifications, 
   Info, 
   ThumbUp, 
-  Announcement
+  Announcement,
+  Celebration
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 
-type NotificationType = 'general' | 'kudos' | 'announcement'
+type NotificationType = 'general' | 'kudos' | 'announcement' | 'welcome'
 
 type Notification = {
   id: string
@@ -129,6 +130,8 @@ export default function NotificationsList() {
 
   const getNotificationIcon = (type: NotificationType, priority?: string) => {
     switch (type) {
+      case 'welcome':
+        return <Celebration sx={{ color: 'primary.main' }} />
       case 'announcement':
         return <Announcement sx={{ color: priority === 'high' ? 'error.main' : 'warning.main' }} />
       case 'kudos':
@@ -142,6 +145,8 @@ export default function NotificationsList() {
 
   const getNotificationColor = (type: NotificationType, priority?: string) => {
     switch (type) {
+      case 'welcome':
+        return 'primary'
       case 'announcement':
         return priority === 'high' ? 'error' : 'warning'
       case 'kudos':
