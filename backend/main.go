@@ -62,6 +62,7 @@ func main() {
 	// Users endpoints (usando Supabase Auth)
 	api.HandleFunc("/me", handlers.GetCurrentUserHandler).Methods("GET")
 	api.HandleFunc("/me/stats", handlers.GetUserStatsHandler).Methods("GET")
+	api.HandleFunc("/me/last-signin", handlers.UpdateLastSignInHandler).Methods("POST")
 
 	// Social endpoints
 	api.HandleFunc("/social/workouts", handlers.GetSocialWorkoutsHandler).Methods("GET")

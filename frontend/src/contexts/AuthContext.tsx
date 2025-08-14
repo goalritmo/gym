@@ -75,6 +75,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setIsAdmin(userInfo.is_admin || false)
           setUserRole(userInfo.role || 'user')
           
+          // Actualizar último acceso
+          try {
+            await apiClient.updateLastSignIn()
+            console.log('Último acceso actualizado')
+          } catch (error) {
+            console.log('Error actualizando último acceso:', error)
+            // No es crítico si falla, solo log
+          }
+          
           // Crear notificación de bienvenida para nuevos usuarios
           try {
             await apiClient.createWelcomeNotification()

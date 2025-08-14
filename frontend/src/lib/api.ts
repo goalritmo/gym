@@ -95,6 +95,11 @@ class ApiClient {
     return this.request('/health', { requireAuth: false })
   }
 
+  // Update last sign in
+  async updateLastSignIn() {
+    return this.request('/me/last-signin', { method: 'POST' })
+  }
+
   // Workouts API
   async getWorkouts(date?: string, workoutDayId?: string) {
     const params = new URLSearchParams()

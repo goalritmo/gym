@@ -254,7 +254,10 @@ export function AdminNotifications() {
     <Box sx={{ 
       maxWidth: '900px', 
       mx: 'auto',
-      px: { xs: 2, sm: 3, md: 4 }
+      px: { xs: 2, sm: 3, md: 4 },
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       {/* Header */}
       <Box sx={{ 
@@ -297,8 +300,7 @@ export function AdminNotifications() {
 
       {/* Notifications List */}
       <Box sx={{ 
-        minHeight: '400px',
-        maxHeight: '60vh', 
+        flex: 1,
         overflowY: 'auto',
         pr: 1,
         '&::-webkit-scrollbar': {

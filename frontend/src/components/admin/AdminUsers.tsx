@@ -148,7 +148,10 @@ export function AdminUsers() {
     <Box sx={{
       maxWidth: '900px',
       mx: 'auto',
-      px: { xs: 2, sm: 3, md: 4 }
+      px: { xs: 2, sm: 3, md: 4 },
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       {/* Header */}
       <Box sx={{ 
@@ -190,8 +193,7 @@ export function AdminUsers() {
 
       {/* Users List */}
       <Box sx={{ 
-        minHeight: '400px',
-        maxHeight: '600px', 
+        flex: 1,
         overflowY: 'auto',
         '&::-webkit-scrollbar': {
           width: '8px',
