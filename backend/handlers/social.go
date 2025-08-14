@@ -438,6 +438,9 @@ func createKudosNotification(workoutDayID int, fromUserID, toUserID string) {
 		fmt.Printf("Error obteniendo fecha del workout: %v\n", err)
 		return
 	}
+	
+	// Restar un día para corregir el offset de zona horaria en notificaciones
+	workoutDate = workoutDate.AddDate(0, 0, -1)
 
 	// Buscar si ya existe una notificación de kudos para este workout
 	var existingNotificationID int
