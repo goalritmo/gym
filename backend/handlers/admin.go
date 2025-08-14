@@ -324,7 +324,7 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		SELECT 
-			id, name, muscle_group, equipment_id, video_url, created_at
+			id, name, muscle_group, equipment, video_url, created_at
 		FROM exercises
 		ORDER BY name ASC
 	`
@@ -341,13 +341,13 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	count := 0
 	for rows.Next() {
 		var exercise AdminExercise
-		var equipmentID *int
+		var equipment string
 		
 		err := rows.Scan(
 			&exercise.ID,
 			&exercise.Name,
 			&exercise.MuscleGroup,
-			&equipmentID,
+			&equipment,
 			&exercise.VideoURL,
 			&exercise.CreatedAt,
 		)
@@ -357,12 +357,7 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Por ahora, usar el ID del equipo como nombre
-		if equipmentID != nil {
-			exercise.Equipment = fmt.Sprintf("Equipo %d", *equipmentID)
-		} else {
-			exercise.Equipment = "Sin equipo"
-		}
+		exercise.Equipment = equipment
 		
 		// Arrays vacíos por defecto
 		exercise.PrimaryMuscles = []string{}
@@ -388,24 +383,25 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validar campos requeridos
-	if req.Name == "" || req.MuscleGroup == "" || req.Equipment == "" {
-		http.Error(w, "Nombre, grupo muscular y equipo son requeridos", http.StatusBadRequest)
+	if req.Name == "" || req.MuscleGroup == "" {
+		http.Error(w, "Nombre y grupo muscular son requeridos", http.StatusBadRequest)
 		return
 	}
 
 	query := `
-		INSERT INTO exercises (name, muscle_group, equipment, primary_muscles, secondary_muscles, video_url)
-		VALUES ($1, $2, $3, $4, $5, $6)
-		RETURNING id, created_at, updated_at
+		INSERT INTO exercises (name, muscle_group, equipment, video_url)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id, created_at
 	`
+
+	// Usar "Peso libre" como default
+	equipment := "Peso libre"
 
 	var exercise AdminExercise
 	err := database.DB.QueryRow(query, 
 		req.Name, 
 		req.MuscleGroup, 
-		req.Equipment, 
-		req.PrimaryMuscles,
-		req.SecondaryMuscles,
+		equipment,
 		req.VideoURL,
 	).Scan(&exercise.ID, &exercise.CreatedAt)
 
@@ -416,9 +412,9 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 
 	exercise.Name = req.Name
 	exercise.MuscleGroup = req.MuscleGroup
-	exercise.Equipment = req.Equipment
-	exercise.PrimaryMuscles = req.PrimaryMuscles
-	exercise.SecondaryMuscles = req.SecondaryMuscles
+	exercise.Equipment = "Peso libre"
+	exercise.PrimaryMuscles = []string{}
+	exercise.SecondaryMuscles = []string{}
 	exercise.VideoURL = req.VideoURL
 
 	w.WriteHeader(http.StatusCreated)
