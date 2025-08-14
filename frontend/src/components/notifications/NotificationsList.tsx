@@ -64,7 +64,7 @@ export default function NotificationsList() {
       
       // Combinar y transformar las notificaciones
       const allNotifications: Notification[] = [
-        ...userNotifications.map((notif: any) => ({
+        ...(userNotifications || []).map((notif: any) => ({
           id: notif.id.toString(),
           type: notif.type as NotificationType,
           title: notif.title,
@@ -73,7 +73,7 @@ export default function NotificationsList() {
           read: notif.is_read || false,
           priority: notif.priority || 'medium'
         })),
-        ...systemNotifications.map((notif: any) => ({
+        ...(systemNotifications || []).map((notif: any) => ({
           id: `system_${notif.id}`,
           type: notif.type as NotificationType,
           title: notif.title,
@@ -176,7 +176,7 @@ export default function NotificationsList() {
     )
   }
 
-  if (notifications.length === 0) {
+  if (notifications?.length === 0) {
     return (
       <Box sx={{ p: 3 }}>
         <Paper 

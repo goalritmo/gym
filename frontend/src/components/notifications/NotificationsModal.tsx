@@ -74,7 +74,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     
     try {
       const notificationsData = await apiClient.getNotifications() as Notification[]
-      setNotifications(notificationsData)
+      setNotifications(notificationsData || [])
     } catch (error) {
       console.error('Error cargando notificaciones:', error)
       setError('Error al cargar las notificaciones')
@@ -159,7 +159,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     }
   }
 
-  const unreadCount = notifications.filter(n => !n.is_read).length
+  const unreadCount = notifications?.filter(n => !n.is_read)?.length || 0
 
   return (
     <Dialog 
@@ -221,7 +221,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
-        ) : notifications.length === 0 ? (
+        ) : notifications?.length === 0 ? (
           <Paper 
             elevation={0} 
             sx={{ 
@@ -241,7 +241,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
           </Paper>
         ) : (
           <Stack spacing={2} sx={{ maxWidth: 600, mx: 'auto', mt: 2 }}>
-            {notifications.map((notification) => (
+            {notifications?.map((notification) => (
               <Card 
                 key={notification.id} 
                 sx={{ 
