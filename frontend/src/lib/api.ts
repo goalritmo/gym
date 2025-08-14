@@ -104,7 +104,7 @@ class ApiClient {
   async setupUser(userId: string, email: string, name?: string) {
     return this.request('/me/setup', {
       method: 'POST',
-      body: JSON.stringify({ user_id: userId, email, name })
+      body: { user_id: userId, email, name }
     })
   }
 
