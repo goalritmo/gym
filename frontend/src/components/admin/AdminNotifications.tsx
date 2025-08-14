@@ -111,13 +111,17 @@ export function AdminNotifications() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    const date = new Date(dateString)
+    const weekdays = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
+    const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+    
+    const weekday = weekdays[date.getDay()]
+    const day = date.getDate()
+    const month = months[date.getMonth()]
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    
+    return `Creada el ${weekday} ${day} de ${month} a las ${hours}:${minutes}`
   }
 
   const handleDeleteClick = (id: number) => {
@@ -222,12 +226,12 @@ export function AdminNotifications() {
                       </Typography>
                     </Box>
                     
-                    <Typography variant="body1" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
+                    <Typography variant="body1" sx={{ mb: 1, whiteSpace: 'pre-wrap' }}>
                       {notification.message}
                     </Typography>
 
                     <Typography variant="caption" color="text.secondary">
-                      Creada: {formatDate(notification.created_at)}
+                      {formatDate(notification.created_at)}
                       {notification.updated_at !== notification.created_at && 
                         ` • Actualizada: ${formatDate(notification.updated_at)}`
                       }
@@ -360,7 +364,7 @@ export function AdminNotifications() {
           Confirmar eliminación
         </DialogTitle>
         <DialogContent sx={{ pt: 3 }}>
-          <Typography variant="body1">
+          <Typography variant="body1" sx={{ pt: 2 }}>
             ¿Estás seguro de que quieres eliminar esta notificación? Esta acción no se puede deshacer.
           </Typography>
         </DialogContent>
