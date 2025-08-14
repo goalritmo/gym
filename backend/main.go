@@ -91,14 +91,16 @@ func main() {
 	api.HandleFunc("/fix-triggers", handlers.FixTriggersHandler).Methods("POST")
 
 	// Admin endpoints (requieren permisos de administrador)
-	api.HandleFunc("/admin/notifications", handlers.AdminMiddleware(handlers.GetAdminNotificationsHandler)).Methods("GET")
-	api.HandleFunc("/admin/notifications", handlers.AdminMiddleware(handlers.CreateNotificationHandler)).Methods("POST")
-	api.HandleFunc("/admin/notifications/{id}", handlers.AdminMiddleware(handlers.UpdateAdminNotificationHandler)).Methods("PUT")
-	api.HandleFunc("/admin/notifications/{id}", handlers.AdminMiddleware(handlers.DeleteAdminNotificationHandler)).Methods("DELETE")
-	api.HandleFunc("/admin/notifications/{id}/history", handlers.AdminMiddleware(handlers.GetNotificationHistoryHandler)).Methods("GET")
-	api.HandleFunc("/admin/exercises", handlers.AdminMiddleware(handlers.GetAdminExercisesHandler)).Methods("GET")
-	api.HandleFunc("/admin/exercises", handlers.AdminMiddleware(handlers.CreateExerciseHandler)).Methods("POST")
+	api.HandleFunc("/admin/notifications", handlers.AdminStaffOrTeacherMiddleware(handlers.GetAdminNotificationsHandler)).Methods("GET")
+	api.HandleFunc("/admin/notifications", handlers.AdminStaffOrTeacherMiddleware(handlers.CreateNotificationHandler)).Methods("POST")
+	api.HandleFunc("/admin/notifications/{id}", handlers.AdminStaffOrTeacherMiddleware(handlers.UpdateAdminNotificationHandler)).Methods("PUT")
+	api.HandleFunc("/admin/notifications/{id}", handlers.AdminStaffOrTeacherMiddleware(handlers.DeleteAdminNotificationHandler)).Methods("DELETE")
+	api.HandleFunc("/admin/notifications/{id}/history", handlers.AdminStaffOrTeacherMiddleware(handlers.GetNotificationHistoryHandler)).Methods("GET")
+	api.HandleFunc("/admin/exercises", handlers.AdminOrTeacherMiddleware(handlers.GetAdminExercisesHandler)).Methods("GET")
+	api.HandleFunc("/admin/exercises", handlers.AdminOrTeacherMiddleware(handlers.CreateExerciseHandler)).Methods("POST")
 	api.HandleFunc("/admin/users", handlers.AdminMiddleware(handlers.GetAdminUsersHandler)).Methods("GET")
+	api.HandleFunc("/admin/users/{id}", handlers.AdminMiddleware(handlers.DeleteAdminUserHandler)).Methods("DELETE")
+	api.HandleFunc("/admin/users/{id}/role", handlers.AdminMiddleware(handlers.UpdateAdminUserRoleHandler)).Methods("PUT")
 	
 
 

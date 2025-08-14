@@ -14,6 +14,7 @@ import { Close as CloseIcon } from '@mui/icons-material'
 import { AdminNotifications } from './AdminNotifications'
 import { AdminExercises } from './AdminExercises'
 import { AdminUsers } from './AdminUsers'
+import { useAuth } from '../../contexts/AuthContext'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -49,6 +50,7 @@ type AdminPanelProps = {
 export default function AdminPanel({ open, onClose }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState(0)
   const [loading, setLoading] = useState(true)
+  const { userRole } = useAuth()
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue)
@@ -83,7 +85,9 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-            🛠️ Panel de Administrador
+            {userRole === 'staff' ? '🛠️ Panel de Staff' : 
+             userRole === 'profe' ? '👍 Panel de Profesor' : 
+             '🛠️ Panel de Administrador'}
           </Typography>
         </Box>
         <IconButton

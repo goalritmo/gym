@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/goalritmo/gym/backend/database"
 )
 
@@ -12,8 +13,8 @@ type SupabaseUser struct {
 	ID       string                 `json:"id"`
 	Email    *string                `json:"email"`
 	Metadata map[string]interface{} `json:"user_metadata"`
-	Role     string                 `json:"role"`
 	IsAdmin  bool                   `json:"is_admin"`
+	Role     string                 `json:"role"`
 }
 
 // GetCurrentUserHandler obtiene el usuario actual desde Supabase Auth
@@ -32,8 +33,8 @@ func GetCurrentUserHandler(w http.ResponseWriter, r *http.Request) {
 			u.id,
 			u.email,
 			COALESCE(u.raw_user_meta_data, '{}')::jsonb as user_metadata,
-			u.role,
-			COALESCE(up.is_admin, false) as is_admin
+			COALESCE(up.is_admin, false) as is_admin,
+			COALESCE(up.role, 'user') as role
 		FROM auth.users u
 		LEFT JOIN user_profiles up ON u.id = up.user_id
 		WHERE u.id = $1
@@ -46,8 +47,8 @@ func GetCurrentUserHandler(w http.ResponseWriter, r *http.Request) {
 		&user.ID,
 		&user.Email,
 		&userMetadataJSON,
-		&user.Role,
 		&user.IsAdmin,
+		&user.Role,
 	)
 
 	if err != nil {
@@ -118,6 +119,7 @@ type AdminUser struct {
 	Email     *string `json:"email"`
 	Name      *string `json:"name"`
 	IsAdmin   bool    `json:"is_admin"`
+	Role      string  `json:"role"`
 	CreatedAt string  `json:"created_at"`
 	LastLogin *string `json:"last_login"`
 	Settings  *UserSettings `json:"settings"`
@@ -134,6 +136,7 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			u.email,
 			COALESCE(up.name, 'Sin nombre') as name,
 			COALESCE(up.is_admin, false) as is_admin,
+			COALESCE(up.role, 'user') as role,
 			u.created_at,
 			u.last_sign_in_at,
 			COALESCE(us.show_own_workouts_in_social, true) as show_own_workouts_in_social,
@@ -164,6 +167,7 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			&user.Email,
 			&user.Name,
 			&user.IsAdmin,
+			&user.Role,
 			&user.CreatedAt,
 			&lastSignInAt,
 			&showOwnWorkoutsInSocial,
@@ -194,4 +198,186 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(users)
+}
+
+// DeleteAdminUserHandler elimina un usuario (solo para administradores)
+func DeleteAdminUserHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Obtener el ID del usuario a eliminar de la URL
+	vars := mux.Vars(r)
+	userID := vars["id"]
+
+	if userID == "" {
+		http.Error(w, "ID de usuario requerido", http.StatusBadRequest)
+		return
+	}
+
+	// Iniciar transacción
+	tx, err := database.DB.Begin()
+	if err != nil {
+		http.Error(w, "Error iniciando transacción", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
+
+	// Eliminar registros relacionados en orden (por restricciones de clave foránea)
+	
+	// 1. Eliminar de notification_history
+	_, err = tx.Exec("DELETE FROM notification_history WHERE changed_by = $1", userID)
+	if err != nil {
+		http.Error(w, "Error eliminando historial de notificaciones", http.StatusInternalServerError)
+		return
+	}
+
+	// 2. Actualizar admin_notifications (poner created_by y updated_by en NULL)
+	_, err = tx.Exec("UPDATE admin_notifications SET created_by = NULL, updated_by = NULL WHERE created_by = $1 OR updated_by = $1", userID)
+	if err != nil {
+		http.Error(w, "Error actualizando notificaciones", http.StatusInternalServerError)
+		return
+	}
+
+	// 3. Eliminar de user_settings
+	_, err = tx.Exec("DELETE FROM user_settings WHERE user_id = $1", userID)
+	if err != nil {
+		http.Error(w, "Error eliminando configuraciones de usuario", http.StatusInternalServerError)
+		return
+	}
+
+	// 4. Eliminar de user_profiles
+	_, err = tx.Exec("DELETE FROM user_profiles WHERE user_id = $1", userID)
+	if err != nil {
+		http.Error(w, "Error eliminando perfil de usuario", http.StatusInternalServerError)
+		return
+	}
+
+	// 5. Eliminar de workouts y workout_sessions
+	_, err = tx.Exec("DELETE FROM workout_sessions WHERE user_id = $1", userID)
+	if err != nil {
+		http.Error(w, "Error eliminando sesiones de entrenamiento", http.StatusInternalServerError)
+		return
+	}
+
+	_, err = tx.Exec("DELETE FROM workouts WHERE user_id = $1", userID)
+	if err != nil {
+		http.Error(w, "Error eliminando entrenamientos", http.StatusInternalServerError)
+		return
+	}
+
+	// 6. Eliminar de workout_days
+	_, err = tx.Exec("DELETE FROM workout_days WHERE user_id = $1", userID)
+	if err != nil {
+		http.Error(w, "Error eliminando días de entrenamiento", http.StatusInternalServerError)
+		return
+	}
+
+	// 7. Eliminar de notifications
+	_, err = tx.Exec("DELETE FROM notifications WHERE user_id = $1", userID)
+	if err != nil {
+		http.Error(w, "Error eliminando notificaciones", http.StatusInternalServerError)
+		return
+	}
+
+	// 8. Eliminar de kudos
+	_, err = tx.Exec("DELETE FROM kudos WHERE from_user_id = $1 OR to_user_id = $1", userID, userID)
+	if err != nil {
+		http.Error(w, "Error eliminando kudos", http.StatusInternalServerError)
+		return
+	}
+
+	// 9. Finalmente, eliminar de auth.users
+	_, err = tx.Exec("DELETE FROM auth.users WHERE id = $1", userID)
+	if err != nil {
+		http.Error(w, "Error eliminando usuario de auth", http.StatusInternalServerError)
+		return
+	}
+
+	// Confirmar transacción
+	if err = tx.Commit(); err != nil {
+		http.Error(w, "Error confirmando transacción", http.StatusInternalServerError)
+		return
+	}
+
+	// Responder con éxito
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Usuario eliminado exitosamente",
+	})
+}
+
+// UpdateUserRoleRequest representa la solicitud para actualizar el rol de un usuario
+type UpdateUserRoleRequest struct {
+	Role string `json:"role"`
+}
+
+// UpdateAdminUserRoleHandler actualiza el rol de un usuario (solo para administradores)
+func UpdateAdminUserRoleHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Obtener el ID del usuario de la URL
+	vars := mux.Vars(r)
+	userID := vars["id"]
+
+	if userID == "" {
+		http.Error(w, "ID de usuario requerido", http.StatusBadRequest)
+		return
+	}
+
+	// Decodificar el cuerpo de la solicitud
+	var req UpdateUserRoleRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		return
+	}
+
+	// Validar el rol
+	validRoles := map[string]bool{
+		"user":  true,
+		"profe": true,
+		"staff": true,
+	}
+
+	if !validRoles[req.Role] {
+		http.Error(w, "Rol inválido. Roles válidos: user, profe, staff", http.StatusBadRequest)
+		return
+	}
+
+	// Actualizar el rol del usuario
+	query := `
+		UPDATE user_profiles 
+		SET role = $1, updated_at = NOW()
+		WHERE user_id = $2
+	`
+
+	result, err := database.DB.Exec(query, req.Role, userID)
+	if err != nil {
+		http.Error(w, "Error actualizando rol de usuario", http.StatusInternalServerError)
+		return
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		http.Error(w, "Error verificando actualización", http.StatusInternalServerError)
+		return
+	}
+
+	if rowsAffected == 0 {
+		// Si no se actualizó ningún registro, crear el perfil
+		_, err = database.DB.Exec(`
+			INSERT INTO user_profiles (user_id, role, updated_at) 
+			VALUES ($1, $2, NOW()) 
+			ON CONFLICT (user_id) DO UPDATE SET role = $2, updated_at = NOW()
+		`, userID, req.Role)
+		
+		if err != nil {
+			http.Error(w, "Error creando/actualizando perfil de usuario", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Responder con éxito
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Rol de usuario actualizado exitosamente",
+	})
 }

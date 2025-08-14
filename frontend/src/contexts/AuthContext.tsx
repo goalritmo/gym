@@ -8,8 +8,8 @@ type UserInfo = {
   id: string
   email?: string
   user_metadata: Record<string, any>
-  role: string
   is_admin: boolean
+  role: string
 }
 
 type AuthContextType = {
@@ -20,6 +20,7 @@ type AuthContextType = {
   isLoggingOut: boolean
   isSigningIn: boolean
   isAdmin: boolean
+  userRole: string
   signInWithGoogle: () => Promise<{ error?: any }>
   logout: () => Promise<void>
 }
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isSigningIn, setIsSigningIn] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [userRole, setUserRole] = useState('user')
 
   useEffect(() => {
     // Get initial session
@@ -71,6 +73,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         try {
           const userInfo = await apiClient.getCurrentUser() as UserInfo
           setIsAdmin(userInfo.is_admin || false)
+          setUserRole(userInfo.role || 'user')
           
           // Crear notificación de bienvenida para nuevos usuarios
           try {
@@ -86,6 +89,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       } else {
         setIsAdmin(false)
+        setUserRole('user')
       }
     }
 
@@ -132,6 +136,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isLoggingOut,
       isSigningIn,
       isAdmin,
+      userRole,
       signInWithGoogle, 
       logout 
     }}>

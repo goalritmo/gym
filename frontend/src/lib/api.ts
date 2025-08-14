@@ -296,6 +296,19 @@ class ApiClient {
   async getAdminUsers() {
     return this.request('/admin/users')
   }
+
+  async deleteAdminUser(id: string) {
+    return this.request(`/admin/users/${id}`, {
+      method: 'DELETE'
+    })
+  }
+
+  async updateAdminUserRole(id: string, role: string) {
+    return this.request(`/admin/users/${id}/role`, {
+      method: 'PUT',
+      body: { role }
+    })
+  }
 }
 
 // Export singleton instance

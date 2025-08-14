@@ -106,6 +106,76 @@ func AdminMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// Middleware para verificar si el usuario es administrador o profesor
+func AdminOrTeacherMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID, ok := r.Context().Value("user_id").(string)
+		if !ok || userID == "" {
+			http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+			return
+		}
+
+		// Verificar si el usuario es administrador o profesor
+		var isAdmin bool
+		var role string
+		query := `SELECT COALESCE(is_admin, false), COALESCE(role, 'user') FROM user_profiles WHERE user_id = $1`
+		err := database.DB.QueryRow(query, userID).Scan(&isAdmin, &role)
+		if err != nil {
+			// Si no existe el perfil, crear uno por defecto
+			_, err = database.DB.Exec(`INSERT INTO user_profiles (user_id, is_admin, role) VALUES ($1, false, 'user') ON CONFLICT (user_id) DO NOTHING`, userID)
+			if err != nil {
+				http.Error(w, "Error verificando permisos", http.StatusInternalServerError)
+				return
+			}
+			isAdmin = false
+			role = "user"
+		}
+
+		// Permitir acceso si es admin o profesor
+		if !isAdmin && role != "profe" {
+			http.Error(w, "Forbidden: Admin or Teacher access required", http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	}
+}
+
+// Middleware para verificar si el usuario es administrador, staff o profesor
+func AdminStaffOrTeacherMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID, ok := r.Context().Value("user_id").(string)
+		if !ok || userID == "" {
+			http.Error(w, "Unauthorized: user_id not found in context", http.StatusUnauthorized)
+			return
+		}
+
+		// Verificar si el usuario es administrador, staff o profesor
+		var isAdmin bool
+		var role string
+		query := `SELECT COALESCE(is_admin, false), COALESCE(role, 'user') FROM user_profiles WHERE user_id = $1`
+		err := database.DB.QueryRow(query, userID).Scan(&isAdmin, &role)
+		if err != nil {
+			// Si no existe el perfil, crear uno por defecto
+			_, err = database.DB.Exec(`INSERT INTO user_profiles (user_id, is_admin, role) VALUES ($1, false, 'user') ON CONFLICT (user_id) DO NOTHING`, userID)
+			if err != nil {
+				http.Error(w, "Error verificando permisos", http.StatusInternalServerError)
+				return
+			}
+			isAdmin = false
+			role = "user"
+		}
+
+		// Permitir acceso si es admin, staff o profesor
+		if !isAdmin && role != "profe" && role != "staff" {
+			http.Error(w, "Forbidden: Admin, Staff or Teacher access required", http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	}
+}
+
 // GetAdminNotificationsHandler obtiene todas las notificaciones del administrador
 func GetAdminNotificationsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
