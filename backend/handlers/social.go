@@ -431,13 +431,16 @@ func createKudosNotification(workoutDayID int, fromUserID, toUserID string) {
 		return
 	}
 
-	// Verificar que existe el workout day
+			// Verificar que existe el workout day
 	var workoutDate time.Time
 	err = database.DB.QueryRow("SELECT created_at FROM workout_days WHERE id = $1 AND user_id = $2", workoutDayID, toUserID).Scan(&workoutDate)
 	if err != nil {
 		fmt.Printf("Error obteniendo fecha del workout: %v\n", err)
 		return
 	}
+	
+	// Corregir offset de zona horaria agregando un día
+	workoutDate = workoutDate.AddDate(0, 0, 1)
 
 	// Buscar si ya existe una notificación de kudos para este workout
 	var existingNotificationID int
