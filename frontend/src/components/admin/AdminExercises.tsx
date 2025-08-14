@@ -132,7 +132,11 @@ export function AdminExercises() {
   }
 
   return (
-    <Box>
+    <Box sx={{ 
+      maxWidth: '900px', 
+      mx: 'auto',
+      px: { xs: 2, sm: 3, md: 4 }
+    }}>
       {/* Header */}
       <Box sx={{ 
         display: 'flex', 
@@ -256,7 +260,7 @@ export function AdminExercises() {
           fontWeight: 'bold'
         }}>
           <AddIcon sx={{ color: 'primary.main' }} />
-          Crear Ejercicio
+          Agregar Ejercicio
         </DialogTitle>
         
         <DialogContent>
@@ -284,9 +288,9 @@ export function AdminExercises() {
             variant="contained"
             onClick={handleCreateExercise}
             disabled={creating || !form.name.trim()}
-            startIcon={creating ? <CircularProgress size={16} /> : <AddIcon />}
+            startIcon={creating ? <CircularProgress size={16} /> : undefined}
           >
-            {creating ? 'Creando...' : 'Crear Ejercicio'}
+            {creating ? 'Creando...' : 'Confirmar'}
           </Button>
         </DialogActions>
       </Dialog>

@@ -170,7 +170,11 @@ export function AdminNotifications() {
   }
 
   return (
-    <Box>
+    <Box sx={{ 
+      maxWidth: '900px', 
+      mx: 'auto',
+      px: { xs: 2, sm: 3, md: 4 }
+    }}>
       {/* Header */}
       <Box sx={{ 
         display: 'flex', 
