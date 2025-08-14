@@ -123,6 +123,8 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         data.seconds = currentTimerTime
       }
       
+      console.log('🔍 DEBUG - data.weight antes de procesar:', data.weight, 'tipo:', typeof data.weight)
+      
       // Crear objeto de datos sin el campo weight si está vacío
       const workoutData: any = {
         exercise_id: data.exercise_id,
@@ -222,7 +224,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             type="number"
             disabled={isLoading}
             error={Boolean(errors.weight)}
-            value={watch('weight') || ''}
+            value={watch('weight') === undefined || watch('weight') === null ? '' : watch('weight')}
             onChange={(e) => handleNumberInput('weight', e.target.value)}
             inputProps={{ 
               step: 'any',
