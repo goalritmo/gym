@@ -24,8 +24,7 @@ import {
   Info as InfoIcon,
   Warning as WarningIcon,
   CheckCircle as SuccessIcon,
-  Error as ErrorIcon,
-  Delete as DeleteIcon
+  Error as ErrorIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 
@@ -64,7 +63,6 @@ export function AdminNotifications() {
   const [error, setError] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
   const [creating, setCreating] = useState(false)
-  const [deleting, setDeleting] = useState<number | null>(null)
   const [form, setForm] = useState<CreateNotificationForm>({
     title: '',
     message: '',

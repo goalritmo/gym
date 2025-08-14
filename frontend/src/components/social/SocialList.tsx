@@ -178,7 +178,10 @@ export default function SocialList() {
     })
     
     socialWorkouts.forEach(workout => {
-      const dayKey = workout.workout_date
+      // Agrupar solo por fecha (sin hora)
+      const workoutDate = new Date(workout.workout_date)
+      const dayKey = workoutDate.toISOString().split('T')[0] // YYYY-MM-DD
+      
       if (!groups[dayKey]) {
         groups[dayKey] = []
       }
