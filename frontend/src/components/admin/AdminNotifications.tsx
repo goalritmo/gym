@@ -238,9 +238,14 @@ export function AdminNotifications() {
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        minHeight: '300px'
+        minHeight: '400px',
+        flexDirection: 'column',
+        gap: 2
       }}>
-        <CircularProgress size={40} />
+        <CircularProgress size={60} thickness={4} sx={{ color: 'primary.main' }} />
+        <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
+          Cargando notificaciones...
+        </Typography>
       </Box>
     )
   }

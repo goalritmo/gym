@@ -10,9 +10,19 @@ import {
   TextField,
   InputAdornment,
   Chip,
-  Avatar
+  Avatar,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from '@mui/material'
-import { Search as SearchIcon, Person as PersonIcon } from '@mui/icons-material'
+import { Search as SearchIcon, Person as PersonIcon, Delete as DeleteIcon } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 
 type AdminUser = {
@@ -22,7 +32,7 @@ type AdminUser = {
   is_admin: boolean
   role: string
   created_at: string
-  last_login: string | null
+  last_sign_in_at: string | null
   settings: {
     show_own_workouts_in_social: boolean
     unc_notifications_enabled: boolean
@@ -34,6 +44,9 @@ export function AdminUsers() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filterText, setFilterText] = useState('')
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ open: boolean; user: AdminUser | null }>({ open: false, user: null })
+  const [updatingRole, setUpdatingRole] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
   const loadUsers = async () => {
     try {
@@ -66,6 +79,45 @@ export function AdminUsers() {
     const minutes = date.getMinutes().toString().padStart(2, '0')
     
     return `${weekday} ${day} de ${month} de ${year} a las ${hours}:${minutes}`
+  }
+
+  const handleDeleteClick = (user: AdminUser) => {
+    setDeleteConfirmation({ open: true, user })
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmation.user) return
+    
+    try {
+      setDeleting(deleteConfirmation.user.id)
+      await apiClient.deleteAdminUser(deleteConfirmation.user.id)
+      setUsers(users.filter(u => u.id !== deleteConfirmation.user!.id))
+      setDeleteConfirmation({ open: false, user: null })
+    } catch (error) {
+      console.error('Error eliminando usuario:', error)
+      setError('Error al eliminar el usuario')
+    } finally {
+      setDeleting(null)
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmation({ open: false, user: null })
+  }
+
+  const handleUpdateRole = async (userId: string, newRole: string) => {
+    try {
+      setUpdatingRole(userId)
+      await apiClient.updateAdminUserRole(userId, newRole)
+      setUsers(users.map(user => 
+        user.id === userId ? { ...user, role: newRole } : user
+      ))
+    } catch (error) {
+      console.error('Error actualizando rol:', error)
+      setError('Error al actualizar el rol del usuario')
+    } finally {
+      setUpdatingRole(null)
+    }
   }
 
   // Filtrar usuarios por nombre o email
@@ -168,6 +220,13 @@ export function AdminUsers() {
                               sx={{ fontSize: '0.75rem' }}
                             />
                           )}
+                          <Chip 
+                            label={user.role === 'profe' ? 'Profe' : user.role === 'staff' ? 'Staff' : 'Usuario'} 
+                            size="small" 
+                            color={user.role === 'profe' ? 'secondary' : user.role === 'staff' ? 'warning' : 'default'} 
+                            variant="outlined"
+                            sx={{ fontSize: '0.75rem' }}
+                          />
                         </Box>
                         
                         {/* User Settings */}
@@ -194,6 +253,36 @@ export function AdminUsers() {
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         {user.email}
                       </Typography>
+
+                      {/* Role Selection and Delete Button */}
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
+                          <InputLabel>Rol</InputLabel>
+                          <Select
+                            value={user.role}
+                            label="Rol"
+                            onChange={(e) => handleUpdateRole(user.id, e.target.value)}
+                            disabled={updatingRole === user.id}
+                          >
+                            <MenuItem value="user">Usuario</MenuItem>
+                            <MenuItem value="profe">Profe</MenuItem>
+                            <MenuItem value="staff">Staff</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                        <IconButton
+                          onClick={() => handleDeleteClick(user)}
+                          disabled={deleting === user.id}
+                          color="error"
+                          size="small"
+                        >
+                          {deleting === user.id ? (
+                            <CircularProgress size={16} />
+                          ) : (
+                            <DeleteIcon />
+                          )}
+                        </IconButton>
+                      </Box>
                     </Box>
                   </Box>
 
@@ -202,9 +291,9 @@ export function AdminUsers() {
                       Registrado el {formatDate(user.created_at)}
                     </Typography>
                     
-                    {user.last_login && (
+                    {user.last_sign_in_at && (
                       <Typography variant="caption" color="text.secondary">
-                        Último acceso: {formatDate(user.last_login)}
+                        Último acceso: {formatDate(user.last_sign_in_at)}
                       </Typography>
                     )}
                   </Box>
@@ -214,6 +303,31 @@ export function AdminUsers() {
           )}
         </Stack>
       </Box>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmation.open} onClose={handleCancelDelete}>
+        <DialogTitle>Confirmar eliminación</DialogTitle>
+        <DialogContent>
+          <Typography>
+            ¿Estás seguro de que quieres eliminar al usuario{' '}
+            <strong>{deleteConfirmation.user?.name || deleteConfirmation.user?.email}</strong>?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Esta acción no se puede deshacer y eliminará todos los datos del usuario.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}>Cancelar</Button>
+          <Button 
+            onClick={handleConfirmDelete} 
+            color="error" 
+            variant="contained"
+            disabled={deleting === deleteConfirmation.user?.id}
+          >
+            {deleting === deleteConfirmation.user?.id ? 'Eliminando...' : 'Eliminar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }
