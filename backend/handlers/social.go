@@ -73,7 +73,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			wd.user_id,
 			COALESCE(up.name, 'Usuario') as user_name,
 			COALESCE(up.avatar_url, '') as user_avatar_url,
-			wd.created_at as workout_date,
+			wd.date as workout_date,
 			COALESCE(COUNT(DISTINCT w.exercise_id), 0) as total_exercises,
 			COALESCE(COUNT(w.id), 0) as total_series,
 			COALESCE(
@@ -96,8 +96,8 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		LEFT JOIN exercises e ON w.exercise_id = e.id
 		LEFT JOIN user_settings us ON wd.user_id = us.user_id
 		WHERE (us.show_own_workouts_in_social IS NULL OR us.show_own_workouts_in_social = true)
-		GROUP BY wd.id, wd.user_id, up.name, up.avatar_url, wd.created_at
-		ORDER BY wd.created_at DESC
+		GROUP BY wd.id, wd.user_id, up.name, up.avatar_url, wd.date
+		ORDER BY wd.date DESC
 		LIMIT $1 OFFSET $2
 	`
 
