@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -214,8 +215,10 @@ func DeleteAdminUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Iniciar transacción
+	fmt.Printf("Iniciando eliminación de usuario %s\n", userID)
 	tx, err := database.DB.Begin()
 	if err != nil {
+		fmt.Printf("Error iniciando transacción: %v\n", err)
 		http.Error(w, "Error iniciando transacción", http.StatusInternalServerError)
 		return
 	}
@@ -251,22 +254,20 @@ func DeleteAdminUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 5. Eliminar de workouts y workout_sessions
-	_, err = tx.Exec("DELETE FROM workout_sessions WHERE user_id = $1", userID)
-	if err != nil {
-		http.Error(w, "Error eliminando sesiones de entrenamiento", http.StatusInternalServerError)
-		return
-	}
-
+	// 5. Eliminar de workouts primero (porque tiene FK a workout_days)
+	fmt.Printf("Eliminando workouts para usuario %s\n", userID)
 	_, err = tx.Exec("DELETE FROM workouts WHERE user_id = $1", userID)
 	if err != nil {
+		fmt.Printf("Error eliminando workouts: %v\n", err)
 		http.Error(w, "Error eliminando entrenamientos", http.StatusInternalServerError)
 		return
 	}
 
-	// 6. Eliminar de workout_days
+	// 6. Eliminar de workout_days después
+	fmt.Printf("Eliminando workout_days para usuario %s\n", userID)
 	_, err = tx.Exec("DELETE FROM workout_days WHERE user_id = $1", userID)
 	if err != nil {
+		fmt.Printf("Error eliminando workout_days: %v\n", err)
 		http.Error(w, "Error eliminando días de entrenamiento", http.StatusInternalServerError)
 		return
 	}
