@@ -17,7 +17,7 @@ type Exercise = {
 const workoutFormSchema = z.object({
   exercise_id: z.coerce.number().refine(val => val > 0, ' '),
   weight: z.string().transform((val) => {
-    if (val === '') return undefined
+    if (val === '' || val === '0') return undefined
     const num = parseFloat(val)
     return isNaN(num) ? undefined : num
   }).refine((val) => val === undefined || (val > 0 && val <= 1000), ' ').optional(), // Máximo 1000 kg, opcional
@@ -132,8 +132,8 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         observations: data.observations
       }
       
-      // Solo incluir weight si tiene un valor válido
-      if (data.weight !== undefined && data.weight !== 0 && data.weight !== null) {
+      // Solo incluir weight si tiene un valor válido mayor a 0
+      if (data.weight !== undefined && data.weight !== null && data.weight > 0) {
         workoutData.weight = data.weight
       }
       

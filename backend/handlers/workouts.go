@@ -41,7 +41,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	date := r.URL.Query().Get("date")
 	workoutDayID := r.URL.Query().Get("workout_day_id")
 
-	fmt.Printf("Consultando workouts para usuario: %s, fecha: %s, workoutDayID: %s\n", userID, date, workoutDayID)
+
 
 	query := `
 		SELECT w.id, w.user_id, w.workout_day_id, w.exercise_id, e.name as exercise_name, 
@@ -117,7 +117,7 @@ func GetWorkoutDaysHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("Consultando días de entrenamiento para usuario: %s\n", userID)
+
 
 	query := `
 		SELECT id, user_id, date, name, effort, mood, created_at, updated_at
