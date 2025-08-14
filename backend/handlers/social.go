@@ -65,7 +65,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Printf("Consultando entrenamientos sociales con límite: %d, offset: %d, usuario: %s\n", limit, offset, userID)
+
 
 	// Query actualizada para usar workout_days con kudos reales y filtrar por configuración de usuario
 	query := `
@@ -103,7 +103,7 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		LIMIT $1 OFFSET $2
 	`
 
-	fmt.Printf("Query: %s\n", query)
+
 	fmt.Printf("Ejecutando query con parámetros: limit=%d, offset=%d, userID=%s\n", limit, offset, userID)
 	
 	rows, err := database.DB.Query(query, limit, offset, userID)

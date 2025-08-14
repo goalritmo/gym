@@ -183,6 +183,8 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Printf("🔍 DEBUG - Backend recibió: Weight=%v (tipo: %T), Reps=%d\n", req.Weight, req.Weight, req.Reps)
+	
 	// Validaciones
 	if req.Reps <= 0 {
 		http.Error(w, "Repeticiones deben ser mayores a 0", http.StatusBadRequest)
@@ -190,9 +192,14 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Validar peso si se proporciona
-	if req.Weight != nil && *req.Weight <= 0 {
-		http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
-		return
+	if req.Weight != nil {
+		fmt.Printf("🔍 DEBUG - Weight no es nil, valor: %f\n", *req.Weight)
+		if *req.Weight <= 0 {
+			http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
+			return
+		}
+	} else {
+		fmt.Printf("🔍 DEBUG - Weight es nil (correcto)\n")
 	}
 
 	// Verificar que el ejercicio existe
