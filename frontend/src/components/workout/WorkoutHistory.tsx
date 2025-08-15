@@ -652,14 +652,14 @@ export default function WorkoutHistory() {
                           
                           <Stack direction="row" spacing={1} alignItems="center">
                             <Chip 
-                              label={`${workout.weight}${workout.exercise_name.toLowerCase().includes('running') ? 'km' : 'kg'}`} 
+                              label={workout.weight === 0 ? 'Peso corporal' : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') ? 'km' : 'kg'}`} 
                               variant="outlined" 
                               size="small"
                               sx={{ 
                                 fontWeight: 'bold',
                                 borderColor: '#2196f3',
                                 color: '#2196f3',
-                                minWidth: '60px',
+                                minWidth: workout.weight === 0 ? '100px' : '60px',
                                 '&:hover': {
                                   backgroundColor: '#2196f3',
                                   color: 'white'
