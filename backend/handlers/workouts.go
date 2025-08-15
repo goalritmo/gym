@@ -182,16 +182,12 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	fmt.Printf("🔍 DEBUG - JSON raw recibido: %s\n", string(bodyBytes))
-	
 	// Decodificar JSON
 	if err := json.Unmarshal(bodyBytes, &req); err != nil {
 		fmt.Printf("Error decodificando JSON: %v\n", err)
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
-
-	fmt.Printf("🔍 DEBUG - Backend recibió: Weight=%v (tipo: %T), Reps=%d\n", req.Weight, req.Weight, req.Reps)
 	
 	// Validaciones
 	if req.Reps <= 0 {
@@ -201,13 +197,10 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	
 	// Validar peso si se proporciona
 	if req.Weight != nil {
-		fmt.Printf("🔍 DEBUG - Weight no es nil, valor: %f\n", *req.Weight)
 		if *req.Weight <= 0 {
 			http.Error(w, "Peso debe ser mayor a 0 si se proporciona", http.StatusBadRequest)
 			return
 		}
-	} else {
-		fmt.Printf("🔍 DEBUG - Weight es nil (correcto)\n")
 	}
 
 	// Verificar que el ejercicio existe
@@ -236,8 +229,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	var workoutDayID int
 
-	fmt.Printf("🔍 DEBUG: Fecha actual en Argentina: %s\n", now.Format("2006-01-02 15:04:05"))
-	fmt.Printf("🔍 DEBUG: Buscando día de entrenamiento para fecha: %s, userID: %s\n", today, userID)
+
 
 	// Verificar si ya existe un día de entrenamiento para hoy
 	sessionQuery := `SELECT id FROM workout_days WHERE user_id = $1 AND date = $2`
@@ -245,7 +237,6 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	err = database.DB.QueryRow(sessionQuery, userID, today).Scan(&existingID)
 	
 	if err != nil {
-		fmt.Printf("🔍 DEBUG: No existe día de entrenamiento para hoy, creando nuevo... Error: %v\n", err)
 		// No existe día de entrenamiento para hoy, crear uno nuevo
 		createDayQuery := `
 			INSERT INTO workout_days (user_id, date, name, effort, mood) 
@@ -262,7 +253,6 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Día de entrenamiento creado con ID: %d\n", workoutDayID)
 	} else {
 		workoutDayID = existingID
-		fmt.Printf("🔍 DEBUG: Día de entrenamiento existente encontrado con ID: %d\n", workoutDayID)
 	}
 
 	// Insertar workout asociado al día de entrenamiento

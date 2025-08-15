@@ -158,13 +158,17 @@ function AuthenticatedAppContent() {
       }
 
       // Crear el nuevo workout en el backend
-      const workoutData = {
+      const workoutData: any = {
         exercise_id: data.exercise_id,
-        weight: data.weight || 0,
         reps: data.reps || 0,
         serie: data.serie || 1,
         seconds: data.seconds || undefined,
         observations: data.observations || ''
+      }
+
+      // Solo incluir weight si tiene un valor válido mayor a 0
+      if (data.weight !== undefined && data.weight !== null && data.weight > 0) {
+        workoutData.weight = data.weight
       }
 
       await apiClient.createWorkout(workoutData) as Workout

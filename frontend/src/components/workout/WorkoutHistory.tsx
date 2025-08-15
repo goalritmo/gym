@@ -397,7 +397,7 @@ export default function WorkoutHistory() {
               {/* Header del día */}
                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Box sx={{ pl: 0, ml: 0 }}>
-                    <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left' }}>
+                    <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left', fontSize: '1rem' }}>
                       {formatDate(day.workoutDay.date)}
                     </Typography>
                     <Box 

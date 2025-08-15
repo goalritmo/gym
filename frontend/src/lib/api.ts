@@ -67,7 +67,6 @@ class ApiClient {
 
     if (body && method !== 'GET') {
       const bodyString = JSON.stringify(body)
-      console.log('🔍 DEBUG - API request body:', bodyString)
       requestConfig.body = bodyString
     }
 
