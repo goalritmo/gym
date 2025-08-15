@@ -157,42 +157,58 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
                     }
                   }}
                 >
-                  <Tab 
-                    label="📢 Notificaciones" 
-                    id="admin-tab-0"
-                    aria-controls="admin-tabpanel-0"
-                  />
-                  <Tab 
-                    label="💪 Ejercicios" 
-                    id="admin-tab-1"
-                    aria-controls="admin-tabpanel-1"
-                  />
-                  <Tab 
-                    label="👥 Usuarios" 
-                    id="admin-tab-2"
-                    aria-controls="admin-tabpanel-2"
-                  />
+                  {/* Mostrar Notificaciones para admin, staff y profe */}
+                  {(userRole === 'admin' || userRole === 'staff' || userRole === 'profe') && (
+                    <Tab 
+                      label="📢 Notificaciones" 
+                      id="admin-tab-0"
+                      aria-controls="admin-tabpanel-0"
+                    />
+                  )}
+                  {/* Ejercicios solo para admin y profe */}
+                  {(userRole === 'admin' || userRole === 'profe') && (
+                    <Tab 
+                      label="💪 Ejercicios" 
+                      id="admin-tab-1"
+                      aria-controls="admin-tabpanel-1"
+                    />
+                  )}
+                  {/* Solo mostrar Usuarios para admin */}
+                  {userRole === 'admin' && (
+                    <Tab 
+                      label="👥 Usuarios" 
+                      id="admin-tab-2"
+                      aria-controls="admin-tabpanel-2"
+                    />
+                  )}
                 </Tabs>
               </Box>
             </Box>
 
             {/* Tab Panels */}
             <Box sx={{ height: 'calc(100% - 64px)', overflow: 'hidden' }}>
-              <TabPanel value={activeTab} index={0}>
-                <Box sx={{ height: '100%' }}>
-                  <AdminNotifications />
-                </Box>
-              </TabPanel>
-              <TabPanel value={activeTab} index={1}>
+              {/* Solo mostrar Notificaciones para admin y staff */}
+              {(userRole === 'admin' || userRole === 'staff') && (
+                <TabPanel value={activeTab} index={0}>
+                  <Box sx={{ height: '100%' }}>
+                    <AdminNotifications />
+                  </Box>
+                </TabPanel>
+              )}
+              {/* Ejercicios para todos los roles */}
+              <TabPanel value={activeTab} index={userRole === 'profe' ? 0 : 1}>
                 <Box sx={{ height: '100%' }}>
                   <AdminExercises />
                 </Box>
               </TabPanel>
-              <TabPanel value={activeTab} index={2}>
-                <Box sx={{ height: '100%' }}>
-                  <AdminUsers />
-                </Box>
-              </TabPanel>
+              {/* Solo mostrar Usuarios para admin */}
+              {userRole === 'admin' && (
+                <TabPanel value={activeTab} index={2}>
+                  <Box sx={{ height: '100%' }}>
+                    <AdminUsers />
+                  </Box>
+                </TabPanel>
+              )}
             </Box>
           </Box>
         )}

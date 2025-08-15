@@ -31,6 +31,7 @@ import {
   History as HistoryIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
+import { useAuth } from '../../contexts/AuthContext'
 
 type AdminNotification = {
   id: number
@@ -73,6 +74,7 @@ const notificationTypeIcons = {
 
 
 export function AdminNotifications() {
+  const { userRole } = useAuth()
   const [notifications, setNotifications] = useState<AdminNotification[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -269,14 +271,17 @@ export function AdminNotifications() {
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
           Notificaciones del Sistema
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setOpenDialog(true)}
-          sx={{ fontWeight: 600 }}
-        >
-          Agregar
-        </Button>
+        {/* Solo mostrar botón de agregar para admin y staff */}
+        {(userRole === 'admin' || userRole === 'staff') && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setOpenDialog(true)}
+            sx={{ fontWeight: 600 }}
+          >
+            Agregar
+          </Button>
+        )}
       </Box>
 
       {/* Filter */}
@@ -400,24 +405,27 @@ export function AdminNotifications() {
                       <EditIcon />
                     </IconButton>
 
-                    <IconButton
-                      onClick={() => handleDeleteClick(notification.id)}
-                      disabled={deleting === notification.id}
-                      size="small"
-                      sx={{
-                        color: 'error.main',
-                        '&:hover': {
-                          backgroundColor: 'error.light',
-                          color: 'white'
-                        }
-                      }}
-                    >
-                      {deleting === notification.id ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        <DeleteIcon />
-                      )}
-                    </IconButton>
+                    {/* Solo mostrar botón de eliminar para admin */}
+                    {userRole === 'admin' && (
+                      <IconButton
+                        onClick={() => handleDeleteClick(notification.id)}
+                        disabled={deleting === notification.id}
+                        size="small"
+                        sx={{
+                          color: 'error.main',
+                          '&:hover': {
+                            backgroundColor: 'error.light',
+                            color: 'white'
+                          }
+                        }}
+                      >
+                        {deleting === notification.id ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          <DeleteIcon />
+                        )}
+                      </IconButton>
+                    )}
                   </Box>
                 </Box>
               </CardContent>

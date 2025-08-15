@@ -54,7 +54,9 @@ export function AdminExercises() {
   const loadExercises = async () => {
     try {
       setLoading(true)
+      console.log('🔍 Cargando ejercicios...')
       const data = await apiClient.getAdminExercises() as AdminExercise[]
+      console.log('🔍 Ejercicios cargados:', data)
       setExercises(data || [])
       setError('')
     } catch (error) {

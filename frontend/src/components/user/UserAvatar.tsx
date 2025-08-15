@@ -181,13 +181,17 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
 
         <Divider />
 
-        {/* Opción de Panel de Admin - se muestra si el usuario es administrador o profe */}
-        {(isAdmin || userRole === 'profe') && (
+        {/* Opción de Panel de Admin - se muestra si el usuario es administrador, profe o staff */}
+        {(isAdmin || userRole === 'profe' || userRole === 'staff') && (
           <MenuItem onClick={handleOpenAdminPanel}>
             <ListItemIcon>
               <AdminIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>{userRole === 'profe' ? 'Panel de Profe' : 'Panel de Admin'}</ListItemText>
+            <ListItemText>
+              {userRole === 'profe' ? 'Panel de Profe' : 
+               userRole === 'staff' ? 'Panel de Staff' : 
+               'Panel de Admin'}
+            </ListItemText>
           </MenuItem>
         )}
 
