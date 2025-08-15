@@ -52,9 +52,35 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
   const [loading, setLoading] = useState(true)
   const { userRole } = useAuth()
 
+  // Determinar qué pestañas están disponibles según el rol
+  const getAvailableTabs = () => {
+    const tabs = []
+    
+    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe') {
+      tabs.push('notifications')
+    }
+    if (userRole === 'admin' || userRole === 'profe') {
+      tabs.push('exercises')
+    }
+    if (userRole === 'admin') {
+      tabs.push('users')
+    }
+    
+    return tabs
+  }
+
+  const availableTabs = getAvailableTabs()
+
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue)
   }
+
+  // Resetear activeTab si está fuera del rango válido
+  useEffect(() => {
+    if (activeTab >= availableTabs.length) {
+      setActiveTab(0)
+    }
+  }, [activeTab, availableTabs.length])
 
   useEffect(() => {
     // No necesitamos verificar permisos aquí porque el usuario ya pasó la verificación del menú
@@ -157,58 +183,43 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
                     }
                   }}
                 >
-                  {/* Mostrar Notificaciones para admin, staff y profe */}
-                  {(userRole === 'admin' || userRole === 'staff' || userRole === 'profe') && (
-                    <Tab 
-                      label="📢 Notificaciones" 
-                      id="admin-tab-0"
-                      aria-controls="admin-tabpanel-0"
-                    />
-                  )}
-                  {/* Ejercicios solo para admin y profe */}
-                  {(userRole === 'admin' || userRole === 'profe') && (
-                    <Tab 
-                      label="💪 Ejercicios" 
-                      id="admin-tab-1"
-                      aria-controls="admin-tabpanel-1"
-                    />
-                  )}
-                  {/* Solo mostrar Usuarios para admin */}
-                  {userRole === 'admin' && (
-                    <Tab 
-                      label="👥 Usuarios" 
-                      id="admin-tab-2"
-                      aria-controls="admin-tabpanel-2"
-                    />
-                  )}
+                  {availableTabs.map((tab, index) => {
+                    const tabConfig = {
+                      notifications: { label: "📢 Notificaciones", id: `admin-tab-${index}`, controls: `admin-tabpanel-${index}` },
+                      exercises: { label: "💪 Ejercicios", id: `admin-tab-${index}`, controls: `admin-tabpanel-${index}` },
+                      users: { label: "👥 Usuarios", id: `admin-tab-${index}`, controls: `admin-tabpanel-${index}` }
+                    }
+                    
+                    return (
+                      <Tab 
+                        key={tab}
+                        label={tabConfig[tab as keyof typeof tabConfig].label}
+                        id={tabConfig[tab as keyof typeof tabConfig].id}
+                        aria-controls={tabConfig[tab as keyof typeof tabConfig].controls}
+                      />
+                    )
+                  })}
                 </Tabs>
               </Box>
             </Box>
 
             {/* Tab Panels */}
             <Box sx={{ height: 'calc(100% - 64px)', overflow: 'hidden' }}>
-              {/* Solo mostrar Notificaciones para admin y staff */}
-              {(userRole === 'admin' || userRole === 'staff') && (
-                <TabPanel value={activeTab} index={0}>
-                  <Box sx={{ height: '100%' }}>
-                    <AdminNotifications />
-                  </Box>
-                </TabPanel>
-              )}
-              {/* Ejercicios para todos los roles */}
-              <TabPanel value={activeTab} index={userRole === 'profe' ? 0 : 1}>
-                <Box sx={{ height: '100%' }}>
-                  <AdminExercises />
-                </Box>
-              </TabPanel>
-              {/* Solo mostrar Usuarios para admin */}
-              {userRole === 'admin' && (
-                <TabPanel value={activeTab} index={2}>
-                  <Box sx={{ height: '100%' }}>
-                    <AdminUsers />
-                  </Box>
-                </TabPanel>
-              )}
+              {availableTabs.map((tab, index) => {
+                const panelConfig = {
+                  notifications: <AdminNotifications />,
+                  exercises: <AdminExercises />,
+                  users: <AdminUsers />
+                }
+                
+                return (
+                  <TabPanel key={tab} value={activeTab} index={index}>
+                    <Box sx={{ height: '100%' }}>
+                      {panelConfig[tab as keyof typeof panelConfig]}
+                    </Box>
+                  </TabPanel>
+                )
+              })}
             </Box>
           </Box>
         )}
