@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { TextField, Button, Stack, Box, Typography, Alert, Snackbar, CircularProgress, Backdrop } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import { AccessTime } from '@mui/icons-material'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TimerComponent from '../timer/TimerComponent'
@@ -21,7 +21,7 @@ const workoutFormSchema = z.object({
     const num = parseFloat(val)
     return isNaN(num) ? undefined : num
   }).refine((val) => val === undefined || (val > 0 && val <= 1000), ' ').optional(), // Máximo 1000 kg, opcional
-  reps: z.coerce.number().int().refine(val => val > 0 && val <= 100, ' '), // Máximo 100 reps
+  reps: z.coerce.number().int().refine(val => val > 0 && val <= 100, ' ').optional(), // Máximo 100 reps, opcional para Running
   serie: z.coerce.number().int().min(1, ' '),
   seconds: z.coerce.number().min(0).max(3600).optional(), // Máximo 1 hora (3600 segundos)
   observations: z.string().default('')
@@ -64,6 +64,14 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = filteredExercises.length === 0
 
+  // Detectar si el ejercicio seleccionado es Running (ID: 18)
+  const selectedExerciseId = watch('exercise_id')
+  const selectedExercise = useMemo(() => {
+    return filteredExercises.find(ex => ex.id === selectedExerciseId)
+  }, [filteredExercises, selectedExerciseId])
+  
+  const isRunningExercise = selectedExerciseId === 18
+
   // Función para validar y limitar valores en tiempo real
   const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {
     // Si el valor está vacío, permitir que se borre
@@ -86,8 +94,14 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
 
     switch (field) {
       case 'weight':
-        maxLimit = 1000
-        minLimit = 0.1
+        // Para Running, cambiar límites a distancia (km)
+        if (isRunningExercise) {
+          maxLimit = 100 // 100 km máximo
+          minLimit = 0.1 // 100 metros mínimo
+        } else {
+          maxLimit = 1000
+          minLimit = 0.1
+        }
         // Permitir valores vacíos para peso opcional
         if (value === '') {
           setValue(field, '')
@@ -126,7 +140,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       // Crear objeto de datos sin el campo weight si está vacío
       const workoutData: any = {
         exercise_id: data.exercise_id,
-        reps: data.reps,
+        reps: isRunningExercise ? 1 : data.reps, // Para Running, enviar 1 como valor mínimo
         serie: data.serie,
         seconds: data.seconds,
         observations: data.observations
@@ -209,14 +223,14 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
 
         </FormControl>
 
-        {/* Peso, Reps y Serie en la misma fila */}
+        {/* Peso/Distancia, Reps y Serie en la misma fila */}
         <Box sx={{ 
           display: 'flex', 
           gap: 2, 
           flexDirection: { xs: 'row' }
         }}>
           <TextField
-            label="Peso (kg)"
+            label={isRunningExercise ? "Distancia (km)" : "Peso (kg)"}
             type="number"
             disabled={isLoading}
             error={Boolean(errors.weight)}
@@ -225,11 +239,11 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             inputProps={{ 
               step: 'any',
               inputMode: 'decimal',
-              min: 0.1,
-              max: 1000
+              min: isRunningExercise ? 0.1 : 0.1,
+              max: isRunningExercise ? 100 : 1000
             }}
             sx={{
-              flex: 1,
+              flex: isRunningExercise ? 2 : 1, // 2/3 del espacio para Running
               '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
                 display: 'none'
               },
@@ -239,33 +253,36 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             }}
           />
 
-          <TextField
-            label="Reps"
-            type="number"
-            disabled={isLoading}
-            error={Boolean(errors.reps)}
-            value={watch('reps') || ''}
-            onChange={(e) => handleNumberInput('reps', e.target.value)}
-            inputProps={{ 
-              inputMode: 'numeric',
-              min: 1,
-              max: 100
-            }}
-            sx={{
-              flex: 1,
-              '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                display: 'none'
-              },
-              '& input[type=number]': {
-                MozAppearance: 'textfield'
-              }
-            }}
-          />
+          {/* Ocultar campo Reps para Running */}
+          {!isRunningExercise && (
+            <TextField
+              label="Reps"
+              type="number"
+              disabled={isLoading}
+              error={Boolean(errors.reps)}
+              value={watch('reps') || ''}
+              onChange={(e) => handleNumberInput('reps', e.target.value)}
+              inputProps={{ 
+                inputMode: 'numeric',
+                min: 1,
+                max: 100
+              }}
+              sx={{
+                flex: 1,
+                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                  display: 'none'
+                },
+                '& input[type=number]': {
+                  MozAppearance: 'textfield'
+                }
+              }}
+            />
+          )}
 
           <FormControl 
             fullWidth 
             error={Boolean(errors.serie)}
-            disabled={isLoading}
+            disabled={isLoading || isRunningExercise} // Bloquear para Running
             sx={{ flex: 1 }}
           >
             <InputLabel id="serie-select-label">Serie</InputLabel>
@@ -289,88 +306,90 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           <Box>
             <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <AccessTime color="primary" />
-              Tiempo de Serie
+              {isRunningExercise ? "Tiempo" : "Tiempo de Serie"}
             </Typography>
             
-            {/* Mensaje educativo */}
-            <Alert 
-              severity="info" 
-              icon={false}
-              sx={{ 
-                mb: 3, 
-                borderRadius: 2,
-                bgcolor: 'rgba(33, 150, 243, 0.04)',
-                border: '1px solid rgba(33, 150, 243, 0.2)',
-                p: 2, // Reducir padding del contenedor
-                '& .MuiAlert-message': {
+            {/* Ocultar tips para Running */}
+            {!isRunningExercise && (
+              <Alert 
+                severity="info" 
+                icon={false}
+                sx={{ 
+                  mb: 3, 
+                  borderRadius: 2,
+                  bgcolor: 'rgba(33, 150, 243, 0.04)',
+                  border: '1px solid rgba(33, 150, 243, 0.2)',
+                  p: 2, // Reducir padding del contenedor
+                  '& .MuiAlert-message': {
+                    width: '100%',
+                    textAlign: 'left'
+                  }
+                }}
+              >
+                <Typography variant="caption" sx={{ 
+                  fontWeight: 600, 
+                  color: 'primary.main', 
+                  mb: 1, 
+                  textAlign: 'left', 
+                  fontSize: '0.8rem',
+                  display: 'block'
+                }}>
+                  💡 Tips para maximizar resultados
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ 
+                  lineHeight: 1.6, 
+                  width: '100%', 
+                  textAlign: 'left', 
+                  fontSize: '0.75rem',
+                  display: 'block',
+                  mb: 1
+                }}>
+                  <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Este registro te va a permitir mejorar la técnica y comparar tu progreso.
+                </Typography>
+                <Box sx={{ 
+                  display: 'flex', 
+                  gap: 0.8, 
+                  mt: 1, 
+                  justifyContent: 'space-between',
                   width: '100%',
-                  textAlign: 'left'
-                }
-              }}
-            >
-              <Typography variant="caption" sx={{ 
-                fontWeight: 600, 
-                color: 'primary.main', 
-                mb: 1, 
-                textAlign: 'left', 
-                fontSize: '0.8rem',
-                display: 'block'
-              }}>
-                💡 Tips para maximizar resultados
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ 
-                lineHeight: 1.6, 
-                width: '100%', 
-                textAlign: 'left', 
-                fontSize: '0.75rem',
-                display: 'block',
-                mb: 1
-              }}>
-                <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Este registro te va a permitir mejorar la técnica y comparar tu progreso.
-              </Typography>
-              <Box sx={{ 
-                display: 'flex', 
-                gap: 0.8, 
-                mt: 1, 
-                justifyContent: 'space-between',
-                width: '100%',
-                '& > div': {
-                  bgcolor: 'rgba(255,255,255,0.8)',
-                  px: 0.8,
-                  py: 0.6,
-                  borderRadius: 1,
-                  border: '1px solid rgba(33, 150, 243, 0.1)',
-                  textAlign: 'center',
-                  flex: 1,
-                  minWidth: 0
-                }
-              }}>
-                <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
-                    Fuerza:
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
-                    20-40s
-                  </Typography>
+                  '& > div': {
+                    bgcolor: 'rgba(255,255,255,0.8)',
+                    px: 0.8,
+                    py: 0.6,
+                    borderRadius: 1,
+                    border: '1px solid rgba(33, 150, 243, 0.1)',
+                    textAlign: 'center',
+                    flex: 1,
+                    minWidth: 0
+                  }
+                }}>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
+                      Fuerza:
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
+                      20-40s
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
+                      Hipertrofia:
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
+                      40-60s
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
+                      Resistencia:
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
+                      60s+
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
-                    Hipertrofia:
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
-                    40-60s
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
-                    Resistencia:
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
-                    60s+
-                  </Typography>
-                </Box>
-              </Box>
-            </Alert>
+              </Alert>
+            )}
 
             {/* Cronómetro */}
             <Box sx={{ width: '100%' }}>
