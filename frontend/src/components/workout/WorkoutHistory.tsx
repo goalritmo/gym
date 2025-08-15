@@ -393,10 +393,10 @@ export default function WorkoutHistory() {
             }}
             onClick={() => toggleDayExpansion(day.workoutDay.date)}
             >
-            <CardContent sx={{ pl: 2, pr: 2, pt: 2, pb: 2 }}>
+            <CardContent sx={{ pl: 2.5, pr: 2, pt: 2, pb: 0 }}>
               {/* Header del día */}
                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  <Box sx={{ pl: 0, ml: 0.5, pb: '2 !important' }}>
+                  <Box sx={{ pl: 0, ml: 0.5, pb: '2 !important', mt: 0.5 }}>
                     <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left', fontSize: '1rem' }}>
                       {formatDate(day.workoutDay.date)}
                     </Typography>
