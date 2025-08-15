@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { TextField, Button, Stack, Box, Typography, Alert, Snackbar, CircularProgress, Backdrop } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import { AccessTime } from '@mui/icons-material'
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TimerComponent from '../timer/TimerComponent'
@@ -66,9 +66,6 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
 
   // Detectar si el ejercicio seleccionado es Running (ID: 18)
   const selectedExerciseId = watch('exercise_id')
-  const selectedExercise = useMemo(() => {
-    return filteredExercises.find(ex => ex.id === selectedExerciseId)
-  }, [filteredExercises, selectedExerciseId])
   
   const isRunningExercise = selectedExerciseId === 18
 
