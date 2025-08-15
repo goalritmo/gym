@@ -375,7 +375,7 @@ export default function WorkoutHistory() {
         {/* Cards de entrenamientos */}
         <Box sx={{ mx: 0.5 }}>
           {filteredWorkoutDays.map((day) => (
-            <Box key={day.workoutDay.date} sx={{ position: 'relative', mb: 2 }}>
+            <Box key={day.workoutDay.date} sx={{ position: 'relative' }}>
             <Card sx={{ 
               boxShadow: 2, 
               width: '100%',
