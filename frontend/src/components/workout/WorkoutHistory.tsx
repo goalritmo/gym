@@ -652,7 +652,7 @@ export default function WorkoutHistory() {
                           
                           <Stack direction="row" spacing={1} alignItems="center">
                             <Chip 
-                              label={`${workout.weight}kg`} 
+                              label={`${workout.weight}${workout.exercise_name.toLowerCase().includes('running') ? 'km' : 'kg'}`} 
                               variant="outlined" 
                               size="small"
                               sx={{ 
@@ -666,22 +666,24 @@ export default function WorkoutHistory() {
                                 }
                               }}
                             />
-                            <Chip 
-                              label={`${workout.reps} reps`} 
-                              variant="outlined" 
-                              size="small"
-                              sx={{ 
-                                fontWeight: 'bold',
-                                borderColor: '#4caf50',
-                                color: '#4caf50',
-                                minWidth: '60px',
-                                '&:hover': {
-                                  backgroundColor: '#4caf50',
-                                  color: 'white'
-                                }
-                              }}
-                            />
-                            {workout.seconds && (
+                            {!workout.exercise_name.toLowerCase().includes('running') && (
+                              <Chip 
+                                label={`${workout.reps} reps`} 
+                                variant="outlined" 
+                                size="small"
+                                sx={{ 
+                                  fontWeight: 'bold',
+                                  borderColor: '#4caf50',
+                                  color: '#4caf50',
+                                  minWidth: '60px',
+                                  '&:hover': {
+                                    backgroundColor: '#4caf50',
+                                    color: 'white'
+                                  }
+                                }}
+                              />
+                            )}
+                            {workout.seconds && workout.seconds > 0 && (
                               <Chip 
                                 label={`${workout.seconds}s`} 
                                 variant="outlined" 
