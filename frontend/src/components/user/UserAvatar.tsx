@@ -23,7 +23,7 @@ type UserAvatarProps = {
 }
 
 export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpenAdminPanel, unreadNotifications = 0 }: UserAvatarProps) {
-  const { user, logout, isAdmin } = useAuth()
+  const { user, logout, isAdmin, userRole } = useAuth()
   const { settings } = useUserSettings()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -181,13 +181,13 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
 
         <Divider />
 
-        {/* Opción de Panel de Admin - solo se muestra si el usuario es administrador */}
-        {isAdmin && (
+        {/* Opción de Panel de Admin - se muestra si el usuario es administrador o profe */}
+        {(isAdmin || userRole === 'profe') && (
           <MenuItem onClick={handleOpenAdminPanel}>
             <ListItemIcon>
               <AdminIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Panel de Admin</ListItemText>
+            <ListItemText>{userRole === 'profe' ? 'Panel de Profe' : 'Panel de Admin'}</ListItemText>
           </MenuItem>
         )}
 
