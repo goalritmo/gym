@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { TextField, Button, Stack, Box, Typography, Alert, Snackbar, CircularProgress, Backdrop } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import { AccessTime } from '@mui/icons-material'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TimerComponent from '../timer/TimerComponent'
@@ -68,6 +68,13 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   const selectedExerciseId = watch('exercise_id')
   
   const isRunningExercise = selectedExerciseId === 18
+
+  // Establecer reps = 1 automáticamente cuando se selecciona Running
+  useEffect(() => {
+    if (isRunningExercise) {
+      setValue('reps', 1)
+    }
+  }, [isRunningExercise, setValue])
 
   // Función para validar y limitar valores en tiempo real
   const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {
