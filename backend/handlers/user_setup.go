@@ -82,8 +82,8 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 		VALUES ($1, $2, $3, $4)
 		ON CONFLICT (user_id) DO UPDATE SET
 			name = EXCLUDED.name,
-			is_admin = EXCLUDED.is_admin,
-			role = EXCLUDED.role
+			is_admin = EXCLUDED.is_admin
+			-- No actualizar el rol para preservar roles existentes
 	`, req.UserID, userName, false, "user")
 
 	if err != nil {
