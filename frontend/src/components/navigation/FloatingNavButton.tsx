@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Fab, Zoom } from '@mui/material'
-import { History, AllInclusive, People } from '@mui/icons-material'
+import { AllInclusive, People, FitnessCenter } from '@mui/icons-material'
 
 import { TABS, type TabType } from '../../constants/tabs'
 
@@ -50,7 +50,7 @@ export default function FloatingNavButton({ currentTab, onTabChange }: FloatingN
 
   const getIcon = () => {
     if (currentTab === TABS.WORKOUT) {
-      return <History />
+      return <FitnessCenter />
     } else if (currentTab === TABS.HISTORY) {
       return <People />
     } else if (currentTab === TABS.SOCIAL) {

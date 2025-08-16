@@ -1,5 +1,5 @@
 import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography, IconButton } from '@mui/material'
-import { Close as CloseIcon } from '@mui/icons-material'
+import { Stop as StopIcon } from '@mui/icons-material'
 import { useState, useEffect, useCallback } from 'react'
 import WorkoutForm from '../workout/WorkoutForm'
 import WorkoutHistory from '../workout/WorkoutHistory'
@@ -246,48 +246,45 @@ function AuthenticatedAppContent() {
         {/* Pestaña Entrenamiento */}
         {activeTab === TABS.WORKOUT && (
           <Box sx={{ position: 'relative', zIndex: 1, minHeight: 'calc(100vh - 200px)' }}>
+            
             {/* Barra de progreso de rutina activa */}
             {activeRoutine && (
               <Box sx={{ 
                 mb: 3, 
                 p: 2, 
-                backgroundColor: 'primary.main', 
+                backgroundColor: 'warning.main', 
                 borderRadius: 2,
                 color: 'white',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                position: 'relative'
               }}>
-                <Box sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  mb: 1
-                }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    🏋️ {activeRoutine.name}
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                      {routineProgress}% completado
-                    </Typography>
-                    <IconButton
-                      size="small"
-                      onClick={() => setActiveRoutine(null)}
-                      sx={{ 
-                        color: 'white',
-                        '&:hover': {
-                          backgroundColor: 'rgba(255,255,255,0.1)'
-                        }
-                      }}
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  </Box>
-                </Box>
+                <IconButton
+                  size="small"
+                  onClick={() => setActiveRoutine(null)}
+                  sx={{ 
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    color: 'white',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255,255,255,0.2)'
+                    }
+                  }}
+                >
+                  <StopIcon />
+                </IconButton>
+                
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                  🏋️ {activeRoutine.name}
+                </Typography>
+                
                 <Box sx={{ 
                   width: '100%', 
                   backgroundColor: 'rgba(255,255,255,0.2)', 
                   borderRadius: 1,
-                  height: 8
+                  height: 8,
+                  mb: 1
                 }}>
                   <Box sx={{ 
                     width: `${routineProgress}%`, 
@@ -297,16 +294,32 @@ function AuthenticatedAppContent() {
                     transition: 'width 0.3s ease'
                   }} />
                 </Box>
+                
                 <Box sx={{ 
                   display: 'flex', 
                   justifyContent: 'space-between', 
-                  mt: 1
+                  alignItems: 'center'
                 }}>
-                  <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                    {activeRoutine.exercises?.length || 0} ejercicios
+                  <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500 }}>
+                    {routineProgress}% completado
                   </Typography>
-                  <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                    {activeRoutine.total_exercises || 0} total
+                  
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      '&:hover': {
+                        opacity: 0.8
+                      }
+                    }}
+                    onClick={() => {
+                      setActiveTab(TABS.ROUTINES)
+                      // Aquí podrías abrir el modal de detalles de la rutina
+                    }}
+                  >
+                    Ver rutina
                   </Typography>
                 </Box>
               </Box>

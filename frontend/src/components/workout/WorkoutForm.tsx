@@ -202,8 +202,6 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         Registrar
       </Typography>
       
-
-      
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
         <FormControl fullWidth error={Boolean(errors.exercise_id)} disabled={isLoading || filteredExercises.length === 0}>
@@ -233,6 +231,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
                           {filteredExercises.map((ex) => (
               <MenuItem key={ex.id} value={ex.id}>
                 {ex.name}
+                {ex.name.toLowerCase().includes('running') && ' ⭐'}
               </MenuItem>
             ))}
           </Select>
