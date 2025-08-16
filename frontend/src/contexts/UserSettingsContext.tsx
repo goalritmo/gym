@@ -95,21 +95,21 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('user-settings', JSON.stringify(settingsToSave))
   }, [settings.favoriteExercises, settings.showWorkoutSection])
 
-  const toggleWorkoutSection = () => {
+  const toggleWorkoutSection = useCallback(() => {
     setSettings(prev => ({ 
       ...prev, 
       showWorkoutSection: !prev.showWorkoutSection
     }))
-  }
+  }, [])
 
-  const setFavoriteExercises = (exerciseIds: number[]) => {
+  const setFavoriteExercises = useCallback((exerciseIds: number[]) => {
     setSettings(prev => ({ 
       ...prev, 
       favoriteExercises: exerciseIds
     }))
-  }
+  }, [])
 
-  const toggleUncNotifications = async () => {
+  const toggleUncNotifications = useCallback(async () => {
     const newValue = !settings.uncNotificationsEnabled
     setSettings(prev => ({ 
       ...prev, 
@@ -121,9 +121,9 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error updating UNC notifications setting:', error)
     }
-  }
+  }, [settings.uncNotificationsEnabled])
 
-  const toggleShowOwnWorkoutsInSocial = async () => {
+  const toggleShowOwnWorkoutsInSocial = useCallback(async () => {
     const newValue = !settings.showOwnWorkoutsInSocial
     setSettings(prev => ({ 
       ...prev, 
@@ -139,9 +139,9 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error updating show own workouts setting:', error)
     }
-  }
+  }, [settings.showOwnWorkoutsInSocial, onSocialSettingsChange])
 
-  const initializeAllExercisesAsFavorites = (exerciseIds: number[]) => {
+  const initializeAllExercisesAsFavorites = useCallback((exerciseIds: number[]) => {
     // Solo inicializar si no hay ejercicios favoritos configurados
     if (settings.favoriteExercises.length === 0) {
       
@@ -150,7 +150,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
         favoriteExercises: exerciseIds
       }))
     }
-  }
+  }, [settings.favoriteExercises.length])
 
   const value: UserSettingsContextType = {
     settings, 
