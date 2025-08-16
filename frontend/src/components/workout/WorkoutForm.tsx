@@ -327,6 +327,7 @@ export default function WorkoutForm({
           <Select
             labelId="exercise-select-label"
             label="Ejercicio"
+            value={watch('exercise_id') || ''}
             {...register('exercise_id', { valueAsNumber: true })}
             sx={{
               '& .MuiInputLabel-root': {

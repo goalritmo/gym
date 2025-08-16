@@ -314,10 +314,8 @@ function AuthenticatedAppContent() {
           setRoutineProgress(100)
         }
       } else {
-        // Si no hay rutina activa, refrescar la página después de 1 segundo
-        setTimeout(() => {
-          window.location.reload()
-        }, 1000)
+        // Si no hay rutina activa, solo limpiar el formulario
+        console.log('Workout guardado sin rutina activa')
       }
     } catch (error) {
       console.error('❌ Error guardando workout:', error)

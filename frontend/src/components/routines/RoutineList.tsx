@@ -444,8 +444,21 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       })
                       window.dispatchEvent(event)
                     } else {
-                      // Abrir el modal de detalles de la rutina
-                      await handleViewRoutine(routine)
+                      // Obtener la rutina completa y abrir el modal
+                      try {
+                        const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
+                        setSelectedRoutine(fullRoutine)
+                        setOpenDetailDialog(true)
+                        
+                        // También iniciar la rutina automáticamente
+                        const event = new CustomEvent('startRoutine', { 
+                          detail: { routine: fullRoutine } 
+                        })
+                        window.dispatchEvent(event)
+                      } catch (error) {
+                        console.error('Error obteniendo detalles de la rutina:', error)
+                        setError('Error al cargar los detalles de la rutina')
+                      }
                     }
                   }}
                   sx={{ 
@@ -522,9 +535,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 setOpenEditDialog(true)
               }}
               onStart={() => {
-                // Cerrar el modal y cambiar a la tab de registrar
-                setOpenDetailDialog(false)
-                // Emitir un evento personalizado para que AuthenticatedApp lo capture
+                // Solo iniciar la rutina sin cerrar el modal ni cambiar de tab
                 const event = new CustomEvent('startRoutine', { 
                   detail: { routine: selectedRoutine } 
                 })
