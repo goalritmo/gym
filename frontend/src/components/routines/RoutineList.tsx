@@ -12,7 +12,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Alert,
   CircularProgress,
   Fab,
@@ -26,7 +25,7 @@ import {
   FitnessCenter as FitnessCenterIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
-import { RoutineWithExercises, CreateRoutineRequest } from '../../types/routine'
+import type { RoutineWithExercises, CreateRoutineRequest } from '../../types/routine'
 import RoutineForm from './RoutineForm'
 import RoutineDetail from './RoutineDetail'
 
@@ -45,7 +44,7 @@ const RoutineList: React.FC = () => {
     try {
       setLoading(true)
       setError(null)
-      const data = await apiClient.getUserRoutines()
+      const data = await apiClient.getUserRoutines() as RoutineWithExercises[]
       setRoutines(data)
     } catch (err) {
       console.error('Error cargando rutinas:', err)
@@ -70,7 +69,7 @@ const RoutineList: React.FC = () => {
     }
   }
 
-  const handleEditRoutine = async (id: number, routineData: Partial<CreateRoutineRequest>) => {
+  const handleEditRoutine = async (id: number, routineData: Partial<CreateRoutineRequest>): Promise<void> => {
     try {
       await apiClient.updateUserRoutine(id, routineData)
       setOpenEditDialog(false)

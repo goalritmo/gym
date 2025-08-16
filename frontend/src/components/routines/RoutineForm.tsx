@@ -8,14 +8,12 @@ import {
   IconButton,
   Card,
   CardContent,
-  Chip,
   Alert,
   CircularProgress,
   FormControl,
   InputLabel,
   Select,
-  MenuItem,
-  Grid
+  MenuItem
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -23,7 +21,7 @@ import {
   DragIndicator as DragIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
-import { RoutineWithExercises, CreateRoutineRequest, CreateRoutineExerciseRequest } from '../../types/routine'
+import type { RoutineWithExercises, CreateRoutineRequest, CreateRoutineExerciseRequest } from '../../types/routine'
 
 interface Exercise {
   id: number
@@ -62,7 +60,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
   const loadExercises = async () => {
     try {
       setLoading(true)
-      const data = await apiClient.getExercises()
+      const data = await apiClient.getExercises() as Exercise[]
       setAvailableExercises(data)
     } catch (err) {
       console.error('Error cargando ejercicios:', err)
@@ -133,10 +131,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     onSubmit(routineData)
   }
 
-  const getExerciseName = (exerciseId: number) => {
-    const exercise = availableExercises.find(ex => ex.id === exerciseId)
-    return exercise?.name || 'Seleccionar ejercicio'
-  }
+
 
   if (loading) {
     return (
@@ -154,30 +149,27 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
         </Alert>
       )}
 
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Nombre de la rutina"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            sx={{ mb: 2 }}
-          />
-        </Grid>
-        
-        <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Descripción (opcional)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            multiline
-            rows={3}
-            sx={{ mb: 3 }}
-          />
-        </Grid>
-      </Grid>
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          fullWidth
+          label="Nombre de la rutina"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          sx={{ mb: 2 }}
+        />
+      </Box>
+      
+      <Box sx={{ mb: 3 }}>
+        <TextField
+          fullWidth
+          label="Descripción (opcional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          multiline
+          rows={3}
+        />
+      </Box>
 
       <Divider sx={{ my: 3 }}>
         <Typography variant="h6" component="span">
@@ -202,82 +194,76 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
               </IconButton>
             </Box>
 
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel>Ejercicio</InputLabel>
-                  <Select
-                    value={exercise.exercise_id}
-                    onChange={(e) => handleExerciseChange(index, 'exercise_id', e.target.value)}
-                    label="Ejercicio"
-                  >
-                    {availableExercises.map((ex) => (
-                      <MenuItem key={ex.id} value={ex.id}>
-                        {ex.name} ({ex.muscle_group})
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+            <Box sx={{ mb: 2 }}>
+              <FormControl fullWidth required>
+                <InputLabel>Ejercicio</InputLabel>
+                <Select
+                  value={exercise.exercise_id}
+                  onChange={(e) => handleExerciseChange(index, 'exercise_id', e.target.value)}
+                  label="Ejercicio"
+                >
+                  {availableExercises.map((ex) => (
+                    <MenuItem key={ex.id} value={ex.id}>
+                      {ex.name} ({ex.muscle_group})
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
 
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Series"
-                  type="number"
-                  value={exercise.sets}
-                  onChange={(e) => handleExerciseChange(index, 'sets', parseInt(e.target.value))}
-                  inputProps={{ min: 1, max: 20 }}
-                  required
-                />
-              </Grid>
+            <Box display="flex" gap={2} sx={{ mb: 2 }}>
+              <TextField
+                fullWidth
+                label="Series"
+                type="number"
+                value={exercise.sets}
+                onChange={(e) => handleExerciseChange(index, 'sets', parseInt(e.target.value))}
+                inputProps={{ min: 1, max: 20 }}
+                required
+              />
 
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Repeticiones"
-                  type="number"
-                  value={exercise.reps}
-                  onChange={(e) => handleExerciseChange(index, 'reps', parseInt(e.target.value))}
-                  inputProps={{ min: 1, max: 100 }}
-                  required
-                />
-              </Grid>
+              <TextField
+                fullWidth
+                label="Repeticiones"
+                type="number"
+                value={exercise.reps}
+                onChange={(e) => handleExerciseChange(index, 'reps', parseInt(e.target.value))}
+                inputProps={{ min: 1, max: 100 }}
+                required
+              />
+            </Box>
 
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Peso (kg) - opcional"
-                  type="number"
-                  value={exercise.weight || ''}
-                  onChange={(e) => handleExerciseChange(index, 'weight', e.target.value ? parseFloat(e.target.value) : undefined)}
-                  inputProps={{ min: 0, step: 0.5 }}
-                />
-              </Grid>
+            <Box display="flex" gap={2} sx={{ mb: 2 }}>
+              <TextField
+                fullWidth
+                label="Peso (kg) - opcional"
+                type="number"
+                value={exercise.weight || ''}
+                onChange={(e) => handleExerciseChange(index, 'weight', e.target.value ? parseFloat(e.target.value) : undefined)}
+                inputProps={{ min: 0, step: 0.5 }}
+              />
 
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Descanso (segundos)"
-                  type="number"
-                  value={exercise.rest_time_seconds}
-                  onChange={(e) => handleExerciseChange(index, 'rest_time_seconds', parseInt(e.target.value))}
-                  inputProps={{ min: 0, max: 3600 }}
-                  required
-                />
-              </Grid>
+              <TextField
+                fullWidth
+                label="Descanso (segundos)"
+                type="number"
+                value={exercise.rest_time_seconds}
+                onChange={(e) => handleExerciseChange(index, 'rest_time_seconds', parseInt(e.target.value))}
+                inputProps={{ min: 0, max: 3600 }}
+                required
+              />
+            </Box>
 
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Notas (opcional)"
-                  value={exercise.notes}
-                  onChange={(e) => handleExerciseChange(index, 'notes', e.target.value)}
-                  multiline
-                  rows={2}
-                />
-              </Grid>
-            </Grid>
+            <Box>
+              <TextField
+                fullWidth
+                label="Notas (opcional)"
+                value={exercise.notes}
+                onChange={(e) => handleExerciseChange(index, 'notes', e.target.value)}
+                multiline
+                rows={2}
+              />
+            </Box>
           </CardContent>
         </Card>
       ))}

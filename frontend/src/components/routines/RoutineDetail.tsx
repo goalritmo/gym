@@ -8,21 +8,19 @@ import {
   Button,
   Divider,
   List,
-  ListItem,
   ListItemText,
   ListItemIcon,
   IconButton,
   Tooltip
 } from '@mui/material'
 import {
-  FitnessCenter as FitnessCenterIcon,
   Timer as TimerIcon,
   Edit as EditIcon,
   PlayArrow as PlayIcon,
   AccessTime as AccessTimeIcon,
   Notes as NotesIcon
 } from '@mui/icons-material'
-import { RoutineWithExercises } from '../../types/routine'
+import type { RoutineWithExercises } from '../../types/routine'
 
 interface RoutineDetailProps {
   routine: RoutineWithExercises
