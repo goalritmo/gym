@@ -136,7 +136,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   sx={{ fontWeight: 700 }}
                 />
                 <Chip
-                  label={`${getTotalReps()} reps total`}
+                  label={`${getTotalReps()} ${getTotalReps() === 1 ? 'rep' : 'reps'}`}
                   color={isActiveRoutine ? "warning" : "primary"}
                   variant="filled"
                   size="medium"
@@ -325,14 +325,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     alignItems: 'center'
                   }}>
                     <Chip
-                      label={`${exercise.sets} series`}
+                      label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
                       size="small"
                       color={isCompleted ? "warning" : "primary"}
                       variant="filled"
                       sx={{ fontWeight: 600 }}
                     />
                     <Chip
-                      label={`${exercise.reps} reps`}
+                      label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
                       size="small"
                       color={isCompleted ? "warning" : "primary"}
                       variant="filled"
@@ -466,7 +466,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 {getTotalSets()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🔄 Series total
+                🔄 {(getTotalSets() === 1 ? 'Serie' : 'Series')}
               </Typography>
             </Box>
             <Box sx={{ 
@@ -482,7 +482,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 {getTotalReps()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🔄 Reps total
+                🔄 {(getTotalReps() === 1 ? 'Rep' : 'Reps')}
               </Typography>
             </Box>
           </Box>
