@@ -18,22 +18,22 @@ import { useAuth } from '../../contexts/AuthContext'
 
 interface TabPanelProps {
   children?: React.ReactNode
-  index: number
-  value: number
+  value: string
+  tabValue: string
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props
+  const { children, value, tabValue, ...other } = props
 
   return (
     <div
       role="tabpanel"
-      hidden={value !== index}
-      id={`admin-tabpanel-${index}`}
-      aria-labelledby={`admin-tab-${index}`}
+      hidden={value !== tabValue}
+      id={`admin-tabpanel-${tabValue}`}
+      aria-labelledby={`admin-tab-${tabValue}`}
       {...other}
     >
-      {value === index && (
+      {value === tabValue && (
         <Box sx={{ p: 3 }}>
           {children}
         </Box>
@@ -48,7 +48,6 @@ type AdminPanelProps = {
 }
 
 export default function AdminPanel({ open, onClose }: AdminPanelProps) {
-  const [activeTab, setActiveTab] = useState(0)
   const [loading, setLoading] = useState(true)
   const { userRole } = useAuth()
 
@@ -70,17 +69,23 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
   }
 
   const availableTabs = getAvailableTabs()
+  const [activeTab, setActiveTab] = useState<string>(availableTabs[0] || 'notifications')
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+  // Debug logs
+  console.log('AdminPanel - userRole:', userRole)
+  console.log('AdminPanel - availableTabs:', availableTabs)
+  console.log('AdminPanel - activeTab:', activeTab)
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setActiveTab(newValue)
   }
 
-  // Resetear activeTab si está fuera del rango válido
+  // Resetear activeTab si no está en las pestañas disponibles
   useEffect(() => {
-    if (activeTab >= availableTabs.length) {
-      setActiveTab(0)
+    if (!availableTabs.includes(activeTab)) {
+      setActiveTab(availableTabs[0] || 'notifications')
     }
-  }, [activeTab, availableTabs.length])
+  }, [activeTab, availableTabs])
 
   useEffect(() => {
     // No necesitamos verificar permisos aquí porque el usuario ya pasó la verificación del menú
@@ -183,19 +188,18 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
                     }
                   }}
                 >
-                  {availableTabs.map((tab, index) => {
+                  {availableTabs.map((tab) => {
                     const tabConfig = {
-                      notifications: { label: "📢 Notificaciones", id: `admin-tab-${index}`, controls: `admin-tabpanel-${index}` },
-                      exercises: { label: "💪 Ejercicios", id: `admin-tab-${index}`, controls: `admin-tabpanel-${index}` },
-                      users: { label: "👥 Usuarios", id: `admin-tab-${index}`, controls: `admin-tabpanel-${index}` }
+                      notifications: { label: "📢 Notificaciones", value: "notifications" },
+                      exercises: { label: "💪 Ejercicios", value: "exercises" },
+                      users: { label: "👥 Usuarios", value: "users" }
                     }
                     
                     return (
                       <Tab 
                         key={tab}
                         label={tabConfig[tab as keyof typeof tabConfig].label}
-                        id={tabConfig[tab as keyof typeof tabConfig].id}
-                        aria-controls={tabConfig[tab as keyof typeof tabConfig].controls}
+                        value={tabConfig[tab as keyof typeof tabConfig].value}
                       />
                     )
                   })}
@@ -205,7 +209,7 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
 
             {/* Tab Panels */}
             <Box sx={{ height: 'calc(100% - 64px)', overflow: 'hidden' }}>
-              {availableTabs.map((tab, index) => {
+              {availableTabs.map((tab) => {
                 const panelConfig = {
                   notifications: <AdminNotifications />,
                   exercises: <AdminExercises />,
@@ -213,7 +217,7 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
                 }
                 
                 return (
-                  <TabPanel key={tab} value={activeTab} index={index}>
+                  <TabPanel key={tab} value={activeTab} tabValue={tab}>
                     <Box sx={{ height: '100%' }}>
                       {panelConfig[tab as keyof typeof panelConfig]}
                     </Box>
