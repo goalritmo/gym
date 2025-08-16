@@ -125,16 +125,16 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 alignItems: 'center'
               }}>
                 <Chip
-                  label={`${routine.total_exercises || 0} ejercicios`}
+                  label={`${routine.exercises?.length || 0} ejercicios`}
                   color={isActiveRoutine ? "warning" : "primary"}
                   variant="filled"
                   size="medium"
                   sx={{ fontWeight: 700 }}
                 />
                 <Chip
-                  label={`${getTotalSets()} series total`}
+                  label={`${getTotalSets()} series`}
                   color={isActiveRoutine ? "warning" : "primary"}
-                  variant="outlined"
+                  variant="filled"
                   size="medium"
                   sx={{ fontWeight: 700 }}
                 />
@@ -331,14 +331,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     <Chip
                       label={`${exercise.sets} series`}
                       size="small"
-                      color="primary"
+                      color={isActiveRoutine ? "warning" : "primary"}
                       variant="filled"
                       sx={{ fontWeight: 600 }}
                     />
                     <Chip
                       label={`${exercise.reps} reps`}
                       size="small"
-                      color="secondary"
+                      color={isActiveRoutine ? "warning" : "secondary"}
                       variant="filled"
                       sx={{ fontWeight: 600 }}
                     />
@@ -346,7 +346,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       <Chip
                         label={`${exercise.weight} kg`}
                         size="small"
-                        color="info"
+                        color={isActiveRoutine ? "warning" : "info"}
                         variant="filled"
                         sx={{ fontWeight: 600 }}
                       />
@@ -354,7 +354,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     <Chip
                       label={`${formatTime(exercise.rest_time_seconds)} descanso`}
                       size="small"
-                      color="warning"
+                      color={isActiveRoutine ? "warning" : "primary"}
                       variant="filled"
                       icon={<TimerIcon />}
                       sx={{ fontWeight: 600 }}
@@ -479,10 +479,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
-              borderColor: 'warning.light',
+              borderColor: isActiveRoutine ? 'warning.light' : 'primary.light',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-              <Typography variant="h3" color="warning.main" sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
                 {formatTime(getTotalTime())}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
