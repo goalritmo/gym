@@ -41,7 +41,7 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
         clearInterval(intervalRef.current)
       }
     }
-  }, [isRunning, onTimeUpdate, time])
+  }, [isRunning, onTimeUpdate]) // Removido 'time' de las dependencias
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60)

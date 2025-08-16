@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   TextField,
@@ -52,14 +52,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    loadExercises()
-  }, [])
-
-  // Detectar si el ejercicio seleccionado es Running (ID: 18)
-  const isRunningExercise = (exerciseId: number) => exerciseId === 18
-
-  const loadExercises = async () => {
+  const loadExercises = useCallback(async () => {
     try {
       setLoading(true)
       const data = await apiClient.getExercises() as Exercise[]
@@ -70,7 +63,14 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadExercises()
+  }, [loadExercises])
+
+  // Detectar si el ejercicio seleccionado es Running (ID: 18)
+  const isRunningExercise = (exerciseId: number) => exerciseId === 18
 
   const handleAddExercise = () => {
     const newExercise: CreateRoutineExerciseRequest = {
