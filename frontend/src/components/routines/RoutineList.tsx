@@ -301,7 +301,8 @@ const RoutineList: React.FC = () => {
                     display: 'block',
                     fontStyle: 'italic',
                     opacity: 0.8,
-                    mb: 2
+                    mb: 2,
+                    textAlign: 'left'
                   }}
                 >
                   Creada el {new Date(routine.created_at).toLocaleDateString('es-ES', {
@@ -442,6 +443,10 @@ const RoutineList: React.FC = () => {
                 // TODO: Implementar funcionalidad de comenzar rutina
                 console.log('Comenzando rutina:', selectedRoutine.name)
                 setOpenDetailDialog(false)
+              }}
+              onDelete={() => {
+                setOpenDetailDialog(false)
+                setDeleteDialogOpen(true)
               }}
             />
           )}

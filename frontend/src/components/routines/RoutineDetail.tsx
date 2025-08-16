@@ -15,7 +15,8 @@ import {
   Edit as EditIcon,
   PlayArrow as PlayIcon,
   AccessTime as AccessTimeIcon,
-  Notes as NotesIcon
+  Notes as NotesIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material'
 import type { RoutineWithExercises } from '../../types/routine'
 
@@ -24,13 +25,15 @@ interface RoutineDetailProps {
   onClose: () => void
   onEdit?: () => void
   onStart?: () => void
+  onDelete?: () => void
 }
 
 const RoutineDetail: React.FC<RoutineDetailProps> = ({ 
   routine, 
   onClose, 
   onEdit, 
-  onStart
+  onStart,
+  onDelete
 }) => {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
@@ -108,14 +111,6 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 flexWrap: 'wrap',
                 alignItems: 'center'
               }}>
-                {routine.is_active && (
-                  <Chip
-                    label="Activa"
-                    color="success"
-                    size="medium"
-                    sx={{ fontWeight: 700 }}
-                  />
-                )}
                 <Chip
                   label={`${routine.exercises?.length || 0} ejercicios`}
                   color="primary"
@@ -125,13 +120,13 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 />
                 <Chip
                   label={`${getTotalSets()} series total`}
-                  color="secondary"
-                  variant="filled"
+                  color="primary"
+                  variant="outlined"
                   size="medium"
                   sx={{ fontWeight: 700 }}
                 />
                 <Chip
-                  label={`~${formatTime(getTotalTime())} descanso`}
+                  label={`${formatTime(getTotalTime())} descanso`}
                   color="warning"
                   variant="filled"
                   size="medium"
@@ -170,6 +165,23 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 onClick={onEdit}
               >
                 <EditIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          {onDelete && (
+            <Tooltip title="Eliminar rutina">
+              <IconButton
+                color="error"
+                onClick={onDelete}
+                sx={{ 
+                  backgroundColor: 'error.main',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'error.dark'
+                  }
+                }}
+              >
+                <DeleteIcon />
               </IconButton>
             </Tooltip>
           )}
@@ -334,7 +346,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         mt: 3, 
         backgroundColor: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
         border: '2px solid',
-        borderColor: 'secondary.main',
+        borderColor: 'primary.main',
         borderRadius: '16px',
         boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
         overflow: 'hidden'
@@ -345,7 +357,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             sx={{ 
               mb: 3, 
               fontWeight: 800,
-              color: 'secondary.main',
+              color: 'primary.main',
               textAlign: 'center',
               textShadow: '0 1px 2px rgba(0,0,0,0.1)'
             }}
@@ -383,10 +395,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
-              borderColor: 'secondary.light',
+              borderColor: 'primary.light',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-              <Typography variant="h3" color="secondary.main" sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h3" color="primary.main" sx={{ fontWeight: 800, mb: 1 }}>
                 {getTotalSets()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
