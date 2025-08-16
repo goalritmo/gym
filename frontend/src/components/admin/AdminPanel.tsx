@@ -55,9 +55,6 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
   const getAvailableTabs = () => {
     const tabs = []
     
-    // Debug: verificar tanto userRole como isAdmin
-    console.log('getAvailableTabs - userRole:', userRole, 'isAdmin:', isAdmin)
-    
     if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
       tabs.push('notifications')
     }
@@ -68,21 +65,14 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
       tabs.push('users')
     }
     
-    console.log('getAvailableTabs - tabs generados:', tabs)
     return tabs
   }
 
   const availableTabs = useMemo(() => getAvailableTabs(), [userRole, isAdmin])
   const [activeTab, setActiveTab] = useState<string>(availableTabs[0] || 'notifications')
 
-  // Debug logs
-  console.log('🔄 AdminPanel - Renderizando con userRole:', userRole, 'isAdmin:', isAdmin)
-  console.log('🔄 AdminPanel - availableTabs:', availableTabs)
-  console.log('🔄 AdminPanel - activeTab:', activeTab)
-
   // Si no hay pestañas disponibles, no mostrar el panel
   if (availableTabs.length === 0) {
-    console.warn('AdminPanel - No hay pestañas disponibles para este rol:', userRole, 'isAdmin:', isAdmin)
     return null
   }
 

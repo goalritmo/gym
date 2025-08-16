@@ -24,6 +24,7 @@ import {
 } from '@mui/material'
 import { Search as SearchIcon, Person as PersonIcon, Delete as DeleteIcon } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
+import { useAuth } from '../../contexts/AuthContext'
 
 type AdminUser = {
   id: string
@@ -40,6 +41,10 @@ type AdminUser = {
 }
 
 export function AdminUsers() {
+  const { userRole, isAdmin } = useAuth()
+  
+
+  
   const [users, setUsers] = useState<AdminUser[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -320,18 +325,20 @@ export function AdminUsers() {
                           </Select>
                         </FormControl>
 
-                        <IconButton
-                          onClick={() => handleDeleteClick(user)}
-                          disabled={deleting === user.id}
-                          color="error"
-                          size="small"
-                        >
-                          {deleting === user.id ? (
-                            <CircularProgress size={16} />
-                          ) : (
-                            <DeleteIcon />
-                          )}
-                        </IconButton>
+                        {isAdmin && (
+                          <IconButton
+                            onClick={() => handleDeleteClick(user)}
+                            disabled={deleting === user.id}
+                            color="error"
+                            size="small"
+                          >
+                            {deleting === user.id ? (
+                              <CircularProgress size={16} />
+                            ) : (
+                              <DeleteIcon />
+                            )}
+                          </IconButton>
+                        )}
                       </Box>
 
                       {/* Registration and Last Login Info */}

@@ -20,6 +20,7 @@ import {
   Search as SearchIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
+import { useAuth } from '../../contexts/AuthContext'
 
 type AdminExercise = {
   id: number
@@ -41,6 +42,10 @@ type CreateExerciseForm = {
 
 
 export function AdminExercises() {
+  const { userRole, isAdmin } = useAuth()
+  
+
+  
   const [exercises, setExercises] = useState<AdminExercise[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -157,14 +162,16 @@ export function AdminExercises() {
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
           Ejercicios del Sistema
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setOpenDialog(true)}
-          sx={{ fontWeight: 600 }}
-        >
-          Agregar
-        </Button>
+        {isAdmin && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setOpenDialog(true)}
+            sx={{ fontWeight: 600 }}
+          >
+            Agregar
+          </Button>
+        )}
       </Box>
 
       {/* Filter */}

@@ -74,7 +74,10 @@ const notificationTypeIcons = {
 
 
 export function AdminNotifications() {
-  const { userRole } = useAuth()
+  const { userRole, isAdmin } = useAuth()
+  
+  // Debug: verificar permisos
+  console.log('🔧 AdminNotifications - userRole:', userRole, 'isAdmin:', isAdmin)
   const [notifications, setNotifications] = useState<AdminNotification[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -272,7 +275,7 @@ export function AdminNotifications() {
           Notificaciones del Sistema
         </Typography>
         {/* Solo mostrar botón de agregar para admin y staff */}
-        {(userRole === 'admin' || userRole === 'staff') && (
+        {(userRole === 'admin' || userRole === 'staff' || isAdmin) && (
           <Button
             variant="contained"
             startIcon={<AddIcon />}
@@ -406,7 +409,7 @@ export function AdminNotifications() {
                     </IconButton>
 
                     {/* Solo mostrar botón de eliminar para admin */}
-                    {userRole === 'admin' && (
+                    {(userRole === 'admin' || isAdmin) && (
                       <IconButton
                         onClick={() => handleDeleteClick(notification.id)}
                         disabled={deleting === notification.id}

@@ -144,7 +144,6 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
   const initializeAllExercisesAsFavorites = useCallback((exerciseIds: number[]) => {
     // Solo inicializar si no hay ejercicios favoritos configurados
     if (settings.favoriteExercises.length === 0 && exerciseIds.length > 0) {
-      console.log('🔧 Inicializando ejercicios favoritos:', exerciseIds.length)
       setSettings(prev => ({ 
         ...prev, 
         favoriteExercises: exerciseIds
