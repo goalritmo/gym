@@ -21,6 +21,7 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   PlayArrow as PlayIcon,
+  Stop as StopIcon,
   FitnessCenter as FitnessCenterIcon,
   Search as SearchIcon
 } from '@mui/icons-material'
@@ -305,7 +306,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               {activeRoutine?.id === routine.id && (
                 <Box sx={{
                   position: 'absolute',
-                  top: 12,
+                  top: 27,
                   right: 12,
                   backgroundColor: 'warning.main',
                   color: 'white',
@@ -430,10 +431,10 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       fontWeight: 600,
                       borderRadius: '8px',
                       textTransform: 'none',
-                      color: 'primary.main',
-                      borderColor: 'primary.main',
+                      color: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
+                      borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
                       '&:hover': {
-                        backgroundColor: 'primary.main',
+                        backgroundColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
                         color: 'white'
                       }
                     }}
@@ -459,7 +460,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     }
                   }}
                 >
-                  <PlayIcon />
+                  {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
                 </IconButton>
               </CardActions>
             </Card>
