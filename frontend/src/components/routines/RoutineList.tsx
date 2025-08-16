@@ -30,7 +30,11 @@ import type { RoutineWithExercises, CreateRoutineRequest } from '../../types/rou
 import RoutineForm from './RoutineForm'
 import RoutineDetail from './RoutineDetail'
 
-const RoutineList: React.FC = () => {
+interface RoutineListProps {
+  activeRoutine?: any
+}
+
+const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine }) => {
   const [routines, setRoutines] = useState<RoutineWithExercises[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -41,6 +45,17 @@ const RoutineList: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingRoutineId, setDeletingRoutineId] = useState<number | null>(null)
   const [filterText, setFilterText] = useState('')
+  const [editNameModal, setEditNameModal] = useState<{
+    show: boolean
+    routineId: number | null
+    currentName: string
+    newName: string
+  }>({
+    show: false,
+    routineId: null,
+    currentName: '',
+    newName: ''
+  })
 
   const loadRoutines = useCallback(async () => {
     console.log('🔄 RoutineList - loadRoutines ejecutándose')
@@ -123,9 +138,39 @@ const RoutineList: React.FC = () => {
     setOpenDetailDialog(true)
   }
 
-  const handleEditClick = (routine: RoutineWithExercises) => {
-    setSelectedRoutine(routine)
-    setOpenEditDialog(true)
+
+
+  const handleEditNameClick = (routine: RoutineWithExercises) => {
+    setEditNameModal({
+      show: true,
+      routineId: routine.id,
+      currentName: routine.name,
+      newName: routine.name
+    })
+  }
+
+  const handleSaveRoutineName = async () => {
+    if (!editNameModal.routineId || !editNameModal.newName.trim()) {
+      return
+    }
+
+    try {
+      await apiClient.updateUserRoutine(editNameModal.routineId, { name: editNameModal.newName.trim() })
+      
+      // Actualizar el estado local
+      setRoutines(prevRoutines => 
+        prevRoutines.map(routine => 
+          routine.id === editNameModal.routineId 
+            ? { ...routine, name: editNameModal.newName.trim() }
+            : routine
+        )
+      )
+
+      setEditNameModal({ show: false, routineId: null, currentName: '', newName: '' })
+    } catch (error) {
+      console.error('Error actualizando nombre de la rutina:', error)
+      setError('Error al actualizar el nombre de la rutina')
+    }
   }
 
 
@@ -251,7 +296,8 @@ const RoutineList: React.FC = () => {
                 overflow: 'hidden',
                 transition: 'all 0.3s ease',
                 '&:hover': {
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  transform: 'translateY(-4px)'
                 }
               }}
             >
@@ -274,13 +320,13 @@ const RoutineList: React.FC = () => {
                         textDecoration: 'underline'
                       }
                     }}
-                    onClick={() => handleEditClick(routine)}
+                    onClick={() => handleEditNameClick(routine)}
                   >
                     {routine.name}
                   </Typography>
                   <IconButton
                     size="small"
-                    onClick={() => handleEditClick(routine)}
+                    onClick={() => handleEditNameClick(routine)}
                     sx={{ 
                       color: 'primary.main',
                       '&:hover': {
@@ -451,7 +497,7 @@ const RoutineList: React.FC = () => {
                 setOpenDetailDialog(false)
                 setDeleteDialogOpen(true)
               }}
-              isActiveRoutine={false} // TODO: Pasar el estado real de la rutina activa
+              isActiveRoutine={activeRoutine?.id === selectedRoutine?.id}
             />
           )}
         </DialogContent>
@@ -483,6 +529,94 @@ const RoutineList: React.FC = () => {
             ) : (
               'Eliminar'
             )}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modal de edición de nombre */}
+      <Dialog
+        open={editNameModal.show}
+        onClose={() => setEditNameModal({ show: false, routineId: null, currentName: '', newName: '' })}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            border: '1px solid',
+            borderColor: 'divider'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          pb: 1,
+          fontWeight: 600,
+          fontSize: '1.2rem',
+          color: 'primary.main',
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}>
+          Editar nombre de la rutina
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <TextField
+            autoFocus
+            fullWidth
+            placeholder="Nombre de la rutina"
+            value={editNameModal.newName}
+            onChange={(e) => setEditNameModal(prev => ({ ...prev, newName: e.target.value }))}
+            variant="outlined"
+            sx={{
+              mt: 2,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                '&:hover': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main'
+                  }
+                }
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button
+            onClick={() => setEditNameModal({ show: false, routineId: null, currentName: '', newName: '' })}
+            sx={{
+              px: 3,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              color: 'text.secondary',
+              border: '1px solid',
+              borderColor: 'divider',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+              }
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSaveRoutineName}
+            disabled={!editNameModal.newName.trim() || editNameModal.newName.trim() === editNameModal.currentName}
+            variant="contained"
+            sx={{
+              px: 4,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              backgroundColor: '#1976d2',
+              '&:hover': {
+                backgroundColor: '#1565c0'
+              }
+            }}
+          >
+            Guardar
           </Button>
         </DialogActions>
       </Dialog>

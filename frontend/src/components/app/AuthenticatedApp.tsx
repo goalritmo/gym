@@ -442,7 +442,7 @@ function AuthenticatedAppContent() {
         {/* Pestaña Mis Rutinas */}
         {activeTab === TABS.ROUTINES && (
           <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
-            <RoutineList />
+            <RoutineList activeRoutine={activeRoutine} />
           </Box>
         )}
 
