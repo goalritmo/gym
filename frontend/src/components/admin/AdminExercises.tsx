@@ -42,7 +42,7 @@ type CreateExerciseForm = {
 
 
 export function AdminExercises() {
-  const { isAdmin } = useAuth()
+  const { isAdmin, userRole } = useAuth()
   const [exercises, setExercises] = useState<AdminExercise[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -159,7 +159,7 @@ export function AdminExercises() {
         <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
           Ejercicios del Sistema
         </Typography>
-        {isAdmin && (
+        {(isAdmin || userRole === 'profe') && (
           <Button
             variant="contained"
             startIcon={<AddIcon />}
