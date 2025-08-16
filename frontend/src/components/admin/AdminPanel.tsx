@@ -76,9 +76,9 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<string>(availableTabs[0] || 'notifications')
 
   // Debug logs
-  console.log('AdminPanel - userRole:', userRole, 'isAdmin:', isAdmin)
-  console.log('AdminPanel - availableTabs:', availableTabs)
-  console.log('AdminPanel - activeTab:', activeTab)
+  console.log('🔄 AdminPanel - Renderizando con userRole:', userRole, 'isAdmin:', isAdmin)
+  console.log('🔄 AdminPanel - availableTabs:', availableTabs)
+  console.log('🔄 AdminPanel - activeTab:', activeTab)
 
   // Si no hay pestañas disponibles, no mostrar el panel
   if (availableTabs.length === 0) {
@@ -93,9 +93,10 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
   // Resetear activeTab si no está en las pestañas disponibles
   useEffect(() => {
     if (availableTabs.length > 0 && !availableTabs.includes(activeTab)) {
+      console.log('🔄 AdminPanel - Reseteando activeTab de', activeTab, 'a', availableTabs[0])
       setActiveTab(availableTabs[0])
     }
-  }, [availableTabs]) // Solo dependemos de availableTabs, no de activeTab
+  }, [availableTabs, activeTab]) // Incluir activeTab para evitar cambios innecesarios
 
   useEffect(() => {
     // No necesitamos verificar permisos aquí porque el usuario ya pasó la verificación del menú
