@@ -239,7 +239,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
               Progreso de la rutina
             </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: isActiveRoutine ? 'warning.main' : 'primary.main' }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: isActiveRoutine ? 'warning.main' : 'text.secondary' }}>
               {routineProgress}%
             </Typography>
           </Box>
@@ -266,7 +266,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {Array.isArray(routine.exercises) && routine.exercises.length > 0 ? (
-          routine.exercises.map((exercise, index) => {
+          routine.exercises.map((exercise) => {
             const isCompleted = completedExercises?.includes(exercise.id) || false
             return (
               <Card 
@@ -310,24 +310,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   }}
                 />
                 
-                {/* Número del ejercicio */}
-                <Box
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    backgroundColor: isCompleted ? 'success.main' : 'primary.main',
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1rem',
-                    fontWeight: 700,
-                    flexShrink: 0
-                  }}
-                >
-                  {index + 1}
-                </Box>
+
                 
                 {/* Información del ejercicio */}
                 <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -336,7 +319,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     sx={{ 
                       fontWeight: 700,
                       mb: 1,
-                      color: 'text.primary'
+                      color: isActiveRoutine ? 'text.primary' : 'text.secondary'
                     }}
                   >
                     {exercise.exercise_name}
@@ -471,12 +454,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderColor: isActiveRoutine ? 'warning.light' : 'primary.light',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-              <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
-                {getCompletedExercises()}
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🏋️ {(getCompletedExercises() === 1 ? 'Ejercicio' : 'Ejercicios')} completados
-              </Typography>
+                          <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'text.secondary'} sx={{ fontWeight: 800, mb: 1 }}>
+              {getCompletedExercises()}
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+              🏋️ {(getCompletedExercises() === 1 ? 'Ejercicio' : 'Ejercicios')} completados
+            </Typography>
             </Box>
             <Box sx={{ 
               textAlign: 'center',
@@ -487,7 +470,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderColor: isActiveRoutine ? 'warning.light' : 'primary.light',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-              <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'text.secondary'} sx={{ fontWeight: 800, mb: 1 }}>
                 {getCompletedSets()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
