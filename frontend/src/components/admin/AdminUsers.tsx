@@ -41,7 +41,7 @@ type AdminUser = {
 }
 
 export function AdminUsers() {
-  const { userRole, isAdmin } = useAuth()
+  const { isAdmin } = useAuth()
   
 
   
