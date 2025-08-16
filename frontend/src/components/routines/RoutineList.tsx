@@ -44,11 +44,19 @@ const RoutineList: React.FC = () => {
     try {
       setLoading(true)
       setError(null)
-      const data = await apiClient.getUserRoutines() as RoutineWithExercises[]
-      setRoutines(data)
+      const data = await apiClient.getUserRoutines()
+      
+      // Validar que data sea un array
+      if (Array.isArray(data)) {
+        setRoutines(data as RoutineWithExercises[])
+      } else {
+        console.warn('API devolvió datos no válidos:', data)
+        setRoutines([])
+      }
     } catch (err) {
       console.error('Error cargando rutinas:', err)
       setError('Error al cargar las rutinas')
+      setRoutines([])
     } finally {
       setLoading(false)
     }
@@ -142,7 +150,7 @@ const RoutineList: React.FC = () => {
         </Alert>
       )}
 
-      {routines.length === 0 ? (
+      {(!routines || routines.length === 0) ? (
         <Card sx={{ textAlign: 'center', py: 4 }}>
           <CardContent>
             <FitnessCenterIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
@@ -163,7 +171,7 @@ const RoutineList: React.FC = () => {
         </Card>
       ) : (
         <Box display="grid" gap={2} sx={{ gridTemplateColumns: { xs: '1fr', md: 'repeat(auto-fill, minmax(350px, 1fr))' } }}>
-          {routines.map((routine) => (
+          {routines?.map((routine) => (
             <Card key={routine.id} sx={{ height: 'fit-content' }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
