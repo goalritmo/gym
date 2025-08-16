@@ -323,6 +323,51 @@ class ApiClient {
       body: { role }
     })
   }
+
+  // Routines API
+  async getUserRoutines() {
+    return this.request('/routines')
+  }
+
+  async getUserRoutine(id: number) {
+    return this.request(`/routines/${id}`)
+  }
+
+  async createUserRoutine(routine: {
+    name: string
+    description?: string
+    exercises?: Array<{
+      exercise_id: number
+      order_index: number
+      sets: number
+      reps: number
+      weight?: number
+      rest_time_seconds: number
+      notes?: string
+    }>
+  }) {
+    return this.request('/routines', {
+      method: 'POST',
+      body: routine
+    })
+  }
+
+  async updateUserRoutine(id: number, routine: {
+    name?: string
+    description?: string
+    is_active?: boolean
+  }) {
+    return this.request(`/routines/${id}`, {
+      method: 'PUT',
+      body: routine
+    })
+  }
+
+  async deleteUserRoutine(id: number) {
+    return this.request(`/routines/${id}`, {
+      method: 'DELETE'
+    })
+  }
 }
 
 // Export singleton instance

@@ -42,7 +42,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		SELECT w.id, w.user_id, w.workout_day_id, w.exercise_id, e.name as exercise_name, 
-			   w.weight, w.reps, w.serie, w.seconds, w.observations, w.created_at
+			   w.weight, w.reps, w.set, w.seconds, w.observations, w.created_at
 		FROM workouts w
 		JOIN exercises e ON w.exercise_id = e.id
 		WHERE w.user_id = $1
@@ -82,7 +82,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			&workout.ExerciseName,
 			&workout.Weight,
 			&workout.Reps,
-			&workout.Serie,
+			&workout.Set,
 			&workout.Seconds,
 			&workout.Observations,
 			&workout.CreatedAt,
@@ -257,7 +257,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Insertar workout asociado al día de entrenamiento
 	query := `
-		INSERT INTO workouts (user_id, workout_day_id, exercise_id, weight, reps, serie, seconds, observations)
+		INSERT INTO workouts (user_id, workout_day_id, exercise_id, weight, reps, set, seconds, observations)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id, workout_day_id, created_at
 	`
@@ -276,9 +276,9 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	workout.Observations = req.Observations
 
 	// Obtener valores de los punteros de forma segura
-	var serieValue int = 1
-	if req.Serie != nil {
-		serieValue = *req.Serie
+	var setValue int = 1
+	if req.Set != nil {
+		setValue = *req.Set
 	}
 
 	// Obtener valor de peso de forma segura
@@ -291,7 +291,7 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	err = database.DB.QueryRow(
 		query,
 		userID, workoutDayID, req.ExerciseID, weightValue, req.Reps,
-		serieValue, req.Seconds, req.Observations,
+		setValue, req.Seconds, req.Observations,
 	).Scan(&workout.ID, &workout.WorkoutDayID, &workout.CreatedAt)
 
 	if err != nil {
@@ -346,14 +346,14 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		UPDATE workouts 
-		SET weight = $1, reps = $2, serie = $3, seconds = $4, observations = $5
+		SET weight = $1, reps = $2, set = $3, seconds = $4, observations = $5
 		WHERE id = $6 AND user_id = $7
-		RETURNING id, exercise_id, weight, reps, serie, seconds, observations, workout_day_id, created_at
+		RETURNING id, exercise_id, weight, reps, set, seconds, observations, workout_day_id, created_at
 	`
 
-	var serieValue int = 1
-	if req.Serie != nil {
-		serieValue = *req.Serie
+	var setValue int = 1
+	if req.Set != nil {
+		setValue = *req.Set
 	}
 
 	// Obtener valor de peso de forma segura
@@ -365,11 +365,11 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	var workout models.Workout
 	err = database.DB.QueryRow(
 		query,
-		weightValue, req.Reps, serieValue, req.Seconds, req.Observations,
+		weightValue, req.Reps, setValue, req.Seconds, req.Observations,
 		id, userID,
 	).Scan(
 		&workout.ID, &workout.ExerciseID, &workout.Weight, &workout.Reps,
-		&workout.Serie, &workout.Seconds, &workout.Observations,
+		&workout.Set, &workout.Seconds, &workout.Observations,
 		&workout.WorkoutDayID, &workout.CreatedAt,
 	)
 

@@ -23,7 +23,7 @@ type Workout struct {
 	ExerciseName string    `json:"exercise_name" db:"exercise_name"`
 	Weight       float64   `json:"weight" db:"weight"`
 	Reps         int       `json:"reps" db:"reps"`
-	Serie        int       `json:"serie" db:"serie"`
+	Set          int       `json:"set" db:"set"`
 	Seconds      *int      `json:"seconds" db:"seconds"`
 	Observations string    `json:"observations" db:"observations"`
 	CreatedAt    time.Time `json:"created_at" db:"created_at"`
@@ -34,7 +34,7 @@ type CreateWorkoutRequest struct {
 	ExerciseID   int      `json:"exercise_id" validate:"required,gt=0"`
 	Weight       *float64 `json:"weight" validate:"omitempty,gt=0"`
 	Reps         int      `json:"reps" validate:"required,gt=0"`
-	Serie        *int     `json:"serie"`
+	Set          *int     `json:"set"`
 	Seconds      *int     `json:"seconds" validate:"omitempty,gt=0"`
 	Observations string   `json:"observations"`
 }

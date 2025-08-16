@@ -647,7 +647,7 @@ export default function WorkoutHistory() {
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                            Serie {workout.serie}
+                            Serie nº{workout.set}
                           </Typography>
                           
                           <Stack direction="row" spacing={1} alignItems="center">

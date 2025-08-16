@@ -32,7 +32,7 @@ type SocialExercise struct {
 	Weight       float64 `json:"weight"`
 	Reps         int     `json:"reps"`
 	Seconds      *int    `json:"seconds"`
-	Serie        int     `json:"serie"`
+	Set          int     `json:"set"`
 }
 
 // GetSocialWorkoutsHandler obtiene entrenamientos sociales de todos los usuarios
@@ -85,8 +85,8 @@ func GetSocialWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 						'weight', w.weight,
 						'reps', w.reps,
 						'seconds', w.seconds,
-						'serie', w.serie
-					) ORDER BY w.serie
+						'set', w.set
+					) ORDER BY w.set
 				) FILTER (WHERE w.id IS NOT NULL),
 				'[]'::json
 			) as exercises,

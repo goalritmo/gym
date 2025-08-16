@@ -22,7 +22,7 @@ const workoutFormSchema = z.object({
     return isNaN(num) ? undefined : num
   }).refine((val) => val === undefined || (val > 0 && val <= 1000), ' ').optional(), // Máximo 1000 kg, opcional
   reps: z.coerce.number().int().refine(val => val > 0 && val <= 100, ' ').optional(), // Máximo 100 reps, opcional para Running
-  serie: z.coerce.number().int().min(1, ' '),
+  set: z.coerce.number().int().min(1, ' '),
   seconds: z.coerce.number().min(0).max(3600).optional(), // Máximo 1 hora (3600 segundos)
   observations: z.string().default('')
 })
@@ -48,7 +48,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       exercise_id: '',
       weight: '',
       reps: '',
-      serie: 1,
+      set: 1,
       seconds: '',
       observations: ''
     }
@@ -145,7 +145,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       const workoutData: any = {
         exercise_id: data.exercise_id,
         reps: isRunningExercise ? 1 : data.reps, // Para Running, enviar 1 como valor mínimo
-        serie: data.serie,
+        set: data.set,
         seconds: data.seconds,
         observations: data.observations
       }
@@ -161,7 +161,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         exercise_id: '',
         weight: '',
         reps: '',
-        serie: 1,
+        set: 1,
         seconds: '',
         observations: ''
       })
@@ -285,7 +285,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
 
           <FormControl 
             fullWidth 
-            error={Boolean(errors.serie)}
+            error={Boolean(errors.set)}
             disabled={isLoading || isRunningExercise} // Bloquear para Running
             sx={{ flex: 1 }}
           >
@@ -293,8 +293,8 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
             <Select
               labelId="serie-select-label"
               label="Serie"
-              value={watch('serie')}
-              {...register('serie', { valueAsNumber: true })}
+              value={watch('set')}
+              {...register('set', { valueAsNumber: true })}
             >
               {[1, 2, 3, 4, 5].map((serie) => (
                 <MenuItem key={serie} value={serie}>

@@ -1,0 +1,311 @@
+import React, { useState, useEffect } from 'react'
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Divider,
+  IconButton,
+  Card,
+  CardContent,
+  Chip,
+  Alert,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid
+} from '@mui/material'
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  DragIndicator as DragIcon
+} from '@mui/icons-material'
+import { apiClient } from '../../lib/api'
+import { RoutineWithExercises, CreateRoutineRequest, CreateRoutineExerciseRequest } from '../../types/routine'
+
+interface Exercise {
+  id: number
+  name: string
+  muscle_group: string
+}
+
+interface RoutineFormProps {
+  routine?: RoutineWithExercises
+  onSubmit: (data: CreateRoutineRequest) => void
+  onCancel: () => void
+}
+
+const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }) => {
+  const [name, setName] = useState(routine?.name || '')
+  const [description, setDescription] = useState(routine?.description || '')
+  const [exercises, setExercises] = useState<CreateRoutineExerciseRequest[]>(
+    routine?.exercises?.map(ex => ({
+      exercise_id: ex.exercise_id,
+      order_index: ex.order_index,
+      sets: ex.sets,
+      reps: ex.reps,
+      weight: ex.weight,
+      rest_time_seconds: ex.rest_time_seconds,
+      notes: ex.notes || ''
+    })) || []
+  )
+  const [availableExercises, setAvailableExercises] = useState<Exercise[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    loadExercises()
+  }, [])
+
+  const loadExercises = async () => {
+    try {
+      setLoading(true)
+      const data = await apiClient.getExercises()
+      setAvailableExercises(data)
+    } catch (err) {
+      console.error('Error cargando ejercicios:', err)
+      setError('Error al cargar los ejercicios disponibles')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAddExercise = () => {
+    const newExercise: CreateRoutineExerciseRequest = {
+      exercise_id: 0,
+      order_index: exercises.length,
+      sets: 3,
+      reps: 10,
+      weight: undefined,
+      rest_time_seconds: 60,
+      notes: ''
+    }
+    setExercises([...exercises, newExercise])
+  }
+
+  const handleRemoveExercise = (index: number) => {
+    const newExercises = exercises.filter((_, i) => i !== index)
+    // Reordenar los índices
+    const reorderedExercises = newExercises.map((ex, i) => ({
+      ...ex,
+      order_index: i
+    }))
+    setExercises(reorderedExercises)
+  }
+
+  const handleExerciseChange = (index: number, field: keyof CreateRoutineExerciseRequest, value: any) => {
+    const newExercises = [...exercises]
+    newExercises[index] = {
+      ...newExercises[index],
+      [field]: value
+    }
+    setExercises(newExercises)
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!name.trim()) {
+      setError('El nombre de la rutina es obligatorio')
+      return
+    }
+
+    if (exercises.length === 0) {
+      setError('Debes agregar al menos un ejercicio a la rutina')
+      return
+    }
+
+    // Validar que todos los ejercicios tengan un ejercicio seleccionado
+    const hasInvalidExercises = exercises.some(ex => ex.exercise_id === 0)
+    if (hasInvalidExercises) {
+      setError('Todos los ejercicios deben tener un ejercicio seleccionado')
+      return
+    }
+
+    const routineData: CreateRoutineRequest = {
+      name: name.trim(),
+      description: description.trim() || undefined,
+      exercises: exercises
+    }
+
+    onSubmit(routineData)
+  }
+
+  const getExerciseName = (exerciseId: number) => {
+    const exercise = availableExercises.find(ex => ex.id === exerciseId)
+    return exercise?.name || 'Seleccionar ejercicio'
+  }
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" p={3}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  return (
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label="Nombre de la rutina"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            sx={{ mb: 2 }}
+          />
+        </Grid>
+        
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label="Descripción (opcional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            multiline
+            rows={3}
+            sx={{ mb: 3 }}
+          />
+        </Grid>
+      </Grid>
+
+      <Divider sx={{ my: 3 }}>
+        <Typography variant="h6" component="span">
+          Ejercicios de la rutina
+        </Typography>
+      </Divider>
+
+      {exercises.map((exercise, index) => (
+        <Card key={index} sx={{ mb: 2 }}>
+          <CardContent>
+            <Box display="flex" alignItems="center" mb={2}>
+              <DragIcon sx={{ mr: 1, color: 'text.secondary' }} />
+              <Typography variant="subtitle2" sx={{ flex: 1 }}>
+                Ejercicio {index + 1}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => handleRemoveExercise(index)}
+                sx={{ color: 'error.main' }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel>Ejercicio</InputLabel>
+                  <Select
+                    value={exercise.exercise_id}
+                    onChange={(e) => handleExerciseChange(index, 'exercise_id', e.target.value)}
+                    label="Ejercicio"
+                  >
+                    {availableExercises.map((ex) => (
+                      <MenuItem key={ex.id} value={ex.id}>
+                        {ex.name} ({ex.muscle_group})
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Series"
+                  type="number"
+                  value={exercise.sets}
+                  onChange={(e) => handleExerciseChange(index, 'sets', parseInt(e.target.value))}
+                  inputProps={{ min: 1, max: 20 }}
+                  required
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Repeticiones"
+                  type="number"
+                  value={exercise.reps}
+                  onChange={(e) => handleExerciseChange(index, 'reps', parseInt(e.target.value))}
+                  inputProps={{ min: 1, max: 100 }}
+                  required
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Peso (kg) - opcional"
+                  type="number"
+                  value={exercise.weight || ''}
+                  onChange={(e) => handleExerciseChange(index, 'weight', e.target.value ? parseFloat(e.target.value) : undefined)}
+                  inputProps={{ min: 0, step: 0.5 }}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Descanso (segundos)"
+                  type="number"
+                  value={exercise.rest_time_seconds}
+                  onChange={(e) => handleExerciseChange(index, 'rest_time_seconds', parseInt(e.target.value))}
+                  inputProps={{ min: 0, max: 3600 }}
+                  required
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Notas (opcional)"
+                  value={exercise.notes}
+                  onChange={(e) => handleExerciseChange(index, 'notes', e.target.value)}
+                  multiline
+                  rows={2}
+                />
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+      ))}
+
+      <Box display="flex" justifyContent="center" mb={3}>
+        <Button
+          variant="outlined"
+          startIcon={<AddIcon />}
+          onClick={handleAddExercise}
+        >
+          Agregar ejercicio
+        </Button>
+      </Box>
+
+      <Box display="flex" justifyContent="space-between" sx={{ mt: 3 }}>
+        <Button variant="outlined" onClick={onCancel}>
+          Cancelar
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={!name.trim() || exercises.length === 0}
+        >
+          {routine ? 'Actualizar rutina' : 'Crear rutina'}
+        </Button>
+      </Box>
+    </Box>
+  )
+}
+
+export default RoutineForm

@@ -19,7 +19,7 @@ export interface Workout {
   exercise_name: string
   weight: number
   reps: number
-  serie: number
+  set: number
   seconds?: number
   observations: string
   created_at: string
@@ -29,7 +29,7 @@ export interface CreateWorkoutRequest {
   exercise_id: number
   weight: number
   reps: number
-  serie?: number
+  set?: number
   seconds?: number
   observations?: string
 }

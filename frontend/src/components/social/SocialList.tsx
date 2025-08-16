@@ -27,7 +27,7 @@ type SocialWorkout = {
   workout_date: string
   created_at: string
   total_exercises: number
-  total_series: number
+  total_sets: number
   exercises: SocialExercise[]
   kudos_count: number
   has_kudos: boolean
@@ -35,8 +35,8 @@ type SocialWorkout = {
 
 type SocialExercise = {
   exercise_name: string
-  total_series: number
-  serie: number
+  total_sets: number
+  set: number
   weight: number
   reps: number
   seconds?: number

@@ -5,8 +5,9 @@ export const TABS = {
   EQUIPMENT: 2,
   HISTORY: 3,
   SOCIAL: 4,
-  NOTIFICATIONS: 5,
-  ADMIN: 6
+  ROUTINES: 5,
+  NOTIFICATIONS: 6,
+  ADMIN: 7
 } as const
 
 export type TabType = typeof TABS[keyof typeof TABS]

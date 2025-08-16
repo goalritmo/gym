@@ -5,6 +5,7 @@ import WorkoutHistory from '../workout/WorkoutHistory'
 import ExerciseList from '../exercises/ExerciseList'
 import EquipmentList from '../equipment/EquipmentList'
 import SocialList from '../social/SocialList'
+import RoutineList from '../routines/RoutineList'
 import AdminPanel from '../admin/AdminPanel'
 import Navigation from '../navigation/Navigation'
 import SettingsModal from '../settings/SettingsModal'
@@ -161,7 +162,7 @@ function AuthenticatedAppContent() {
       const workoutData: any = {
         exercise_id: data.exercise_id,
         reps: data.reps || 0,
-        serie: data.serie || 1,
+        set: data.set || 1,
         seconds: data.seconds || undefined,
         observations: data.observations || ''
       }
@@ -344,6 +345,12 @@ function AuthenticatedAppContent() {
           </Box>
         )}
 
+        {/* Pestaña Mis Rutinas */}
+        {activeTab === TABS.ROUTINES && (
+          <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
+            <RoutineList />
+          </Box>
+        )}
 
       </Box>
 

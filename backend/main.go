@@ -106,8 +106,13 @@ func main() {
 	api.HandleFunc("/admin/users", handlers.AdminMiddleware(handlers.GetAdminUsersHandler)).Methods("GET")
 	api.HandleFunc("/admin/users/{id}", handlers.AdminMiddleware(handlers.DeleteAdminUserHandler)).Methods("DELETE")
 	api.HandleFunc("/admin/users/{id}/role", handlers.AdminMiddleware(handlers.UpdateAdminUserRoleHandler)).Methods("PUT")
-	
 
+	// Routines endpoints
+	api.HandleFunc("/routines", handlers.GetUserRoutinesHandler).Methods("GET")
+	api.HandleFunc("/routines", handlers.CreateUserRoutineHandler).Methods("POST")
+	api.HandleFunc("/routines/{id}", handlers.GetUserRoutineHandler).Methods("GET")
+	api.HandleFunc("/routines/{id}", handlers.UpdateUserRoutineHandler).Methods("PUT")
+	api.HandleFunc("/routines/{id}", handlers.DeleteUserRoutineHandler).Methods("DELETE")
 
 	// Configurar CORS
 	c := cors.New(cors.Options{
