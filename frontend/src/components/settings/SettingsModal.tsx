@@ -37,7 +37,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     toggleWorkoutSection,
     setFavoriteExercises,
     toggleUncNotifications,
-    toggleShowOwnWorkoutsInSocial
+    toggleShowOwnWorkoutsInSocial,
+    toggleRoutinesTab
   } = useUserSettings()
   const [hasChanges, setHasChanges] = useState(false)
   const [tempSettings, setTempSettings] = useState(settings)
@@ -72,6 +73,14 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     setHasChanges(true)
   }
 
+  const handleToggleRoutinesTab = () => {
+    setTempSettings(prev => ({
+      ...prev,
+      showRoutinesTab: !prev.showRoutinesTab
+    }))
+    setHasChanges(true)
+  }
+
   const handleToggleFavoriteExercise = (exerciseId: number) => {
     const isFavorite = tempSettings.favoriteExercises.includes(exerciseId)
     const newFavorites = isFavorite
@@ -96,6 +105,9 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       }
       if (tempSettings.showOwnWorkoutsInSocial !== settings.showOwnWorkoutsInSocial) {
         await toggleShowOwnWorkoutsInSocial()
+      }
+      if (tempSettings.showRoutinesTab !== settings.showRoutinesTab) {
+        await toggleRoutinesTab()
       }
       if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
         setFavoriteExercises(tempSettings.favoriteExercises)
@@ -292,6 +304,35 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
               width: '100%',
               m: 0,
               p: 2,
+              borderRadius: 1,
+              backgroundColor: 'grey.50',
+              '&:hover': {
+                backgroundColor: 'grey.100'
+              }
+            }}
+          />
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Sección CONFIGURACIÓN DE TABS */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            CONFIGURACIÓN DE TABS
+          </Typography>
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={tempSettings.showRoutinesTab}
+                onChange={handleToggleRoutinesTab}
+                color="primary"
+              />
+            }
+            label="Mostrar tab de Mis Rutinas"
+            sx={{
+              py: 1,
+              px: 2,
               borderRadius: 1,
               backgroundColor: 'grey.50',
               '&:hover': {

@@ -5,6 +5,7 @@ import { apiClient } from '../lib/api'
 interface ApiUserSettings {
   show_own_workouts_in_social: boolean
   unc_notifications_enabled: boolean
+  show_routines_tab: boolean
 }
 
 interface UserSettings {
@@ -12,6 +13,7 @@ interface UserSettings {
   favoriteExercises: number[]
   uncNotificationsEnabled: boolean
   showOwnWorkoutsInSocial: boolean
+  showRoutinesTab: boolean
 }
 
 interface UserSettingsContextType {
@@ -20,6 +22,7 @@ interface UserSettingsContextType {
   setFavoriteExercises: (exercises: number[]) => void
   toggleUncNotifications: () => void
   toggleShowOwnWorkoutsInSocial: () => void
+  toggleRoutinesTab: () => void
   initializeAllExercisesAsFavorites: (exerciseIds: number[]) => void
   onSocialSettingsChange?: () => void
   setOnSocialSettingsChange: (callback: () => void) => void
@@ -31,7 +34,8 @@ const defaultSettings: UserSettings = {
   showWorkoutSection: true, // Por defecto mostrar sección de registro
   favoriteExercises: [], // Se llenará automáticamente con todos los ejercicios
   uncNotificationsEnabled: true, // Por defecto habilitadas para usuarios UNC
-  showOwnWorkoutsInSocial: true // Por defecto mostrar ejercicios propios en social
+  showOwnWorkoutsInSocial: true, // Por defecto mostrar ejercicios propios en social
+  showRoutinesTab: true // Por defecto mostrar tab de rutinas
 }
 
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
@@ -60,6 +64,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
         ...defaultSettings, 
         showOwnWorkoutsInSocial: apiSettingsTyped.show_own_workouts_in_social,
         uncNotificationsEnabled: apiSettingsTyped.unc_notifications_enabled,
+        showRoutinesTab: apiSettingsTyped.show_routines_tab,
         favoriteExercises: localSettings.favoriteExercises || [],
         showWorkoutSection: localSettings.showWorkoutSection !== undefined ? localSettings.showWorkoutSection : defaultSettings.showWorkoutSection
       })
@@ -141,6 +146,20 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     }
   }, [settings.showOwnWorkoutsInSocial, onSocialSettingsChange])
 
+  const toggleRoutinesTab = useCallback(async () => {
+    const newValue = !settings.showRoutinesTab
+    setSettings(prev => ({ 
+      ...prev, 
+      showRoutinesTab: newValue
+    }))
+    
+    try {
+      await apiClient.updateUserSettings({ show_routines_tab: newValue })
+    } catch (error) {
+      console.error('Error updating show routines tab setting:', error)
+    }
+  }, [settings.showRoutinesTab])
+
   const initializeAllExercisesAsFavorites = useCallback((exerciseIds: number[]) => {
     // Solo inicializar si no hay ejercicios favoritos configurados
     if (settings.favoriteExercises.length === 0 && exerciseIds.length > 0) {
@@ -157,6 +176,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     setFavoriteExercises,
     toggleUncNotifications,
     toggleShowOwnWorkoutsInSocial,
+    toggleRoutinesTab,
     initializeAllExercisesAsFavorites,
     onSocialSettingsChange,
     setOnSocialSettingsChange
