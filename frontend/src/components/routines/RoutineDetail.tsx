@@ -7,9 +7,6 @@ import {
   Chip,
   Button,
   Divider,
-  List,
-  ListItemText,
-  ListItemIcon,
   IconButton,
   Tooltip
 } from '@mui/material'
@@ -60,54 +57,95 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       width: '100%',
       boxSizing: 'border-box'
     }}>
-      {/* Header de la rutina */}
-      <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={3} sx={{
-        flexDirection: { xs: 'column', sm: 'row' },
-        gap: { xs: 2, sm: 0 }
-      }}>
-        <Box>
-          <Typography variant="h5" component="h2" sx={{ fontWeight: 600, mb: 1 }}>
-            {routine.name}
-          </Typography>
-          {routine.description && (
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-              {routine.description}
-            </Typography>
-          )}
-          <Box display="flex" gap={1} flexWrap="wrap" sx={{ 
-          '@media (max-width: 600px)': {
-            gap: 0.5
-          }
-        }}>
-            {routine.is_active && (
-              <Chip
-                label="Activa"
-                color="success"
-                size="small"
-              />
-            )}
-            <Chip
-              label={`${routine.exercises?.length || 0} ejercicios`}
-              variant="outlined"
-              size="small"
-            />
-            <Chip
-              label={`${getTotalSets()} series total`}
-              variant="outlined"
-              size="small"
-            />
-            <Chip
-              label={`~${formatTime(getTotalTime())} descanso`}
-              variant="outlined"
-              size="small"
-              icon={<AccessTimeIcon />}
-            />
-          </Box>
-        </Box>
-        
-        <Box display="flex" gap={1} sx={{
-          alignSelf: { xs: 'flex-start', sm: 'flex-end' }
-        }}>
+            {/* Header de la rutina */}
+      <Card 
+        elevation={3}
+        sx={{ 
+          mb: 3,
+          border: '2px solid',
+          borderColor: 'primary.main',
+          borderRadius: '16px',
+          background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+        }}
+      >
+        <CardContent sx={{ p: 3 }}>
+          <Box sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'space-between',
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            gap: 2
+          }}>
+            <Box sx={{ flex: 1 }}>
+              <Typography 
+                variant="h4" 
+                component="h2" 
+                sx={{ 
+                  fontWeight: 800, 
+                  mb: 1,
+                  color: 'primary.main',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                }}
+              >
+                {routine.name}
+              </Typography>
+              {routine.description && (
+                <Typography 
+                  variant="body1" 
+                  color="text.secondary" 
+                  sx={{ 
+                    mb: 2,
+                    fontStyle: 'italic',
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  {routine.description}
+                </Typography>
+              )}
+              <Box sx={{ 
+                display: 'flex', 
+                gap: 1, 
+                flexWrap: 'wrap',
+                alignItems: 'center'
+              }}>
+                {routine.is_active && (
+                  <Chip
+                    label="Activa"
+                    color="success"
+                    size="medium"
+                    sx={{ fontWeight: 700 }}
+                  />
+                )}
+                <Chip
+                  label={`${routine.exercises?.length || 0} ejercicios`}
+                  color="primary"
+                  variant="filled"
+                  size="medium"
+                  sx={{ fontWeight: 700 }}
+                />
+                <Chip
+                  label={`${getTotalSets()} series total`}
+                  color="secondary"
+                  variant="filled"
+                  size="medium"
+                  sx={{ fontWeight: 700 }}
+                />
+                <Chip
+                  label={`~${formatTime(getTotalTime())} descanso`}
+                  color="warning"
+                  variant="filled"
+                  size="medium"
+                  icon={<AccessTimeIcon />}
+                  sx={{ fontWeight: 700 }}
+                />
+              </Box>
+            </Box>
+            
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 1,
+              flexShrink: 0
+            }}>
           {onStart && (
             <Tooltip title="Comenzar rutina">
               <IconButton
@@ -136,7 +174,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             </Tooltip>
           )}
         </Box>
-      </Box>
+          </Box>
+        </CardContent>
+      </Card>
 
       <Divider sx={{ my: 3 }} />
 
@@ -145,134 +185,228 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         Ejercicios de la rutina
       </Typography>
 
-      <List sx={{ p: 0 }}>
-        {routine.exercises?.map((exercise, index) => (
-          <Card key={exercise.id} sx={{ 
-            mb: 2,
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 2,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            '&:hover': {
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              transition: 'box-shadow 0.2s ease-in-out'
-            }
-          }}>
-            <CardContent sx={{ p: 2 }}>
-              <Box display="flex" alignItems="center" mb={2}>
-                <ListItemIcon sx={{ minWidth: 40 }}>
-                  <Box
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.875rem',
-                      fontWeight: 600
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {routine.exercises && routine.exercises.length > 0 ? (
+          routine.exercises.map((exercise, index) => (
+          <Card 
+            key={exercise.id} 
+            elevation={2}
+            sx={{ 
+              border: '2px solid',
+              borderColor: 'grey.300',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                borderColor: 'primary.main',
+                boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                transform: 'translateY(-2px)'
+              }
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              {/* Header del ejercicio */}
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'flex-start', 
+                gap: 2,
+                mb: 2
+              }}>
+                {/* Número del ejercicio */}
+                <Box
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1rem',
+                    fontWeight: 700,
+                    flexShrink: 0
+                  }}
+                >
+                  {index + 1}
+                </Box>
+                
+                {/* Información del ejercicio */}
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 700,
+                      mb: 1,
+                      color: 'text.primary'
                     }}
                   >
-                    {index + 1}
+                    {exercise.exercise_name}
+                  </Typography>
+                  
+                  {/* Chips de información */}
+                  <Box sx={{ 
+                    display: 'flex', 
+                    gap: 1, 
+                    flexWrap: 'wrap',
+                    alignItems: 'center'
+                  }}>
+                    <Chip
+                      label={`${exercise.sets} series`}
+                      size="small"
+                      color="primary"
+                      variant="filled"
+                      sx={{ fontWeight: 600 }}
+                    />
+                    <Chip
+                      label={`${exercise.reps} reps`}
+                      size="small"
+                      color="secondary"
+                      variant="filled"
+                      sx={{ fontWeight: 600 }}
+                    />
+                    {exercise.weight && exercise.weight > 0 && (
+                      <Chip
+                        label={`${exercise.weight} kg`}
+                        size="small"
+                        color="info"
+                        variant="filled"
+                        sx={{ fontWeight: 600 }}
+                      />
+                    )}
+                    <Chip
+                      label={`${formatTime(exercise.rest_time_seconds)} descanso`}
+                      size="small"
+                      color="warning"
+                      variant="filled"
+                      icon={<TimerIcon />}
+                      sx={{ fontWeight: 600 }}
+                    />
                   </Box>
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      {exercise.exercise_name}
-                    </Typography>
-                  }
-                  secondary={
-                    <Box display="flex" gap={1} flexWrap="wrap" sx={{ 
-                      mt: 1,
-                      '@media (max-width: 600px)': {
-                        gap: 0.5
-                      }
-                    }}>
-                      <Chip
-                        label={`${exercise.sets} series`}
-                        size="small"
-                        variant="outlined"
-                      />
-                      <Chip
-                        label={`${exercise.reps} reps`}
-                        size="small"
-                        variant="outlined"
-                      />
-                      {exercise.weight && exercise.weight > 0 && (
-                        <Chip
-                          label={`${exercise.weight} kg`}
-                          size="small"
-                          variant="outlined"
-                        />
-                      )}
-                      <Chip
-                        label={`${formatTime(exercise.rest_time_seconds)} descanso`}
-                        size="small"
-                        variant="outlined"
-                        icon={<TimerIcon />}
-                      />
-                    </Box>
-                  }
-                />
+                </Box>
               </Box>
 
+              {/* Notas del ejercicio */}
               {exercise.notes && (
-                <Box display="flex" alignItems="flex-start" sx={{ mt: 2 }}>
-                  <NotesIcon sx={{ mr: 1, mt: 0.5, color: 'text.secondary', fontSize: 20 }} />
-                  <Typography variant="body2" color="text.secondary">
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'flex-start', 
+                  gap: 1,
+                  mt: 2,
+                  p: 2,
+                  backgroundColor: 'grey.50',
+                  borderRadius: '8px',
+                  border: '1px solid',
+                  borderColor: 'grey.200'
+                }}>
+                  <NotesIcon sx={{ 
+                    color: 'text.secondary', 
+                    fontSize: 20,
+                    mt: 0.25
+                  }} />
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ fontStyle: 'italic' }}
+                  >
                     {exercise.notes}
                   </Typography>
                 </Box>
               )}
             </CardContent>
           </Card>
-        ))}
-      </List>
+        ))
+        ) : (
+          <Box sx={{ 
+            textAlign: 'center', 
+            py: 4,
+            color: 'text.secondary'
+          }}>
+            <Typography variant="h6">
+              No hay ejercicios en esta rutina
+            </Typography>
+          </Box>
+        )}
+      </Box>
 
       {/* Resumen de la rutina */}
       <Card sx={{ 
         mt: 3, 
-        backgroundColor: 'grey.50',
-        border: '1px solid',
-        borderColor: 'divider',
-        borderRadius: 2,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        backgroundColor: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+        border: '2px solid',
+        borderColor: 'secondary.main',
+        borderRadius: '16px',
+        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+        overflow: 'hidden'
       }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            Resumen de la rutina
+        <CardContent sx={{ p: 3 }}>
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              mb: 3, 
+              fontWeight: 800,
+              color: 'secondary.main',
+              textAlign: 'center',
+              textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+            }}
+          >
+            📊 Resumen de la rutina
           </Typography>
-          <Box display="grid" gridTemplateColumns="repeat(auto-fit, minmax(120px, 1fr))" gap={2} sx={{ 
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', 
+            gap: 3,
             '@media (max-width: 600px)': {
-              gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-              gap: 1
+              gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+              gap: 2
             }
           }}>
-            <Box textAlign="center">
-              <Typography variant="h4" color="primary.main" sx={{ fontWeight: 600 }}>
+            <Box sx={{ 
+              textAlign: 'center',
+              p: 2,
+              borderRadius: '12px',
+              backgroundColor: 'white',
+              border: '2px solid',
+              borderColor: 'primary.light',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
+              <Typography variant="h3" color="primary.main" sx={{ fontWeight: 800, mb: 1 }}>
                 {routine.exercises?.length || 0}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Ejercicios
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                🏋️ Ejercicios
               </Typography>
             </Box>
-            <Box textAlign="center">
-              <Typography variant="h4" color="primary.main" sx={{ fontWeight: 600 }}>
+            <Box sx={{ 
+              textAlign: 'center',
+              p: 2,
+              borderRadius: '12px',
+              backgroundColor: 'white',
+              border: '2px solid',
+              borderColor: 'secondary.light',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
+              <Typography variant="h3" color="secondary.main" sx={{ fontWeight: 800, mb: 1 }}>
                 {getTotalSets()}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Series total
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                🔄 Series total
               </Typography>
             </Box>
-            <Box textAlign="center">
-              <Typography variant="h4" color="primary.main" sx={{ fontWeight: 600 }}>
+            <Box sx={{ 
+              textAlign: 'center',
+              p: 2,
+              borderRadius: '12px',
+              backgroundColor: 'white',
+              border: '2px solid',
+              borderColor: 'warning.light',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
+              <Typography variant="h3" color="warning.main" sx={{ fontWeight: 800, mb: 1 }}>
                 {formatTime(getTotalTime())}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Tiempo descanso
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                ⏱️ Tiempo descanso
               </Typography>
             </Box>
           </Box>

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -599,27 +600,22 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	fmt.Printf("GetAdminExercisesHandler: Iniciando consulta de ejercicios\n")
-	fmt.Printf("GetAdminExercisesHandler: User ID from context: %v\n", r.Context().Value("user_id"))
+
 
 	// Primero verificar si la tabla existe
 	var tableExists bool
 	err := database.DB.QueryRow("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'exercises')").Scan(&tableExists)
 	if err != nil {
-		fmt.Printf("Error verificando existencia de tabla exercises: %v\n", err)
 		http.Error(w, "Error verificando estructura de base de datos", http.StatusInternalServerError)
 		return
 	}
 
 	if !tableExists {
-		fmt.Printf("Tabla 'exercises' no existe\n")
 		// Devolver array vacío en lugar de error
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode([]AdminExercise{})
 		return
 	}
-
-	fmt.Printf("Tabla 'exercises' existe, procediendo con consulta\n")
 
 	query := `
 		SELECT 
@@ -630,7 +626,6 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Printf("Error en consulta SQL: %v\n", err)
 		http.Error(w, "Error obteniendo ejercicios", http.StatusInternalServerError)
 		return
 	}
@@ -640,24 +635,42 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	count := 0
 	for rows.Next() {
 		var exercise AdminExercise
-		var equipment string
+		var muscleGroup sql.NullString
+		var equipment sql.NullString
+		var videoURL sql.NullString
 		
 		err := rows.Scan(
 			&exercise.ID,
 			&exercise.Name,
-			&exercise.MuscleGroup,
+			&muscleGroup,
 			&equipment,
-			&exercise.VideoURL,
+			&videoURL,
 			&exercise.CreatedAt,
 		)
 		if err != nil {
-			fmt.Printf("Error escaneando ejercicio %d: %v\n", count+1, err)
 			http.Error(w, "Error escaneando ejercicio", http.StatusInternalServerError)
 			return
 		}
 
-		exercise.Equipment = equipment
+		// Manejar valores NULL
+		if muscleGroup.Valid {
+			exercise.MuscleGroup = muscleGroup.String
+		} else {
+			exercise.MuscleGroup = "General"
+		}
 		
+		if equipment.Valid {
+			exercise.Equipment = equipment.String
+		} else {
+			exercise.Equipment = "Peso libre"
+		}
+		
+		if videoURL.Valid {
+			exercise.VideoURL = &videoURL.String
+		} else {
+			exercise.VideoURL = nil
+		}
+
 		// Arrays vacíos por defecto
 		exercise.PrimaryMuscles = []string{}
 		exercise.SecondaryMuscles = []string{}
@@ -665,8 +678,6 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 		exercises = append(exercises, exercise)
 		count++
 	}
-
-	fmt.Printf("Se escanearon %d ejercicios exitosamente\n", count)
 
 	json.NewEncoder(w).Encode(exercises)
 }
