@@ -14,13 +14,16 @@ import {
   DialogActions,
   Alert,
   CircularProgress,
-  Fab
+  Fab,
+  TextField,
+  InputAdornment
 } from '@mui/material'
 import {
   Add as AddIcon,
   Edit as EditIcon,
   PlayArrow as PlayIcon,
-  FitnessCenter as FitnessCenterIcon
+  FitnessCenter as FitnessCenterIcon,
+  Search as SearchIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import type { RoutineWithExercises, CreateRoutineRequest } from '../../types/routine'
@@ -37,6 +40,7 @@ const RoutineList: React.FC = () => {
   const [selectedRoutine, setSelectedRoutine] = useState<RoutineWithExercises | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingRoutineId, setDeletingRoutineId] = useState<number | null>(null)
+  const [filterText, setFilterText] = useState('')
 
   const loadRoutines = useCallback(async () => {
     console.log('🔄 RoutineList - loadRoutines ejecutándose')
@@ -93,6 +97,12 @@ const RoutineList: React.FC = () => {
       setError('Error al actualizar la rutina')
     }
   }
+
+  // Filtrar rutinas por nombre o descripción
+  const filteredRoutines = routines.filter(routine =>
+    routine.name.toLowerCase().includes(filterText.toLowerCase()) ||
+    (routine.description && routine.description.toLowerCase().includes(filterText.toLowerCase()))
+  )
 
   const handleDeleteRoutine = async (id: number) => {
     try {
@@ -199,19 +209,36 @@ const RoutineList: React.FC = () => {
           </CardContent>
         </Card>
       ) : (
-        <Box sx={{ 
-          display: 'grid', 
-          gap: 3,
-          gridTemplateColumns: { 
-            xs: '1fr', 
-            sm: 'repeat(auto-fill, minmax(320px, 1fr))', 
-            md: 'repeat(auto-fill, minmax(350px, 1fr))' 
-          },
-          width: '100%',
-          maxWidth: '100%',
-          overflow: 'hidden'
-        }}>
-          {routines?.map((routine) => (
+        <Box>
+          {/* Campo de búsqueda */}
+          <TextField
+            fullWidth
+            placeholder="Buscar rutinas por nombre o descripción..."
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+            sx={{ mb: 3 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          
+          <Box sx={{ 
+            display: 'grid', 
+            gap: 2,
+            gridTemplateColumns: { 
+              xs: '1fr', 
+              sm: 'repeat(auto-fill, minmax(280px, 1fr))', 
+              md: 'repeat(auto-fill, minmax(300px, 1fr))' 
+            },
+            width: '100%',
+            maxWidth: '100%',
+            overflow: 'hidden'
+          }}>
+            {filteredRoutines?.map((routine) => (
             <Card 
               key={routine.id} 
               elevation={2}
@@ -306,8 +333,7 @@ const RoutineList: React.FC = () => {
                     opacity: 0.8
                   }}
                 >
-                  📅 Creada el {new Date(routine.created_at).toLocaleDateString('es-ES', {
-                    year: 'numeric',
+                  Creada el {new Date(routine.created_at).toLocaleDateString('es-ES', {
                     month: 'long',
                     day: 'numeric'
                   })}
@@ -355,6 +381,7 @@ const RoutineList: React.FC = () => {
               </CardActions>
             </Card>
           ))}
+        </Box>
         </Box>
       )}
 

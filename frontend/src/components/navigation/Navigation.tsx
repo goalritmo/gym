@@ -141,8 +141,8 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
 
   const menuItems = [
     { label: 'Registrar', icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
-    { label: 'Mis Rutinas', icon: <FitnessCenterIcon />, value: TABS.ROUTINES },
-    { label: 'Entrenamientos', icon: <HistoryIcon />, value: TABS.HISTORY },
+    { label: 'Mis Rutinas', icon: <HistoryIcon />, value: TABS.ROUTINES },
+    { label: 'Entrenamientos', icon: <FitnessCenterIcon />, value: TABS.HISTORY },
     { label: 'Feed Social', icon: <PeopleIcon />, value: TABS.SOCIAL },
   ]
 
