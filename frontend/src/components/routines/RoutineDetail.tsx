@@ -335,33 +335,49 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     <Chip
                       label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
                       size="small"
-                      color={isCompleted ? "warning" : "primary"}
+                      color={isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default")}
                       variant="filled"
-                      sx={{ fontWeight: 600 }}
+                      sx={{ 
+                        fontWeight: 600,
+                        backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
+                        color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                      }}
                     />
                     <Chip
                       label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
                       size="small"
-                      color={isCompleted ? "warning" : "primary"}
+                      color={isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default")}
                       variant="filled"
-                      sx={{ fontWeight: 600 }}
+                      sx={{ 
+                        fontWeight: 600,
+                        backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
+                        color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                      }}
                     />
                     {exercise.weight && exercise.weight > 0 && (
                       <Chip
                         label={`${exercise.weight} kg`}
                         size="small"
-                        color={isCompleted ? "warning" : "primary"}
+                        color={isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default")}
                         variant="filled"
-                        sx={{ fontWeight: 600 }}
+                        sx={{ 
+                          fontWeight: 600,
+                          backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
+                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                        }}
                       />
                     )}
                     <Chip
                       label={`${formatTime(exercise.rest_time_seconds)} descanso`}
                       size="small"
-                      color={isCompleted ? "warning" : "primary"}
+                      color={isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default")}
                       variant="filled"
                       icon={<TimerIcon />}
-                      sx={{ fontWeight: 600 }}
+                      sx={{ 
+                        fontWeight: 600,
+                        backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
+                        color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                      }}
                     />
                   </Box>
                 </Box>
@@ -486,7 +502,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderColor: isActiveRoutine ? 'warning.light' : 'primary.light',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-              <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'text.secondary'} sx={{ fontWeight: 800, mb: 1 }}>
                 {getCompletedReps()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
