@@ -600,6 +600,7 @@ func GetAdminExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	fmt.Printf("GetAdminExercisesHandler: Iniciando consulta de ejercicios\n")
+	fmt.Printf("GetAdminExercisesHandler: User ID from context: %v\n", r.Context().Value("user_id"))
 
 	// Primero verificar si la tabla existe
 	var tableExists bool

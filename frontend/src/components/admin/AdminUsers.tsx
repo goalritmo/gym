@@ -142,11 +142,21 @@ export function AdminUsers() {
     }
   }
 
-  // Filtrar usuarios por nombre o email
-  const filteredUsers = (users || []).filter(user =>
-    (user.name && user.name.toLowerCase().includes(filterText.toLowerCase())) ||
-    (user.email && user.email.toLowerCase().includes(filterText.toLowerCase()))
-  )
+  // Filtrar usuarios por nombre, email o tipo de usuario
+  const filteredUsers = (users || []).filter(user => {
+    const searchText = filterText.toLowerCase()
+    
+    // Búsqueda por nombre o email
+    const nameMatch = user.name && user.name.toLowerCase().includes(searchText)
+    const emailMatch = user.email && user.email.toLowerCase().includes(searchText)
+    
+    // Búsqueda por tipo de usuario
+    const adminMatch = searchText === 'admin' && user.is_admin
+    const profeMatch = searchText === 'profe' && !user.is_admin && user.role === 'profe'
+    const staffMatch = searchText === 'staff' && !user.is_admin && user.role === 'staff'
+    
+    return nameMatch || emailMatch || adminMatch || profeMatch || staffMatch
+  })
 
   if (loading) {
     return (
@@ -207,7 +217,7 @@ export function AdminUsers() {
       {/* Search Bar */}
       <TextField
         fullWidth
-        placeholder="Buscar por nombre o email..."
+        placeholder="Buscar por nombre, email, tipo de usuario..."
         value={filterText}
         onChange={(e) => setFilterText(e.target.value)}
         sx={{ mb: 3 }}
@@ -275,13 +285,15 @@ export function AdminUsers() {
                               sx={{ fontSize: '0.75rem' }}
                             />
                           )}
-                          <Chip 
-                            label={user.role === 'profe' ? 'Profe' : user.role === 'staff' ? 'Staff' : 'Usuario'} 
-                            size="small" 
-                            color={user.role === 'profe' ? 'secondary' : user.role === 'staff' ? 'warning' : 'default'} 
-                            variant="outlined"
-                            sx={{ fontSize: '0.75rem' }}
-                          />
+                          {!user.is_admin && (
+                            <Chip 
+                              label={user.role === 'profe' ? 'Profe' : user.role === 'staff' ? 'Staff' : 'Usuario'} 
+                              size="small" 
+                              color={user.role === 'profe' ? 'secondary' : user.role === 'staff' ? 'warning' : 'default'} 
+                              variant="outlined"
+                              sx={{ fontSize: '0.75rem' }}
+                            />
+                          )}
                         </Box>
                         
                         {/* User Settings */}
