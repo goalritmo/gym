@@ -6,7 +6,6 @@ import {
   CardContent,
   CardActions,
   Button,
-  Chip,
   IconButton,
   Dialog,
   DialogTitle,
@@ -32,9 +31,10 @@ import RoutineDetail from './RoutineDetail'
 
 interface RoutineListProps {
   activeRoutine?: any
+  routineProgress?: number
 }
 
-const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine }) => {
+const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgress = 0 }) => {
   const [routines, setRoutines] = useState<RoutineWithExercises[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -295,12 +295,31 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine }) => {
                 borderRadius: '16px',
                 overflow: 'hidden',
                 transition: 'all 0.3s ease',
+                position: 'relative',
                 '&:hover': {
                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                   transform: 'translateY(-4px)'
                 }
               }}
             >
+              {activeRoutine?.id === routine.id && (
+                <Box sx={{
+                  position: 'absolute',
+                  top: 12,
+                  right: 12,
+                  backgroundColor: 'warning.main',
+                  color: 'white',
+                  borderRadius: '12px',
+                  px: 1.5,
+                  py: 0.5,
+                  zIndex: 1,
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
+                    {routineProgress}%
+                  </Typography>
+                </Box>
+              )}
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ 
                   display: 'flex', 
@@ -322,7 +341,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine }) => {
                     }}
                     onClick={() => activeRoutine?.id !== routine.id && handleEditNameClick(routine)}
                   >
-                    {routine.name}
+                    🏋️ {routine.name}
                   </Typography>
                   {activeRoutine?.id !== routine.id && (
                     <IconButton
@@ -372,21 +391,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine }) => {
                   </Typography>
                 )}
 
-                <Box sx={{ 
-                  display: 'flex', 
-                  gap: 1, 
-                  flexWrap: 'wrap', 
-                  mb: 2,
-                  alignItems: 'center'
-                }}>
-                  <Chip
-                    label={`${routine.total_exercises} ejercicios`}
-                    color={activeRoutine?.id === routine.id ? "warning" : "primary"}
-                    variant="filled"
-                    size="medium"
-                    sx={{ fontWeight: 600 }}
-                  />
-                </Box>
+
               </CardContent>
 
               <CardActions sx={{ 
@@ -395,24 +400,47 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine }) => {
                 pb: 3,
                 pt: 0
               }}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => handleViewRoutine(routine)}
-                  sx={{ 
-                    fontWeight: 600,
-                    borderRadius: '8px',
-                    textTransform: 'none',
-                    color: 'primary.main',
-                    borderColor: 'primary.main',
-                    '&:hover': {
-                      backgroundColor: 'primary.main',
-                      color: 'white'
-                    }
-                  }}
-                >
-                  Ver detalles
-                </Button>
+                {activeRoutine?.id === routine.id ? (
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      // Iniciar rutina directamente sin abrir modal
+                      const event = new CustomEvent('startRoutine', { 
+                        detail: { routine: routine } 
+                      })
+                      window.dispatchEvent(event)
+                    }}
+                    sx={{ 
+                      color: 'white',
+                      backgroundColor: 'warning.main',
+                      '&:hover': {
+                        backgroundColor: 'warning.light',
+                        color: 'white'
+                      }
+                    }}
+                  >
+                    <PlayIcon />
+                  </IconButton>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => handleViewRoutine(routine)}
+                    sx={{ 
+                      fontWeight: 600,
+                      borderRadius: '8px',
+                      textTransform: 'none',
+                      color: 'primary.main',
+                      borderColor: 'primary.main',
+                      '&:hover': {
+                        backgroundColor: 'primary.main',
+                        color: 'white'
+                      }
+                    }}
+                  >
+                    Ver detalles
+                  </Button>
+                )}
                 <IconButton
                   size="medium"
                   onClick={() => {

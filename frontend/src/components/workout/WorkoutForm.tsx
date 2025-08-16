@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { TextField, Button, Stack, Box, Typography, Alert, Snackbar, CircularProgress, Backdrop, IconButton } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import { AccessTime, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
+import { AccessTime, KeyboardArrowDown, KeyboardArrowUp, Stop as StopIcon, Close as CloseIcon } from '@mui/icons-material'
 import { useState, useEffect } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -34,9 +34,23 @@ type WorkoutFormProps = {
   exercises: Exercise[]
   onSubmit: (data: WorkoutFormData) => Promise<void>
   isLoading?: boolean
+  activeRoutine?: any
+  isRoutinePaused?: boolean
+  routineProgress?: number
+  onPauseRoutine?: () => void
+  onStopRoutine?: () => void
 }
 
-export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: WorkoutFormProps) {
+export default function WorkoutForm({ 
+  exercises, 
+  onSubmit, 
+  isLoading = false,
+  activeRoutine,
+  isRoutinePaused = false,
+  routineProgress = 0,
+  onPauseRoutine,
+  onStopRoutine
+}: WorkoutFormProps) {
   const { settings } = useUserSettings()
   
   // Filtrar ejercicios favoritos si están configurados
@@ -61,7 +75,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   // Estado para trackear el tiempo del cronómetro
   const [currentTimerTime, setCurrentTimerTime] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [showTimeTip, setShowTimeTip] = useState(true)
+  const [showTimeTip, setShowTimeTip] = useState(false)
   
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = filteredExercises.length === 0
@@ -203,6 +217,83 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
         Registrar
       </Typography>
       
+      {/* Barra de progreso de rutina activa */}
+      {activeRoutine && (
+        <Box sx={{ 
+          mb: 3, 
+          p: 2, 
+          backgroundColor: isRoutinePaused ? 'primary.main' : 'warning.main', 
+          borderRadius: 2,
+          color: 'white',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          position: 'relative'
+        }}>
+          <IconButton
+            size="small"
+            onClick={isRoutinePaused ? onStopRoutine : onPauseRoutine}
+            sx={{ 
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              color: 'white',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              '&:hover': {
+                backgroundColor: 'rgba(255,255,255,0.2)'
+              }
+            }}
+          >
+            {isRoutinePaused ? <CloseIcon /> : <StopIcon />}
+          </IconButton>
+          
+          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: 'left' }}>
+            🏋️ {isRoutinePaused ? 'A la espera' : activeRoutine.name}
+          </Typography>
+          
+          <Box sx={{ 
+            width: '100%', 
+            backgroundColor: 'rgba(255,255,255,0.2)', 
+            borderRadius: 1,
+            height: 8,
+            mb: 1
+          }}>
+            <Box sx={{ 
+              width: `${routineProgress}%`, 
+              backgroundColor: 'white', 
+              borderRadius: 1,
+              height: '100%',
+              transition: 'width 0.3s ease'
+            }} />
+          </Box>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center'
+          }}>
+            <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500 }}>
+              {routineProgress}% completado
+            </Typography>
+            
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                '&:hover': {
+                  opacity: 0.8
+                }
+              }}
+              onClick={() => {
+                // Aquí podrías abrir el modal de detalles de la rutina
+              }}
+            >
+              {isRoutinePaused ? 'Elegir rutina' : 'Ver rutina'}
+            </Typography>
+          </Box>
+        </Box>
+      )}
+      
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
         <FormControl fullWidth error={Boolean(errors.exercise_id)} disabled={isLoading || filteredExercises.length === 0}>
@@ -320,9 +411,14 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
 
         {settings.showWorkoutSection && (
           <Box>
-            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="h6" gutterBottom sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1,
+              mb: !isRunningExercise && !showTimeTip ? 1 : undefined
+            }}>
               <AccessTime color="primary" />
-              {isRunningExercise ? "Tiempo" : "Tiempo de la Serie"}
+              {isRunningExercise ? "Tiempo" : "Tiempo de Serie"}
               {!isRunningExercise && (
                 <IconButton
                   size="small"

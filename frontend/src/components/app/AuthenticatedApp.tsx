@@ -1,5 +1,4 @@
-import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography, IconButton } from '@mui/material'
-import { Stop as StopIcon, Close as CloseIcon } from '@mui/icons-material'
+import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography } from '@mui/material'
 import { useState, useEffect, useCallback } from 'react'
 import WorkoutForm from '../workout/WorkoutForm'
 import WorkoutHistory from '../workout/WorkoutHistory'
@@ -261,89 +260,15 @@ function AuthenticatedAppContent() {
         {/* Pestaña Entrenamiento */}
         {activeTab === TABS.WORKOUT && (
           <Box sx={{ position: 'relative', zIndex: 1, minHeight: 'calc(100vh - 200px)' }}>
-            
-            {/* Barra de progreso de rutina activa */}
-            {activeRoutine && (
-              <Box sx={{ 
-                mb: 3, 
-                p: 2, 
-                backgroundColor: isRoutinePaused ? 'primary.main' : 'warning.main', 
-                borderRadius: 2,
-                color: 'white',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                position: 'relative'
-              }}>
-                <IconButton
-                  size="small"
-                  onClick={isRoutinePaused ? handleStopRoutine : handlePauseRoutine}
-                  sx={{ 
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                    color: 'white',
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255,255,255,0.2)'
-                    }
-                  }}
-                >
-                  {isRoutinePaused ? <CloseIcon /> : <StopIcon />}
-                </IconButton>
-                
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: 'left' }}>
-                  🏋️ {isRoutinePaused ? 'A la espera' : activeRoutine.name}
-                </Typography>
-                
-                <Box sx={{ 
-                  width: '100%', 
-                  backgroundColor: 'rgba(255,255,255,0.2)', 
-                  borderRadius: 1,
-                  height: 8,
-                  mb: 1
-                }}>
-                  <Box sx={{ 
-                    width: `${routineProgress}%`, 
-                    backgroundColor: 'white', 
-                    borderRadius: 1,
-                    height: '100%',
-                    transition: 'width 0.3s ease'
-                  }} />
-                </Box>
-                
-                <Box sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center'
-                }}>
-                  <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500 }}>
-                    {routineProgress}% completado
-                  </Typography>
-                  
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      '&:hover': {
-                        opacity: 0.8
-                      }
-                    }}
-                    onClick={() => {
-                      setActiveTab(TABS.ROUTINES)
-                      // Aquí podrías abrir el modal de detalles de la rutina
-                    }}
-                  >
-                    {isRoutinePaused ? 'Elegir rutina' : 'Ver rutina'}
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-            
             <WorkoutForm 
               exercises={exercises} 
               onSubmit={handleWorkoutSubmit}
               isLoading={isSubmittingWorkout}
+              activeRoutine={activeRoutine}
+              isRoutinePaused={isRoutinePaused}
+              routineProgress={routineProgress}
+              onPauseRoutine={handlePauseRoutine}
+              onStopRoutine={handleStopRoutine}
             />
           </Box>
         )}
@@ -471,7 +396,7 @@ function AuthenticatedAppContent() {
         {/* Pestaña Mis Rutinas */}
         {activeTab === TABS.ROUTINES && (
           <Box sx={{ minHeight: 'calc(100vh - 200px)' }}>
-            <RoutineList activeRoutine={activeRoutine} />
+            <RoutineList activeRoutine={activeRoutine} routineProgress={routineProgress} />
           </Box>
         )}
 
