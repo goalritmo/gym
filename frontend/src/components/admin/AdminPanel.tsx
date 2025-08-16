@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Box,
   Typography,
@@ -72,7 +72,7 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
     return tabs
   }
 
-  const availableTabs = getAvailableTabs()
+  const availableTabs = useMemo(() => getAvailableTabs(), [userRole, isAdmin])
   const [activeTab, setActiveTab] = useState<string>(availableTabs[0] || 'notifications')
 
   // Debug logs
