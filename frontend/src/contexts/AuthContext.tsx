@@ -70,6 +70,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Función para obtener información del usuario
   const fetchUserInfo = useCallback(async () => {
     if (user) {
+      console.log('🔍 AuthContext - fetchUserInfo ejecutándose para usuario:', user.email)
       try {
         const userInfo = await apiClient.getCurrentUser() as UserInfo
         setIsAdmin(userInfo.is_admin || false)
