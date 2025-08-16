@@ -62,7 +62,7 @@ export default function WorkoutForm({
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
-      exercise_id: '',
+      exercise_id: 0,
       weight: '',
       reps: '',
       set: 1,
@@ -108,6 +108,7 @@ export default function WorkoutForm({
   // Pre-cargar ejercicio cuando se recibe desde la rutina
   useEffect(() => {
     if (preloadedExercise) {
+      console.log('Pre-cargando ejercicio:', preloadedExercise)
       setValue('exercise_id', preloadedExercise.exercise_id)
       setValue('weight', preloadedExercise.weight?.toString() || '')
       setValue('reps', preloadedExercise.reps || '')
