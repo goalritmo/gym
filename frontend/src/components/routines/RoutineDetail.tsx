@@ -141,6 +141,36 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               gap: 1,
               flexShrink: 0
             }}>
+          {onDelete && (
+            <Tooltip title="Eliminar rutina">
+              <IconButton
+                color="error"
+                onClick={onDelete}
+                sx={{ 
+                  backgroundColor: 'transparent',
+                  color: 'error.main',
+                  border: '1px solid',
+                  borderColor: 'error.main',
+                  '&:hover': {
+                    backgroundColor: 'error.main',
+                    color: 'white'
+                  }
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          {onEdit && (
+            <Tooltip title="Editar rutina">
+              <IconButton
+                color="primary"
+                onClick={onEdit}
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          )}
           {onStart && (
             <Tooltip title="Comenzar rutina">
               <IconButton
@@ -155,33 +185,6 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 }}
               >
                 <PlayIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-          {onEdit && (
-            <Tooltip title="Editar rutina">
-              <IconButton
-                color="primary"
-                onClick={onEdit}
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-          {onDelete && (
-            <Tooltip title="Eliminar rutina">
-              <IconButton
-                color="error"
-                onClick={onDelete}
-                sx={{ 
-                  backgroundColor: 'error.main',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: 'error.dark'
-                  }
-                }}
-              >
-                <DeleteIcon />
               </IconButton>
             </Tooltip>
           )}
