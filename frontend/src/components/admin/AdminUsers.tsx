@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -49,7 +49,7 @@ export function AdminUsers() {
   const [updatingRole, setUpdatingRole] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
@@ -61,11 +61,11 @@ export function AdminUsers() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     loadUsers()
-  }, [])
+  }, [loadUsers])
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)

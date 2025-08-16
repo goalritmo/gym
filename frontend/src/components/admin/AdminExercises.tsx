@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -51,7 +51,7 @@ export function AdminExercises() {
     name: ''
   })
 
-  const loadExercises = async () => {
+  const loadExercises = useCallback(async () => {
     try {
       setLoading(true)
       console.log('🔍 Cargando ejercicios...')
@@ -66,11 +66,11 @@ export function AdminExercises() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     loadExercises()
-  }, [])
+  }, [loadExercises])
 
   const handleCreateExercise = async () => {
     if (!form.name.trim()) {

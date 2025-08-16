@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -94,7 +94,7 @@ export function AdminNotifications() {
     type: 'info'
   })
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     try {
       setLoading(true)
       const data = await apiClient.getAdminNotifications() as AdminNotification[]
@@ -107,11 +107,11 @@ export function AdminNotifications() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     loadNotifications()
-  }, [])
+  }, [loadNotifications])
 
   const handleCreateNotification = async () => {
     if (!form.title.trim() || !form.message.trim()) {

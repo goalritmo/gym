@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { 
   Box, 
   Typography, 
@@ -50,11 +50,7 @@ export default function NotificationsList() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    loadNotifications()
-  }, [settings.showOwnWorkoutsInSocial, settings.uncNotificationsEnabled])
-
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     setIsLoading(true)
     setError('')
     
@@ -121,7 +117,11 @@ export default function NotificationsList() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [settings.showOwnWorkoutsInSocial, settings.uncNotificationsEnabled])
+
+  useEffect(() => {
+    loadNotifications()
+  }, [loadNotifications])
 
   const markAsRead = (notificationId: string) => {
     setNotifications(prev => 

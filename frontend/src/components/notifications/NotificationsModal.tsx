@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -65,13 +65,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (open) {
-      loadNotifications()
-    }
-  }, [open, settings.showOwnWorkoutsInSocial, settings.uncNotificationsEnabled])
-
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     setIsLoading(true)
     setError('')
     
@@ -98,7 +92,13 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [settings.showOwnWorkoutsInSocial, settings.uncNotificationsEnabled])
+
+  useEffect(() => {
+    if (open) {
+      loadNotifications()
+    }
+  }, [open, loadNotifications])
 
   const markAsRead = async (notificationId: number) => {
     try {
