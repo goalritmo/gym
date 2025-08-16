@@ -17,7 +17,6 @@ import {
   Edit as EditIcon,
   PlayArrow as PlayIcon,
   Stop as StopIcon,
-  AccessTime as AccessTimeIcon,
   Notes as NotesIcon,
   Delete as DeleteIcon
 } from '@mui/icons-material'
@@ -52,16 +51,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
-  const getTotalTime = () => {
-    if (!routine.exercises || routine.exercises.length === 0) return 0
-    return routine.exercises.reduce((total, exercise) => {
-      return total + (exercise.rest_time_seconds * (exercise.sets - 1))
-    }, 0)
-  }
-
   const getTotalSets = () => {
     if (!routine.exercises || routine.exercises.length === 0) return 0
     return routine.exercises.reduce((total, exercise) => total + exercise.sets, 0)
+  }
+
+  const getTotalReps = () => {
+    if (!routine.exercises || routine.exercises.length === 0) return 0
+    return routine.exercises.reduce((total, exercise) => total + (exercise.reps * exercise.sets), 0)
   }
 
   return (
@@ -125,25 +122,24 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 alignItems: 'center'
               }}>
                 <Chip
-                  label={`${routine.exercises?.length || 0} ejercicios`}
+                  label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
                   color={isActiveRoutine ? "warning" : "primary"}
                   variant="filled"
                   size="medium"
                   sx={{ fontWeight: 700 }}
                 />
                 <Chip
-                  label={`${getTotalSets()} series`}
+                  label={`${getTotalSets()} ${getTotalSets() === 1 ? 'serie' : 'series'}`}
                   color={isActiveRoutine ? "warning" : "primary"}
                   variant="filled"
                   size="medium"
                   sx={{ fontWeight: 700 }}
                 />
                 <Chip
-                  label={`${formatTime(getTotalTime())} descanso`}
+                  label={`${getTotalReps()} reps total`}
                   color={isActiveRoutine ? "warning" : "primary"}
                   variant="filled"
                   size="medium"
-                  icon={<AccessTimeIcon />}
                   sx={{ fontWeight: 700 }}
                 />
               </Box>
@@ -331,14 +327,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     <Chip
                       label={`${exercise.sets} series`}
                       size="small"
-                      color={isActiveRoutine ? "warning" : "primary"}
+                      color={isCompleted ? "warning" : "primary"}
                       variant="filled"
                       sx={{ fontWeight: 600 }}
                     />
                     <Chip
                       label={`${exercise.reps} reps`}
                       size="small"
-                      color={isActiveRoutine ? "warning" : "secondary"}
+                      color={isCompleted ? "warning" : "primary"}
                       variant="filled"
                       sx={{ fontWeight: 600 }}
                     />
@@ -346,7 +342,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       <Chip
                         label={`${exercise.weight} kg`}
                         size="small"
-                        color={isActiveRoutine ? "warning" : "info"}
+                        color={isCompleted ? "warning" : "primary"}
                         variant="filled"
                         sx={{ fontWeight: 600 }}
                       />
@@ -354,7 +350,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     <Chip
                       label={`${formatTime(exercise.rest_time_seconds)} descanso`}
                       size="small"
-                      color={isActiveRoutine ? "warning" : "primary"}
+                      color={isCompleted ? "warning" : "primary"}
                       variant="filled"
                       icon={<TimerIcon />}
                       sx={{ fontWeight: 600 }}
@@ -451,10 +447,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
               <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
-                {routine.total_exercises || 0}
+                {routine.exercises?.length || 0}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🏋️ Ejercicios
+                🏋️ {(routine.exercises?.length || 0) === 1 ? 'Ejercicio' : 'Ejercicios'}
               </Typography>
             </Box>
             <Box sx={{ 
@@ -483,10 +479,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
               <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
-                {formatTime(getTotalTime())}
+                {getTotalReps()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                ⏱️ Tiempo descanso
+                🔄 Reps total
               </Typography>
             </Box>
           </Box>
