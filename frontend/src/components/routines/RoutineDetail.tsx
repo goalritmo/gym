@@ -42,12 +42,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   }
 
   const getTotalTime = () => {
+    if (!routine.exercises || routine.exercises.length === 0) return 0
     return routine.exercises.reduce((total, exercise) => {
       return total + (exercise.rest_time_seconds * (exercise.sets - 1))
     }, 0)
   }
 
   const getTotalSets = () => {
+    if (!routine.exercises || routine.exercises.length === 0) return 0
     return routine.exercises.reduce((total, exercise) => total + exercise.sets, 0)
   }
 
@@ -73,7 +75,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               />
             )}
             <Chip
-              label={`${routine.exercises.length} ejercicios`}
+              label={`${routine.exercises?.length || 0} ejercicios`}
               variant="outlined"
               size="small"
             />
@@ -130,7 +132,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       </Typography>
 
       <List sx={{ p: 0 }}>
-        {routine.exercises.map((exercise, index) => (
+        {routine.exercises?.map((exercise, index) => (
           <Card key={exercise.id} sx={{ mb: 2 }}>
             <CardContent sx={{ p: 2 }}>
               <Box display="flex" alignItems="center" mb={2}>

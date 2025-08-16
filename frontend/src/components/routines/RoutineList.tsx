@@ -158,11 +158,15 @@ const RoutineList: React.FC = () => {
         </Card>
       ) : (
         <Box display="grid" gap={2} sx={{ 
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(auto-fill, minmax(350px, 1fr))' },
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(auto-fill, minmax(300px, 1fr))', md: 'repeat(auto-fill, minmax(320px, 1fr))' },
           mx: 0.5
         }}>
           {routines?.map((routine) => (
-            <Card key={routine.id} sx={{ height: 'fit-content' }}>
+            <Card key={routine.id} sx={{ 
+              height: 'fit-content',
+              maxWidth: '100%',
+              overflow: 'hidden'
+            }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
                   <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
@@ -285,6 +289,15 @@ const RoutineList: React.FC = () => {
             <RoutineDetail
               routine={selectedRoutine}
               onClose={() => setOpenDetailDialog(false)}
+              onEdit={() => {
+                setOpenDetailDialog(false)
+                setOpenEditDialog(true)
+              }}
+              onStart={() => {
+                // TODO: Implementar funcionalidad de comenzar rutina
+                console.log('Comenzando rutina:', selectedRoutine.name)
+                setOpenDetailDialog(false)
+              }}
             />
           )}
         </DialogContent>
