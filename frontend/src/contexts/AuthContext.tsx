@@ -104,7 +104,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Obtener información del usuario incluyendo is_admin cuando cambie el usuario
   useEffect(() => {
     fetchUserInfo()
-  }, [fetchUserInfo])
+  }, [user]) // Solo depender de user, no de fetchUserInfo
 
 
 
