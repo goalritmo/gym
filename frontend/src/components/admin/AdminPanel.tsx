@@ -92,10 +92,10 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
 
   // Resetear activeTab si no está en las pestañas disponibles
   useEffect(() => {
-    if (!availableTabs.includes(activeTab)) {
-      setActiveTab(availableTabs[0] || 'notifications')
+    if (availableTabs.length > 0 && !availableTabs.includes(activeTab)) {
+      setActiveTab(availableTabs[0])
     }
-  }, [activeTab, availableTabs])
+  }, [availableTabs]) // Solo dependemos de availableTabs, no de activeTab
 
   useEffect(() => {
     // No necesitamos verificar permisos aquí porque el usuario ya pasó la verificación del menú

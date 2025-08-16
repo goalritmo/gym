@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -95,7 +95,7 @@ export default function SocialList() {
     }
   }
 
-  const loadSocialWorkouts = async () => {
+  const loadSocialWorkouts = useCallback(async () => {
     try {
       setLoading(true)
       const workouts = await apiClient.getSocialWorkouts(10, 0)
@@ -128,7 +128,7 @@ export default function SocialList() {
     } finally {
       setLoading(false)
     }
-  }
+  }, []) // Dependencies for useCallback
 
   const handleKudos = async (workoutId: number) => {
     if (!user) return
@@ -213,7 +213,7 @@ export default function SocialList() {
 
   useEffect(() => {
     loadSocialWorkouts()
-  }, [])
+  }, [loadSocialWorkouts])
 
   // Registrar callback para recargar cuando cambien las configuraciones sociales
   useEffect(() => {
@@ -223,7 +223,7 @@ export default function SocialList() {
     return () => {
       setOnSocialSettingsChange(() => {})
     }
-  }, [setOnSocialSettingsChange])
+  }, [setOnSocialSettingsChange, loadSocialWorkouts])
 
   if (loading) {
     return (
