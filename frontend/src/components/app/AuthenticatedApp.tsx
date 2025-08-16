@@ -1,5 +1,5 @@
 import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography } from '@mui/material'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import WorkoutForm from '../workout/WorkoutForm'
 import WorkoutHistory from '../workout/WorkoutHistory'
 import ExerciseList from '../exercises/ExerciseList'
@@ -40,7 +40,7 @@ function AuthenticatedAppContent() {
   const [unreadNotifications, setUnreadNotifications] = useState(0)
 
   // Función para cargar el contador de notificaciones no leídas
-  const loadUnreadNotificationsCount = async () => {
+  const loadUnreadNotificationsCount = useCallback(async () => {
     try {
       const response = await apiClient.getUnreadNotificationsCount() as { unread_count: number }
       setUnreadNotifications(response.unread_count || 0)
@@ -48,10 +48,10 @@ function AuthenticatedAppContent() {
       console.error('Error cargando contador de notificaciones:', error)
       setUnreadNotifications(0)
     }
-  }
+  }, [])
 
   // Función para cargar datos desde el backend
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true)
     try {
       // Cargar workouts, workout days y ejercicios en paralelo
@@ -90,7 +90,7 @@ function AuthenticatedAppContent() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [initializeAllExercisesAsFavorites])
 
   // Cargar datos desde el backend al montar el componente
   useEffect(() => {
@@ -98,12 +98,12 @@ function AuthenticatedAppContent() {
     if (workouts.length === 0 && workoutDays.length === 0 && exercises.length === 0) {
       loadData()
     }
-  }, [])
+  }, [loadData])
 
   // Cargar contador de notificaciones no leídas al montar el componente
   useEffect(() => {
     loadUnreadNotificationsCount()
-  }, [])
+  }, [loadUnreadNotificationsCount])
 
   // Guardar workouts cuando cambien
   useEffect(() => {
