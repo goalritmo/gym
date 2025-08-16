@@ -40,6 +40,7 @@ const RoutineList: React.FC = () => {
   const [deletingRoutineId, setDeletingRoutineId] = useState<number | null>(null)
 
   const loadRoutines = useCallback(async () => {
+    console.log('🔄 RoutineList - loadRoutines ejecutándose')
     try {
       setLoading(true)
       setError(null)
@@ -47,16 +48,18 @@ const RoutineList: React.FC = () => {
       
       // Validar que data sea un array
       if (Array.isArray(data)) {
+        console.log('✅ RoutineList - Datos válidos recibidos:', data.length, 'rutinas')
         setRoutines(data as RoutineWithExercises[])
       } else if (data === null || data === undefined) {
         // Si no hay rutinas, establecer array vacío
+        console.log('ℹ️ RoutineList - No hay rutinas (null/undefined)')
         setRoutines([])
       } else {
-        console.warn('API devolvió datos no válidos:', data)
+        console.warn('⚠️ RoutineList - API devolvió datos no válidos:', data)
         setRoutines([])
       }
     } catch (err) {
-      console.error('Error cargando rutinas:', err)
+      console.error('❌ RoutineList - Error cargando rutinas:', err)
       setError('Error al cargar las rutinas')
       setRoutines([])
     } finally {
@@ -65,6 +68,7 @@ const RoutineList: React.FC = () => {
   }, [])
 
   useEffect(() => {
+    console.log('🔄 RoutineList - useEffect ejecutándose, loadRoutines:', loadRoutines)
     loadRoutines()
   }, [loadRoutines])
 

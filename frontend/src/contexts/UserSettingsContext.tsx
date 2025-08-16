@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import { apiClient } from '../lib/api'
 
@@ -38,52 +38,53 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings)
   const [onSocialSettingsChange, setOnSocialSettingsChange] = useState<(() => void) | undefined>(undefined)
 
-  // Cargar configuraciones desde la API al montar
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const apiSettings = await apiClient.getUserSettings()
+  // Función para cargar configuraciones desde la API
+  const loadSettings = useCallback(async () => {
+    try {
+      const apiSettings = await apiClient.getUserSettings()
 
-        
-        // Combinar configuraciones de API con localStorage para ejercicios favoritos
-        const savedSettings = localStorage.getItem('user-settings')
-        let localSettings: Partial<UserSettings> = {}
-        if (savedSettings) {
-          try {
-            localSettings = JSON.parse(savedSettings)
-          } catch (error) {
-            console.error('Error parsing local settings:', error)
-          }
-        }
-        
-        const apiSettingsTyped = apiSettings as ApiUserSettings
-        setSettings({ 
-          ...defaultSettings, 
-          showOwnWorkoutsInSocial: apiSettingsTyped.show_own_workouts_in_social,
-          uncNotificationsEnabled: apiSettingsTyped.unc_notifications_enabled,
-          favoriteExercises: localSettings.favoriteExercises || [],
-          showWorkoutSection: localSettings.showWorkoutSection !== undefined ? localSettings.showWorkoutSection : defaultSettings.showWorkoutSection
-        })
-      } catch (error) {
-        console.error('Error loading user settings from API:', error)
-        // Fallback a localStorage
-        const savedSettings = localStorage.getItem('user-settings')
-        if (savedSettings) {
-          try {
-            const parsedSettings = JSON.parse(savedSettings)
-            setSettings({ ...defaultSettings, ...parsedSettings })
-          } catch (error) {
-            console.error('Error parsing user settings:', error)
-            setSettings(defaultSettings)
-          }
-        } else {
-          setSettings(defaultSettings)
+      
+      // Combinar configuraciones de API con localStorage para ejercicios favoritos
+      const savedSettings = localStorage.getItem('user-settings')
+      let localSettings: Partial<UserSettings> = {}
+      if (savedSettings) {
+        try {
+          localSettings = JSON.parse(savedSettings)
+        } catch (error) {
+          console.error('Error parsing local settings:', error)
         }
       }
+      
+      const apiSettingsTyped = apiSettings as ApiUserSettings
+      setSettings({ 
+        ...defaultSettings, 
+        showOwnWorkoutsInSocial: apiSettingsTyped.show_own_workouts_in_social,
+        uncNotificationsEnabled: apiSettingsTyped.unc_notifications_enabled,
+        favoriteExercises: localSettings.favoriteExercises || [],
+        showWorkoutSection: localSettings.showWorkoutSection !== undefined ? localSettings.showWorkoutSection : defaultSettings.showWorkoutSection
+      })
+    } catch (error) {
+      console.error('Error loading user settings from API:', error)
+      // Fallback a localStorage
+      const savedSettings = localStorage.getItem('user-settings')
+      if (savedSettings) {
+        try {
+          const parsedSettings = JSON.parse(savedSettings)
+          setSettings({ ...defaultSettings, ...parsedSettings })
+        } catch (error) {
+          console.error('Error parsing user settings:', error)
+          setSettings(defaultSettings)
+        }
+      } else {
+        setSettings(defaultSettings)
+      }
     }
-    
-    loadSettings()
   }, [])
+
+  // Cargar configuraciones desde la API al montar
+  useEffect(() => {
+    loadSettings()
+  }, [loadSettings])
 
   // Guardar configuraciones en localStorage (solo ejercicios favoritos y showWorkoutSection)
   useEffect(() => {
