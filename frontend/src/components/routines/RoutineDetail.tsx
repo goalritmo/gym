@@ -140,7 +140,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 />
                 <Chip
                   label={`${formatTime(getTotalTime())} descanso`}
-                  color="warning"
+                  color={isActiveRoutine ? "warning" : "primary"}
                   variant="filled"
                   size="medium"
                   icon={<AccessTimeIcon />}
@@ -218,7 +218,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
               Progreso de la rutina
             </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: isActiveRoutine ? 'warning.main' : 'primary.main' }}>
               {routineProgress}%
             </Typography>
           </Box>
@@ -230,7 +230,8 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: 4,
               backgroundColor: 'grey.200',
               '& .MuiLinearProgress-bar': {
-                borderRadius: 4
+                borderRadius: 4,
+                backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main'
               }
             }}
           />
@@ -243,7 +244,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       </Typography>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {routine.exercises && routine.exercises.length > 0 ? (
+        {Array.isArray(routine.exercises) && routine.exercises.length > 0 ? (
           routine.exercises.map((exercise, index) => {
             const isCompleted = completedExercises?.includes(exercise.id) || false
             return (
