@@ -19,7 +19,6 @@ import {
 import {
   Add as AddIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon,
   PlayArrow as PlayIcon,
   FitnessCenter as FitnessCenterIcon
 } from '@mui/icons-material'
@@ -119,10 +118,7 @@ const RoutineList: React.FC = () => {
     setOpenEditDialog(true)
   }
 
-  const handleDeleteClick = (routine: RoutineWithExercises) => {
-    setSelectedRoutine(routine)
-    setDeleteDialogOpen(true)
-  }
+
 
   if (loading) {
     return (
@@ -212,12 +208,13 @@ const RoutineList: React.FC = () => {
             md: 'repeat(auto-fill, minmax(350px, 1fr))' 
           },
           width: '100%',
-          p: { xs: 1, sm: 0 }
+          maxWidth: '100%',
+          overflow: 'hidden'
         }}>
           {routines?.map((routine) => (
             <Card 
               key={routine.id} 
-              elevation={3}
+              elevation={2}
               sx={{ 
                 height: 'fit-content',
                 width: '100%',
@@ -228,44 +225,45 @@ const RoutineList: React.FC = () => {
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   borderColor: 'primary.main',
-                  boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                  transform: 'translateY(-4px)'
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 }
               }}
             >
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ 
                   display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'flex-start', 
+                  alignItems: 'center', 
+                  gap: 1,
                   mb: 2
                 }}>
                   <Typography 
                     variant="h5" 
                     component="h2" 
                     sx={{ 
-                      fontWeight: 700, 
-                      flex: 1, 
-                      mr: 2,
+                      fontWeight: 700,
                       color: 'primary.main',
-                      textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                      textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        textDecoration: 'underline'
+                      }
                     }}
+                    onClick={() => handleEditClick(routine)}
                   >
                     {routine.name}
                   </Typography>
                   <IconButton
-                    size="medium"
-                    onClick={() => handleViewRoutine(routine)}
+                    size="small"
+                    onClick={() => handleEditClick(routine)}
                     sx={{ 
                       color: 'primary.main',
-                      backgroundColor: 'primary.light',
                       '&:hover': {
-                        backgroundColor: 'primary.main',
+                        backgroundColor: 'primary.light',
                         color: 'white'
                       }
                     }}
                   >
-                    <PlayIcon />
+                    <EditIcon fontSize="small" />
                   </IconButton>
                 </Box>
 
@@ -297,15 +295,6 @@ const RoutineList: React.FC = () => {
                     size="medium"
                     sx={{ fontWeight: 600 }}
                   />
-                  {routine.is_active && (
-                    <Chip
-                      label="Activa"
-                      color="success"
-                      variant="filled"
-                      size="medium"
-                      sx={{ fontWeight: 600 }}
-                    />
-                  )}
                 </Box>
                 
                 <Typography 
@@ -331,48 +320,38 @@ const RoutineList: React.FC = () => {
                 pb: 3,
                 pt: 0
               }}>
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <IconButton
-                    size="medium"
-                    onClick={() => handleEditClick(routine)}
-                    sx={{ 
-                      color: 'primary.main',
-                      backgroundColor: 'primary.light',
-                      '&:hover': {
-                        backgroundColor: 'primary.main',
-                        color: 'white'
-                      }
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    size="medium"
-                    onClick={() => handleDeleteClick(routine)}
-                    sx={{ 
-                      color: 'error.main',
-                      backgroundColor: 'error.light',
-                      '&:hover': {
-                        backgroundColor: 'error.main',
-                        color: 'white'
-                      }
-                    }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
                 <Button
-                  variant="contained"
-                  size="medium"
+                  variant="outlined"
+                  size="small"
                   onClick={() => handleViewRoutine(routine)}
                   sx={{ 
                     fontWeight: 600,
                     borderRadius: '8px',
-                    textTransform: 'none'
+                    textTransform: 'none',
+                    color: 'primary.main',
+                    borderColor: 'primary.main',
+                    '&:hover': {
+                      backgroundColor: 'primary.main',
+                      color: 'white'
+                    }
                   }}
                 >
                   Ver detalles
                 </Button>
+                <IconButton
+                  size="medium"
+                  onClick={() => handleViewRoutine(routine)}
+                  sx={{ 
+                    color: 'primary.main',
+                    backgroundColor: 'primary.light',
+                    '&:hover': {
+                      backgroundColor: 'primary.main',
+                      color: 'white'
+                    }
+                  }}
+                >
+                  <PlayIcon />
+                </IconButton>
               </CardActions>
             </Card>
           ))}

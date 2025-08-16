@@ -30,7 +30,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   routine, 
   onClose, 
   onEdit, 
-  onStart 
+  onStart
 }) => {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
