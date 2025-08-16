@@ -476,10 +476,12 @@ function AuthenticatedAppContent() {
       />
 
       {/* Modal del Panel de Administrador */}
-      <AdminPanel 
-        open={adminPanelOpen} 
-        onClose={() => setAdminPanelOpen(false)}
-      />
+      {adminPanelOpen && (
+        <AdminPanel 
+          open={adminPanelOpen} 
+          onClose={() => setAdminPanelOpen(false)}
+        />
+      )}
     </Box>
   )
 }
