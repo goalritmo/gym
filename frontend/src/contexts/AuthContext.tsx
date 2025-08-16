@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import { auth } from '../lib/supabase'
 import { apiClient } from '../lib/api'
@@ -67,43 +67,44 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Obtener información del usuario incluyendo is_admin cuando cambie el usuario
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (user) {
+  // Función para obtener información del usuario
+  const fetchUserInfo = useCallback(async () => {
+    if (user) {
+      try {
+        const userInfo = await apiClient.getCurrentUser() as UserInfo
+        setIsAdmin(userInfo.is_admin || false)
+        setUserRole(userInfo.role || 'user')
+        
+        // Actualizar último acceso
         try {
-          const userInfo = await apiClient.getCurrentUser() as UserInfo
-          setIsAdmin(userInfo.is_admin || false)
-          setUserRole(userInfo.role || 'user')
-          
-          // Actualizar último acceso
+          await apiClient.updateLastSignIn()
+        } catch (error) {
+          // No es crítico si falla, solo log
+        }
+        
+        // Configurar usuario solo si no tiene perfil (usuario nuevo) y no tiene rol específico
+        if (!userInfo.profile_name && !userInfo.is_admin && userInfo.role === 'user') {
           try {
-            await apiClient.updateLastSignIn()
+            const userName = user.user_metadata?.name || user.user_metadata?.full_name
+            await apiClient.setupUser(user.id, user.email || '', userName)
           } catch (error) {
             // No es crítico si falla, solo log
           }
-          
-          // Configurar usuario solo si no tiene perfil (usuario nuevo) y no tiene rol específico
-          if (!userInfo.profile_name && !userInfo.is_admin && userInfo.role === 'user') {
-            try {
-              const userName = user.user_metadata?.name || user.user_metadata?.full_name
-              await apiClient.setupUser(user.id, user.email || '', userName)
-            } catch (error) {
-              // No es crítico si falla, solo log
-            }
-          }
-        } catch (error) {
-          console.error('Error fetching user info:', error)
-          setIsAdmin(false)
         }
-      } else {
+      } catch (error) {
+        console.error('Error fetching user info:', error)
         setIsAdmin(false)
-        setUserRole('user')
       }
+    } else {
+      setIsAdmin(false)
+      setUserRole('user')
     }
-
-    fetchUserInfo()
   }, [user])
+
+  // Obtener información del usuario incluyendo is_admin cuando cambie el usuario
+  useEffect(() => {
+    fetchUserInfo()
+  }, [fetchUserInfo])
 
 
 
