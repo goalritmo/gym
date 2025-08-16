@@ -127,22 +127,10 @@ const RoutineList: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
-          Mis Rutinas
-        </Typography>
-        <Tooltip title="Crear nueva rutina">
-          <Fab
-            color="primary"
-            aria-label="crear rutina"
-            onClick={() => setOpenCreateDialog(true)}
-            sx={{ boxShadow: 3 }}
-          >
-            <AddIcon />
-          </Fab>
-        </Tooltip>
-      </Box>
+    <Box sx={{ p: 1 }}>
+      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
+        Mis Rutinas
+      </Typography>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -151,7 +139,7 @@ const RoutineList: React.FC = () => {
       )}
 
       {(!routines || routines.length === 0) ? (
-        <Card sx={{ textAlign: 'center', py: 4 }}>
+        <Card sx={{ textAlign: 'center', py: 4, mx: 0.5 }}>
           <CardContent>
             <FitnessCenterIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
             <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -165,12 +153,15 @@ const RoutineList: React.FC = () => {
               startIcon={<AddIcon />}
               onClick={() => setOpenCreateDialog(true)}
             >
-              Crear mi primera rutina
+              Crear
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <Box display="grid" gap={2} sx={{ gridTemplateColumns: { xs: '1fr', md: 'repeat(auto-fill, minmax(350px, 1fr))' } }}>
+        <Box display="grid" gap={2} sx={{ 
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(auto-fill, minmax(350px, 1fr))' },
+          mx: 0.5
+        }}>
           {routines?.map((routine) => (
             <Card key={routine.id} sx={{ height: 'fit-content' }}>
               <CardContent>
@@ -329,6 +320,27 @@ const RoutineList: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Botón flotante para crear rutina */}
+      <Fab
+        color="primary"
+        aria-label="crear rutina"
+        onClick={() => setOpenCreateDialog(true)}
+        sx={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          zIndex: 1000,
+          boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+          '&:hover': {
+            boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)',
+            transform: 'scale(1.05)'
+          },
+          transition: 'all 0.2s ease-in-out'
+        }}
+      >
+        <AddIcon />
+      </Fab>
     </Box>
   )
 }
