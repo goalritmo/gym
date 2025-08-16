@@ -8,7 +8,9 @@ import {
   Button,
   Divider,
   IconButton,
-  Tooltip
+  Tooltip,
+  Checkbox,
+  LinearProgress
 } from '@mui/material'
 import {
   Timer as TimerIcon,
@@ -28,6 +30,9 @@ interface RoutineDetailProps {
   onStart?: () => void
   onDelete?: () => void
   isActiveRoutine?: boolean
+  completedExercises?: number[]
+  routineProgress?: number
+  onExerciseClick?: (exercise: any) => void
 }
 
 const RoutineDetail: React.FC<RoutineDetailProps> = ({ 
@@ -36,7 +41,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   onEdit, 
   onStart,
   onDelete,
-  isActiveRoutine = false
+  isActiveRoutine = false,
+  completedExercises = [],
+  routineProgress,
+  onExerciseClick
 }) => {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
@@ -203,6 +211,32 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
 
       <Divider sx={{ my: 3 }} />
 
+      {/* Barra de progreso */}
+      {routineProgress !== undefined && (
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+              Progreso de la rutina
+            </Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+              {routineProgress}%
+            </Typography>
+          </Box>
+          <LinearProgress 
+            variant="determinate" 
+            value={routineProgress} 
+            sx={{ 
+              height: 8, 
+              borderRadius: 4,
+              backgroundColor: 'grey.200',
+              '& .MuiLinearProgress-bar': {
+                borderRadius: 4
+              }
+            }}
+          />
+        </Box>
+      )}
+
       {/* Lista de ejercicios */}
       <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
         Ejercicios de la rutina
@@ -210,23 +244,27 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {routine.exercises && routine.exercises.length > 0 ? (
-          routine.exercises.map((exercise, index) => (
-          <Card 
-            key={exercise.id} 
-            elevation={2}
-            sx={{ 
-              border: '2px solid',
-              borderColor: 'grey.300',
-              borderRadius: '12px',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                borderColor: 'primary.main',
-                boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                transform: 'translateY(-2px)'
-              }
-            }}
-          >
+          routine.exercises.map((exercise, index) => {
+            const isCompleted = completedExercises?.includes(exercise.id) || false
+            return (
+              <Card 
+                key={exercise.id} 
+                elevation={2}
+                sx={{ 
+                  border: '2px solid',
+                  borderColor: isCompleted ? 'success.main' : 'grey.300',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    borderColor: isCompleted ? 'success.dark' : 'primary.main',
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                    transform: 'translateY(-2px)'
+                  }
+                }}
+                onClick={() => onExerciseClick?.(exercise)}
+              >
             <CardContent sx={{ p: 3 }}>
               {/* Header del ejercicio */}
               <Box sx={{ 
@@ -235,13 +273,28 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 gap: 2,
                 mb: 2
               }}>
+                {/* Checkbox del ejercicio */}
+                <Checkbox
+                  checked={isCompleted}
+                  disabled
+                  sx={{
+                    color: 'success.main',
+                    '&.Mui-checked': {
+                      color: 'success.main',
+                    },
+                    '&.Mui-disabled': {
+                      color: isCompleted ? 'success.main' : 'grey.400',
+                    }
+                  }}
+                />
+                
                 {/* Número del ejercicio */}
                 <Box
                   sx={{
                     width: 40,
                     height: 40,
                     borderRadius: '50%',
-                    backgroundColor: 'primary.main',
+                    backgroundColor: isCompleted ? 'success.main' : 'primary.main',
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
@@ -338,7 +391,8 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               )}
             </CardContent>
           </Card>
-        ))
+            )
+          })
         ) : (
           <Box sx={{ 
             textAlign: 'center', 

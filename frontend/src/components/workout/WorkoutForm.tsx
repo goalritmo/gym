@@ -39,6 +39,7 @@ type WorkoutFormProps = {
   routineProgress?: number
   onPauseRoutine?: () => void
   onStopRoutine?: () => void
+  preloadedExercise?: any
 }
 
 export default function WorkoutForm({ 
@@ -49,7 +50,8 @@ export default function WorkoutForm({
   isRoutinePaused = false,
   routineProgress = 0,
   onPauseRoutine,
-  onStopRoutine
+  onStopRoutine,
+  preloadedExercise
 }: WorkoutFormProps) {
   const { settings } = useUserSettings()
   
@@ -102,6 +104,18 @@ export default function WorkoutForm({
       setValue('weight', '') // Dejar vacío para ejercicios de peso corporal
     }
   }, [isBodyweightExercise, setValue])
+
+  // Pre-cargar ejercicio cuando se recibe desde la rutina
+  useEffect(() => {
+    if (preloadedExercise) {
+      setValue('exercise_id', preloadedExercise.exercise_id)
+      setValue('weight', preloadedExercise.weight?.toString() || '')
+      setValue('reps', preloadedExercise.reps || '')
+      setValue('set', preloadedExercise.set || 1)
+      setValue('seconds', preloadedExercise.rest_time_seconds?.toString() || '')
+      setValue('observations', preloadedExercise.notes || '')
+    }
+  }, [preloadedExercise, setValue])
 
   // Función para validar y limitar valores en tiempo real
   const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {

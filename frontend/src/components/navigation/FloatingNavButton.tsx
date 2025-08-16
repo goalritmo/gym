@@ -59,7 +59,7 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
 
   const getIcon = () => {
     if (currentTab === TABS.ROUTINES && activeRoutine) {
-      return <FitnessCenter />
+      return <AllInclusive />
     } else if (currentTab === TABS.WORKOUT) {
       return <FitnessCenter />
     } else if (currentTab === TABS.HISTORY) {

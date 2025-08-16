@@ -523,6 +523,16 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 setDeleteDialogOpen(true)
               }}
               isActiveRoutine={activeRoutine?.id === selectedRoutine?.id}
+              completedExercises={[]} // TODO: Obtener ejercicios completados del backend
+              routineProgress={routineProgress}
+              onExerciseClick={(exercise) => {
+                setOpenDetailDialog(false)
+                // Navegar al registro con el ejercicio pre-cargado
+                const event = new CustomEvent('startRoutineWithExercise', { 
+                  detail: { routine: selectedRoutine, exercise: exercise } 
+                })
+                window.dispatchEvent(event)
+              }}
             />
           )}
         </DialogContent>

@@ -146,6 +146,7 @@ function AuthenticatedAppContent() {
   const [activeRoutine, setActiveRoutine] = useState<any>(null)
   const [routineProgress, setRoutineProgress] = useState(0)
   const [isRoutinePaused, setIsRoutinePaused] = useState(false)
+  const [preloadedExercise, setPreloadedExercise] = useState<any>(null)
 
   // Función para manejar el inicio de una rutina
   const handleStartRoutine = (routine: any) => {
@@ -155,7 +156,20 @@ function AuthenticatedAppContent() {
     setActiveRoutine(routine)
     setRoutineProgress(0)
     setIsRoutinePaused(false)
+    setPreloadedExercise(null)
     console.log('Iniciando rutina:', routine.name)
+  }
+
+  // Función para manejar el inicio de una rutina con ejercicio pre-cargado
+  const handleStartRoutineWithExercise = (routine: any, exercise: any) => {
+    // Cambiar a la tab de registrar
+    setActiveTab(TABS.WORKOUT)
+    // Establecer la rutina activa
+    setActiveRoutine(routine)
+    setRoutineProgress(0)
+    setIsRoutinePaused(false)
+    setPreloadedExercise(exercise)
+    console.log('Iniciando rutina con ejercicio pre-cargado:', routine.name, exercise.exercise_name)
   }
 
   // Función para pausar la rutina (limpiar campos pero mantener la box)
@@ -169,12 +183,17 @@ function AuthenticatedAppContent() {
     setActiveRoutine(null)
     setIsRoutinePaused(false)
     setRoutineProgress(0)
+    setPreloadedExercise(null)
   }
 
   // Event listener para el inicio de rutinas
   useEffect(() => {
     const handleRoutineStart = (event: CustomEvent) => {
       handleStartRoutine(event.detail.routine)
+    }
+
+    const handleStartRoutineWithExerciseEvent = (event: CustomEvent) => {
+      handleStartRoutineWithExercise(event.detail.routine, event.detail.exercise)
     }
 
     const handleViewRoutine = (_event: CustomEvent) => {
@@ -190,11 +209,13 @@ function AuthenticatedAppContent() {
     }
 
     window.addEventListener('startRoutine', handleRoutineStart as EventListener)
+    window.addEventListener('startRoutineWithExercise', handleStartRoutineWithExerciseEvent as EventListener)
     window.addEventListener('viewRoutine', handleViewRoutine as EventListener)
     window.addEventListener('stopRoutine', handleStopRoutine as EventListener)
     
     return () => {
       window.removeEventListener('startRoutine', handleRoutineStart as EventListener)
+      window.removeEventListener('startRoutineWithExercise', handleStartRoutineWithExerciseEvent as EventListener)
       window.removeEventListener('viewRoutine', handleViewRoutine as EventListener)
       window.removeEventListener('stopRoutine', handleStopRoutine as EventListener)
     }
@@ -285,6 +306,7 @@ function AuthenticatedAppContent() {
               routineProgress={routineProgress}
               onPauseRoutine={handlePauseRoutine}
               onStopRoutine={handleStopRoutine}
+              preloadedExercise={preloadedExercise}
             />
           </Box>
         )}
