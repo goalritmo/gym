@@ -296,6 +296,12 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
         </Button>
       </Box>
 
+      {exercises.some(ex => ex.exercise_id === 0) && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          Debes seleccionar un ejercicio para cada elemento de la rutina
+        </Alert>
+      )}
+
       <Box display="flex" justifyContent="space-between" sx={{ mt: 3 }}>
         <Button variant="outlined" onClick={onCancel}>
           Cancelar
@@ -303,7 +309,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
         <Button
           type="submit"
           variant="contained"
-          disabled={!name.trim() || exercises.length === 0}
+          disabled={!name.trim() || exercises.length === 0 || exercises.some(ex => ex.exercise_id === 0)}
         >
           {routine ? 'Actualizar rutina' : 'Crear rutina'}
         </Button>

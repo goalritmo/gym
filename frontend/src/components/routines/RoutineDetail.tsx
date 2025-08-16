@@ -26,6 +26,7 @@ interface RoutineDetailProps {
   onEdit?: () => void
   onStart?: () => void
   onDelete?: () => void
+  isActiveRoutine?: boolean
 }
 
 const RoutineDetail: React.FC<RoutineDetailProps> = ({ 
@@ -33,7 +34,8 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   onClose, 
   onEdit, 
   onStart,
-  onDelete
+  onDelete,
+  isActiveRoutine = false
 }) => {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
@@ -66,9 +68,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         sx={{ 
           mb: 3,
           border: '2px solid',
-          borderColor: 'primary.main',
+          borderColor: isActiveRoutine ? 'warning.main' : 'primary.main',
           borderRadius: '16px',
-          background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+          background: isActiveRoutine 
+            ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
+            : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
         }}
       >
         <CardContent sx={{ p: 3 }}>
@@ -86,7 +90,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 sx={{ 
                   fontWeight: 800, 
                   mb: 1,
-                  color: 'primary.main',
+                  color: isActiveRoutine ? 'warning.main' : 'primary.main',
                   textShadow: '0 1px 2px rgba(0,0,0,0.1)'
                 }}
               >
@@ -113,14 +117,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               }}>
                 <Chip
                   label={`${routine.total_exercises || 0} ejercicios`}
-                  color="primary"
+                  color={isActiveRoutine ? "warning" : "primary"}
                   variant="filled"
                   size="medium"
                   sx={{ fontWeight: 700 }}
                 />
                 <Chip
                   label={`${getTotalSets()} series total`}
-                  color="primary"
+                  color={isActiveRoutine ? "warning" : "primary"}
                   variant="outlined"
                   size="medium"
                   sx={{ fontWeight: 700 }}
@@ -149,8 +153,6 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 sx={{ 
                   backgroundColor: 'transparent',
                   color: 'error.main',
-                  border: '1px solid',
-                  borderColor: 'error.main',
                   '&:hover': {
                     backgroundColor: 'error.main',
                     color: 'white'
@@ -172,15 +174,20 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             </Tooltip>
           )}
           {onStart && (
-            <Tooltip title="Comenzar rutina">
+            <Tooltip title={isActiveRoutine ? "Rutina en progreso" : "Comenzar rutina"}>
               <IconButton
-                color="primary"
+                color={isActiveRoutine ? "warning" : "primary"}
                 onClick={onStart}
+                disabled={isActiveRoutine}
                 sx={{ 
-                  backgroundColor: 'primary.main',
+                  backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',
                   color: 'white',
                   '&:hover': {
-                    backgroundColor: 'primary.dark'
+                    backgroundColor: isActiveRoutine ? 'warning.dark' : 'primary.dark'
+                  },
+                  '&.Mui-disabled': {
+                    backgroundColor: 'warning.main',
+                    color: 'white'
                   }
                 }}
               >
@@ -347,9 +354,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       {/* Resumen de la rutina */}
       <Card sx={{ 
         mt: 3, 
-        backgroundColor: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+        backgroundColor: isActiveRoutine 
+          ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
+          : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
         border: '2px solid',
-        borderColor: 'primary.main',
+        borderColor: isActiveRoutine ? 'warning.main' : 'primary.main',
         borderRadius: '16px',
         boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
         overflow: 'hidden'
@@ -360,7 +369,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             sx={{ 
               mb: 3, 
               fontWeight: 800,
-              color: 'primary.main',
+              color: isActiveRoutine ? 'warning.main' : 'primary.main',
               textAlign: 'center',
               textShadow: '0 1px 2px rgba(0,0,0,0.1)'
             }}
@@ -382,10 +391,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
-              borderColor: 'primary.light',
+              borderColor: isActiveRoutine ? 'warning.light' : 'primary.light',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-              <Typography variant="h3" color="primary.main" sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
                 {routine.total_exercises || 0}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
@@ -398,10 +407,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
-              borderColor: 'primary.light',
+              borderColor: isActiveRoutine ? 'warning.light' : 'primary.light',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-              <Typography variant="h3" color="primary.main" sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
                 {getTotalSets()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>

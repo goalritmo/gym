@@ -1,4 +1,5 @@
-import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography } from '@mui/material'
+import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography, IconButton } from '@mui/material'
+import { Close as CloseIcon } from '@mui/icons-material'
 import { useState, useEffect, useCallback } from 'react'
 import WorkoutForm from '../workout/WorkoutForm'
 import WorkoutHistory from '../workout/WorkoutHistory'
@@ -141,6 +142,33 @@ function AuthenticatedAppContent() {
     setNotificationsModalOpen(false)
   }
 
+  // Estado para la rutina activa
+  const [activeRoutine, setActiveRoutine] = useState<any>(null)
+  const [routineProgress, setRoutineProgress] = useState(0)
+
+  // Función para manejar el inicio de una rutina
+  const handleStartRoutine = (routine: any) => {
+    // Cambiar a la tab de registrar
+    setActiveTab(TABS.WORKOUT)
+    // Establecer la rutina activa
+    setActiveRoutine(routine)
+    setRoutineProgress(0)
+    console.log('Iniciando rutina:', routine.name)
+  }
+
+  // Event listener para el inicio de rutinas
+  useEffect(() => {
+    const handleRoutineStart = (event: CustomEvent) => {
+      handleStartRoutine(event.detail.routine)
+    }
+
+    window.addEventListener('startRoutine', handleRoutineStart as EventListener)
+    
+    return () => {
+      window.removeEventListener('startRoutine', handleRoutineStart as EventListener)
+    }
+  }, [])
+
   // Función para manejar el envío del formulario de workout
   const handleWorkoutSubmit = async (data: any): Promise<void> => {
     setIsSubmittingWorkout(true)
@@ -217,6 +245,72 @@ function AuthenticatedAppContent() {
         {/* Pestaña Entrenamiento */}
         {activeTab === TABS.WORKOUT && (
           <Box sx={{ position: 'relative', zIndex: 1, minHeight: 'calc(100vh - 200px)' }}>
+            {/* Barra de progreso de rutina activa */}
+            {activeRoutine && (
+              <Box sx={{ 
+                mb: 3, 
+                p: 2, 
+                backgroundColor: 'primary.main', 
+                borderRadius: 2,
+                color: 'white',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  mb: 1
+                }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    🏋️ {activeRoutine.name}
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                      {routineProgress}% completado
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={() => setActiveRoutine(null)}
+                      sx={{ 
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255,255,255,0.1)'
+                        }
+                      }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+                <Box sx={{ 
+                  width: '100%', 
+                  backgroundColor: 'rgba(255,255,255,0.2)', 
+                  borderRadius: 1,
+                  height: 8
+                }}>
+                  <Box sx={{ 
+                    width: `${routineProgress}%`, 
+                    backgroundColor: 'white', 
+                    borderRadius: 1,
+                    height: '100%',
+                    transition: 'width 0.3s ease'
+                  }} />
+                </Box>
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  mt: 1
+                }}>
+                  <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                    {activeRoutine.exercises?.length || 0} ejercicios
+                  </Typography>
+                  <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                    {activeRoutine.total_exercises || 0} total
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+            
             <WorkoutForm 
               exercises={exercises} 
               onSubmit={handleWorkoutSubmit}

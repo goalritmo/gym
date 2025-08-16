@@ -439,14 +439,19 @@ const RoutineList: React.FC = () => {
                 setOpenEditDialog(true)
               }}
               onStart={() => {
-                // TODO: Implementar funcionalidad de comenzar rutina
-                console.log('Comenzando rutina:', selectedRoutine.name)
+                // Cerrar el modal y cambiar a la tab de registrar
                 setOpenDetailDialog(false)
+                // Emitir un evento personalizado para que AuthenticatedApp lo capture
+                const event = new CustomEvent('startRoutine', { 
+                  detail: { routine: selectedRoutine } 
+                })
+                window.dispatchEvent(event)
               }}
               onDelete={() => {
                 setOpenDetailDialog(false)
                 setDeleteDialogOpen(true)
               }}
+              isActiveRoutine={false} // TODO: Pasar el estado real de la rutina activa
             />
           )}
         </DialogContent>
