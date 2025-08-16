@@ -300,6 +300,7 @@ class ApiClient {
     secondary_muscles: string[]
     equipment: string
     video_url?: string
+    bodyweight?: boolean
   }) {
     return this.request('/admin/exercises', {
       method: 'POST',

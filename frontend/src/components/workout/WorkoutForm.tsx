@@ -11,6 +11,7 @@ import { useUserSettings } from '../../contexts/UserSettingsContext'
 type Exercise = {
   id: number
   name: string
+  bodyweight?: boolean
 }
 
 // Esquema de validación con Zod
@@ -68,6 +69,10 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   const selectedExerciseId = watch('exercise_id')
   
   const isRunningExercise = selectedExerciseId === 18
+  
+  // Detectar ejercicios de peso corporal usando el campo bodyweight del ejercicio
+  const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId)
+  const isBodyweightExercise = selectedExercise?.bodyweight || false
 
   // Establecer reps = 1 automáticamente cuando se selecciona Running
   useEffect(() => {
@@ -75,6 +80,13 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
       setValue('reps', 1)
     }
   }, [isRunningExercise, setValue])
+
+  // Limpiar peso cuando se selecciona ejercicio de peso corporal
+  useEffect(() => {
+    if (isBodyweightExercise) {
+      setValue('weight', '') // Dejar vacío para ejercicios de peso corporal
+    }
+  }, [isBodyweightExercise, setValue])
 
   // Función para validar y limitar valores en tiempo real
   const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {
@@ -234,7 +246,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           flexDirection: { xs: 'row' }
         }}>
           <TextField
-            label={isRunningExercise ? "Distancia (km)" : "Peso (kg)"}
+            label={isRunningExercise ? "Distancia (km)" : (isBodyweightExercise ? "Peso (opcional)" : "Peso (kg)")}
             type="number"
             disabled={isLoading}
             error={Boolean(errors.weight)}

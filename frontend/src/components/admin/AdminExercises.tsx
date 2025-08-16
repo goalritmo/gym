@@ -19,6 +19,7 @@ import {
   FitnessCenter as ExerciseIcon,
   Search as SearchIcon
 } from '@mui/icons-material'
+import { FormControlLabel, Switch } from '@mui/material'
 import { apiClient } from '../../lib/api'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -37,6 +38,7 @@ type AdminExercise = {
 
 type CreateExerciseForm = {
   name: string
+  bodyweight: boolean
 }
 
 
@@ -50,7 +52,8 @@ export function AdminExercises() {
   const [creating, setCreating] = useState(false)
   const [filterText, setFilterText] = useState('')
   const [form, setForm] = useState<CreateExerciseForm>({
-    name: ''
+    name: '',
+    bodyweight: false
   })
 
   const loadExercises = useCallback(async () => {
@@ -88,10 +91,12 @@ export function AdminExercises() {
         equipment: 'Peso libre',
         primary_muscles: [],
         secondary_muscles: [],
-        video_url: undefined
+        video_url: undefined,
+        bodyweight: form.bodyweight
       })
       setForm({
-        name: ''
+        name: '',
+        bodyweight: false
       })
       setOpenDialog(false)
       await loadExercises() // Recargar lista
@@ -287,6 +292,17 @@ export function AdminExercises() {
               required
               placeholder="Ej: Press de banca"
               autoFocus
+            />
+            
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={form.bodyweight}
+                  onChange={(e) => setForm(prev => ({ ...prev, bodyweight: e.target.checked }))}
+                  color="primary"
+                />
+              }
+              label="Ejercicio de peso corporal"
             />
           </Stack>
         </DialogContent>

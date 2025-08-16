@@ -13,6 +13,7 @@ type Exercise struct {
 	SecondaryMuscles []string `json:"secondary_muscles" db:"secondary_muscles"`
 	Equipment        string   `json:"equipment" db:"equipment"`
 	VideoURL         *string  `json:"video_url" db:"video_url"`
+	Bodyweight       bool     `json:"bodyweight" db:"bodyweight"`
 	CreatedAt        time.Time `json:"created_at" db:"created_at"`
 }
 

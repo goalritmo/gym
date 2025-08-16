@@ -33,6 +33,7 @@ type AdminExercise struct {
 	PrimaryMuscles   []string  `json:"primary_muscles"`
 	SecondaryMuscles []string  `json:"secondary_muscles"`
 	VideoURL         *string   `json:"video_url"`
+	Bodyweight       bool      `json:"bodyweight"`
 	CreatedAt        time.Time `json:"created_at"`
 }
 
@@ -73,6 +74,7 @@ type CreateExerciseRequest struct {
 	PrimaryMuscles   []string `json:"primary_muscles"`
 	SecondaryMuscles []string `json:"secondary_muscles"`
 	VideoURL         *string  `json:"video_url"`
+	Bodyweight       bool     `json:"bodyweight"`
 }
 
 // Middleware para verificar si el usuario es administrador
@@ -699,8 +701,8 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query := `
-		INSERT INTO exercises (name, muscle_group, equipment, video_url)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO exercises (name, muscle_group, equipment, video_url, bodyweight)
+		VALUES ($1, $2, $3, $4, $5)
 		RETURNING id, created_at
 	`
 
@@ -713,6 +715,7 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 		req.MuscleGroup, 
 		equipment,
 		req.VideoURL,
+		req.Bodyweight,
 	).Scan(&exercise.ID, &exercise.CreatedAt)
 
 	if err != nil {
@@ -726,6 +729,7 @@ func CreateExerciseHandler(w http.ResponseWriter, r *http.Request) {
 	exercise.PrimaryMuscles = []string{}
 	exercise.SecondaryMuscles = []string{}
 	exercise.VideoURL = req.VideoURL
+	exercise.Bodyweight = req.Bodyweight
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(exercise)

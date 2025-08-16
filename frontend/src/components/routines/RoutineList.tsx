@@ -313,30 +313,32 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine }) => {
                     component="h2" 
                     sx={{ 
                       fontWeight: 700,
-                      color: 'primary.main',
+                      color: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
                       textShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                      cursor: 'pointer',
+                      cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
                       '&:hover': {
-                        textDecoration: 'underline'
+                        textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
                       }
                     }}
-                    onClick={() => handleEditNameClick(routine)}
+                    onClick={() => activeRoutine?.id !== routine.id && handleEditNameClick(routine)}
                   >
                     {routine.name}
                   </Typography>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleEditNameClick(routine)}
-                    sx={{ 
-                      color: 'primary.main',
-                      '&:hover': {
-                        backgroundColor: 'primary.light',
-                        color: 'white'
-                      }
-                    }}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
+                  {activeRoutine?.id !== routine.id && (
+                    <IconButton
+                      size="small"
+                      onClick={() => handleEditNameClick(routine)}
+                      sx={{ 
+                        color: 'primary.main',
+                        '&:hover': {
+                          backgroundColor: 'primary.light',
+                          color: 'white'
+                        }
+                      }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  )}
                 </Box>
 
                 <Typography 
@@ -379,7 +381,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine }) => {
                 }}>
                   <Chip
                     label={`${routine.total_exercises} ejercicios`}
-                    color="primary"
+                    color={activeRoutine?.id === routine.id ? "warning" : "primary"}
                     variant="filled"
                     size="medium"
                     sx={{ fontWeight: 600 }}
@@ -413,12 +415,18 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine }) => {
                 </Button>
                 <IconButton
                   size="medium"
-                  onClick={() => handleViewRoutine(routine)}
+                  onClick={() => {
+                    // Iniciar rutina directamente sin abrir modal
+                    const event = new CustomEvent('startRoutine', { 
+                      detail: { routine: routine } 
+                    })
+                    window.dispatchEvent(event)
+                  }}
                   sx={{ 
-                    color: 'primary.main',
-                    backgroundColor: 'primary.light',
+                    color: 'white',
+                    backgroundColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
                     '&:hover': {
-                      backgroundColor: 'primary.main',
+                      backgroundColor: activeRoutine?.id === routine.id ? 'warning.light' : 'primary.light',
                       color: 'white'
                     }
                   }}

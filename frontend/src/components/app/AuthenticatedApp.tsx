@@ -22,6 +22,7 @@ import FloatingNavButton from '../navigation/FloatingNavButton'
 type Exercise = {
   id: number
   name: string
+  bodyweight?: boolean
 }
 
 function AuthenticatedAppContent() {

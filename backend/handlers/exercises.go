@@ -16,7 +16,7 @@ func GetExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// Query simple para obtener solo id y name para el select del frontend
-	query := `SELECT id, name FROM exercises ORDER BY name ASC`
+	query := `SELECT id, name, bodyweight FROM exercises ORDER BY name ASC`
 
 	rows, err := database.DB.Query(query)
 	if err != nil {
@@ -27,15 +27,16 @@ func GetExercisesHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Estructura simple para el select
 	type SimpleExercise struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
+		ID         int    `json:"id"`
+		Name       string `json:"name"`
+		Bodyweight bool   `json:"bodyweight"`
 	}
 
 	var exercises []SimpleExercise
 	for rows.Next() {
 		var exercise SimpleExercise
 
-		err := rows.Scan(&exercise.ID, &exercise.Name)
+		err := rows.Scan(&exercise.ID, &exercise.Name, &exercise.Bodyweight)
 		if err != nil {
 			http.Error(w, "Error escaneando ejercicio", http.StatusInternalServerError)
 			return
