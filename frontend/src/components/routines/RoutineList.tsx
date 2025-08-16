@@ -251,7 +251,6 @@ const RoutineList: React.FC = () => {
                 overflow: 'hidden',
                 transition: 'all 0.3s ease',
                 '&:hover': {
-                  borderColor: 'primary.main',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 }
               }}

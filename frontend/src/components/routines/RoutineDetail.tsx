@@ -112,7 +112,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 alignItems: 'center'
               }}>
                 <Chip
-                  label={`${routine.exercises?.length || 0} ejercicios`}
+                  label={`${routine.total_exercises || 0} ejercicios`}
                   color="primary"
                   variant="filled"
                   size="medium"
@@ -383,7 +383,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
               <Typography variant="h3" color="primary.main" sx={{ fontWeight: 800, mb: 1 }}>
-                {routine.exercises?.length || 0}
+                {routine.total_exercises || 0}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
                 🏋️ Ejercicios

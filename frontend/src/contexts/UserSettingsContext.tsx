@@ -35,7 +35,7 @@ const defaultSettings: UserSettings = {
   favoriteExercises: [], // Se llenará automáticamente con todos los ejercicios
   uncNotificationsEnabled: true, // Por defecto habilitadas para usuarios UNC
   showOwnWorkoutsInSocial: true, // Por defecto mostrar ejercicios propios en social
-  showRoutinesTab: true // Por defecto mostrar tab de rutinas
+  showRoutinesTab: false // Por defecto ocultar tab de rutinas
 }
 
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
