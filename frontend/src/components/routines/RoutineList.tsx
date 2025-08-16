@@ -176,7 +176,7 @@ const RoutineList: React.FC = () => {
               gutterBottom
               sx={{ fontWeight: 700, mb: 2 }}
             >
-              No tienes rutinas creadas
+              0 rutinas creadas
             </Typography>
             <Typography 
               variant="body1" 
@@ -188,7 +188,7 @@ const RoutineList: React.FC = () => {
                 lineHeight: 1.6
               }}
             >
-              Crea tu primera rutina personalizada para organizar mejor tus entrenamientos y alcanzar tus objetivos de fitness
+              Crea tu primera rutina personalizada para organizar mejor tus entrenamientos y alcanzar tus objetivos
             </Typography>
             <Button
               variant="contained"
@@ -204,7 +204,7 @@ const RoutineList: React.FC = () => {
                 fontSize: '1.1rem'
               }}
             >
-              Crear mi primera rutina
+               Crear
             </Button>
           </CardContent>
         </Card>
@@ -231,8 +231,8 @@ const RoutineList: React.FC = () => {
             gap: 2,
             gridTemplateColumns: { 
               xs: '1fr', 
-              sm: 'repeat(auto-fill, minmax(280px, 1fr))', 
-              md: 'repeat(auto-fill, minmax(300px, 1fr))' 
+              sm: 'repeat(auto-fill, minmax(250px, 1fr))', 
+              md: 'repeat(auto-fill, minmax(280px, 1fr))' 
             },
             width: '100%',
             maxWidth: '100%',
@@ -294,6 +294,22 @@ const RoutineList: React.FC = () => {
                   </IconButton>
                 </Box>
 
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary" 
+                  sx={{ 
+                    display: 'block',
+                    fontStyle: 'italic',
+                    opacity: 0.8,
+                    mb: 2
+                  }}
+                >
+                  Creada el {new Date(routine.created_at).toLocaleDateString('es-ES', {
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </Typography>
+
                 {routine.description && (
                   <Typography 
                     variant="body1" 
@@ -323,21 +339,6 @@ const RoutineList: React.FC = () => {
                     sx={{ fontWeight: 600 }}
                   />
                 </Box>
-                
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary" 
-                  sx={{ 
-                    display: 'block',
-                    fontStyle: 'italic',
-                    opacity: 0.8
-                  }}
-                >
-                  Creada el {new Date(routine.created_at).toLocaleDateString('es-ES', {
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </Typography>
               </CardContent>
 
               <CardActions sx={{ 
