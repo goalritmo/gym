@@ -1,5 +1,5 @@
 import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography, IconButton } from '@mui/material'
-import { Stop as StopIcon } from '@mui/icons-material'
+import { Stop as StopIcon, Close as CloseIcon } from '@mui/icons-material'
 import { useState, useEffect, useCallback } from 'react'
 import WorkoutForm from '../workout/WorkoutForm'
 import WorkoutHistory from '../workout/WorkoutHistory'
@@ -146,6 +146,7 @@ function AuthenticatedAppContent() {
   // Estado para la rutina activa
   const [activeRoutine, setActiveRoutine] = useState<any>(null)
   const [routineProgress, setRoutineProgress] = useState(0)
+  const [isRoutinePaused, setIsRoutinePaused] = useState(false)
 
   // Función para manejar el inicio de una rutina
   const handleStartRoutine = (routine: any) => {
@@ -154,7 +155,21 @@ function AuthenticatedAppContent() {
     // Establecer la rutina activa
     setActiveRoutine(routine)
     setRoutineProgress(0)
+    setIsRoutinePaused(false)
     console.log('Iniciando rutina:', routine.name)
+  }
+
+  // Función para pausar la rutina (limpiar campos pero mantener la box)
+  const handlePauseRoutine = () => {
+    setIsRoutinePaused(true)
+    setRoutineProgress(0)
+  }
+
+  // Función para detener completamente la rutina
+  const handleStopRoutine = () => {
+    setActiveRoutine(null)
+    setIsRoutinePaused(false)
+    setRoutineProgress(0)
   }
 
   // Event listener para el inicio de rutinas
@@ -252,7 +267,7 @@ function AuthenticatedAppContent() {
               <Box sx={{ 
                 mb: 3, 
                 p: 2, 
-                backgroundColor: 'warning.main', 
+                backgroundColor: isRoutinePaused ? 'primary.main' : 'warning.main', 
                 borderRadius: 2,
                 color: 'white',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -260,7 +275,7 @@ function AuthenticatedAppContent() {
               }}>
                 <IconButton
                   size="small"
-                  onClick={() => setActiveRoutine(null)}
+                  onClick={isRoutinePaused ? handleStopRoutine : handlePauseRoutine}
                   sx={{ 
                     position: 'absolute',
                     top: 8,
@@ -272,11 +287,11 @@ function AuthenticatedAppContent() {
                     }
                   }}
                 >
-                  <StopIcon />
+                  {isRoutinePaused ? <CloseIcon /> : <StopIcon />}
                 </IconButton>
                 
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                  🏋️ {activeRoutine.name}
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: 'left' }}>
+                  🏋️ {isRoutinePaused ? 'A la espera' : activeRoutine.name}
                 </Typography>
                 
                 <Box sx={{ 
@@ -319,7 +334,7 @@ function AuthenticatedAppContent() {
                       // Aquí podrías abrir el modal de detalles de la rutina
                     }}
                   >
-                    Ver rutina
+                    {isRoutinePaused ? 'Elegir rutina' : 'Ver rutina'}
                   </Typography>
                 </Box>
               </Box>
