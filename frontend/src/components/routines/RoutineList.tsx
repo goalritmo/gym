@@ -434,7 +434,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 </Button>
                 <IconButton
                   size="medium"
-                  onClick={() => {
+                  onClick={async () => {
                     if (activeRoutine?.id === routine.id) {
                       // Detener la rutina activa
                       const event = new CustomEvent('stopRoutine', { 
@@ -442,11 +442,17 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       })
                       window.dispatchEvent(event)
                     } else {
-                      // Iniciar rutina directamente sin abrir modal
-                      const event = new CustomEvent('startRoutine', { 
-                        detail: { routine: routine } 
-                      })
-                      window.dispatchEvent(event)
+                      // Obtener la rutina completa con ejercicios antes de iniciar
+                      try {
+                        const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
+                        const event = new CustomEvent('startRoutine', { 
+                          detail: { routine: fullRoutine } 
+                        })
+                        window.dispatchEvent(event)
+                      } catch (error) {
+                        console.error('Error obteniendo detalles de la rutina:', error)
+                        setError('Error al cargar los detalles de la rutina')
+                      }
                     }
                   }}
                   sx={{ 
