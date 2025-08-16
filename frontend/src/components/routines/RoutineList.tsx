@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -39,7 +39,7 @@ const RoutineList: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingRoutineId, setDeletingRoutineId] = useState<number | null>(null)
 
-  const loadRoutines = async () => {
+  const loadRoutines = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -48,6 +48,9 @@ const RoutineList: React.FC = () => {
       // Validar que data sea un array
       if (Array.isArray(data)) {
         setRoutines(data as RoutineWithExercises[])
+      } else if (data === null || data === undefined) {
+        // Si no hay rutinas, establecer array vacío
+        setRoutines([])
       } else {
         console.warn('API devolvió datos no válidos:', data)
         setRoutines([])
@@ -59,11 +62,11 @@ const RoutineList: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     loadRoutines()
-  }, [])
+  }, [loadRoutines])
 
   const handleCreateRoutine = async (routineData: CreateRoutineRequest) => {
     try {
