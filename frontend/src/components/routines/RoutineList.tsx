@@ -145,90 +145,231 @@ const RoutineList: React.FC = () => {
       )}
 
       {(!routines || routines.length === 0) ? (
-        <Card sx={{ textAlign: 'center', py: 4, mx: 0.5 }}>
+        <Card 
+          elevation={3}
+          sx={{ 
+            textAlign: 'center', 
+            py: 6,
+            mx: { xs: 1, sm: 0 },
+            border: '2px solid',
+            borderColor: 'grey.300',
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+          }}
+        >
           <CardContent>
-            <FitnessCenterIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-            <Typography variant="h6" color="text.secondary" gutterBottom>
+            <FitnessCenterIcon sx={{ 
+              fontSize: 80, 
+              color: 'primary.main', 
+              mb: 3,
+              opacity: 0.7
+            }} />
+            <Typography 
+              variant="h4" 
+              color="primary.main" 
+              gutterBottom
+              sx={{ fontWeight: 700, mb: 2 }}
+            >
               No tienes rutinas creadas
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Crea tu primera rutina personalizada para organizar mejor tus entrenamientos
+            <Typography 
+              variant="body1" 
+              color="text.secondary" 
+              sx={{ 
+                mb: 3,
+                maxWidth: '400px',
+                mx: 'auto',
+                lineHeight: 1.6
+              }}
+            >
+              Crea tu primera rutina personalizada para organizar mejor tus entrenamientos y alcanzar tus objetivos de fitness
             </Typography>
             <Button
               variant="contained"
+              size="large"
               startIcon={<AddIcon />}
               onClick={() => setOpenCreateDialog(true)}
+              sx={{ 
+                fontWeight: 600,
+                borderRadius: '12px',
+                px: 4,
+                py: 1.5,
+                textTransform: 'none',
+                fontSize: '1.1rem'
+              }}
             >
-              Crear
+              Crear mi primera rutina
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <Box display="grid" gap={2} sx={{ 
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(auto-fill, minmax(280px, 1fr))', md: 'repeat(auto-fill, minmax(300px, 1fr))' },
+        <Box sx={{ 
+          display: 'grid', 
+          gap: 3,
+          gridTemplateColumns: { 
+            xs: '1fr', 
+            sm: 'repeat(auto-fill, minmax(320px, 1fr))', 
+            md: 'repeat(auto-fill, minmax(350px, 1fr))' 
+          },
           width: '100%',
-          overflow: 'hidden'
+          p: { xs: 1, sm: 0 }
         }}>
           {routines?.map((routine) => (
-            <Card key={routine.id} sx={{ 
-              height: 'fit-content',
-              width: '100%',
-              overflow: 'hidden'
-            }}>
-              <CardContent sx={{ p: 2 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
-                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600, flex: 1, mr: 1 }}>
+            <Card 
+              key={routine.id} 
+              elevation={3}
+              sx={{ 
+                height: 'fit-content',
+                width: '100%',
+                border: '2px solid',
+                borderColor: 'grey.300',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                  transform: 'translateY(-4px)'
+                }
+              }}
+            >
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'flex-start', 
+                  mb: 2
+                }}>
+                  <Typography 
+                    variant="h5" 
+                    component="h2" 
+                    sx={{ 
+                      fontWeight: 700, 
+                      flex: 1, 
+                      mr: 2,
+                      color: 'primary.main',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                    }}
+                  >
                     {routine.name}
                   </Typography>
                   <IconButton
-                    size="small"
+                    size="medium"
                     onClick={() => handleViewRoutine(routine)}
-                    sx={{ color: 'primary.main' }}
+                    sx={{ 
+                      color: 'primary.main',
+                      backgroundColor: 'primary.light',
+                      '&:hover': {
+                        backgroundColor: 'primary.main',
+                        color: 'white'
+                      }
+                    }}
                   >
                     <PlayIcon />
                   </IconButton>
                 </Box>
 
                 {routine.description && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <Typography 
+                    variant="body1" 
+                    color="text.secondary" 
+                    sx={{ 
+                      mb: 2,
+                      fontStyle: 'italic',
+                      lineHeight: 1.5
+                    }}
+                  >
                     {routine.description}
                   </Typography>
                 )}
 
-                <Box display="flex" gap={1} flexWrap="wrap" mb={1}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  gap: 1, 
+                  flexWrap: 'wrap', 
+                  mb: 2,
+                  alignItems: 'center'
+                }}>
                   <Chip
                     label={`${routine.total_exercises} ejercicios`}
-                    variant="outlined"
-                    size="small"
+                    color="primary"
+                    variant="filled"
+                    size="medium"
+                    sx={{ fontWeight: 600 }}
                   />
+                  {routine.is_active && (
+                    <Chip
+                      label="Activa"
+                      color="success"
+                      variant="filled"
+                      size="medium"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  )}
                 </Box>
                 
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                  Creada el {new Date(routine.created_at).toLocaleDateString('es-ES')}
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary" 
+                  sx={{ 
+                    display: 'block',
+                    fontStyle: 'italic',
+                    opacity: 0.8
+                  }}
+                >
+                  📅 Creada el {new Date(routine.created_at).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
                 </Typography>
               </CardContent>
 
-              <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                <Box>
+              <CardActions sx={{ 
+                justifyContent: 'space-between', 
+                px: 3, 
+                pb: 3,
+                pt: 0
+              }}>
+                <Box sx={{ display: 'flex', gap: 1 }}>
                   <IconButton
-                    size="small"
+                    size="medium"
                     onClick={() => handleEditClick(routine)}
-                    sx={{ color: 'primary.main' }}
+                    sx={{ 
+                      color: 'primary.main',
+                      backgroundColor: 'primary.light',
+                      '&:hover': {
+                        backgroundColor: 'primary.main',
+                        color: 'white'
+                      }
+                    }}
                   >
                     <EditIcon />
                   </IconButton>
                   <IconButton
-                    size="small"
+                    size="medium"
                     onClick={() => handleDeleteClick(routine)}
-                    sx={{ color: 'error.main' }}
+                    sx={{ 
+                      color: 'error.main',
+                      backgroundColor: 'error.light',
+                      '&:hover': {
+                        backgroundColor: 'error.main',
+                        color: 'white'
+                      }
+                    }}
                   >
                     <DeleteIcon />
                   </IconButton>
                 </Box>
                 <Button
-                  variant="outlined"
-                  size="small"
+                  variant="contained"
+                  size="medium"
                   onClick={() => handleViewRoutine(routine)}
+                  sx={{ 
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    textTransform: 'none'
+                  }}
                 >
                   Ver detalles
                 </Button>
