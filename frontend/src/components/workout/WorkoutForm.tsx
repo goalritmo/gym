@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
-import { TextField, Button, Stack, Box, Typography, Alert, Snackbar, CircularProgress, Backdrop } from '@mui/material'
+import { TextField, Button, Stack, Box, Typography, Alert, Snackbar, CircularProgress, Backdrop, IconButton } from '@mui/material'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import { AccessTime } from '@mui/icons-material'
+import { AccessTime, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
 import { useState, useEffect } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -61,6 +61,7 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
   // Estado para trackear el tiempo del cronómetro
   const [currentTimerTime, setCurrentTimerTime] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
+  const [showTimeTip, setShowTimeTip] = useState(true)
   
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = filteredExercises.length === 0
@@ -321,11 +322,26 @@ export default function WorkoutForm({ exercises, onSubmit, isLoading = false }: 
           <Box>
             <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <AccessTime color="primary" />
-              {isRunningExercise ? "Tiempo" : "Tiempo de Serie"}
+              {isRunningExercise ? "Tiempo" : "Tiempo de la Serie"}
+              {!isRunningExercise && (
+                <IconButton
+                  size="small"
+                  onClick={() => setShowTimeTip(!showTimeTip)}
+                  sx={{ 
+                    ml: 'auto',
+                    color: 'primary.main',
+                    '&:hover': {
+                      backgroundColor: 'rgba(25, 118, 210, 0.04)'
+                    }
+                  }}
+                >
+                  {showTimeTip ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                </IconButton>
+              )}
             </Typography>
             
             {/* Ocultar tips para Running */}
-            {!isRunningExercise && (
+            {!isRunningExercise && showTimeTip && (
               <Alert 
                 severity="info" 
                 icon={false}
