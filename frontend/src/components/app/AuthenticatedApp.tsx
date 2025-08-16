@@ -183,12 +183,20 @@ function AuthenticatedAppContent() {
       // Por ahora solo cambia a la tab de rutinas
     }
 
+    const handleStopRoutine = (_event: CustomEvent) => {
+      setActiveRoutine(null)
+      setIsRoutinePaused(false)
+      setRoutineProgress(0)
+    }
+
     window.addEventListener('startRoutine', handleRoutineStart as EventListener)
     window.addEventListener('viewRoutine', handleViewRoutine as EventListener)
+    window.addEventListener('stopRoutine', handleStopRoutine as EventListener)
     
     return () => {
       window.removeEventListener('startRoutine', handleRoutineStart as EventListener)
       window.removeEventListener('viewRoutine', handleViewRoutine as EventListener)
+      window.removeEventListener('stopRoutine', handleStopRoutine as EventListener)
     }
   }, [])
 
@@ -509,10 +517,11 @@ function AuthenticatedAppContent() {
       </Backdrop>
 
       {/* Botón flotante para navegación rápida */}
-      <FloatingNavButton 
-        currentTab={activeTab} 
-        onTabChange={handleTabChange} 
-      />
+              <FloatingNavButton 
+          currentTab={activeTab} 
+          onTabChange={handleTabChange}
+          activeRoutine={activeRoutine}
+        />
 
       {/* Modal de configuración */}
       <SettingsModal 

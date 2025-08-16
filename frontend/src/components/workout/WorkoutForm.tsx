@@ -523,7 +523,10 @@ export default function WorkoutForm({
             )}
 
             {/* Cronómetro */}
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{ 
+              width: '100%',
+              mt: !isRunningExercise && !showTimeTip ? 2 : 0
+            }}>
               <TimerComponent 
                 onTimeComplete={handleTimerComplete} 
                 onTimeUpdate={handleTimerUpdate}

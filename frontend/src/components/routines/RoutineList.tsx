@@ -306,8 +306,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               {activeRoutine?.id === routine.id && (
                 <Box sx={{
                   position: 'absolute',
-                  top: 27,
-                  right: 12,
+                  top: 20,
+                  right: 16,
                   backgroundColor: 'warning.main',
                   color: 'white',
                   borderRadius: '12px',
@@ -368,7 +368,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     display: 'block',
                     fontStyle: 'italic',
                     opacity: 0.8,
-                    mb: 1,
+                    mb: 0.5,
                     textAlign: 'left'
                   }}
                 >
@@ -401,55 +401,40 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 pb: 3,
                 pt: 0
               }}>
-                {activeRoutine?.id === routine.id ? (
-                  <IconButton
-                    size="small"
-                    onClick={() => {
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handleViewRoutine(routine)}
+                  sx={{ 
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    color: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
+                    borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
+                    '&:hover': {
+                      backgroundColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
+                      color: 'white'
+                    }
+                  }}
+                >
+                  Ver detalles
+                </Button>
+                <IconButton
+                  size="medium"
+                  onClick={() => {
+                    if (activeRoutine?.id === routine.id) {
+                      // Detener la rutina activa
+                      const event = new CustomEvent('stopRoutine', { 
+                        detail: { routine: routine } 
+                      })
+                      window.dispatchEvent(event)
+                    } else {
                       // Iniciar rutina directamente sin abrir modal
                       const event = new CustomEvent('startRoutine', { 
                         detail: { routine: routine } 
                       })
                       window.dispatchEvent(event)
-                    }}
-                    sx={{ 
-                      color: 'white',
-                      backgroundColor: 'warning.main',
-                      '&:hover': {
-                        backgroundColor: 'warning.light',
-                        color: 'white'
-                      }
-                    }}
-                  >
-                    <PlayIcon />
-                  </IconButton>
-                ) : (
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => handleViewRoutine(routine)}
-                    sx={{ 
-                      fontWeight: 600,
-                      borderRadius: '8px',
-                      textTransform: 'none',
-                      color: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
-                      borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
-                      '&:hover': {
-                        backgroundColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
-                        color: 'white'
-                      }
-                    }}
-                  >
-                    Ver detalles
-                  </Button>
-                )}
-                <IconButton
-                  size="medium"
-                  onClick={() => {
-                    // Iniciar rutina directamente sin abrir modal
-                    const event = new CustomEvent('startRoutine', { 
-                      detail: { routine: routine } 
-                    })
-                    window.dispatchEvent(event)
+                    }
                   }}
                   sx={{ 
                     color: 'white',
