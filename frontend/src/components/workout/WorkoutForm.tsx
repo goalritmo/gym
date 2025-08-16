@@ -437,7 +437,7 @@ export default function WorkoutForm({
               mb: !isRunningExercise && !showTimeTip ? 1 : undefined
             }}>
               <AccessTime color="primary" />
-              {isRunningExercise ? "Tiempo" : "Tiempo de Serie"}
+              {isRunningExercise ? "Tiempo" : "Tiempo de la Serie"}
               {!isRunningExercise && (
                 <IconButton
                   size="small"

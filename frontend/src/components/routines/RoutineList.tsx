@@ -266,7 +266,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
           {/* Campo de búsqueda */}
           <TextField
             fullWidth
-            placeholder="Buscar rutinas por nombre o descripción..."
+            placeholder="Buscar rutinas por nombre..."
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
             sx={{ mb: 3 }}

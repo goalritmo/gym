@@ -243,12 +243,12 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Box>
                   <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    Mostrar sección de tiempo de serie
+                    Mostrar sección de tiempo de laserie
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {tempSettings.showWorkoutSection
                       ? 'El cronómetro aparece en el formulario de registro'
-                      : 'La sección de tiempo de serie está oculta'
+                      : 'La sección de tiempo de la serie está oculta'
                     }
                   </Typography>
                 </Box>
