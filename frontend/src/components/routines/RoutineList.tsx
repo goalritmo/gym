@@ -423,14 +423,10 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       color: 'white'
                     },
                     '&:focus': {
-                      borderColor: `${activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'} !important`,
                       outline: 'none'
                     },
                     '&.Mui-focused': {
-                      borderColor: `${activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'} !important`
-                    },
-                    '&.MuiButton-outlined.Mui-focused': {
-                      borderColor: `${activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'} !important`
+                      outline: 'none'
                     }
                   }}
                 >

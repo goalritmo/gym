@@ -111,7 +111,8 @@ export default function WorkoutForm({
       setValue('exercise_id', preloadedExercise.exercise_id)
       setValue('weight', preloadedExercise.weight?.toString() || '')
       setValue('reps', preloadedExercise.reps || '')
-      setValue('set', preloadedExercise.set || 1)
+      // Si hay currentSet (auto-completado), usar ese valor, sino usar 1
+      setValue('set', preloadedExercise.currentSet || 1)
       setValue('seconds', preloadedExercise.rest_time_seconds?.toString() || '')
       setValue('observations', preloadedExercise.notes || '')
     }

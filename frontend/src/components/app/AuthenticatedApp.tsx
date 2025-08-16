@@ -156,8 +156,19 @@ function AuthenticatedAppContent() {
     setActiveRoutine(routine)
     setRoutineProgress(0)
     setIsRoutinePaused(false)
-    setPreloadedExercise(null)
-    console.log('Iniciando rutina:', routine.name)
+    
+    // Auto-completar con el primer ejercicio de la rutina
+    if (routine.exercises && routine.exercises.length > 0) {
+      const firstExercise = {
+        ...routine.exercises[0],
+        currentSet: 1
+      }
+      setPreloadedExercise(firstExercise)
+      console.log('Iniciando rutina con primer ejercicio:', routine.name, firstExercise.exercise_name)
+    } else {
+      setPreloadedExercise(null)
+      console.log('Iniciando rutina sin ejercicios:', routine.name)
+    }
   }
 
   // Función para manejar el inicio de una rutina con ejercicio pre-cargado
@@ -184,6 +195,39 @@ function AuthenticatedAppContent() {
     setIsRoutinePaused(false)
     setRoutineProgress(0)
     setPreloadedExercise(null)
+  }
+
+  // Función para obtener el siguiente ejercicio o serie de la rutina
+  const getNextExerciseOrSet = (currentExercise: any, currentSet: number) => {
+    if (!activeRoutine || !activeRoutine.exercises) return null
+
+    const currentExerciseIndex = activeRoutine.exercises.findIndex(
+      (ex: any) => ex.exercise_id === currentExercise.exercise_id
+    )
+
+    if (currentExerciseIndex === -1) return null
+
+    const currentExerciseData = activeRoutine.exercises[currentExerciseIndex]
+    
+    // Si hay más series del mismo ejercicio
+    if (currentSet < currentExerciseData.sets) {
+      return {
+        ...currentExerciseData,
+        currentSet: currentSet + 1
+      }
+    }
+    
+    // Si no hay más series, buscar el siguiente ejercicio
+    if (currentExerciseIndex < activeRoutine.exercises.length - 1) {
+      const nextExercise = activeRoutine.exercises[currentExerciseIndex + 1]
+      return {
+        ...nextExercise,
+        currentSet: 1
+      }
+    }
+    
+    // Si no hay más ejercicios, la rutina está completa
+    return null
   }
 
   // Event listener para el inicio de rutinas
@@ -254,10 +298,27 @@ function AuthenticatedAppContent() {
 
       await apiClient.createWorkout(workoutData) as Workout
       
-      // Refrescar la página después de 1 segundo para que se vea el mensaje de éxito
-      setTimeout(() => {
-        window.location.reload()
-      }, 1000)
+      // Si hay una rutina activa, auto-completar con el siguiente ejercicio o serie
+      if (activeRoutine && preloadedExercise) {
+        const nextExercise = getNextExerciseOrSet(preloadedExercise, data.set)
+        
+        if (nextExercise) {
+          // Auto-completar con el siguiente ejercicio/serie
+          setPreloadedExercise(nextExercise)
+          console.log('Auto-completando con siguiente ejercicio/serie:', nextExercise.exercise_name, 'Serie:', nextExercise.currentSet)
+        } else {
+          // La rutina está completa
+          console.log('¡Rutina completada!')
+          setActiveRoutine(null)
+          setPreloadedExercise(null)
+          setRoutineProgress(100)
+        }
+      } else {
+        // Si no hay rutina activa, refrescar la página después de 1 segundo
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
+      }
     } catch (error) {
       console.error('❌ Error guardando workout:', error)
       throw error // Re-lanzar el error para que el formulario lo capture
