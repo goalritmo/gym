@@ -61,6 +61,31 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
     return routine.exercises.reduce((total, exercise) => total + (exercise.reps * exercise.sets), 0)
   }
 
+  // Funciones para calcular el progreso real
+  const getCompletedExercises = () => {
+    return completedExercises?.length || 0
+  }
+
+  const getCompletedSets = () => {
+    if (!routine.exercises || !completedExercises) return 0
+    return routine.exercises.reduce((total, exercise) => {
+      if (completedExercises.includes(exercise.id)) {
+        return total + exercise.sets
+      }
+      return total
+    }, 0)
+  }
+
+  const getCompletedReps = () => {
+    if (!routine.exercises || !completedExercises) return 0
+    return routine.exercises.reduce((total, exercise) => {
+      if (completedExercises.includes(exercise.id)) {
+        return total + (exercise.reps * exercise.sets)
+      }
+      return total
+    }, 0)
+  }
+
   return (
     <Box sx={{ 
       p: 2,
@@ -253,14 +278,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   borderRadius: '12px',
                   overflow: 'hidden',
                   transition: 'all 0.3s ease',
-                  cursor: 'pointer',
+                  cursor: isActiveRoutine ? 'pointer' : 'default',
                   '&:hover': {
-                    borderColor: isCompleted ? 'success.dark' : 'primary.main',
-                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                    transform: 'translateY(-2px)'
+                    borderColor: isCompleted ? 'success.dark' : (isActiveRoutine ? 'primary.main' : 'grey.300'),
+                    boxShadow: isActiveRoutine ? '0 8px 25px rgba(0,0,0,0.15)' : 'none',
+                    transform: isActiveRoutine ? 'translateY(-2px)' : 'none'
                   }
                 }}
-                onClick={() => onExerciseClick?.(exercise)}
+                onClick={() => isActiveRoutine && onExerciseClick?.(exercise)}
               >
             <CardContent sx={{ p: 3 }}>
               {/* Header del ejercicio */}
@@ -273,7 +298,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 {/* Checkbox del ejercicio */}
                 <Checkbox
                   checked={isCompleted}
-                  disabled
+                  disabled={!isActiveRoutine}
                   sx={{
                     color: 'success.main',
                     '&.Mui-checked': {
@@ -447,10 +472,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
               <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
-                {routine.exercises?.length || 0}
+                {getCompletedExercises()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🏋️ {(routine.exercises?.length || 0) === 1 ? 'Ejercicio' : 'Ejercicios'}
+                🏋️ {(getCompletedExercises() === 1 ? 'Ejercicio' : 'Ejercicios')} completados
               </Typography>
             </Box>
             <Box sx={{ 
@@ -463,10 +488,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
               <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
-                {getTotalSets()}
+                {getCompletedSets()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🔄 {(getTotalSets() === 1 ? 'Serie' : 'Series')}
+                🔄 {(getCompletedSets() === 1 ? 'Serie' : 'Series')} completadas
               </Typography>
             </Box>
             <Box sx={{ 
@@ -479,10 +504,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
               <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'primary.main'} sx={{ fontWeight: 800, mb: 1 }}>
-                {getTotalReps()}
+                {getCompletedReps()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🔄 {(getTotalReps() === 1 ? 'Rep' : 'Reps')}
+                🔄 {(getCompletedReps() === 1 ? 'Rep' : 'Reps')} completadas
               </Typography>
             </Box>
           </Box>
