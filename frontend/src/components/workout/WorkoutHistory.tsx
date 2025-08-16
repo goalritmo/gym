@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { 
   Box, 
   Typography, 
@@ -183,12 +183,7 @@ export default function WorkoutHistory() {
     return filtered;
   }, [workoutDaysWithExercises, searchTerm]);
 
-  // Cargar datos
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError('');
     
@@ -206,7 +201,12 @@ export default function WorkoutHistory() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Cargar datos
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // Funciones de UI
   const toggleDayExpansion = (date: string) => {
