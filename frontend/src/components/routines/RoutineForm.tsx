@@ -26,7 +26,6 @@ import type { RoutineWithExercises, CreateRoutineRequest, CreateRoutineExerciseR
 interface Exercise {
   id: number
   name: string
-  muscle_group: string
 }
 
 interface RoutineFormProps {
@@ -77,7 +76,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     const newExercise: CreateRoutineExerciseRequest = {
       exercise_id: 0,
       order_index: exercises.length,
-      sets: 3,
+      sets: 1,
       reps: 10,
       weight: undefined,
       rest_time_seconds: 60,
@@ -103,9 +102,10 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
       [field]: value
     }
     
-    // Si se cambia el ejercicio a Running, establecer reps = 1 automáticamente
+    // Si se cambia el ejercicio a Running, establecer reps = 1 y sets = 1 automáticamente
     if (field === 'exercise_id' && value === 18) {
       newExercises[index].reps = 1
+      newExercises[index].sets = 1
     }
     
     setExercises(newExercises)
@@ -213,27 +213,26 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
                 >
                   {availableExercises.map((ex) => (
                     <MenuItem key={ex.id} value={ex.id}>
-                      {ex.name} ({ex.muscle_group})
+                      {ex.name}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Box>
 
-            <Box display="flex" gap={2} sx={{ mb: 2 }}>
-              <TextField
-                fullWidth
-                label="Series"
-                type="number"
-                value={exercise.sets}
-                onChange={(e) => handleExerciseChange(index, 'sets', parseInt(e.target.value))}
-                inputProps={{ min: 1, max: 20 }}
-                required
-                disabled={isRunningExercise(exercise.exercise_id)}
-              />
+            {/* Ocultar campos Series y Repeticiones para Running */}
+            {!isRunningExercise(exercise.exercise_id) && (
+              <Box display="flex" gap={2} sx={{ mb: 2 }}>
+                <TextField
+                  fullWidth
+                  label="Series"
+                  type="number"
+                  value={exercise.sets}
+                  onChange={(e) => handleExerciseChange(index, 'sets', parseInt(e.target.value))}
+                  inputProps={{ min: 1, max: 20 }}
+                  required
+                />
 
-              {/* Ocultar campo Repeticiones para Running */}
-              {!isRunningExercise(exercise.exercise_id) && (
                 <TextField
                   fullWidth
                   label="Repeticiones"
@@ -243,12 +242,11 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
                   inputProps={{ min: 1, max: 100 }}
                   required
                 />
-              )}
-            </Box>
+              </Box>
+            )}
 
             <Box display="flex" gap={2} sx={{ mb: 2 }}>
               <TextField
-                fullWidth
                 label={isRunningExercise(exercise.exercise_id) ? "Distancia (km) - opcional" : "Peso (kg) - opcional"}
                 type="number"
                 value={exercise.weight || ''}
@@ -264,13 +262,13 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
               />
 
               <TextField
-                fullWidth
                 label="Descanso (segundos)"
                 type="number"
                 value={exercise.rest_time_seconds}
                 onChange={(e) => handleExerciseChange(index, 'rest_time_seconds', parseInt(e.target.value))}
                 inputProps={{ min: 0, max: 3600 }}
                 required
+                sx={{ flex: 1 }}
               />
             </Box>
 
