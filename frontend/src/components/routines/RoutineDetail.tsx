@@ -54,9 +54,17 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ 
+      p: 2,
+      maxWidth: '100%',
+      width: '100%',
+      boxSizing: 'border-box'
+    }}>
       {/* Header de la rutina */}
-      <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={3}>
+      <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={3} sx={{
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: { xs: 2, sm: 0 }
+      }}>
         <Box>
           <Typography variant="h5" component="h2" sx={{ fontWeight: 600, mb: 1 }}>
             {routine.name}
@@ -66,7 +74,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               {routine.description}
             </Typography>
           )}
-          <Box display="flex" gap={1} flexWrap="wrap">
+          <Box display="flex" gap={1} flexWrap="wrap" sx={{ 
+          '@media (max-width: 600px)': {
+            gap: 0.5
+          }
+        }}>
             {routine.is_active && (
               <Chip
                 label="Activa"
@@ -93,7 +105,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
           </Box>
         </Box>
         
-        <Box display="flex" gap={1}>
+        <Box display="flex" gap={1} sx={{
+          alignSelf: { xs: 'flex-start', sm: 'flex-end' }
+        }}>
           {onStart && (
             <Tooltip title="Comenzar rutina">
               <IconButton
@@ -133,7 +147,17 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
 
       <List sx={{ p: 0 }}>
         {routine.exercises?.map((exercise, index) => (
-          <Card key={exercise.id} sx={{ mb: 2 }}>
+          <Card key={exercise.id} sx={{ 
+            mb: 2,
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 2,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            '&:hover': {
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              transition: 'box-shadow 0.2s ease-in-out'
+            }
+          }}>
             <CardContent sx={{ p: 2 }}>
               <Box display="flex" alignItems="center" mb={2}>
                 <ListItemIcon sx={{ minWidth: 40 }}>
@@ -161,7 +185,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     </Typography>
                   }
                   secondary={
-                    <Box display="flex" gap={1} flexWrap="wrap" sx={{ mt: 1 }}>
+                    <Box display="flex" gap={1} flexWrap="wrap" sx={{ 
+                      mt: 1,
+                      '@media (max-width: 600px)': {
+                        gap: 0.5
+                      }
+                    }}>
                       <Chip
                         label={`${exercise.sets} series`}
                         size="small"
@@ -204,15 +233,27 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       </List>
 
       {/* Resumen de la rutina */}
-      <Card sx={{ mt: 3, backgroundColor: 'grey.50' }}>
+      <Card sx={{ 
+        mt: 3, 
+        backgroundColor: 'grey.50',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+      }}>
         <CardContent>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
             Resumen de la rutina
           </Typography>
-          <Box display="grid" gridTemplateColumns="repeat(auto-fit, minmax(150px, 1fr))" gap={2}>
+          <Box display="grid" gridTemplateColumns="repeat(auto-fit, minmax(120px, 1fr))" gap={2} sx={{ 
+            '@media (max-width: 600px)': {
+              gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+              gap: 1
+            }
+          }}>
             <Box textAlign="center">
               <Typography variant="h4" color="primary.main" sx={{ fontWeight: 600 }}>
-                {routine.exercises.length}
+                {routine.exercises?.length || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Ejercicios
