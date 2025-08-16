@@ -19,7 +19,7 @@ import {
   FitnessCenter as ExerciseIcon,
   Search as SearchIcon
 } from '@mui/icons-material'
-import { FormControlLabel, Switch } from '@mui/material'
+import { FormControlLabel, Switch, Chip } from '@mui/material'
 import { apiClient } from '../../lib/api'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -32,6 +32,7 @@ type AdminExercise = {
   secondary_muscles: string[] | null
   video_url?: string
   is_active: boolean
+  bodyweight?: boolean
   created_at: string
   updated_at: string
 }
@@ -244,11 +245,25 @@ export function AdminExercises() {
 
                   {/* Content */}
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {exercise.name}
-                    </Typography>
-                    
-
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {exercise.name}
+                      </Typography>
+                      {exercise.bodyweight && (
+                        <Chip
+                          label="Peso Corporal"
+                          size="small"
+                          color="primary"
+                          sx={{ 
+                            fontSize: '0.7rem',
+                            height: 20,
+                            '& .MuiChip-label': {
+                              px: 1
+                            }
+                          }}
+                        />
+                      )}
+                    </Box>
 
                     <Typography variant="caption" color="text.secondary">
                       Creado el {formatDate(exercise.created_at)}
