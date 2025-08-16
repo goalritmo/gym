@@ -367,11 +367,11 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     display: 'block',
                     fontStyle: 'italic',
                     opacity: 0.8,
-                    mb: 2,
+                    mb: 1,
                     textAlign: 'left'
                   }}
                 >
-                  Creada el {new Date(routine.created_at).toLocaleDateString('es-ES', {
+                  {routine.updated_at && routine.updated_at !== routine.created_at ? 'Actualizada' : 'Creada'} el {new Date(routine.updated_at || routine.created_at).toLocaleDateString('es-ES', {
                     month: 'long',
                     day: 'numeric'
                   })}

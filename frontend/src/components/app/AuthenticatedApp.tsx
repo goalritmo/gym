@@ -177,10 +177,18 @@ function AuthenticatedAppContent() {
       handleStartRoutine(event.detail.routine)
     }
 
+    const handleViewRoutine = (_event: CustomEvent) => {
+      setActiveTab(TABS.ROUTINES)
+      // Aquí podrías abrir el modal de detalles de la rutina
+      // Por ahora solo cambia a la tab de rutinas
+    }
+
     window.addEventListener('startRoutine', handleRoutineStart as EventListener)
+    window.addEventListener('viewRoutine', handleViewRoutine as EventListener)
     
     return () => {
       window.removeEventListener('startRoutine', handleRoutineStart as EventListener)
+      window.removeEventListener('viewRoutine', handleViewRoutine as EventListener)
     }
   }, [])
 

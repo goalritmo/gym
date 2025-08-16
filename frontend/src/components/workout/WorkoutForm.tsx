@@ -285,7 +285,11 @@ export default function WorkoutForm({
                 }
               }}
               onClick={() => {
-                // Aquí podrías abrir el modal de detalles de la rutina
+                // Emitir evento para cambiar a la tab de rutinas y abrir el modal
+                const event = new CustomEvent('viewRoutine', { 
+                  detail: { routine: activeRoutine } 
+                })
+                window.dispatchEvent(event)
               }}
             >
               {isRoutinePaused ? 'Elegir rutina' : 'Ver rutina'}
