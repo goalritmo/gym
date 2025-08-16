@@ -57,6 +57,9 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     loadExercises()
   }, [])
 
+  // Detectar si el ejercicio seleccionado es Running (ID: 18)
+  const isRunningExercise = (exerciseId: number) => exerciseId === 18
+
   const loadExercises = async () => {
     try {
       setLoading(true)
@@ -99,6 +102,12 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
       ...newExercises[index],
       [field]: value
     }
+    
+    // Si se cambia el ejercicio a Running, establecer reps = 1 automáticamente
+    if (field === 'exercise_id' && value === 18) {
+      newExercises[index].reps = 1
+    }
+    
     setExercises(newExercises)
   }
 
@@ -220,27 +229,38 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
                 onChange={(e) => handleExerciseChange(index, 'sets', parseInt(e.target.value))}
                 inputProps={{ min: 1, max: 20 }}
                 required
+                disabled={isRunningExercise(exercise.exercise_id)}
               />
 
-              <TextField
-                fullWidth
-                label="Repeticiones"
-                type="number"
-                value={exercise.reps}
-                onChange={(e) => handleExerciseChange(index, 'reps', parseInt(e.target.value))}
-                inputProps={{ min: 1, max: 100 }}
-                required
-              />
+              {/* Ocultar campo Repeticiones para Running */}
+              {!isRunningExercise(exercise.exercise_id) && (
+                <TextField
+                  fullWidth
+                  label="Repeticiones"
+                  type="number"
+                  value={exercise.reps}
+                  onChange={(e) => handleExerciseChange(index, 'reps', parseInt(e.target.value))}
+                  inputProps={{ min: 1, max: 100 }}
+                  required
+                />
+              )}
             </Box>
 
             <Box display="flex" gap={2} sx={{ mb: 2 }}>
               <TextField
                 fullWidth
-                label="Peso (kg) - opcional"
+                label={isRunningExercise(exercise.exercise_id) ? "Distancia (km) - opcional" : "Peso (kg) - opcional"}
                 type="number"
                 value={exercise.weight || ''}
                 onChange={(e) => handleExerciseChange(index, 'weight', e.target.value ? parseFloat(e.target.value) : undefined)}
-                inputProps={{ min: 0, step: 0.5 }}
+                inputProps={{ 
+                  min: 0, 
+                  step: isRunningExercise(exercise.exercise_id) ? 0.1 : 0.5,
+                  max: isRunningExercise(exercise.exercise_id) ? 100 : 1000
+                }}
+                sx={{
+                  flex: isRunningExercise(exercise.exercise_id) ? 2 : 1 // 2/3 del espacio para Running
+                }}
               />
 
               <TextField
