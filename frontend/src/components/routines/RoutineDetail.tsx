@@ -434,7 +434,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
           ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
           : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
         border: '2px solid',
-        borderColor: isActiveRoutine ? 'warning.main' : 'primary.main',
+        borderColor: isActiveRoutine ? 'warning.main' : 'grey.400',
         borderRadius: '16px',
         boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
         overflow: 'hidden'
@@ -445,7 +445,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             sx={{ 
               mb: 3, 
               fontWeight: 800,
-              color: isActiveRoutine ? 'warning.main' : 'primary.main',
+              color: isActiveRoutine ? 'warning.main' : 'text.secondary',
               textAlign: 'center',
               textShadow: '0 1px 2px rgba(0,0,0,0.1)'
             }}
@@ -467,7 +467,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
-              borderColor: isActiveRoutine ? 'warning.light' : 'primary.light',
+              borderColor: isActiveRoutine ? 'warning.light' : 'grey.300',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
                           <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'text.secondary'} sx={{ fontWeight: 800, mb: 1 }}>
@@ -483,7 +483,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
-              borderColor: isActiveRoutine ? 'warning.light' : 'primary.light',
+              borderColor: isActiveRoutine ? 'warning.light' : 'grey.300',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
               <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'text.secondary'} sx={{ fontWeight: 800, mb: 1 }}>
@@ -499,7 +499,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
-              borderColor: isActiveRoutine ? 'warning.light' : 'primary.light',
+              borderColor: isActiveRoutine ? 'warning.light' : 'grey.300',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
               <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'text.secondary'} sx={{ fontWeight: 800, mb: 1 }}>

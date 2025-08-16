@@ -423,10 +423,12 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       color: 'white'
                     },
                     '&:focus': {
-                      outline: 'none'
+                      outline: 'none',
+                      borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'
                     },
                     '&.Mui-focused': {
-                      outline: 'none'
+                      outline: 'none',
+                      borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'
                     }
                   }}
                 >
@@ -442,17 +444,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       })
                       window.dispatchEvent(event)
                     } else {
-                      // Obtener la rutina completa con ejercicios antes de iniciar
-                      try {
-                        const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
-                        const event = new CustomEvent('startRoutine', { 
-                          detail: { routine: fullRoutine } 
-                        })
-                        window.dispatchEvent(event)
-                      } catch (error) {
-                        console.error('Error obteniendo detalles de la rutina:', error)
-                        setError('Error al cargar los detalles de la rutina')
-                      }
+                      // Abrir el modal de detalles de la rutina
+                      await handleViewRoutine(routine)
                     }
                   }}
                   sx={{ 
@@ -461,6 +454,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     '&:hover': {
                       backgroundColor: activeRoutine?.id === routine.id ? 'warning.light' : 'primary.light',
                       color: 'white'
+                    },
+                    '&:focus': {
+                      outline: 'none'
                     }
                   }}
                 >

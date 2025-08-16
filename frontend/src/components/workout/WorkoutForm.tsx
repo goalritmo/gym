@@ -16,7 +16,7 @@ type Exercise = {
 
 // Esquema de validación con Zod
 const workoutFormSchema = z.object({
-  exercise_id: z.coerce.number().refine(val => val > 0, ' '),
+  exercise_id: z.coerce.number().refine(val => val > 0, ' ').optional(),
   weight: z.string().transform((val) => {
     if (val === '' || val === '0') return undefined
     const num = parseFloat(val)
@@ -62,7 +62,7 @@ export default function WorkoutForm({
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
-      exercise_id: 0,
+      exercise_id: undefined,
       weight: '',
       reps: '',
       set: 1,
@@ -109,6 +109,7 @@ export default function WorkoutForm({
   useEffect(() => {
     if (preloadedExercise) {
       console.log('Pre-cargando ejercicio:', preloadedExercise)
+      console.log('exercise_id a establecer:', preloadedExercise.exercise_id)
       setValue('exercise_id', preloadedExercise.exercise_id)
       setValue('weight', preloadedExercise.weight?.toString() || '')
       setValue('reps', preloadedExercise.reps || '')
@@ -116,8 +117,13 @@ export default function WorkoutForm({
       setValue('set', preloadedExercise.currentSet || 1)
       setValue('seconds', preloadedExercise.rest_time_seconds?.toString() || '')
       setValue('observations', preloadedExercise.notes || '')
+      
+      // Debug adicional después de establecer valores
+      setTimeout(() => {
+        console.log('Valor actual de exercise_id después de setValue:', watch('exercise_id'))
+      }, 100)
     }
-  }, [preloadedExercise, setValue])
+  }, [preloadedExercise, setValue, watch])
 
   // Función para validar y limitar valores en tiempo real
   const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {
