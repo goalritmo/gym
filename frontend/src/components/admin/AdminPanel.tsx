@@ -49,22 +49,26 @@ type AdminPanelProps = {
 
 export default function AdminPanel({ open, onClose }: AdminPanelProps) {
   const [loading, setLoading] = useState(true)
-  const { userRole } = useAuth()
+  const { userRole, isAdmin } = useAuth()
 
   // Determinar qué pestañas están disponibles según el rol
   const getAvailableTabs = () => {
     const tabs = []
     
-    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe') {
+    // Debug: verificar tanto userRole como isAdmin
+    console.log('getAvailableTabs - userRole:', userRole, 'isAdmin:', isAdmin)
+    
+    if (userRole === 'admin' || userRole === 'staff' || userRole === 'profe' || isAdmin) {
       tabs.push('notifications')
     }
-    if (userRole === 'admin' || userRole === 'profe') {
+    if (userRole === 'admin' || userRole === 'profe' || isAdmin) {
       tabs.push('exercises')
     }
-    if (userRole === 'admin') {
+    if (userRole === 'admin' || isAdmin) {
       tabs.push('users')
     }
     
+    console.log('getAvailableTabs - tabs generados:', tabs)
     return tabs
   }
 
@@ -72,9 +76,15 @@ export default function AdminPanel({ open, onClose }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<string>(availableTabs[0] || 'notifications')
 
   // Debug logs
-  console.log('AdminPanel - userRole:', userRole)
+  console.log('AdminPanel - userRole:', userRole, 'isAdmin:', isAdmin)
   console.log('AdminPanel - availableTabs:', availableTabs)
   console.log('AdminPanel - activeTab:', activeTab)
+
+  // Si no hay pestañas disponibles, no mostrar el panel
+  if (availableTabs.length === 0) {
+    console.warn('AdminPanel - No hay pestañas disponibles para este rol:', userRole, 'isAdmin:', isAdmin)
+    return null
+  }
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setActiveTab(newValue)

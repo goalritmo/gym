@@ -158,37 +158,28 @@ const RoutineList: React.FC = () => {
         </Card>
       ) : (
         <Box display="grid" gap={2} sx={{ 
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(auto-fill, minmax(300px, 1fr))', md: 'repeat(auto-fill, minmax(320px, 1fr))' },
-          mx: 0.5
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(auto-fill, minmax(280px, 1fr))', md: 'repeat(auto-fill, minmax(300px, 1fr))' },
+          width: '100%',
+          overflow: 'hidden'
         }}>
           {routines?.map((routine) => (
             <Card key={routine.id} sx={{ 
               height: 'fit-content',
-              maxWidth: '100%',
+              width: '100%',
               overflow: 'hidden'
             }}>
-              <CardContent>
+              <CardContent sx={{ p: 2 }}>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
-                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600, flex: 1, mr: 1 }}>
                     {routine.name}
                   </Typography>
-                  <Box>
-                    {routine.is_active && (
-                      <Chip
-                        label="Activa"
-                        color="success"
-                        size="small"
-                        sx={{ mr: 1 }}
-                      />
-                    )}
-                    <IconButton
-                      size="small"
-                      onClick={() => handleViewRoutine(routine)}
-                      sx={{ color: 'primary.main' }}
-                    >
-                      <PlayIcon />
-                    </IconButton>
-                  </Box>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleViewRoutine(routine)}
+                    sx={{ color: 'primary.main' }}
+                  >
+                    <PlayIcon />
+                  </IconButton>
                 </Box>
 
                 {routine.description && (
@@ -197,18 +188,17 @@ const RoutineList: React.FC = () => {
                   </Typography>
                 )}
 
-                <Box display="flex" gap={1} flexWrap="wrap" mb={2}>
+                <Box display="flex" gap={1} flexWrap="wrap" mb={1}>
                   <Chip
                     label={`${routine.total_exercises} ejercicios`}
                     variant="outlined"
                     size="small"
                   />
-                  <Chip
-                    label={`Creada ${new Date(routine.created_at).toLocaleDateString('es-ES')}`}
-                    variant="outlined"
-                    size="small"
-                  />
                 </Box>
+                
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                  Creada el {new Date(routine.created_at).toLocaleDateString('es-ES')}
+                </Typography>
               </CardContent>
 
               <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
