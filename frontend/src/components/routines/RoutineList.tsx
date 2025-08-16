@@ -134,9 +134,16 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     }
   }
 
-  const handleViewRoutine = (routine: RoutineWithExercises) => {
-    setSelectedRoutine(routine)
-    setOpenDetailDialog(true)
+  const handleViewRoutine = async (routine: RoutineWithExercises) => {
+    try {
+      // Obtener la rutina completa con ejercicios
+      const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
+      setSelectedRoutine(fullRoutine)
+      setOpenDetailDialog(true)
+    } catch (error) {
+      console.error('Error obteniendo detalles de la rutina:', error)
+      setError('Error al cargar los detalles de la rutina')
+    }
   }
 
 
@@ -416,10 +423,14 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       color: 'white'
                     },
                     '&:focus': {
-                      borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'
+                      borderColor: `${activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'} !important`,
+                      outline: 'none'
                     },
                     '&.Mui-focused': {
-                      borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'
+                      borderColor: `${activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'} !important`
+                    },
+                    '&.MuiButton-outlined.Mui-focused': {
+                      borderColor: `${activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'} !important`
                     }
                   }}
                 >
