@@ -14,6 +14,7 @@ import {
   Timer as TimerIcon,
   Edit as EditIcon,
   PlayArrow as PlayIcon,
+  Stop as StopIcon,
   AccessTime as AccessTimeIcon,
   Notes as NotesIcon,
   Delete as DeleteIcon
@@ -145,7 +146,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               gap: 1,
               flexShrink: 0
             }}>
-          {onDelete && (
+          {onDelete && !isActiveRoutine && (
             <Tooltip title="Eliminar rutina">
               <IconButton
                 color="error"
@@ -163,7 +164,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               </IconButton>
             </Tooltip>
           )}
-          {onEdit && (
+          {onEdit && !isActiveRoutine && (
             <Tooltip title="Editar rutina">
               <IconButton
                 color="primary"
@@ -191,7 +192,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   }
                 }}
               >
-                <PlayIcon />
+                {isActiveRoutine ? <StopIcon /> : <PlayIcon />}
               </IconButton>
             </Tooltip>
           )}

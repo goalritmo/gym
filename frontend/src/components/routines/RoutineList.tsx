@@ -414,6 +414,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     '&:hover': {
                       backgroundColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
                       color: 'white'
+                    },
+                    '&:focus': {
+                      borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'
                     }
                   }}
                 >
