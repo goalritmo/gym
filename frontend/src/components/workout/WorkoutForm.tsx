@@ -455,32 +455,32 @@ export default function WorkoutForm({
                         )}
                       </Box>
                       
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        sx={{
-                          color: 'white',
-                          borderColor: 'rgba(255,255,255,0.5)',
-                          '&:hover': {
-                            borderColor: 'warning.main',
-                            backgroundColor: 'rgba(255,152,0,0.1)'
-                          }
-                        }}
-                        onClick={() => {
-                          // Pre-cargar el ejercicio en el formulario
-                          setValue('exercise_id', exercise.exercise_id)
-                          setValue('weight', exercise.weight?.toString() || '')
-                          setValue('reps', exercise.reps || '')
-                          setValue('set', 1)
-                          setValue('seconds', exercise.rest_time_seconds?.toString() || '')
-                          setValue('observations', exercise.notes || '')
-                          
-                          // Cerrar la lista expandible
-                          setShowRoutineExercises(false)
-                        }}
-                      >
-                        Cargar ejercicio
-                      </Button>
+                                              <Button
+                          variant="outlined"
+                          size="small"
+                          sx={{
+                            color: 'white',
+                            borderColor: 'rgba(255,255,255,0.5)',
+                            '&:hover': {
+                              borderColor: 'warning.main',
+                              backgroundColor: 'rgba(255,152,0,0.1)'
+                            }
+                          }}
+                          onClick={() => {
+                            // Pre-cargar el ejercicio en el formulario
+                            setValue('exercise_id', exercise.exercise_id)
+                            setValue('weight', exercise.weight?.toString() || '')
+                            setValue('reps', exercise.reps || '')
+                            setValue('set', 1)
+                            setValue('seconds', exercise.rest_time_seconds?.toString() || '')
+                            setValue('observations', exercise.notes || '')
+                            
+                            // Cerrar la lista expandible
+                            setShowRoutineExercises(false)
+                          }}
+                        >
+                          Cargar en el registro
+                        </Button>
                     </Box>
                   )
                 })}

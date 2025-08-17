@@ -30,7 +30,6 @@ interface RoutineDetailProps {
   onStart?: () => void
   onDelete?: () => void
   isActiveRoutine?: boolean
-  completedExercises?: number[]
   routineProgress?: number
   onExerciseClick?: (exercise: any) => void
 }
@@ -42,7 +41,6 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   onStart,
   onDelete,
   isActiveRoutine = false,
-  completedExercises = [],
   routineProgress,
   onExerciseClick
 }) => {
@@ -58,6 +56,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
+  // Funciones para calcular el resumen basado en ejercicios completados manualmente
   const getTotalSets = () => {
     if (!routine.exercises || routine.exercises.length === 0) return 0
     return routine.exercises.reduce((total, exercise) => total + exercise.sets, 0)
@@ -68,28 +67,28 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
     return routine.exercises.reduce((total, exercise) => total + (exercise.reps * exercise.sets), 0)
   }
 
-  // Funciones para calcular el progreso real
+  // Funciones para calcular el progreso real basado en checkboxes
   const getCompletedExercises = () => {
-    return completedExercises?.length || 0
+    if (!routine.exercises || routine.exercises.length === 0) return 0
+    return routine.exercises.filter(exercise => {
+      const completedSets = completedExercisesForRoutine[exercise.exercise_id] || []
+      return completedSets.length === exercise.sets
+    }).length
   }
 
   const getCompletedSets = () => {
-    if (!routine.exercises || !completedExercises) return 0
+    if (!routine.exercises || routine.exercises.length === 0) return 0
     return routine.exercises.reduce((total, exercise) => {
-      if (completedExercises.includes(exercise.id)) {
-        return total + exercise.sets
-      }
-      return total
+      const completedSets = completedExercisesForRoutine[exercise.exercise_id] || []
+      return total + completedSets.length
     }, 0)
   }
 
   const getCompletedReps = () => {
-    if (!routine.exercises || !completedExercises) return 0
+    if (!routine.exercises || routine.exercises.length === 0) return 0
     return routine.exercises.reduce((total, exercise) => {
-      if (completedExercises.includes(exercise.id)) {
-        return total + (exercise.reps * exercise.sets)
-      }
-      return total
+      const completedSets = completedExercisesForRoutine[exercise.exercise_id] || []
+      return total + (exercise.reps * completedSets.length)
     }, 0)
   }
 
