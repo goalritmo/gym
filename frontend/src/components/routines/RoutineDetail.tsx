@@ -119,17 +119,34 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             gap: 2
           }}>
             <Box sx={{ flex: 1 }}>
-              <Typography 
-                variant="h4" 
-                component="h2" 
-                sx={{ 
-                  fontWeight: 800,
-                  color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
-                  textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                }}
-              >
-                {routine.name}
-              </Typography>
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                gap: { xs: 2, sm: 2 },
+                mb: { xs: 2, sm: 0 }
+              }}>
+                <Typography 
+                  variant="h4" 
+                  component="h2" 
+                  sx={{ 
+                    fontWeight: 800,
+                    color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
+                    textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  {routine.name}
+                </Typography>
+                
+                <Chip
+                  label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
+                  color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
+                  variant="filled"
+                  size="medium"
+                  sx={{ fontWeight: 700 }}
+                />
+              </Box>
+              
               {routine.description && (
                 <Typography 
                   variant="body1" 
@@ -143,20 +160,6 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   {routine.description}
                 </Typography>
               )}
-              <Box sx={{ 
-                display: 'flex', 
-                gap: 1, 
-                flexWrap: 'wrap',
-                alignItems: 'center'
-              }}>
-                <Chip
-                  label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
-                  color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
-                  variant="filled"
-                  size="medium"
-                  sx={{ fontWeight: 700 }}
-                />
-              </Box>
             </Box>
             
             <Box sx={{ 
@@ -285,8 +288,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'flex-start', 
-                gap: 2,
-                mb: 2
+                gap: 2
               }}>
                 {/* Checkboxes por serie */}
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
@@ -508,7 +510,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 {getCompletedSets()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🔄 {(getCompletedSets() === 1 ? 'Serie' : 'Series')} completadas
+                🔄 {(getCompletedSets() === 1 ? 'Serie' : 'Series')}
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                completadas
               </Typography>
             </Box>
             <Box sx={{ 
