@@ -34,11 +34,9 @@ type SettingsModalProps = {
 export default function SettingsModal({ open, onClose, exercises = [] }: SettingsModalProps) {
   const {
     settings,
-    toggleWorkoutSection,
     setFavoriteExercises,
     toggleUncNotifications,
-    toggleShowOwnWorkoutsInSocial,
-    toggleRoutinesTab
+    toggleShowOwnWorkoutsInSocial
   } = useUserSettings()
   const [hasChanges, setHasChanges] = useState(false)
   const [tempSettings, setTempSettings] = useState(settings)
@@ -49,13 +47,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     setTempSettings(settings)
   }, [settings])
 
-  const handleToggleWorkoutSection = () => {
-    setTempSettings(prev => ({
-      ...prev,
-      showWorkoutSection: !prev.showWorkoutSection
-    }))
-    setHasChanges(true)
-  }
+
 
   const handleToggleUncNotifications = () => {
     setTempSettings(prev => ({
@@ -73,13 +65,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     setHasChanges(true)
   }
 
-  const handleToggleRoutinesTab = () => {
-    setTempSettings(prev => ({
-      ...prev,
-      showRoutinesTab: !prev.showRoutinesTab
-    }))
-    setHasChanges(true)
-  }
+
 
   const handleToggleFavoriteExercise = (exerciseId: number) => {
     const isFavorite = tempSettings.favoriteExercises.includes(exerciseId)
@@ -97,17 +83,11 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const handleSave = async () => {
     try {
       // Aplicar cambios
-      if (tempSettings.showWorkoutSection !== settings.showWorkoutSection) {
-        toggleWorkoutSection()
-      }
       if (tempSettings.uncNotificationsEnabled !== settings.uncNotificationsEnabled) {
         await toggleUncNotifications()
       }
       if (tempSettings.showOwnWorkoutsInSocial !== settings.showOwnWorkoutsInSocial) {
         await toggleShowOwnWorkoutsInSocial()
-      }
-      if (tempSettings.showRoutinesTab !== settings.showRoutinesTab) {
-        await toggleRoutinesTab()
       }
       if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
         setFavoriteExercises(tempSettings.favoriteExercises)
@@ -225,50 +205,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
         <Divider sx={{ my: 2 }} />
 
-        {/* Sección REGISTRO */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            REGISTRO
-          </Typography>
 
-          <FormControlLabel
-            control={
-              <Switch
-                checked={tempSettings.showWorkoutSection}
-                onChange={handleToggleWorkoutSection}
-                color="primary"
-              />
-            }
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    Mostrar sección de tiempo de laserie
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {tempSettings.showWorkoutSection
-                      ? 'El cronómetro aparece en el formulario de registro'
-                      : 'La sección de tiempo de la serie está oculta'
-                    }
-                  </Typography>
-                </Box>
-              </Box>
-            }
-            sx={{
-              alignItems: 'flex-start',
-              width: '100%',
-              m: 0,
-              p: 2,
-              borderRadius: 1,
-              backgroundColor: 'grey.50',
-              '&:hover': {
-                backgroundColor: 'grey.100'
-              }
-            }}
-          />
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
 
         {/* Sección FEED SOCIAL */}
         <Box sx={{ mb: 3 }}>
@@ -315,32 +252,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
         <Divider sx={{ my: 2 }} />
 
-        {/* Sección CONFIGURACIÓN DE TABS */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            CONFIGURACIÓN DE TABS
-          </Typography>
 
-          <FormControlLabel
-            control={
-              <Switch
-                checked={tempSettings.showRoutinesTab}
-                onChange={handleToggleRoutinesTab}
-                color="primary"
-              />
-            }
-            label="Mostrar tab de Mis Rutinas"
-            sx={{
-              py: 1,
-              px: 2,
-              borderRadius: 1,
-              backgroundColor: 'grey.50',
-              '&:hover': {
-                backgroundColor: 'grey.100'
-              }
-            }}
-          />
-        </Box>
 
         <Divider sx={{ my: 2 }} />
 

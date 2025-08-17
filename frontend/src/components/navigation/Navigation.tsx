@@ -21,7 +21,7 @@ import PeopleIcon from '@mui/icons-material/People'
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
 import UserAvatar from '../user/UserAvatar'
 import { TABS, type TabType } from '../../constants/tabs'
-import { useUserSettings } from '../../contexts/UserSettingsContext'
+
 
 type NavigationProps = {
   activeTab: TabType
@@ -34,7 +34,7 @@ type NavigationProps = {
 }
 
 export default function Navigation({ activeTab, onTabChange, onOpenSettings, onOpenNotifications, onOpenAdminPanel, unreadNotifications = 0 }: Omit<NavigationProps, 'onLogout'>) {
-  const { settings } = useUserSettings()
+
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [visibleItems, setVisibleItems] = useState<number[]>([])
   const [showToolbarElements, setShowToolbarElements] = useState(false)
@@ -42,12 +42,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
   const timeoutsRef = useRef<number[]>([])
   const menuRef = useRef<HTMLDivElement>(null)
 
-  // Si la tab actual es ROUTINES pero showRoutinesTab está desactivado, cambiar a WORKOUT
-  useEffect(() => {
-    if (activeTab === TABS.ROUTINES && !settings.showRoutinesTab) {
-      onTabChange(TABS.WORKOUT)
-    }
-  }, [activeTab, settings.showRoutinesTab, onTabChange])
+
 
   // Limpiar timeouts cuando el componente se desmonte
   useEffect(() => {
@@ -150,7 +145,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
 
   const menuItems = [
     { label: 'Registrar', icon: <AllInclusiveIcon />, value: TABS.WORKOUT },
-    ...(settings.showRoutinesTab ? [{ label: 'Mis Rutinas', icon: <HistoryIcon />, value: TABS.ROUTINES }] : []),
+    { label: 'Mis Rutinas', icon: <HistoryIcon />, value: TABS.ROUTINES },
     { label: 'Entrenamientos', icon: <FitnessCenterIcon />, value: TABS.HISTORY },
     { label: 'Feed Social', icon: <PeopleIcon />, value: TABS.SOCIAL },
   ]
