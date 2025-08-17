@@ -157,6 +157,14 @@ function AuthenticatedAppContent() {
     setRoutineProgress(0)
     setIsRoutinePaused(false)
     
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('activeRoutine', JSON.stringify({
+      routine: routine,
+      progress: 0,
+      isPaused: false,
+      timestamp: Date.now()
+    }))
+    
     // Auto-completar con el primer ejercicio de la rutina
     if (routine.exercises && routine.exercises.length > 0) {
       const firstExercise = {
@@ -180,14 +188,19 @@ function AuthenticatedAppContent() {
     setRoutineProgress(0)
     setIsRoutinePaused(false)
     setPreloadedExercise(exercise)
+    
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('activeRoutine', JSON.stringify({
+      routine: routine,
+      progress: 0,
+      isPaused: false,
+      timestamp: Date.now()
+    }))
+    
     console.log('Iniciando rutina con ejercicio pre-cargado:', routine.name, exercise.exercise_name)
   }
 
-  // Función para pausar la rutina (limpiar campos pero mantener la box)
-  const handlePauseRoutine = () => {
-    setIsRoutinePaused(true)
-    setRoutineProgress(0)
-  }
+
 
   // Función para detener completamente la rutina
   const handleStopRoutine = () => {
@@ -195,6 +208,9 @@ function AuthenticatedAppContent() {
     setIsRoutinePaused(false)
     setRoutineProgress(0)
     setPreloadedExercise(null)
+    
+    // Limpiar localStorage
+    localStorage.removeItem('activeRoutine')
   }
 
   // Función para obtener el siguiente ejercicio o serie de la rutina
@@ -230,6 +246,33 @@ function AuthenticatedAppContent() {
     return null
   }
 
+  // Cargar rutina activa desde localStorage al iniciar
+  useEffect(() => {
+    const savedRoutine = localStorage.getItem('activeRoutine')
+    if (savedRoutine) {
+      try {
+        const parsed = JSON.parse(savedRoutine)
+        const now = Date.now()
+        const timeDiff = now - parsed.timestamp
+        
+        // Solo restaurar si no han pasado más de 24 horas
+        if (timeDiff < 24 * 60 * 60 * 1000) {
+          setActiveRoutine(parsed.routine)
+          setRoutineProgress(parsed.progress || 0)
+          setIsRoutinePaused(parsed.isPaused || false)
+          console.log('Rutina activa restaurada desde localStorage:', parsed.routine.name)
+        } else {
+          // Limpiar si es muy antigua
+          localStorage.removeItem('activeRoutine')
+          console.log('Rutina activa expirada, limpiando localStorage')
+        }
+      } catch (error) {
+        console.error('Error al restaurar rutina activa:', error)
+        localStorage.removeItem('activeRoutine')
+      }
+    }
+  }, [])
+
   // Event listener para el inicio de rutinas
   useEffect(() => {
     const handleRoutineStart = (event: CustomEvent) => {
@@ -250,6 +293,7 @@ function AuthenticatedAppContent() {
       setActiveRoutine(null)
       setIsRoutinePaused(false)
       setRoutineProgress(0)
+      localStorage.removeItem('activeRoutine')
     }
 
     window.addEventListener('startRoutine', handleRoutineStart as EventListener)
@@ -305,6 +349,19 @@ function AuthenticatedAppContent() {
         if (nextExercise) {
           // Auto-completar con el siguiente ejercicio/serie
           setPreloadedExercise(nextExercise)
+          
+          // Actualizar progreso y localStorage
+          const newProgress = Math.min(100, routineProgress + 10) // Incrementar progreso
+          setRoutineProgress(newProgress)
+          
+          // Actualizar localStorage
+          localStorage.setItem('activeRoutine', JSON.stringify({
+            routine: activeRoutine,
+            progress: newProgress,
+            isPaused: isRoutinePaused,
+            timestamp: Date.now()
+          }))
+          
           console.log('Auto-completando con siguiente ejercicio/serie:', nextExercise.exercise_name, 'Serie:', nextExercise.currentSet)
         } else {
           // La rutina está completa
@@ -312,6 +369,9 @@ function AuthenticatedAppContent() {
           setActiveRoutine(null)
           setPreloadedExercise(null)
           setRoutineProgress(100)
+          
+          // Limpiar localStorage
+          localStorage.removeItem('activeRoutine')
         }
       } else {
         // Si no hay rutina activa, solo limpiar el formulario
@@ -363,7 +423,6 @@ function AuthenticatedAppContent() {
               activeRoutine={activeRoutine}
               isRoutinePaused={isRoutinePaused}
               routineProgress={routineProgress}
-              onPauseRoutine={handlePauseRoutine}
               onStopRoutine={handleStopRoutine}
               preloadedExercise={preloadedExercise}
             />

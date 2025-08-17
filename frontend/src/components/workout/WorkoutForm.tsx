@@ -1,18 +1,34 @@
 import { useForm } from 'react-hook-form'
-import { TextField, Button, Stack, Box, Typography, Alert, Snackbar, CircularProgress, Backdrop, IconButton } from '@mui/material'
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import { AccessTime, KeyboardArrowDown, KeyboardArrowUp, Stop as StopIcon, Close as CloseIcon } from '@mui/icons-material'
-import { useState, useEffect } from 'react'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import TimerComponent from '../timer/TimerComponent'
+import { z } from 'zod'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
+import TimerComponent from '../timer/TimerComponent'
 
 type Exercise = {
   id: number
   name: string
   bodyweight?: boolean
 }
+import { 
+  Box, 
+  Button, 
+  FormControl, 
+  InputLabel, 
+  MenuItem, 
+  Select, 
+  Stack, 
+  TextField, 
+  Typography,
+  Alert,
+  IconButton
+} from '@mui/material'
+import { 
+  FitnessCenter as FitnessCenterIcon,
+  KeyboardArrowDown,
+  KeyboardArrowUp,
+  Close as CloseIcon
+} from '@mui/icons-material'
+import { useState, useEffect } from 'react'
 
 // Esquema de validación con Zod
 const workoutFormSchema = z.object({
@@ -37,7 +53,6 @@ type WorkoutFormProps = {
   activeRoutine?: any
   isRoutinePaused?: boolean
   routineProgress?: number
-  onPauseRoutine?: () => void
   onStopRoutine?: () => void
   preloadedExercise?: any
 }
@@ -49,7 +64,6 @@ export default function WorkoutForm({
   activeRoutine,
   isRoutinePaused = false,
   routineProgress = 0,
-  onPauseRoutine,
   onStopRoutine,
   preloadedExercise
 }: WorkoutFormProps) {
@@ -78,6 +92,9 @@ export default function WorkoutForm({
   const [currentTimerTime, setCurrentTimerTime] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [showTimeTip, setShowTimeTip] = useState(false)
+  
+  // Estado para controlar la expansión de la box de rutina
+  const [showRoutineExercises, setShowRoutineExercises] = useState(false)
   
   // Estado para detectar si los ejercicios están cargando
   const isLoadingExercises = filteredExercises.length === 0
@@ -214,26 +231,22 @@ export default function WorkoutForm({
         seconds: '',
         observations: ''
       })
-
+      
+      // Resetear el cronómetro
+      setCurrentTimerTime(0)
+      setIsTimerRunning(false)
+      
+      // Ocultar el mensaje de éxito después de 3 segundos
+      setTimeout(() => {
+        setShowSuccess(false)
+      }, 3000)
     } catch (error) {
-      console.error('Error submitting workout:', error)
-      setErrorMessage('Error al registrar el entrenamiento')
+      console.error('Error al guardar el workout:', error)
+      setErrorMessage('Error al guardar el entrenamiento. Por favor, intenta de nuevo.')
     }
   })
 
-  // Función para capturar el tiempo del cronómetro cuando se pausa
-  const handleTimerComplete = (seconds: number) => {
-    setValue('seconds', seconds)
-  }
-
-  // Función para trackear el tiempo actual del cronómetro
-  const handleTimerUpdate = (seconds: number, isRunning: boolean) => {
-    setCurrentTimerTime(seconds)
-    setIsTimerRunning(isRunning)
-  }
-
   return (
-    <>
     <Box sx={{ maxWidth: 600, mx: 'auto', position: 'relative', zIndex: 1 }}>
       <Typography variant="h4" gutterBottom sx={{ mb: 3, textAlign: 'center', color: 'primary.main', fontWeight: 'bold' }}>
         Registrar
@@ -252,7 +265,7 @@ export default function WorkoutForm({
         }}>
           <IconButton
             size="small"
-            onClick={isRoutinePaused ? onStopRoutine : onPauseRoutine}
+            onClick={onStopRoutine}
             sx={{ 
               position: 'absolute',
               top: 8,
@@ -264,7 +277,7 @@ export default function WorkoutForm({
               }
             }}
           >
-            {isRoutinePaused ? <CloseIcon /> : <StopIcon />}
+            <CloseIcon />
           </IconButton>
           
           <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: 'left' }}>
@@ -296,27 +309,114 @@ export default function WorkoutForm({
               {routineProgress}% completado
             </Typography>
             
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                '&:hover': {
-                  opacity: 0.8
-                }
-              }}
-              onClick={() => {
-                // Emitir evento para cambiar a la tab de rutinas y abrir el modal
-                const event = new CustomEvent('viewRoutine', { 
-                  detail: { routine: activeRoutine } 
-                })
-                window.dispatchEvent(event)
-              }}
-            >
-              {isRoutinePaused ? 'Elegir rutina' : 'Ver rutina'}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  '&:hover': {
+                    opacity: 0.8
+                  }
+                }}
+                onClick={() => {
+                  // Emitir evento para cambiar a la tab de rutinas y abrir el modal
+                  const event = new CustomEvent('viewRoutine', { 
+                    detail: { routine: activeRoutine } 
+                  })
+                  window.dispatchEvent(event)
+                }}
+              >
+                {isRoutinePaused ? 'Elegir rutina' : 'Ver rutina'}
+              </Typography>
+              
+              <IconButton
+                size="small"
+                onClick={() => setShowRoutineExercises(!showRoutineExercises)}
+                sx={{ 
+                  color: 'white',
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255,255,255,0.2)'
+                  }
+                }}
+              >
+                {showRoutineExercises ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              </IconButton>
+            </Box>
           </Box>
+          
+          {/* Lista expandible de ejercicios de la rutina */}
+          {showRoutineExercises && activeRoutine?.exercises && (
+            <Box sx={{ 
+              mt: 2, 
+              p: 2, 
+              backgroundColor: 'rgba(255,255,255,0.1)', 
+              borderRadius: 2,
+              maxHeight: '300px',
+              overflow: 'auto'
+            }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, mb: 2, color: 'white' }}>
+                Ejercicios restantes:
+              </Typography>
+              
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {activeRoutine.exercises.map((exercise: any, index: number) => (
+                  <Box
+                    key={`${exercise.exercise_id}-${index}`}
+                    sx={{
+                      p: 1.5,
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      borderRadius: 1,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255,255,255,0.2)'
+                      }
+                    }}
+                    onClick={() => {
+                      // Pre-cargar el ejercicio en el formulario
+                      setValue('exercise_id', exercise.exercise_id)
+                      setValue('weight', exercise.weight?.toString() || '')
+                      setValue('reps', exercise.reps || '')
+                      setValue('set', 1)
+                      setValue('seconds', exercise.rest_time_seconds?.toString() || '')
+                      setValue('observations', exercise.notes || '')
+                      
+                      // Cerrar la lista expandible
+                      setShowRoutineExercises(false)
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: 'white' }}>
+                      {exercise.exercise_name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                        {exercise.sets} {exercise.sets === 1 ? 'serie' : 'series'}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                        •
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                        {exercise.reps} {exercise.reps === 1 ? 'rep' : 'reps'}
+                      </Typography>
+                      {exercise.weight && (
+                        <>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                            •
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                            {exercise.weight}kg
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
         </Box>
       )}
       
@@ -347,14 +447,13 @@ export default function WorkoutForm({
             <MenuItem value="" disabled>
               {filteredExercises.length === 0 ? 'Cargando ejercicios...' : 'Seleccionar ejercicio...'}
             </MenuItem>
-                          {filteredExercises.map((ex) => (
+            {filteredExercises.map((ex) => (
               <MenuItem key={ex.id} value={ex.id}>
                 {ex.name}
                 {ex.name.toLowerCase().includes('running') && ' ⭐'}
               </MenuItem>
             ))}
           </Select>
-
         </FormControl>
 
         {/* Peso/Distancia, Reps y Serie en la misma fila */}
@@ -432,287 +531,108 @@ export default function WorkoutForm({
                 </MenuItem>
               ))}
             </Select>
-
           </FormControl>
         </Box>
 
-        {settings.showWorkoutSection && (
-          <Box>
-            <Typography variant="h6" gutterBottom sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: 1,
-              mb: !isRunningExercise && !showTimeTip ? 1 : undefined
-            }}>
-              <AccessTime color="primary" />
-              {isRunningExercise ? "Tiempo" : "Tiempo de la Serie"}
-              {!isRunningExercise && (
-                <IconButton
-                  size="small"
-                  onClick={() => setShowTimeTip(!showTimeTip)}
-                  sx={{ 
-                    ml: 'auto',
-                    color: 'primary.main',
-                    '&:hover': {
-                      backgroundColor: 'rgba(25, 118, 210, 0.04)'
-                    }
-                  }}
-                >
-                  {showTimeTip ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                </IconButton>
-              )}
+        {/* Tiempo de Serie */}
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: showTimeTip ? 1 : 0 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+              Tiempo de Serie
             </Typography>
-            
-            {/* Ocultar tips para Running */}
-            {!isRunningExercise && showTimeTip && (
-              <Alert 
-                severity="info" 
-                icon={false}
-                sx={{ 
-                  mb: 3, 
-                  borderRadius: 2,
-                  bgcolor: 'rgba(33, 150, 243, 0.04)',
-                  border: '1px solid rgba(33, 150, 243, 0.2)',
-                  p: 2, // Reducir padding del contenedor
-                  '& .MuiAlert-message': {
-                    width: '100%',
-                    textAlign: 'left'
-                  }
-                }}
-              >
-                <Typography variant="caption" sx={{ 
-                  fontWeight: 600, 
-                  color: 'primary.main', 
-                  mb: 1, 
-                  textAlign: 'left', 
-                  fontSize: '0.8rem',
-                  display: 'block'
-                }}>
-                  💡 Tips para maximizar resultados
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ 
-                  lineHeight: 1.6, 
-                  width: '100%', 
-                  textAlign: 'left', 
-                  fontSize: '0.75rem',
-                  display: 'block',
-                  mb: 1
-                }}>
-                  <strong>Más tiempo bajo tensión = más ganancia muscular.</strong> Este registro te va a permitir mejorar la técnica y comparar tu progreso.
-                </Typography>
-                <Box sx={{ 
-                  display: 'flex', 
-                  gap: 0.8, 
-                  mt: 1, 
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  '& > div': {
-                    bgcolor: 'rgba(255,255,255,0.8)',
-                    px: 0.8,
-                    py: 0.6,
-                    borderRadius: 1,
-                    border: '1px solid rgba(33, 150, 243, 0.1)',
-                    textAlign: 'center',
-                    flex: 1,
-                    minWidth: 0
-                  }
-                }}>
-                  <Box>
-                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
-                      Fuerza:
-                    </Typography>
-                    <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
-                      20-40s
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
-                      Hipertrofia:
-                    </Typography>
-                    <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
-                      40-60s
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', display: 'block', fontSize: '0.7rem' }}>
-                      Resistencia:
-                    </Typography>
-                    <Typography variant="caption" sx={{ fontWeight: 500, color: 'warning.main', display: 'block', mt: 0.3, fontSize: '0.65rem' }}>
-                      60s+
-                    </Typography>
-                  </Box>
-                </Box>
-              </Alert>
-            )}
-
-            {/* Cronómetro */}
-            <Box sx={{ 
-              width: '100%',
-              mt: !isRunningExercise && !showTimeTip ? 2 : 0
-            }}>
-              <TimerComponent 
-                onTimeComplete={handleTimerComplete} 
-                onTimeUpdate={handleTimerUpdate}
-                disabled={isLoading} 
-              />
-            </Box>
+            <IconButton
+              size="small"
+              onClick={() => setShowTimeTip(!showTimeTip)}
+              sx={{ 
+                color: 'primary.main',
+                transform: showTimeTip ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 0.2s ease'
+              }}
+            >
+              <KeyboardArrowDown />
+            </IconButton>
           </Box>
-        )}
+          
+          {showTimeTip && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                <strong>💡 Tip:</strong> Usa el cronómetro para medir el tiempo de descanso entre series. 
+                El tiempo se guardará automáticamente cuando envíes el formulario.
+              </Typography>
+            </Alert>
+          )}
+          
+          <TimerComponent 
+            onTimeComplete={(seconds) => setValue('seconds', seconds)}
+            onTimeUpdate={(seconds, isRunning) => {
+              setCurrentTimerTime(seconds)
+              setIsTimerRunning(isRunning)
+            }}
+            disabled={isLoading}
+          />
+        </Box>
 
+        {/* Observaciones */}
         <TextField
-          label="Observaciones"
+          label="Observaciones (opcional)"
           multiline
-          minRows={2}
+          rows={3}
           disabled={isLoading}
+          error={Boolean(errors.observations)}
           {...register('observations')}
           sx={{
             '& .MuiInputLabel-root': {
-              backgroundColor: 'white',
-              px: 1,
-              zIndex: 1
-            },
-            '& .MuiInputLabel-shrink': {
-              backgroundColor: 'white',
-              px: 1,
-              zIndex: 1
+              color: 'primary.main'
             }
           }}
         />
 
-        <Button 
-          type="submit" 
-          variant="contained" 
+        {/* Botón de envío */}
+        <Button
+          type="submit"
+          variant="contained"
           size="large"
-          disabled={isLoading}
-          startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
-          sx={{ 
-            mt: 2, 
-            px: 4,
+          disabled={isLoading || isLoadingExercises}
+          startIcon={<FitnessCenterIcon />}
+          sx={{
             py: 1.5,
-            borderRadius: 1.5,
-            fontSize: '1.1rem',
             fontWeight: 600,
+            fontSize: '1.1rem',
             textTransform: 'none',
-            minWidth: 140,
-            backgroundColor: '#1976d2',
+            borderRadius: 2,
             boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
             '&:hover': {
-              backgroundColor: '#1565c0',
-              boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)',
-              transform: 'translateY(-1px)'
-            },
-            '&:disabled': {
-              backgroundColor: '#e0e0e0',
-              color: '#9e9e9e',
-              boxShadow: 'none',
-              transform: 'none'
-            },
-            transition: 'all 0.2s ease-in-out'
+              boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)'
+            }
           }}
         >
           {isLoading ? 'Guardando...' : 'Guardar Entrenamiento'}
         </Button>
       </Stack>
-    </form>
+      </form>
 
-    {/* Notificación de éxito */}
-    <Snackbar
-      open={showSuccess}
-      autoHideDuration={3000}
-      onClose={() => setShowSuccess(false)}
-      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      sx={{ 
-        mt: 6,
-        width: { xs: '95%', sm: '90%', md: '70%' },
-        left: '50%',
-        transform: 'translateX(-50%)'
-      }}
-    >
-              <Alert 
+      {/* Mensaje de éxito */}
+      {showSuccess && (
+        <Alert 
           severity="success" 
-          sx={{ 
-            width: '100%',
-            minWidth: '300px',
-            fontSize: '0.95rem',
-            fontWeight: 500,
-            backgroundColor: '#e8f5e8',
-            color: '#2e7d32',
-            border: '1px solid #4caf50',
-            '& .MuiAlert-icon': {
-              color: '#2e7d32'
-            }
-          }}
+          sx={{ mt: 2 }}
+          onClose={() => setShowSuccess(false)}
         >
-          ✅ Serie de entrenamiento guardada exitosamente
+          ¡Entrenamiento guardado exitosamente! 🎉
         </Alert>
-    </Snackbar>
+      )}
 
-    <Snackbar
-      open={!!errorMessage}
-      autoHideDuration={4000}
-      onClose={() => setErrorMessage('')}
-      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      sx={{ 
-        mt: 6,
-        width: { xs: '95%', sm: '90%', md: '70%' },
-        left: '50%',
-        transform: 'translateX(-50%)'
-      }}
-    >
-              <Alert 
+      {/* Mensaje de error */}
+      {errorMessage && (
+        <Alert 
           severity="error" 
-          sx={{ 
-            width: '100%',
-            minWidth: '300px',
-            fontSize: '0.95rem',
-            fontWeight: 500,
-            backgroundColor: '#ffebee',
-            color: '#c62828',
-            border: '1px solid #f44336',
-            '& .MuiAlert-icon': {
-              color: '#c62828'
-            }
-          }}
+          sx={{ mt: 2 }}
+          onClose={() => setErrorMessage('')}
         >
-          ❌ {errorMessage}
+          {errorMessage}
         </Alert>
-    </Snackbar>
-
+      )}
     </Box>
-
-    {/* Loader para cuando están cargando los ejercicios */}
-    <Backdrop
-      sx={{
-        color: 'primary.main',
-        zIndex: (theme) => theme.zIndex.modal + 1,
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(4px)',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}
-      open={isLoadingExercises}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 2
-        }}
-      >
-        <CircularProgress size={48} thickness={4} />
-        <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
-          Cargando...
-        </Typography>
-      </Box>
-    </Backdrop>
-    </>
   )
 }
 
