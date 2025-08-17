@@ -137,10 +137,21 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
   }
 
   // Filtrar rutinas por nombre o descripción
-  const filteredRoutines = routines.filter(routine =>
-    routine.name.toLowerCase().includes(filterText.toLowerCase()) ||
-    (routine.description && routine.description.toLowerCase().includes(filterText.toLowerCase()))
-  )
+  const filteredRoutines = routines
+    .filter(routine =>
+      routine.name.toLowerCase().includes(filterText.toLowerCase()) ||
+      (routine.description && routine.description.toLowerCase().includes(filterText.toLowerCase()))
+    )
+    .sort((a, b) => {
+      // La rutina activa siempre va primero
+      if (activeRoutine?.id === a.id) return -1
+      if (activeRoutine?.id === b.id) return 1
+      
+      // Luego ordenar por fecha de creación (más recientes primero)
+      const dateA = new Date(a.created_at).getTime()
+      const dateB = new Date(b.created_at).getTime()
+      return dateB - dateA
+    })
 
   const handleDeleteRoutine = async (id: number) => {
     try {
@@ -474,19 +485,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   })}
                 </Typography>
 
-                {routine.description && (
-                  <Typography 
-                    variant="body1" 
-                    color="text.secondary" 
-                    sx={{ 
-                      mb: 2,
-                      fontStyle: 'italic',
-                      lineHeight: 1.5
-                    }}
-                  >
-                    {routine.description}
-                  </Typography>
-                )}
+
 
 
               </CardContent>

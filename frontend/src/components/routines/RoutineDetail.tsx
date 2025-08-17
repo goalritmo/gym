@@ -152,7 +152,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   variant="body1" 
                   color="text.secondary" 
                   sx={{ 
-                    mb: 2,
+                    mt: 1,
                     fontStyle: 'italic',
                     fontSize: '1.1rem'
                   }}
@@ -544,8 +544,20 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       </Card>
 
       <Box display="flex" justifyContent={isRoutineComplete ? "center" : "space-between"} sx={{ mt: 3 }}>
-        <Button variant="outlined" onClick={onClose}>
-          Cerrar
+        <Button 
+          variant={isRoutineComplete ? "contained" : "outlined"} 
+          onClick={onClose}
+          sx={{
+            backgroundColor: isRoutineComplete ? 'success.main' : 'transparent',
+            color: isRoutineComplete ? 'white' : 'primary.main',
+            borderColor: isRoutineComplete ? 'success.main' : 'primary.main',
+            '&:hover': {
+              backgroundColor: isRoutineComplete ? 'success.dark' : 'primary.light',
+              color: isRoutineComplete ? 'white' : 'white'
+            }
+          }}
+        >
+          {isRoutineComplete ? 'Aceptar' : 'Cerrar'}
         </Button>
         {!isRoutineComplete && onStart && (
           <Button

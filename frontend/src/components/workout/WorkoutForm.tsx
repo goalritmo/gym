@@ -295,7 +295,19 @@ export default function WorkoutForm({
 
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, textAlign: 'left' }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontWeight: 600, 
+                textAlign: 'left',
+                cursor: 'pointer',
+                '&:hover': {
+                  opacity: 0.8,
+                  textDecoration: 'underline'
+                }
+              }}
+              onClick={onNavigateToRoutines}
+            >
               🏋️ {isRoutinePaused ? 'A la espera' : activeRoutine.name}
             </Typography>
             
