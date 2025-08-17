@@ -354,53 +354,55 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 </Box>
               )}
               
-              {/* Botón play/stop en esquina inferior derecha */}
-              <IconButton
-                size="small"
-                onClick={async () => {
-                  if (activeRoutine?.id === routine.id) {
-                    // Detener la rutina activa
-                    const event = new CustomEvent('stopRoutine', { 
-                      detail: { routine: routine } 
-                    })
-                    window.dispatchEvent(event)
-                  } else {
-                    // Obtener la rutina completa, abrir el modal E iniciar la rutina
-                    try {
-                      const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
-                      setSelectedRoutine(fullRoutine)
-                      setOpenDetailDialog(true)
-                      
-                      // Iniciar la rutina automáticamente sin cambiar de tab
-                      const event = new CustomEvent('startRoutineFromModal', { 
-                        detail: { routine: fullRoutine } 
+              {/* Botón play/stop en esquina inferior derecha - se oculta cuando está completa */}
+              {!isRoutineComplete(routine) && (
+                <IconButton
+                  size="small"
+                  onClick={async () => {
+                    if (activeRoutine?.id === routine.id) {
+                      // Detener la rutina activa
+                      const event = new CustomEvent('stopRoutine', { 
+                        detail: { routine: routine } 
                       })
                       window.dispatchEvent(event)
-                    } catch (error) {
-                      console.error('Error obteniendo detalles de la rutina:', error)
-                      setError('Error al cargar los detalles de la rutina')
+                    } else {
+                      // Obtener la rutina completa, abrir el modal E iniciar la rutina
+                      try {
+                        const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
+                        setSelectedRoutine(fullRoutine)
+                        setOpenDetailDialog(true)
+                        
+                        // Iniciar la rutina automáticamente sin cambiar de tab
+                        const event = new CustomEvent('startRoutineFromModal', { 
+                          detail: { routine: fullRoutine } 
+                        })
+                        window.dispatchEvent(event)
+                      } catch (error) {
+                        console.error('Error obteniendo detalles de la rutina:', error)
+                        setError('Error al cargar los detalles de la rutina')
+                      }
                     }
-                  }
-                }}
-                sx={{ 
-                  position: 'absolute',
-                  bottom: 16,
-                  right: 16,
-                  color: 'white',
-                  backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
-                  '&:hover': {
-                    backgroundColor: isRoutineComplete(routine) ? 'success.light' : (activeRoutine?.id === routine.id ? 'warning.light' : 'primary.light'),
-                    color: 'white'
-                  },
-                  '&:focus': {
-                    outline: 'none'
-                  },
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                  zIndex: 1
-                }}
-              >
-                {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
-              </IconButton>
+                  }}
+                  sx={{ 
+                    position: 'absolute',
+                    bottom: 16,
+                    right: 16,
+                    color: 'white',
+                    backgroundColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
+                    '&:hover': {
+                      backgroundColor: activeRoutine?.id === routine.id ? 'warning.light' : 'primary.light',
+                      color: 'white'
+                    },
+                    '&:focus': {
+                      outline: 'none'
+                    },
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    zIndex: 1
+                  }}
+                >
+                  {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
+                </IconButton>
+              )}
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ 
                   display: 'flex', 

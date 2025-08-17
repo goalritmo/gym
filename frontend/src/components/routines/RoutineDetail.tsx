@@ -18,7 +18,8 @@ import {
   PlayArrow as PlayIcon,
   Stop as StopIcon,
   Notes as NotesIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  Close as CloseIcon
 } from '@mui/icons-material'
 import type { RoutineWithExercises } from '../../types/routine'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
@@ -126,18 +127,36 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             gap: 2
           }}>
             <Box sx={{ flex: 1 }}>
-              <Typography 
-                variant="h4" 
-                component="h2" 
-                sx={{ 
-                  fontWeight: 800, 
-                  mb: 1,
-                  color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
-                  textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                }}
-              >
-                {routine.name}
-              </Typography>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'flex-start',
+                mb: 1
+              }}>
+                <Typography 
+                  variant="h4" 
+                  component="h2" 
+                  sx={{ 
+                    fontWeight: 800,
+                    color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
+                    textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  {routine.name}
+                </Typography>
+                <IconButton
+                  onClick={onClose}
+                  sx={{
+                    color: 'text.secondary',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0,0,0,0.04)',
+                      color: 'text.primary'
+                    }
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Box>
               {routine.description && (
                 <Typography 
                   variant="body1" 
@@ -166,14 +185,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 />
                 <Chip
                   label={`${getTotalSets()} ${getTotalSets() === 1 ? 'serie' : 'series'}`}
-                  color={isActiveRoutine ? "warning" : "primary"}
+                  color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
                   variant="filled"
                   size="medium"
                   sx={{ fontWeight: 700 }}
                 />
                 <Chip
                   label={`${getTotalReps()} ${getTotalReps() === 1 ? 'rep' : 'reps'}`}
-                  color={isActiveRoutine ? "warning" : "primary"}
+                  color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
                   variant="filled"
                   size="medium"
                   sx={{ fontWeight: 700 }}
@@ -186,7 +205,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               gap: 1,
               flexShrink: 0
             }}>
-          {onDelete && !isActiveRoutine && (
+          {onDelete && (!isActiveRoutine || isRoutineComplete) && (
             <Tooltip title="Eliminar rutina">
               <IconButton
                 color="error"
@@ -204,7 +223,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               </IconButton>
             </Tooltip>
           )}
-          {onEdit && !isActiveRoutine && (
+          {onEdit && (!isActiveRoutine || isRoutineComplete) && (
             <Tooltip title="Editar rutina">
               <IconButton
                 color="primary"
@@ -214,7 +233,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               </IconButton>
             </Tooltip>
           )}
-          {onStart && (
+          {onStart && !isRoutineComplete && (
             <Tooltip title={isActiveRoutine ? "Rutina en progreso" : "Comenzar rutina"}>
               <IconButton
                 color={isActiveRoutine ? "warning" : "primary"}
@@ -250,7 +269,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
               Progreso de la rutina
             </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: isActiveRoutine ? 'warning.main' : 'text.secondary' }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary') }}>
               {realRoutineProgress}%
             </Typography>
           </Box>
@@ -263,7 +282,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               backgroundColor: 'grey.200',
               '& .MuiLinearProgress-bar': {
                 borderRadius: 4,
-                backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main'
+                backgroundColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main')
               }
             }}
           />
@@ -325,12 +344,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                           }
                         }}
                         sx={{
-                          color: 'warning.main',
+                          color: isRoutineComplete ? 'success.main' : 'warning.main',
                           '&.Mui-checked': {
-                            color: 'warning.main',
+                            color: isRoutineComplete ? 'success.main' : 'warning.main',
                           },
                           '&.Mui-disabled': {
-                            color: isSetCompleted ? 'warning.main' : 'grey.400',
+                            color: isSetCompleted ? (isRoutineComplete ? 'success.main' : 'warning.main') : 'grey.400',
                           },
                           p: 0.5
                         }}
@@ -364,7 +383,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     <Chip
                       label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
                       size="small"
-                      color={isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default")}
+                      color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
                       variant="filled"
                       sx={{ 
                         fontWeight: 600,
@@ -375,7 +394,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     <Chip
                       label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
                       size="small"
-                      color={isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default")}
+                      color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
                       variant="filled"
                       sx={{ 
                         fontWeight: 600,
@@ -387,7 +406,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       <Chip
                         label={`${exercise.weight} kg`}
                         size="small"
-                        color={isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default")}
+                        color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
                         variant="filled"
                         sx={{ 
                           fontWeight: 600,
@@ -399,7 +418,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     <Chip
                       label={`${formatTime(exercise.rest_time_seconds)} descanso`}
                       size="small"
-                      color={isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default")}
+                      color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
                       variant="filled"
                       icon={<TimerIcon />}
                       sx={{ 
@@ -544,7 +563,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         </CardContent>
       </Card>
 
-      <Box display="flex" justifyContent="space-between" sx={{ mt: 3 }}>
+      <Box display="flex" justifyContent={isRoutineComplete ? "center" : "space-between"} sx={{ mt: 3 }}>
         <Button variant="outlined" onClick={onClose}>
           Cerrar
         </Button>
