@@ -147,7 +147,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     flex: 1
                   }}
                 >
-                  🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
+                  🏋️ {routine.name.length > 24 ? `${routine.name.substring(0, 24)}...` : routine.name}
                 </Typography>
                 
                 <Chip

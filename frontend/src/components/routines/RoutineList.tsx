@@ -445,7 +445,8 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   display: 'flex', 
                   alignItems: 'center', 
                   gap: 1,
-                  mb: 2
+                  mb: 2,
+                  justifyContent: 'flex-start'
                 }}>
                   <Typography 
                     variant="h5" 
@@ -458,7 +459,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
-                      flex: 1,
+                      textAlign: 'left',
                       '&:hover': {
                         textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
                       }
@@ -473,6 +474,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       onClick={() => handleEditNameClick(routine)}
                       sx={{ 
                         color: isRoutineComplete(routine) ? 'success.main' : 'primary.main',
+                        flexShrink: 0,
                         '&:hover': {
                           backgroundColor: isRoutineComplete(routine) ? 'success.light' : 'primary.light',
                           color: 'white'

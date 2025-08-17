@@ -460,31 +460,51 @@ export default function WorkoutForm({
                       </Box>
                       
                       <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                          {exercise.sets} {exercise.sets === 1 ? 'serie' : 'series'}
-                        </Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>
+                            {exercise.sets}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
+                            {exercise.sets === 1 ? 'serie' : 'series'}
+                          </Typography>
+                        </Box>
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
                           •
                         </Typography>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                          {exercise.reps} {exercise.reps === 1 ? 'rep' : 'reps'}
-                        </Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>
+                            {exercise.reps}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
+                            {exercise.reps === 1 ? 'rep' : 'reps'}
+                          </Typography>
+                        </Box>
                         {exercise.weight && (
                           <>
                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
                               •
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                              {exercise.weight}kg
-                            </Typography>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>
+                                {exercise.weight}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
+                                kg
+                              </Typography>
+                            </Box>
                           </>
                         )}
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
                           •
                         </Typography>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                          {Math.floor(exercise.rest_time_seconds / 60)}:{(exercise.rest_time_seconds % 60).toString().padStart(2, '0')} descanso
-                        </Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>
+                            {Math.floor(exercise.rest_time_seconds / 60)}:{(exercise.rest_time_seconds % 60).toString().padStart(2, '0')}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.65rem', lineHeight: 1 }}>
+                            descanso
+                          </Typography>
+                        </Box>
                       </Box>
                       
                                               <Button
