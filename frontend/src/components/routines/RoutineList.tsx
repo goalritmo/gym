@@ -72,7 +72,9 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     try {
       setLoading(true)
       setError(null)
+      console.log('📡 Llamando a getUserRoutines...')
       const data = await apiClient.getUserRoutines()
+      console.log('📡 Respuesta de getUserRoutines:', data)
       
       // Validar que data sea un array
       if (Array.isArray(data)) {
@@ -126,12 +128,16 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
   const handleEditRoutine = async (id: number, routineData: Partial<CreateRoutineRequest>): Promise<void> => {
     try {
-      await apiClient.updateUserRoutine(id, routineData)
+      console.log('🔄 Actualizando rutina:', id, routineData)
+      const result = await apiClient.updateUserRoutine(id, routineData)
+      console.log('✅ Rutina actualizada exitosamente:', result)
       setOpenEditDialog(false)
       setSelectedRoutine(null)
-      loadRoutines()
+      console.log('🔄 Recargando rutinas después de actualizar...')
+      await loadRoutines()
+      console.log('✅ Rutinas recargadas')
     } catch (err) {
-      console.error('Error actualizando rutina:', err)
+      console.error('❌ Error actualizando rutina:', err)
       setError('Error al actualizar la rutina')
     }
   }

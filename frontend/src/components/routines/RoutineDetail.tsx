@@ -342,7 +342,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       {exercise.exercise_name}
                     </Typography>
                     
-                    {/* Chips de información */}
+                    {/* Chips de información y notas */}
                     <Box sx={{ 
                       display: 'flex', 
                       gap: 1, 
@@ -352,7 +352,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       <Chip
                         label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
                         size="small"
-                        color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
+                        color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "warning" : "default"))}
                         variant="filled"
                         sx={{ 
                           fontWeight: 600,
@@ -363,7 +363,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       <Chip
                         label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
                         size="small"
-                        color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
+                        color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "warning" : "default"))}
                         variant="filled"
                         sx={{ 
                           fontWeight: 600,
@@ -396,38 +396,39 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                           color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
                         }}
                       />
+                      
+                      {/* Notas del ejercicio */}
+                      {exercise.notes && (
+                        <Box sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: 0.5,
+                          px: 1.5,
+                          py: 0.5,
+                          backgroundColor: 'grey.100',
+                          borderRadius: '12px',
+                          border: '1px solid',
+                          borderColor: 'grey.300'
+                        }}>
+                          <NotesIcon sx={{ 
+                            color: 'text.secondary', 
+                            fontSize: 16
+                          }} />
+                          <Typography 
+                            variant="caption" 
+                            color="text.secondary"
+                            sx={{ fontStyle: 'italic', fontSize: '0.75rem' }}
+                          >
+                            {exercise.notes}
+                          </Typography>
+                        </Box>
+                      )}
                     </Box>
                   </Box>
                 </Box>
               </Box>
 
-              {/* Notas del ejercicio */}
-              {exercise.notes && (
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'flex-start', 
-                  gap: 1,
-                  mt: 2,
-                  p: 2,
-                  backgroundColor: 'grey.50',
-                  borderRadius: '8px',
-                  border: '1px solid',
-                  borderColor: 'grey.200'
-                }}>
-                  <NotesIcon sx={{ 
-                    color: 'text.secondary', 
-                    fontSize: 20,
-                    mt: 0.25
-                  }} />
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary"
-                    sx={{ fontStyle: 'italic' }}
-                  >
-                    {exercise.notes}
-                  </Typography>
-                </Box>
-              )}
+
             </CardContent>
           </Card>
             )
@@ -494,7 +495,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               {getCompletedExercises()}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-              🏋️ {(getCompletedExercises() === 1 ? 'Ejercicio' : 'Ejercicios')} completados
+              🏋️ {(getCompletedExercises() === 1 ? 'Ejercicio' : 'Ejercicios')}
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+              completados
             </Typography>
             </Box>
             <Box sx={{ 
