@@ -99,7 +99,6 @@ export default function WorkoutForm({
   // Estado para trackear el tiempo del cronómetro
   const [currentTimerTime, setCurrentTimerTime] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [isTimerCaptured, setIsTimerCaptured] = useState(false)
   const [showTimeTip, setShowTimeTip] = useState(false)
   const [timerMode, setTimerMode] = useState<'rest' | 'series'>('rest') // 'rest' = descanso, 'series' = serie
   
@@ -127,6 +126,9 @@ export default function WorkoutForm({
   const selectedExerciseId = watch('exercise_id')
   
   const isRunningExercise = selectedExerciseId === 18
+  
+  // Forzar modo "Entrenando..." cuando el ejercicio es Running
+  const effectiveTimerMode = isRunningExercise ? 'series' : timerMode
   
   // Detectar ejercicios de peso corporal usando el campo bodyweight del ejercicio
   const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId)
@@ -226,9 +228,12 @@ export default function WorkoutForm({
 
   const submit = handleSubmit(async (data: WorkoutFormData) => {
     try {
-      // Si el cronómetro está corriendo, usar el tiempo actual del cronómetro
-      if (isTimerRunning && currentTimerTime > 0) {
+      // Solo usar el tiempo del cronómetro si está en modo "Entrenando..." (series)
+      if (effectiveTimerMode === 'series' && isTimerRunning && currentTimerTime > 0) {
         data.seconds = currentTimerTime
+      } else if (effectiveTimerMode === 'rest') {
+        // En modo "Descansando...", los segundos deben ser 0
+        data.seconds = 0
       }
       
       // Crear objeto de datos sin el campo weight si está vacío
@@ -680,47 +685,49 @@ export default function WorkoutForm({
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: showTimeTip ? 1 : 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <AccessTimeIcon sx={{ 
-                color: isTimerCaptured ? 'success.main' : (timerMode === 'series' ? 'warning.main' : 'primary.main'), 
+                color: effectiveTimerMode === 'series' ? 'warning.main' : 'primary.main', 
                 fontSize: 20 
               }} />
               <Typography variant="h6" sx={{ 
                 fontWeight: 600, 
-                color: isTimerCaptured ? 'success.main' : (timerMode === 'series' ? 'warning.main' : 'primary.main') 
+                color: effectiveTimerMode === 'series' ? 'warning.main' : 'primary.main' 
               }}>
-                {timerMode === 'series' ? 'Entrenando...' : 'Descansando...'}
+                {effectiveTimerMode === 'series' ? 'Entrenando...' : 'Descansando...'}
               </Typography>
             </Box>
             
-            <Switch
-              checked={timerMode === 'series'}
-              onChange={(e) => {
-                const newMode = e.target.checked ? 'series' : 'rest'
-                setTimerMode(newMode)
-                setShowTimeTip(false)
-                // Resetear el cronómetro completamente
-                setCurrentTimerTime(0)
-                setIsTimerRunning(false)
-                // Resetear el campo del formulario
-                setValue('seconds', '')
-              }}
-              sx={{
-                '& .MuiSwitch-switchBase': {
-                  color: 'grey.400',
-                  '&.Mui-checked': {
+            {!isRunningExercise && (
+              <Switch
+                checked={timerMode === 'series'}
+                onChange={(e) => {
+                  const newMode = e.target.checked ? 'series' : 'rest'
+                  setTimerMode(newMode)
+                  setShowTimeTip(false)
+                  // Resetear el cronómetro completamente
+                  setCurrentTimerTime(0)
+                  setIsTimerRunning(false)
+                  // Resetear el campo del formulario
+                  setValue('seconds', '')
+                }}
+                sx={{
+                  '& .MuiSwitch-switchBase': {
                     color: 'grey.400',
+                    '&.Mui-checked': {
+                      color: 'grey.400',
+                    },
+                    '&.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: 'grey.400',
+                    },
                   },
-                  '&.Mui-checked + .MuiSwitch-track': {
+                  '& .MuiSwitch-track': {
                     backgroundColor: 'grey.400',
                   },
-                },
-                '& .MuiSwitch-track': {
-                  backgroundColor: 'grey.400',
-                },
-              }}
-            />
+                }}
+              />
+            )}
           </Box>
           
-          {showTimeTip && timerMode === 'series' && (
+          {showTimeTip && effectiveTimerMode === 'series' && (
             <Alert severity="info" sx={{ mb: 2 }}>
               <Typography variant="body2" sx={{ textAlign: 'left' }}>
                 <strong>💡 Tip:</strong> Usa el cronómetro para medir el tiempo de descanso entre series. 
@@ -735,9 +742,9 @@ export default function WorkoutForm({
               setCurrentTimerTime(seconds)
               setIsTimerRunning(isRunning)
             }}
-            onCapturedChange={(isCaptured) => setIsTimerCaptured(isCaptured)}
+
             disabled={isLoading}
-            timerMode={timerMode}
+            timerMode={effectiveTimerMode}
             onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
           />
         </Box>

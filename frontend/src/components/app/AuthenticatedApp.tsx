@@ -412,6 +412,11 @@ function AuthenticatedAppContent() {
     }
   }, [])
 
+  // Función para navegar a la tab de rutinas
+  const handleNavigateToRoutines = () => {
+    setActiveTab(TABS.ROUTINES)
+  }
+
   // Función para manejar el envío del formulario de workout
   const handleWorkoutSubmit = async (data: any): Promise<void> => {
     setIsSubmittingWorkout(true)
@@ -527,6 +532,7 @@ function AuthenticatedAppContent() {
               isRoutinePaused={isRoutinePaused}
               onStopRoutine={handleStopRoutine}
               preloadedExercise={preloadedExercise}
+              onNavigateToRoutines={handleNavigateToRoutines}
             />
           </Box>
         )}

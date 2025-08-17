@@ -165,20 +165,6 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   size="medium"
                   sx={{ fontWeight: 700 }}
                 />
-                <Chip
-                  label={`${getTotalSets()} ${getTotalSets() === 1 ? 'serie' : 'series'}`}
-                  color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
-                  variant="filled"
-                  size="medium"
-                  sx={{ fontWeight: 700 }}
-                />
-                <Chip
-                  label={`${getTotalReps()} ${getTotalReps() === 1 ? 'rep' : 'reps'}`}
-                  color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
-                  variant="filled"
-                  size="medium"
-                  sx={{ fontWeight: 700 }}
-                />
               </Box>
             </Box>
             
@@ -541,7 +527,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 {getCompletedReps()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🔄 {(getCompletedReps() === 1 ? 'Rep' : 'Reps')} completadas
+                🔄 {(getCompletedReps() === 1 ? 'Rep' : 'Reps')}
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                completadas
               </Typography>
             </Box>
           </Box>
