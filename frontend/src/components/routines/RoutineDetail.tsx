@@ -202,20 +202,16 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 )}
               </Box>
               {onStart && !isRoutineComplete && (
-                <Tooltip title={isActiveRoutine ? "Rutina en progreso" : "Comenzar rutina"}>
+                <Tooltip title={isActiveRoutine ? "Parar rutina" : "Comenzar rutina"}>
                   <IconButton
                     color={isActiveRoutine ? "warning" : "primary"}
                     onClick={onStart}
-                    disabled={isActiveRoutine}
                     sx={{ 
                       backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',
                       color: 'white',
+                      cursor: 'pointer',
                       '&:hover': {
                         backgroundColor: isActiveRoutine ? 'warning.dark' : 'primary.dark'
-                      },
-                      '&.Mui-disabled': {
-                        backgroundColor: 'warning.main',
-                        color: 'white'
                       }
                     }}
                   >
@@ -276,7 +272,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   transition: 'all 0.3s ease',
                   cursor: isActiveRoutine ? 'pointer' : 'default',
                   '&:hover': {
-                    borderColor: isCompleted ? 'success.dark' : (isActiveRoutine ? 'primary.main' : 'grey.300'),
+                    borderColor: isCompleted ? 'success.dark' : (isActiveRoutine ? 'warning.main' : 'grey.300'),
                     boxShadow: isActiveRoutine ? '0 8px 25px rgba(0,0,0,0.15)' : 'none',
                     transform: isActiveRoutine ? 'translateY(-2px)' : 'none'
                   }
