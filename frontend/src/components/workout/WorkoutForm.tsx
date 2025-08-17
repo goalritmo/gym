@@ -99,6 +99,7 @@ export default function WorkoutForm({
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [showTimeTip, setShowTimeTip] = useState(false)
   const [timerMode, setTimerMode] = useState<'rest' | 'series'>('rest') // 'rest' = descanso, 'series' = serie
+  const [timerResetKey, setTimerResetKey] = useState(0)
   
   // Estado para controlar la expansión de la box de rutina
   const [showRoutineExercises, setShowRoutineExercises] = useState(false)
@@ -646,9 +647,27 @@ export default function WorkoutForm({
                 const newMode = e.target.checked ? 'series' : 'rest'
                 setTimerMode(newMode)
                 setShowTimeTip(false)
-                // Resetear el cronómetro
+                // Resetear el cronómetro completamente
                 setCurrentTimerTime(0)
                 setIsTimerRunning(false)
+                // Resetear el campo del formulario
+                setValue('seconds', '')
+                // Incrementar resetKey para forzar el reset del TimerComponent
+                setTimerResetKey(prev => prev + 1)
+              }}
+              sx={{
+                '& .MuiSwitch-switchBase': {
+                  color: 'grey.400',
+                  '&.Mui-checked': {
+                    color: 'grey.400',
+                  },
+                  '&.Mui-checked + .MuiSwitch-track': {
+                    backgroundColor: 'grey.400',
+                  },
+                },
+                '& .MuiSwitch-track': {
+                  backgroundColor: 'grey.400',
+                },
               }}
             />
           </Box>
@@ -672,6 +691,7 @@ export default function WorkoutForm({
             autoStart={timerMode === 'rest'}
             timerMode={timerMode}
             onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
+            resetKey={timerResetKey}
           />
         </Box>
 

@@ -8,6 +8,7 @@ type TimerComponentProps = {
   autoStart?: boolean
   timerMode?: 'rest' | 'series'
   onTimerModeChange?: (mode: 'rest' | 'series') => void
+  resetKey?: number
 }
 
 export default function TimerComponent({ 
@@ -16,12 +17,24 @@ export default function TimerComponent({
   disabled = false,
   autoStart = false,
   timerMode = 'rest',
-  onTimerModeChange
+  onTimerModeChange,
+  resetKey = 0
 }: TimerComponentProps) {
   const [time, setTime] = useState(0)
   const [isRunning, setIsRunning] = useState(autoStart)
   const [isCaptured, setIsCaptured] = useState(false)
   const intervalRef = useRef<number | null>(null)
+
+  // Resetear el cronómetro cuando cambie el resetKey
+  useEffect(() => {
+    setTime(0)
+    setIsRunning(false)
+    setIsCaptured(false)
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }, [resetKey])
 
   useEffect(() => {
     if (isRunning) {
@@ -122,9 +135,9 @@ export default function TimerComponent({
           borderRadius: 1.5,
           fontSize: '1.1rem',
           fontWeight: 'bold',
-          backgroundColor: isCaptured ? 'success.main' : (timerMode === 'rest' ? 'warning.main' : 'warning.main'),
+          backgroundColor: isCaptured ? 'success.main' : (timerMode === 'rest' ? 'primary.main' : 'warning.main'),
           '&:hover': {
-            backgroundColor: isCaptured ? 'success.dark' : (timerMode === 'rest' ? 'warning.dark' : 'warning.dark')
+            backgroundColor: isCaptured ? 'success.dark' : (timerMode === 'rest' ? 'primary.dark' : 'warning.dark')
           }
         }}
       >
