@@ -26,7 +26,7 @@ import {
   FitnessCenter as FitnessCenterIcon,
   KeyboardArrowDown,
   KeyboardArrowUp,
-  Close as CloseIcon
+  Stop as StopIcon
 } from '@mui/icons-material'
 import { useState, useEffect } from 'react'
 
@@ -263,26 +263,27 @@ export default function WorkoutForm({
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           position: 'relative'
         }}>
-          <IconButton
-            size="small"
-            onClick={onStopRoutine}
-            sx={{ 
-              position: 'absolute',
-              top: 8,
-              right: 8,
-              color: 'white',
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255,0.2)'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
+
           
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: 'left' }}>
-            🏋️ {isRoutinePaused ? 'A la espera' : activeRoutine.name}
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, textAlign: 'left' }}>
+              🏋️ {isRoutinePaused ? 'A la espera' : activeRoutine.name}
+            </Typography>
+            
+            <IconButton
+              size="small"
+              onClick={onStopRoutine}
+              sx={{ 
+                color: 'white',
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.2)'
+                }
+              }}
+            >
+              <StopIcon />
+            </IconButton>
+          </Box>
           
           <Box sx={{ 
             width: '100%', 
@@ -310,22 +311,24 @@ export default function WorkoutForm({
             </Typography>
             
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    opacity: 0.8
-                  }
-                }}
-                onClick={() => {
-                  // Expandir/contraer la lista de ejercicios
-                  setShowRoutineExercises(!showRoutineExercises)
-                }}
-              >
-                {isRoutinePaused ? 'Elegir rutina' : 'Ver rutina'}
-              </Typography>
+              {!showRoutineExercises && (
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      opacity: 0.8
+                    }
+                  }}
+                  onClick={() => {
+                    // Expandir/contraer la lista de ejercicios
+                    setShowRoutineExercises(!showRoutineExercises)
+                  }}
+                >
+                  {isRoutinePaused ? 'Elegir rutina' : 'Ver rutina'}
+                </Typography>
+              )}
               
               <IconButton
                 size="small"

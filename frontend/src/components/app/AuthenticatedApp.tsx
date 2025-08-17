@@ -231,6 +231,50 @@ function AuthenticatedAppContent() {
     localStorage.removeItem('activeRoutine')
   }
 
+  // Función para calcular el progreso de la rutina basado en workouts del día
+  const calculateRoutineProgress = async () => {
+    if (!activeRoutine || !activeRoutine.exercises) return 0
+
+    try {
+      const today = new Date().toISOString().split('T')[0]
+      
+      // Obtener workouts del día actual
+      const todayWorkouts = await apiClient.getWorkouts(today) as any[]
+      
+      // Crear un mapa de ejercicios completados
+      const completedExercises = new Map()
+      
+      todayWorkouts.forEach((workout: any) => {
+        const exerciseId = workout.exercise_id
+        if (!completedExercises.has(exerciseId)) {
+          completedExercises.set(exerciseId, 0)
+        }
+        completedExercises.set(exerciseId, completedExercises.get(exerciseId) + 1)
+      })
+      
+      // Calcular progreso basado en series completadas vs total de series
+      let completedSets = 0
+      let totalSets = 0
+      
+      activeRoutine.exercises.forEach((exercise: any) => {
+        const exerciseId = exercise.exercise_id
+        const completedForExercise = completedExercises.get(exerciseId) || 0
+        const targetSets = exercise.sets
+        
+        completedSets += Math.min(completedForExercise, targetSets)
+        totalSets += targetSets
+      })
+      
+      // Calcular porcentaje
+      const progress = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0
+      return Math.min(100, Math.max(0, progress))
+      
+    } catch (error) {
+      console.error('Error calculando progreso de rutina:', error)
+      return 0
+    }
+  }
+
   // Función para obtener el siguiente ejercicio o serie de la rutina
   const getNextExerciseOrSet = (currentExercise: any, currentSet: number) => {
     if (!activeRoutine || !activeRoutine.exercises) return null
@@ -266,29 +310,37 @@ function AuthenticatedAppContent() {
 
   // Cargar rutina activa desde localStorage al iniciar
   useEffect(() => {
-    const savedRoutine = localStorage.getItem('activeRoutine')
-    if (savedRoutine) {
-      try {
-        const parsed = JSON.parse(savedRoutine)
-        const now = Date.now()
-        const timeDiff = now - parsed.timestamp
-        
-        // Solo restaurar si no han pasado más de 24 horas
-        if (timeDiff < 24 * 60 * 60 * 1000) {
-          setActiveRoutine(parsed.routine)
-          setRoutineProgress(parsed.progress || 0)
-          setIsRoutinePaused(parsed.isPaused || false)
-          console.log('Rutina activa restaurada desde localStorage:', parsed.routine.name)
-        } else {
-          // Limpiar si es muy antigua
+    const loadActiveRoutine = async () => {
+      const savedRoutine = localStorage.getItem('activeRoutine')
+      if (savedRoutine) {
+        try {
+          const parsed = JSON.parse(savedRoutine)
+          const now = Date.now()
+          const timeDiff = now - parsed.timestamp
+          
+          // Solo restaurar si no han pasado más de 24 horas
+          if (timeDiff < 24 * 60 * 60 * 1000) {
+            setActiveRoutine(parsed.routine)
+            setIsRoutinePaused(parsed.isPaused || false)
+            
+            // Calcular progreso real basado en workouts del día
+            const realProgress = await calculateRoutineProgress()
+            setRoutineProgress(realProgress)
+            
+            console.log('Rutina activa restaurada desde localStorage:', parsed.routine.name, 'Progreso real:', realProgress + '%')
+          } else {
+            // Limpiar si es muy antigua
+            localStorage.removeItem('activeRoutine')
+            console.log('Rutina activa expirada, limpiando localStorage')
+          }
+        } catch (error) {
+          console.error('Error al restaurar rutina activa:', error)
           localStorage.removeItem('activeRoutine')
-          console.log('Rutina activa expirada, limpiando localStorage')
         }
-      } catch (error) {
-        console.error('Error al restaurar rutina activa:', error)
-        localStorage.removeItem('activeRoutine')
       }
     }
+    
+    loadActiveRoutine()
   }, [])
 
   // Event listener para el inicio de rutinas
@@ -374,8 +426,8 @@ function AuthenticatedAppContent() {
           // Auto-completar con el siguiente ejercicio/serie
           setPreloadedExercise(nextExercise)
           
-          // Actualizar progreso y localStorage
-          const newProgress = Math.min(100, routineProgress + 10) // Incrementar progreso
+          // Calcular progreso real basado en workouts del día
+          const newProgress = await calculateRoutineProgress()
           setRoutineProgress(newProgress)
           
           // Actualizar localStorage
@@ -386,7 +438,7 @@ function AuthenticatedAppContent() {
             timestamp: Date.now()
           }))
           
-          console.log('Auto-completando con siguiente ejercicio/serie:', nextExercise.exercise_name, 'Serie:', nextExercise.currentSet)
+          console.log('Auto-completando con siguiente ejercicio/serie:', nextExercise.exercise_name, 'Serie:', nextExercise.currentSet, 'Progreso:', newProgress + '%')
         } else {
           // La rutina está completa
           console.log('¡Rutina completada!')
