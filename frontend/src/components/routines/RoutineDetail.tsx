@@ -100,6 +100,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       {/* Header de la rutina */}
       <Card 
         elevation={3}
+        onClick={isActiveRoutine && onNavigateToWorkout ? onNavigateToWorkout : undefined}
         sx={{ 
           mb: 3,
           border: '2px solid',
@@ -109,7 +110,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             ? 'linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)'
             : (isActiveRoutine 
               ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
-              : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)')
+              : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'),
+          cursor: isActiveRoutine && onNavigateToWorkout ? 'pointer' : 'default',
+          '&:hover': isActiveRoutine && onNavigateToWorkout ? {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
+          } : {}
         }}
       >
         <CardContent sx={{ p: 3 }}>

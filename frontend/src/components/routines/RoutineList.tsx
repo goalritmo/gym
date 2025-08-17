@@ -125,11 +125,23 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
       console.log('🔄 Actualizando rutina:', id, routineData)
       const result = await apiClient.updateUserRoutine(id, routineData)
       console.log('✅ Rutina actualizada exitosamente:', result)
+      
+      // Actualizar el estado local directamente
+      setRoutines(prevRoutines => 
+        prevRoutines.map(routine => 
+          routine.id === id 
+            ? { 
+                ...routine, 
+                name: routineData.name || routine.name,
+                description: routineData.description || routine.description
+              }
+            : routine
+        )
+      )
+      
       setOpenEditDialog(false)
       setSelectedRoutine(null)
-      console.log('🔄 Recargando rutinas después de actualizar...')
-      await loadRoutines()
-      console.log('✅ Rutinas recargadas')
+      console.log('✅ Estado local actualizado')
     } catch (err) {
       console.error('❌ Error actualizando rutina:', err)
       setError('Error al actualizar la rutina')
@@ -633,6 +645,12 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 const event = new CustomEvent('startRoutineWithExercise', { 
                   detail: { routine: selectedRoutine, exercise: exercise } 
                 })
+                window.dispatchEvent(event)
+              }}
+              onNavigateToWorkout={() => {
+                setOpenDetailDialog(false)
+                // Navegar al registro
+                const event = new CustomEvent('navigateToWorkout', {})
                 window.dispatchEvent(event)
               }}
             />

@@ -397,11 +397,16 @@ function AuthenticatedAppContent() {
       localStorage.removeItem('activeRoutine')
     }
 
+    const handleNavigateToWorkout = (_event: CustomEvent) => {
+      setActiveTab(TABS.WORKOUT)
+    }
+
     window.addEventListener('startRoutine', handleRoutineStart as EventListener)
     window.addEventListener('startRoutineFromModal', handleStartRoutineFromModalEvent as EventListener)
     window.addEventListener('startRoutineWithExercise', handleStartRoutineWithExerciseEvent as EventListener)
     window.addEventListener('viewRoutine', handleViewRoutine as EventListener)
     window.addEventListener('stopRoutine', handleStopRoutine as EventListener)
+    window.addEventListener('navigateToWorkout', handleNavigateToWorkout as EventListener)
     
     return () => {
       window.removeEventListener('startRoutine', handleRoutineStart as EventListener)
@@ -409,6 +414,7 @@ function AuthenticatedAppContent() {
       window.removeEventListener('startRoutineWithExercise', handleStartRoutineWithExerciseEvent as EventListener)
       window.removeEventListener('viewRoutine', handleViewRoutine as EventListener)
       window.removeEventListener('stopRoutine', handleStopRoutine as EventListener)
+      window.removeEventListener('navigateToWorkout', handleNavigateToWorkout as EventListener)
     }
   }, [])
 
