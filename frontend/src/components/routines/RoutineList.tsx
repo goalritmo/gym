@@ -122,9 +122,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
   const handleEditRoutine = async (id: number, routineData: Partial<CreateRoutineRequest>): Promise<void> => {
     try {
-      console.log('🔄 Actualizando rutina:', id, routineData)
-      const result = await apiClient.updateUserRoutine(id, routineData)
-      console.log('✅ Rutina actualizada exitosamente:', result)
+      await apiClient.updateUserRoutine(id, routineData)
       
       // Actualizar el estado local directamente
       setRoutines(prevRoutines => 
@@ -141,7 +139,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
       
       setOpenEditDialog(false)
       setSelectedRoutine(null)
-      console.log('✅ Estado local actualizado')
     } catch (err) {
       console.error('❌ Error actualizando rutina:', err)
       setError('Error al actualizar la rutina')
@@ -623,20 +620,16 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               onStart={() => {
                 if (activeRoutine?.id === selectedRoutine?.id) {
                   // Detener la rutina activa
-                  console.log('🛑 Click en parar rutina desde modal')
                   const event = new CustomEvent('stopRoutine', { 
                     detail: { routine: selectedRoutine } 
                   })
                   window.dispatchEvent(event)
-                  console.log('✅ Evento stopRoutine disparado')
                 } else {
                   // Solo iniciar la rutina sin cerrar el modal ni cambiar de tab
-                  console.log('▶️ Click en iniciar rutina desde modal')
                   const event = new CustomEvent('startRoutineFromModal', { 
                     detail: { routine: selectedRoutine } 
                   })
                   window.dispatchEvent(event)
-                  console.log('✅ Evento startRoutineFromModal disparado')
                 }
               }}
               onDelete={() => {

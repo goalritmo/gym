@@ -172,7 +172,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   <Tooltip title="Eliminar rutina">
                     <IconButton
                       color="error"
-                      onClick={onDelete}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onDelete()
+                      }}
                       sx={{ 
                         backgroundColor: 'transparent',
                         color: 'error.main',
@@ -200,7 +203,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   <Tooltip title="Editar rutina">
                     <IconButton
                       color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
-                      onClick={onEdit}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onEdit()
+                      }}
                     >
                       <EditIcon />
                     </IconButton>
@@ -211,7 +217,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 <Tooltip title={isActiveRoutine ? "Parar rutina" : "Comenzar rutina"}>
                   <IconButton
                     color={isActiveRoutine ? "warning" : "primary"}
-                    onClick={onStart}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onStart()
+                    }}
                     sx={{ 
                       backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',
                       color: 'white',
@@ -490,7 +499,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
           <Box sx={{ 
             display: 'flex', 
             flexDirection: { xs: 'column', sm: 'row' },
-            gap: { xs: 2, sm: 3 }
+            gap: { xs: 2, sm: 3 },
+            justifyContent: 'center',
+            alignItems: 'center'
           }}>
             <Box sx={{ 
               display: 'flex',
