@@ -29,6 +29,7 @@ import { apiClient } from '../../lib/api'
 import type { RoutineWithExercises, CreateRoutineRequest } from '../../types/routine'
 import RoutineForm from './RoutineForm'
 import RoutineDetail from './RoutineDetail'
+import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 interface RoutineListProps {
   activeRoutine?: any
@@ -36,6 +37,7 @@ interface RoutineListProps {
 }
 
 const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgress = 0 }) => {
+  const { getRoutineProgress } = useUserSettings()
   const [routines, setRoutines] = useState<RoutineWithExercises[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -324,7 +326,10 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                 }}>
                   <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
-                    {routineProgress}%
+                    {(() => {
+                      const today = new Date().toISOString().split('T')[0]
+                      return getRoutineProgress(today, routine.id, routine)
+                    })()}%
                   </Typography>
                 </Box>
               )}

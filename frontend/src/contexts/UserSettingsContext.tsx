@@ -16,6 +16,14 @@ interface UserSettings {
   showRoutinesTab: boolean
 }
 
+interface CompletedExercises {
+  [date: string]: {
+    [routineId: number]: {
+      [exerciseId: number]: number[] // Array de series completadas
+    }
+  }
+}
+
 interface UserSettingsContextType {
   settings: UserSettings
   toggleWorkoutSection: () => void
@@ -26,6 +34,12 @@ interface UserSettingsContextType {
   initializeAllExercisesAsFavorites: (exerciseIds: number[]) => void
   onSocialSettingsChange?: () => void
   setOnSocialSettingsChange: (callback: () => void) => void
+  // Funciones para ejercicios completados
+  completedExercises: CompletedExercises
+  toggleExerciseCompleted: (date: string, routineId: number, exerciseId: number, setNumber: number) => void
+  getCompletedExercisesForRoutine: (date: string, routineId: number) => { [exerciseId: number]: number[] }
+  getRoutineProgress: (date: string, routineId: number, routine: any) => number
+  resetCompletedExercisesForDate: (date: string) => void
 }
 
 const UserSettingsContext = createContext<UserSettingsContextType | undefined>(undefined)
@@ -41,6 +55,7 @@ const defaultSettings: UserSettings = {
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings)
   const [onSocialSettingsChange, setOnSocialSettingsChange] = useState<(() => void) | undefined>(undefined)
+  const [completedExercises, setCompletedExercises] = useState<CompletedExercises>({})
 
   // Función para cargar configuraciones desde la API
   const loadSettings = useCallback(async () => {
@@ -170,6 +185,88 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     }
   }, [settings.favoriteExercises.length])
 
+  // Función para alternar el estado de completado de un ejercicio
+  const toggleExerciseCompleted = useCallback((date: string, routineId: number, exerciseId: number, setNumber: number) => {
+    setCompletedExercises(prev => {
+      const newState = { ...prev }
+      
+      // Inicializar estructuras si no existen
+      if (!newState[date]) {
+        newState[date] = {}
+      }
+      if (!newState[date][routineId]) {
+        newState[date][routineId] = {}
+      }
+      if (!newState[date][routineId][exerciseId]) {
+        newState[date][routineId][exerciseId] = []
+      }
+      
+      const exerciseSets = newState[date][routineId][exerciseId]
+      
+      // Alternar el estado de la serie
+      if (exerciseSets.includes(setNumber)) {
+        // Remover la serie si ya está completada
+        newState[date][routineId][exerciseId] = exerciseSets.filter(set => set !== setNumber)
+      } else {
+        // Agregar la serie si no está completada
+        newState[date][routineId][exerciseId] = [...exerciseSets, setNumber].sort((a, b) => a - b)
+      }
+      
+      // Guardar en localStorage
+      localStorage.setItem('completed-exercises', JSON.stringify(newState))
+      
+      return newState
+    })
+  }, [])
+
+  // Función para obtener ejercicios completados de una rutina en una fecha
+  const getCompletedExercisesForRoutine = useCallback((date: string, routineId: number) => {
+    return completedExercises[date]?.[routineId] || {}
+  }, [completedExercises])
+
+  // Función para calcular el progreso de una rutina
+  const getRoutineProgress = useCallback((date: string, routineId: number, routine: any) => {
+    if (!routine || !routine.exercises) return 0
+    
+    const completedForRoutine = getCompletedExercisesForRoutine(date, routineId)
+    let completedSets = 0
+    let totalSets = 0
+    
+    routine.exercises.forEach((exercise: any) => {
+      const exerciseId = exercise.exercise_id
+      const completedSetsForExercise = completedForRoutine[exerciseId]?.length || 0
+      const targetSets = exercise.sets
+      
+      completedSets += Math.min(completedSetsForExercise, targetSets)
+      totalSets += targetSets
+    })
+    
+    return totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0
+  }, [getCompletedExercisesForRoutine])
+
+  // Función para resetear ejercicios completados de una fecha
+  const resetCompletedExercisesForDate = useCallback((date: string) => {
+    setCompletedExercises(prev => {
+      const newState = { ...prev }
+      delete newState[date]
+      localStorage.setItem('completed-exercises', JSON.stringify(newState))
+      return newState
+    })
+  }, [])
+
+  // Cargar ejercicios completados desde localStorage al montar
+  useEffect(() => {
+    const savedCompletedExercises = localStorage.getItem('completed-exercises')
+    if (savedCompletedExercises) {
+      try {
+        const parsed = JSON.parse(savedCompletedExercises)
+        setCompletedExercises(parsed)
+      } catch (error) {
+        console.error('Error parsing completed exercises:', error)
+      }
+    }
+  }, [])
+
   const value: UserSettingsContextType = {
     settings, 
     toggleWorkoutSection,
@@ -179,7 +276,12 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     toggleRoutinesTab,
     initializeAllExercisesAsFavorites,
     onSocialSettingsChange,
-    setOnSocialSettingsChange
+    setOnSocialSettingsChange,
+    completedExercises,
+    toggleExerciseCompleted,
+    getCompletedExercisesForRoutine,
+    getRoutineProgress,
+    resetCompletedExercisesForDate
   }
 
   return (

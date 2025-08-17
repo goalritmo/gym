@@ -21,6 +21,7 @@ import {
   Delete as DeleteIcon
 } from '@mui/icons-material'
 import type { RoutineWithExercises } from '../../types/routine'
+import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 interface RoutineDetailProps {
   routine: RoutineWithExercises
@@ -45,6 +46,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   routineProgress,
   onExerciseClick
 }) => {
+  const { toggleExerciseCompleted, getCompletedExercisesForRoutine, getRoutineProgress } = useUserSettings()
+  
+  // Obtener fecha actual y ejercicios completados
+  const today = new Date().toISOString().split('T')[0]
+  const completedExercisesForRoutine = getCompletedExercisesForRoutine(today, routine.id)
+  const realRoutineProgress = getRoutineProgress(today, routine.id, routine)
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
@@ -240,12 +247,12 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               Progreso de la rutina
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 600, color: isActiveRoutine ? 'warning.main' : 'text.secondary' }}>
-              {routineProgress}%
+              {realRoutineProgress}%
             </Typography>
           </Box>
           <LinearProgress 
             variant="determinate" 
-            value={routineProgress} 
+            value={realRoutineProgress} 
             sx={{ 
               height: 8, 
               borderRadius: 4,
@@ -267,7 +274,8 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {Array.isArray(routine.exercises) && routine.exercises.length > 0 ? (
           routine.exercises.map((exercise) => {
-            const isCompleted = completedExercises?.includes(exercise.id) || false
+            const completedSets = completedExercisesForRoutine[exercise.exercise_id] || []
+            const isCompleted = completedSets.length === exercise.sets
             return (
               <Card 
                 key={exercise.id} 
@@ -295,20 +303,37 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 gap: 2,
                 mb: 2
               }}>
-                {/* Checkbox del ejercicio */}
-                <Checkbox
-                  checked={isCompleted}
-                  disabled={!isActiveRoutine}
-                  sx={{
-                    color: 'success.main',
-                    '&.Mui-checked': {
-                      color: 'success.main',
-                    },
-                    '&.Mui-disabled': {
-                      color: isCompleted ? 'success.main' : 'grey.400',
-                    }
-                  }}
-                />
+                {/* Checkboxes por serie */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
+                  {Array.from({ length: exercise.sets }, (_, setIndex) => {
+                    const setNumber = setIndex + 1
+                    const completedSets = completedExercisesForRoutine[exercise.exercise_id] || []
+                    const isSetCompleted = completedSets.includes(setNumber)
+                    
+                    return (
+                      <Checkbox
+                        key={setNumber}
+                        checked={isSetCompleted}
+                        disabled={!isActiveRoutine}
+                        onChange={() => {
+                          if (isActiveRoutine) {
+                            toggleExerciseCompleted(today, routine.id, exercise.exercise_id, setNumber)
+                          }
+                        }}
+                        sx={{
+                          color: 'warning.main',
+                          '&.Mui-checked': {
+                            color: 'warning.main',
+                          },
+                          '&.Mui-disabled': {
+                            color: isSetCompleted ? 'warning.main' : 'grey.400',
+                          },
+                          p: 0.5
+                        }}
+                      />
+                    )
+                  })}
+                </Box>
                 
 
                 

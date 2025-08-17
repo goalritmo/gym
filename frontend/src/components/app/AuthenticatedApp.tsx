@@ -241,18 +241,24 @@ function AuthenticatedAppContent() {
 
   // Función para calcular el progreso de la rutina basado en workouts del día
   const calculateRoutineProgress = async () => {
-    if (!activeRoutine || !activeRoutine.exercises) return 0
+    console.log('🚀 calculateRoutineProgress iniciada')
+    
+    if (!activeRoutine || !activeRoutine.exercises) {
+      console.log('❌ No hay rutina activa o ejercicios')
+      return 0
+    }
 
     try {
       const today = new Date().toISOString().split('T')[0]
-      console.log('Calculando progreso para fecha:', today)
-      console.log('Rutina activa:', activeRoutine.name)
-      console.log('Ejercicios de la rutina:', activeRoutine.exercises.map((ex: any) => ({ id: ex.exercise_id, name: ex.exercise_name, sets: ex.sets })))
+      console.log('📅 Calculando progreso para fecha:', today)
+      console.log('🏋️ Rutina activa:', activeRoutine.name)
+      console.log('📋 Ejercicios de la rutina:', activeRoutine.exercises.map((ex: any) => ({ id: ex.exercise_id, name: ex.exercise_name, sets: ex.sets })))
       
       // Obtener workouts del día actual
+      console.log('🔍 Obteniendo workouts del día...')
       const todayWorkouts = await apiClient.getWorkouts(today) as any[]
-      console.log('Workouts del día:', todayWorkouts.length)
-      console.log('Workouts:', todayWorkouts.map((w: any) => ({ exercise_id: w.exercise_id, set: w.set })))
+      console.log('✅ Workouts del día:', todayWorkouts.length)
+      console.log('📊 Workouts:', todayWorkouts.map((w: any) => ({ exercise_id: w.exercise_id, set: w.set })))
       
       // Crear un mapa de ejercicios completados
       const completedExercises = new Map()
@@ -265,7 +271,7 @@ function AuthenticatedAppContent() {
         completedExercises.set(exerciseId, completedExercises.get(exerciseId) + 1)
       })
       
-      console.log('Ejercicios completados:', Object.fromEntries(completedExercises))
+      console.log('🎯 Ejercicios completados:', Object.fromEntries(completedExercises))
       
       // Calcular progreso basado en series completadas vs total de series
       let completedSets = 0
@@ -276,22 +282,22 @@ function AuthenticatedAppContent() {
         const completedForExercise = completedExercises.get(exerciseId) || 0
         const targetSets = exercise.sets
         
-        console.log(`Ejercicio ${exercise.exercise_name} (ID: ${exerciseId}): ${completedForExercise}/${targetSets} series completadas`)
+        console.log(`💪 Ejercicio ${exercise.exercise_name} (ID: ${exerciseId}): ${completedForExercise}/${targetSets} series completadas`)
         
         completedSets += Math.min(completedForExercise, targetSets)
         totalSets += targetSets
       })
       
-      console.log(`Total: ${completedSets}/${totalSets} series completadas`)
+      console.log(`📈 Total: ${completedSets}/${totalSets} series completadas`)
       
       // Calcular porcentaje
       const progress = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0
-      console.log('Progreso calculado:', progress + '%')
+      console.log('🎉 Progreso calculado:', progress + '%')
       
       return Math.min(100, Math.max(0, progress))
       
     } catch (error) {
-      console.error('Error calculando progreso de rutina:', error)
+      console.error('❌ Error calculando progreso de rutina:', error)
       return 0
     }
   }
@@ -519,7 +525,6 @@ function AuthenticatedAppContent() {
               isLoading={isSubmittingWorkout}
               activeRoutine={activeRoutine}
               isRoutinePaused={isRoutinePaused}
-              routineProgress={routineProgress}
               onStopRoutine={handleStopRoutine}
               preloadedExercise={preloadedExercise}
             />
