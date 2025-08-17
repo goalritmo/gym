@@ -206,23 +206,16 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
   if (loading) {
     return (
-      <Box 
-        display="flex" 
-        flexDirection="column"
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="400px"
-        gap={3}
-      >
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: 'calc(100vh - 200px)',
+        flexDirection: 'column',
+        gap: 2
+      }}>
         <CircularProgress size={60} thickness={4} sx={{ color: 'primary.main' }} />
-        <Typography 
-          variant="h6" 
-          color="text.secondary"
-          sx={{ 
-            fontWeight: 500,
-            textAlign: 'center'
-          }}
-        >
+        <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
           Cargando rutinas...
         </Typography>
       </Box>
@@ -582,7 +575,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
           pb: 1
         }}>
           <Typography variant="h5" sx={{ fontWeight: 700 }}>
-            Detalles de la Rutina
+            Detalles
           </Typography>
           <IconButton
             onClick={() => setOpenDetailDialog(false)}

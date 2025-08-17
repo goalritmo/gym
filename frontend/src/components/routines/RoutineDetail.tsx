@@ -127,7 +127,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 mb: { xs: 2, sm: 0 }
               }}>
                 <Typography 
-                  variant="h4" 
+                  variant="h5" 
                   component="h2" 
                   sx={{ 
                     fontWeight: 800,
