@@ -6,10 +6,8 @@ type TimerComponentProps = {
   onTimeUpdate?: (seconds: number, isRunning: boolean) => void
   onCapturedChange?: (isCaptured: boolean) => void
   disabled?: boolean
-  autoStart?: boolean
   timerMode?: 'rest' | 'series'
   onTimerModeChange?: (mode: 'rest' | 'series') => void
-  resetKey?: number
 }
 
 export default function TimerComponent({ 
@@ -17,60 +15,17 @@ export default function TimerComponent({
   onTimeUpdate, 
   onCapturedChange,
   disabled = false,
-  autoStart = false,
   timerMode = 'rest',
-  onTimerModeChange,
-  resetKey = 0
+  onTimerModeChange
 }: TimerComponentProps) {
-  const [time, setTime] = useState(0)
-  const [isRunning, setIsRunning] = useState(autoStart)
-  const [isCaptured, setIsCaptured] = useState(false)
-  const intervalRef = useRef<number | null>(null)
-
-  // Resetear el cronómetro cuando cambie el resetKey e iniciar automáticamente
-  useEffect(() => {
-    setTime(0)
-    setIsCaptured(false)
-    if (onCapturedChange) {
-      onCapturedChange(false)
-    }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
-    }
-    // Iniciar automáticamente después del reset
-    setIsRunning(true)
-  }, [resetKey, onCapturedChange])
-
-  useEffect(() => {
-    if (isRunning) {
-      intervalRef.current = setInterval(() => {
-        setTime(prevTime => {
-          const newTime = prevTime + 1
-          // Notificar el tiempo actual cada segundo
-          if (onTimeUpdate) {
-            onTimeUpdate(newTime, true)
-          }
-          return newTime
-        })
-      }, 1000) as unknown as number
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-        intervalRef.current = null
-      }
-      // Notificar cuando se pausa
-      if (onTimeUpdate) {
-        onTimeUpdate(time, false)
-      }
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [isRunning, onTimeUpdate]) // Removido 'time' de las dependencias
+  const [restTime, setRestTime] = useState(0)
+  const [seriesTime, setSeriesTime] = useState(0)
+  const [isRestRunning, setIsRestRunning] = useState(false)
+  const [isSeriesRunning, setIsSeriesRunning] = useState(false)
+  const [isRestCaptured, setIsRestCaptured] = useState(false)
+  const [isSeriesCaptured, setIsSeriesCaptured] = useState(false)
+  const restIntervalRef = useRef<number | null>(null)
+  const seriesIntervalRef = useRef<number | null>(null)
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60)
@@ -78,30 +33,114 @@ export default function TimerComponent({
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
-  const handleToggleTimer = () => {
-    if (!isRunning) {
-      if (isCaptured) {
-        // Reiniciar el cronómetro
-        setIsRunning(true)
-        setIsCaptured(false)
-        setTime(0)
+  // Cronómetro de descanso
+  useEffect(() => {
+    if (isRestRunning) {
+      restIntervalRef.current = setInterval(() => {
+        setRestTime(prevTime => {
+          const newTime = prevTime + 1
+          if (onTimeUpdate && timerMode === 'rest') {
+            onTimeUpdate(newTime, true)
+          }
+          return newTime
+        })
+      }, 1000) as unknown as number
+    } else {
+      if (restIntervalRef.current) {
+        clearInterval(restIntervalRef.current)
+        restIntervalRef.current = null
+      }
+      if (onTimeUpdate && timerMode === 'rest') {
+        onTimeUpdate(restTime, false)
+      }
+    }
+
+    return () => {
+      if (restIntervalRef.current) {
+        clearInterval(restIntervalRef.current)
+      }
+    }
+  }, [isRestRunning, onTimeUpdate, timerMode, restTime])
+
+  // Cronómetro de entrenamiento
+  useEffect(() => {
+    if (isSeriesRunning) {
+      seriesIntervalRef.current = setInterval(() => {
+        setSeriesTime(prevTime => {
+          const newTime = prevTime + 1
+          if (onTimeUpdate && timerMode === 'series') {
+            onTimeUpdate(newTime, true)
+          }
+          return newTime
+        })
+      }, 1000) as unknown as number
+    } else {
+      if (seriesIntervalRef.current) {
+        clearInterval(seriesIntervalRef.current)
+        seriesIntervalRef.current = null
+      }
+      if (onTimeUpdate && timerMode === 'series') {
+        onTimeUpdate(seriesTime, false)
+      }
+    }
+
+    return () => {
+      if (seriesIntervalRef.current) {
+        clearInterval(seriesIntervalRef.current)
+      }
+    }
+  }, [isSeriesRunning, onTimeUpdate, timerMode, seriesTime])
+
+  const handleRestTimer = () => {
+    if (!isRestRunning) {
+      if (isRestCaptured) {
+        // Reiniciar el cronómetro de descanso
+        setIsRestRunning(true)
+        setIsRestCaptured(false)
+        setRestTime(0)
       } else {
-        // Iniciar el cronómetro por primera vez
-        setIsRunning(true)
-        // Cambiar a modo serie cuando se inicia
-        if (timerMode === 'rest' && onTimerModeChange) {
-          onTimerModeChange('series')
+        // Iniciar el cronómetro de descanso
+        setIsRestRunning(true)
+        if (onTimerModeChange) {
+          onTimerModeChange('rest')
         }
       }
     } else {
-      // Parar y registrar los segundos
-      setIsRunning(false)
-      setIsCaptured(true)
+      // Parar el cronómetro de descanso
+      setIsRestRunning(false)
+      setIsRestCaptured(true)
       if (onCapturedChange) {
         onCapturedChange(true)
       }
       if (onTimeComplete) {
-        onTimeComplete(time)
+        onTimeComplete(restTime)
+      }
+    }
+  }
+
+  const handleSeriesTimer = () => {
+    if (!isSeriesRunning) {
+      if (isSeriesCaptured) {
+        // Reiniciar el cronómetro de entrenamiento
+        setIsSeriesRunning(true)
+        setIsSeriesCaptured(false)
+        setSeriesTime(0)
+      } else {
+        // Iniciar el cronómetro de entrenamiento
+        setIsSeriesRunning(true)
+        if (onTimerModeChange) {
+          onTimerModeChange('series')
+        }
+      }
+    } else {
+      // Parar el cronómetro de entrenamiento
+      setIsSeriesRunning(false)
+      setIsSeriesCaptured(true)
+      if (onCapturedChange) {
+        onCapturedChange(true)
+      }
+      if (onTimeComplete) {
+        onTimeComplete(seriesTime)
       }
     }
   }
@@ -109,49 +148,125 @@ export default function TimerComponent({
   return (
     <Box sx={{ 
       display: 'flex', 
-      flexDirection: 'row',
+      flexDirection: 'column',
       alignItems: 'center', 
       justifyContent: 'center',
       gap: 3,
       width: '100%'
     }}>
-      {/* Display del tiempo */}
-      <Typography 
-        variant="h4" 
-        component="div" 
-        sx={{ 
-          fontFamily: 'monospace',
-          color: isRunning ? (timerMode === 'series' ? 'warning.main' : 'primary.main') : isCaptured ? 'success.main' : 'text.primary',
-          textAlign: 'center',
-          fontSize: '2.5rem',
-          fontWeight: 'bold',
-          minWidth: '140px'
-        }}
-      >
-        {formatTime(time)}
-      </Typography>
-      
-      {/* Botón centrado */}
-      <Button 
-        variant="contained" 
-        onClick={handleToggleTimer}
-        disabled={disabled}
-        size="large"
-        sx={{ 
-          minWidth: 140,
-          py: 1.5,
-          px: 3,
-          borderRadius: 1.5,
-          fontSize: '1.1rem',
-          fontWeight: 'bold',
-          backgroundColor: isCaptured ? 'success.main' : (timerMode === 'rest' ? 'primary.main' : 'warning.main'),
-          '&:hover': {
-            backgroundColor: isCaptured ? 'success.dark' : (timerMode === 'rest' ? 'primary.dark' : 'warning.dark')
-          }
-        }}
-      >
-        {!isRunning ? (isCaptured ? 'Reiniciar' : 'Iniciar') : 'Parar'}
-      </Button>
+      {/* Cronómetro de Descanso */}
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center', 
+        gap: 2,
+        p: 2,
+        borderRadius: 2,
+        backgroundColor: timerMode === 'rest' ? 'primary.50' : 'grey.50',
+        border: '2px solid',
+        borderColor: timerMode === 'rest' ? 'primary.main' : 'grey.300',
+        width: '100%'
+      }}>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 600, 
+          color: timerMode === 'rest' ? 'primary.main' : 'text.secondary'
+        }}>
+          Descansando
+        </Typography>
+        
+        <Typography 
+          variant="h3" 
+          component="div" 
+          sx={{ 
+            fontFamily: 'monospace',
+            color: isRestRunning ? 'primary.main' : isRestCaptured ? 'success.main' : 'text.primary',
+            textAlign: 'center',
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            minWidth: '140px'
+          }}
+        >
+          {formatTime(restTime)}
+        </Typography>
+        
+        <Button 
+          variant="contained" 
+          onClick={handleRestTimer}
+          disabled={disabled}
+          size="large"
+          sx={{ 
+            minWidth: 120,
+            py: 1.5,
+            px: 3,
+            borderRadius: 1.5,
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            backgroundColor: isRestCaptured ? 'success.main' : 'primary.main',
+            '&:hover': {
+              backgroundColor: isRestCaptured ? 'success.dark' : 'primary.dark'
+            }
+          }}
+        >
+          {!isRestRunning ? 'Iniciar' : 'Parar'}
+        </Button>
+      </Box>
+
+      {/* Cronómetro de Entrenamiento */}
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center', 
+        gap: 2,
+        p: 2,
+        borderRadius: 2,
+        backgroundColor: timerMode === 'series' ? 'warning.50' : 'grey.50',
+        border: '2px solid',
+        borderColor: timerMode === 'series' ? 'warning.main' : 'grey.300',
+        width: '100%'
+      }}>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 600, 
+          color: timerMode === 'series' ? 'warning.main' : 'text.secondary'
+        }}>
+          Entrenando
+        </Typography>
+        
+        <Typography 
+          variant="h3" 
+          component="div" 
+          sx={{ 
+            fontFamily: 'monospace',
+            color: isSeriesRunning ? 'warning.main' : isSeriesCaptured ? 'success.main' : 'text.primary',
+            textAlign: 'center',
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            minWidth: '140px'
+          }}
+        >
+          {formatTime(seriesTime)}
+        </Typography>
+        
+        <Button 
+          variant="contained" 
+          onClick={handleSeriesTimer}
+          disabled={disabled}
+          size="large"
+          sx={{ 
+            minWidth: 120,
+            py: 1.5,
+            px: 3,
+            borderRadius: 1.5,
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            backgroundColor: isSeriesCaptured ? 'success.main' : 'warning.main',
+            '&:hover': {
+              backgroundColor: isSeriesCaptured ? 'success.dark' : 'warning.dark'
+            }
+          }}
+        >
+          {!isSeriesRunning ? 'Iniciar' : 'Parar'}
+        </Button>
+      </Box>
     </Box>
   )
 }

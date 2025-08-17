@@ -102,7 +102,6 @@ export default function WorkoutForm({
   const [isTimerCaptured, setIsTimerCaptured] = useState(false)
   const [showTimeTip, setShowTimeTip] = useState(false)
   const [timerMode, setTimerMode] = useState<'rest' | 'series'>('rest') // 'rest' = descanso, 'series' = serie
-  const [timerResetKey, setTimerResetKey] = useState(0)
   
   // Estado para controlar la expansión de la box de rutina
   const [showRoutineExercises, setShowRoutineExercises] = useState(false)
@@ -501,46 +500,26 @@ export default function WorkoutForm({
         </Box>
       ) : (
         // Box cuando no hay rutina activa
-        <Box 
-          sx={{ 
-            mb: 3, 
-            p: 3, 
-            backgroundColor: 'grey.100', 
-            borderRadius: 2,
-            border: '2px dashed',
-            borderColor: 'grey.300',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            '&:hover': {
-              backgroundColor: 'grey.200',
-              borderColor: 'grey.400',
-              transform: 'translateY(-1px)'
-            }
-          }}
-          onClick={onNavigateToRoutines}
+        <Box sx={{ 
+          mb: 3, 
+          p: 2, 
+          backgroundColor: 'grey.100', 
+          borderRadius: 2,
+          color: 'text.secondary',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          position: 'relative',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            backgroundColor: 'grey.200',
+            transform: 'translateY(-1px)'
+          }
+        }}
+        onClick={onNavigateToRoutines}
         >
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            gap: 2 
-          }}>
-            <FitnessCenterIcon sx={{ 
-              fontSize: 48, 
-              color: 'grey.500' 
-            }} />
-            <Typography variant="h6" sx={{ 
-              color: 'grey.700', 
-              fontWeight: 600,
-              textAlign: 'center'
-            }}>
-              No hay rutina activa
-            </Typography>
-            <Typography variant="body2" sx={{ 
-              color: 'grey.600',
-              textAlign: 'center'
-            }}>
-              Haz click aquí para ir a Mis Rutinas y seleccionar una
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, textAlign: 'left' }}>
+              🏋️ No hay ninguna rutina activa
             </Typography>
           </Box>
         </Box>
@@ -687,8 +666,6 @@ export default function WorkoutForm({
                 setIsTimerRunning(false)
                 // Resetear el campo del formulario
                 setValue('seconds', '')
-                // Incrementar resetKey para forzar el reset del TimerComponent
-                setTimerResetKey(prev => prev + 1)
               }}
               sx={{
                 '& .MuiSwitch-switchBase': {
@@ -724,10 +701,8 @@ export default function WorkoutForm({
             }}
             onCapturedChange={(isCaptured) => setIsTimerCaptured(isCaptured)}
             disabled={isLoading}
-            autoStart={timerMode === 'rest'}
             timerMode={timerMode}
             onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
-            resetKey={timerResetKey}
           />
         </Box>
 
