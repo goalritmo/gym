@@ -27,7 +27,8 @@ import {
   KeyboardArrowDown,
   KeyboardArrowUp,
   Stop as StopIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  AccessTime as AccessTimeIcon
 } from '@mui/icons-material'
 import { useState, useEffect } from 'react'
 
@@ -608,11 +609,12 @@ export default function WorkoutForm({
           </FormControl>
         </Box>
 
-        {/* Tiempo de Serie */}
+        {/* Tiempo de la serie */}
         <Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: showTimeTip ? 1 : 0 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: showTimeTip ? 1 : 1 }}>
+            <AccessTimeIcon sx={{ color: 'primary.main', fontSize: 20 }} />
             <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
-              Tiempo de Serie
+              Tiempo de la serie
             </Typography>
             <IconButton
               size="small"
@@ -629,7 +631,7 @@ export default function WorkoutForm({
           
           {showTimeTip && (
             <Alert severity="info" sx={{ mb: 2 }}>
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ textAlign: 'left' }}>
                 <strong>💡 Tip:</strong> Usa el cronómetro para medir el tiempo de descanso entre series. 
                 El tiempo se guardará automáticamente cuando envíes el formulario.
               </Typography>
@@ -656,7 +658,7 @@ export default function WorkoutForm({
           {...register('observations')}
           sx={{
             '& .MuiInputLabel-root': {
-              color: 'primary.main'
+              color: 'text.primary'
             }
           }}
         />

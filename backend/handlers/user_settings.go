@@ -44,7 +44,7 @@ func GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 			settings = UserSettings{
 				ShowOwnWorkoutsInSocial: true,
 				UncNotificationsEnabled: true,
-				ShowRoutinesTab:         false,
+				ShowRoutinesTab:         true,
 			}
 			
 			insertQuery := `

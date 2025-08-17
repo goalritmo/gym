@@ -189,7 +189,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               flexWrap: 'wrap',
               justifyContent: { xs: 'space-between', sm: 'flex-start' },
               alignItems: 'center',
-              width: '100%'
+              width: { xs: '100%', sm: 'auto' }
             }}>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 {onDelete && (!isActiveRoutine || isRoutineComplete) && (
