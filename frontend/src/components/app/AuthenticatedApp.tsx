@@ -55,12 +55,19 @@ function AuthenticatedAppContent() {
   const loadData = useCallback(async () => {
     setIsLoading(true)
     try {
+      console.log('Cargando datos del backend...')
       // Cargar workouts, workout days y ejercicios en paralelo
       const [workoutsData, workoutDaysData, exercisesData] = await Promise.all([
         apiClient.getWorkouts(),
         apiClient.getWorkoutDays(),
         apiClient.getExercises()
       ])
+      
+      console.log('Datos cargados:', {
+        workouts: Array.isArray(workoutsData) ? workoutsData.length : 0,
+        workoutDays: Array.isArray(workoutDaysData) ? workoutDaysData.length : 0,
+        exercises: Array.isArray(exercisesData) ? exercisesData.length : 0
+      })
       
       setWorkouts(Array.isArray(workoutsData) ? workoutsData : [])
       setWorkoutDays(Array.isArray(workoutDaysData) ? workoutDaysData : [])
@@ -125,6 +132,7 @@ function AuthenticatedAppContent() {
   }
 
   const handleOpenSettings = () => {
+    console.log('Abriendo configuración, ejercicios disponibles:', exercises.length)
     setSettingsModalOpen(true)
   }
 
@@ -237,9 +245,14 @@ function AuthenticatedAppContent() {
 
     try {
       const today = new Date().toISOString().split('T')[0]
+      console.log('Calculando progreso para fecha:', today)
+      console.log('Rutina activa:', activeRoutine.name)
+      console.log('Ejercicios de la rutina:', activeRoutine.exercises.map((ex: any) => ({ id: ex.exercise_id, name: ex.exercise_name, sets: ex.sets })))
       
       // Obtener workouts del día actual
       const todayWorkouts = await apiClient.getWorkouts(today) as any[]
+      console.log('Workouts del día:', todayWorkouts.length)
+      console.log('Workouts:', todayWorkouts.map((w: any) => ({ exercise_id: w.exercise_id, set: w.set })))
       
       // Crear un mapa de ejercicios completados
       const completedExercises = new Map()
@@ -252,6 +265,8 @@ function AuthenticatedAppContent() {
         completedExercises.set(exerciseId, completedExercises.get(exerciseId) + 1)
       })
       
+      console.log('Ejercicios completados:', Object.fromEntries(completedExercises))
+      
       // Calcular progreso basado en series completadas vs total de series
       let completedSets = 0
       let totalSets = 0
@@ -261,12 +276,18 @@ function AuthenticatedAppContent() {
         const completedForExercise = completedExercises.get(exerciseId) || 0
         const targetSets = exercise.sets
         
+        console.log(`Ejercicio ${exercise.exercise_name} (ID: ${exerciseId}): ${completedForExercise}/${targetSets} series completadas`)
+        
         completedSets += Math.min(completedForExercise, targetSets)
         totalSets += targetSets
       })
       
+      console.log(`Total: ${completedSets}/${totalSets} series completadas`)
+      
       // Calcular porcentaje
       const progress = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0
+      console.log('Progreso calculado:', progress + '%')
+      
       return Math.min(100, Math.max(0, progress))
       
     } catch (error) {
