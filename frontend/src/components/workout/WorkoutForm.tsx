@@ -21,8 +21,7 @@ import {
   Typography,
   Alert,
   IconButton,
-  Switch,
-  FormControlLabel
+  Switch
 } from '@mui/material'
 import { 
   FitnessCenter as FitnessCenterIcon,
@@ -617,12 +616,12 @@ export default function WorkoutForm({
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: showTimeTip ? 1 : 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <AccessTimeIcon sx={{ 
-                color: timerMode === 'series' ? 'warning.main' : 'warning.main', 
+                color: timerMode === 'series' ? 'warning.main' : 'primary.main', 
                 fontSize: 20 
               }} />
               <Typography variant="h6" sx={{ 
                 fontWeight: 600, 
-                color: timerMode === 'series' ? 'warning.main' : 'warning.main' 
+                color: timerMode === 'series' ? 'warning.main' : 'primary.main' 
               }}>
                 {timerMode === 'series' ? 'Entrenando...' : 'Descansando...'}
               </Typography>
@@ -641,38 +640,15 @@ export default function WorkoutForm({
               )}
             </Box>
             
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={timerMode === 'series'}
-                  onChange={(e) => {
-                    const newMode = e.target.checked ? 'series' : 'rest'
-                    setTimerMode(newMode)
-                    setShowTimeTip(false)
-                    // Resetear el cronómetro
-                    setCurrentTimerTime(0)
-                    setIsTimerRunning(false)
-                  }}
-                  sx={{
-                    '& .MuiSwitch-switchBase.Mui-checked': {
-                      color: 'warning.main',
-                      '&:hover': {
-                        backgroundColor: 'rgba(255, 152, 0, 0.08)',
-                      },
-                    },
-                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                      backgroundColor: 'warning.main',
-                    },
-                  }}
-                />
-              }
-              label={timerMode === 'series' ? 'Entrenando' : 'Descansando'}
-              sx={{
-                '& .MuiFormControlLabel-label': {
-                  fontSize: '0.875rem',
-                  fontWeight: 600,
-                  color: timerMode === 'series' ? 'warning.main' : 'text.secondary'
-                }
+            <Switch
+              checked={timerMode === 'series'}
+              onChange={(e) => {
+                const newMode = e.target.checked ? 'series' : 'rest'
+                setTimerMode(newMode)
+                setShowTimeTip(false)
+                // Resetear el cronómetro
+                setCurrentTimerTime(0)
+                setIsTimerRunning(false)
               }}
             />
           </Box>
