@@ -202,7 +202,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
                   variant="filled"
                   size="medium"
-                  sx={{ fontWeight: 700 }}
+                  sx={{ fontWeight: 700, mt: 0.5 }}
                 />
                 
                 {onEdit && (isRoutineComplete || !isActiveRoutine) && (

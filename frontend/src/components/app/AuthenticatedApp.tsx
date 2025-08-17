@@ -391,10 +391,12 @@ function AuthenticatedAppContent() {
     }
 
     const handleStopRoutine = (_event: CustomEvent) => {
+      console.log('🛑 Parando rutina desde modal - NO navegando al registro')
       setActiveRoutine(null)
       setIsRoutinePaused(false)
       setRoutineProgress(0)
       localStorage.removeItem('activeRoutine')
+      console.log('✅ Rutina parada exitosamente')
     }
 
     const handleNavigateToWorkout = (_event: CustomEvent) => {

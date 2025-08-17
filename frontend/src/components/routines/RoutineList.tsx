@@ -623,16 +623,20 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               onStart={() => {
                 if (activeRoutine?.id === selectedRoutine?.id) {
                   // Detener la rutina activa
+                  console.log('🛑 Click en parar rutina desde modal')
                   const event = new CustomEvent('stopRoutine', { 
                     detail: { routine: selectedRoutine } 
                   })
                   window.dispatchEvent(event)
+                  console.log('✅ Evento stopRoutine disparado')
                 } else {
                   // Solo iniciar la rutina sin cerrar el modal ni cambiar de tab
+                  console.log('▶️ Click en iniciar rutina desde modal')
                   const event = new CustomEvent('startRoutine', { 
                     detail: { routine: selectedRoutine } 
                   })
                   window.dispatchEvent(event)
+                  console.log('✅ Evento startRoutine disparado')
                 }
               }}
               onDelete={() => {
@@ -641,13 +645,15 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               }}
               isActiveRoutine={activeRoutine?.id === selectedRoutine?.id}
               routineProgress={routineProgress}
-              onExerciseClick={(exercise) => {
-                setOpenDetailDialog(false)
-                // Navegar al registro con el ejercicio pre-cargado
-                const event = new CustomEvent('startRoutineWithExercise', { 
-                  detail: { routine: selectedRoutine, exercise: exercise } 
-                })
-                window.dispatchEvent(event)
+              onExerciseClick={(_exercise) => {
+                // Solo activar la rutina si no está activa, sin cerrar el modal ni navegar
+                if (activeRoutine?.id !== selectedRoutine?.id) {
+                  const event = new CustomEvent('startRoutineFromModal', { 
+                    detail: { routine: selectedRoutine } 
+                  })
+                  window.dispatchEvent(event)
+                }
+                // Si ya está activa, no hacer nada - solo permitir ver los cambios de color
               }}
               onNavigateToWorkout={() => {
                 setOpenDetailDialog(false)
