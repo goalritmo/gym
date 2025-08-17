@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Fab, Zoom } from '@mui/material'
 import { AllInclusive, People, FitnessCenter } from '@mui/icons-material'
+import { useUserSettings } from '../../contexts/UserSettingsContext'
 
 import { TABS, type TabType } from '../../constants/tabs'
 
@@ -11,7 +12,14 @@ type FloatingNavButtonProps = {
 }
 
 export default function FloatingNavButton({ currentTab, onTabChange, activeRoutine }: FloatingNavButtonProps) {
+  const { getRoutineProgress } = useUserSettings()
   const [isVisible, setIsVisible] = useState(true)
+  
+  // Detectar si la rutina está completa
+  const isRoutineComplete = activeRoutine ? (() => {
+    const today = new Date().toISOString().split('T')[0]
+    return getRoutineProgress(today, activeRoutine.id, activeRoutine) === 100
+  })() : false
 
   useEffect(() => {
     // Mostrar el botón en WORKOUT, HISTORY, SOCIAL y ROUTINES (cuando hay rutina activa)
@@ -47,7 +55,11 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
 
   const handleClick = () => {
     if (currentTab === TABS.ROUTINES && activeRoutine) {
-      onTabChange(TABS.WORKOUT)
+      if (isRoutineComplete) {
+        onTabChange(TABS.HISTORY) // Ir a Entrenamientos cuando está completa
+      } else {
+        onTabChange(TABS.WORKOUT) // Ir a Registro cuando está activa
+      }
     } else if (currentTab === TABS.WORKOUT) {
       onTabChange(TABS.HISTORY)
     } else if (currentTab === TABS.HISTORY) {
@@ -72,7 +84,7 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
 
   const getTooltip = () => {
     if (currentTab === TABS.ROUTINES && activeRoutine) {
-      return 'Registrar entrenamiento'
+      return isRoutineComplete ? 'Ver entrenamientos' : 'Registrar entrenamiento'
     } else if (currentTab === TABS.WORKOUT) {
       return 'Ver historial'
     } else if (currentTab === TABS.HISTORY) {
@@ -86,7 +98,7 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
   return (
     <Zoom in={isVisible}>
       <Fab
-        color={currentTab === TABS.ROUTINES && activeRoutine ? "warning" : "primary"}
+        color={currentTab === TABS.ROUTINES && activeRoutine ? (isRoutineComplete ? "success" : "warning") : "primary"}
         aria-label={getTooltip()}
         onClick={handleClick}
         sx={{
@@ -94,12 +106,17 @@ export default function FloatingNavButton({ currentTab, onTabChange, activeRouti
           bottom: 24,
           right: 24,
           zIndex: 1000,
+          backgroundColor: currentTab === TABS.ROUTINES && activeRoutine && isRoutineComplete ? 'success.main' : undefined,
           boxShadow: currentTab === TABS.ROUTINES && activeRoutine 
-            ? '0 4px 12px rgba(255, 152, 0, 0.3)' 
+            ? (isRoutineComplete 
+              ? '0 4px 12px rgba(76, 175, 80, 0.3)' 
+              : '0 4px 12px rgba(255, 152, 0, 0.3)')
             : '0 4px 12px rgba(25, 118, 210, 0.3)',
           '&:hover': {
             boxShadow: currentTab === TABS.ROUTINES && activeRoutine 
-              ? '0 6px 16px rgba(255, 152, 0, 0.4)' 
+              ? (isRoutineComplete 
+                ? '0 6px 16px rgba(76, 175, 80, 0.4)' 
+                : '0 6px 16px rgba(255, 152, 0, 0.4)')
               : '0 6px 16px rgba(25, 118, 210, 0.4)',
             transform: 'scale(1.05)'
           },

@@ -325,7 +325,7 @@ export default function WorkoutForm({
             alignItems: 'center'
           }}>
             <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500 }}>
-              {realRoutineProgress}% completado
+              {realRoutineProgress}% completa
             </Typography>
             
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -393,7 +393,7 @@ export default function WorkoutForm({
                       }}
                     >
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'white', flex: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'white', flex: 1, textAlign: 'left' }}>
                           {exercise.exercise_name}
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 0.5 }}>

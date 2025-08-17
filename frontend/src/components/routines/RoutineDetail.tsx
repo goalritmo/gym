@@ -544,10 +544,26 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         </CardContent>
       </Card>
 
-      <Box display="flex" justifyContent="flex-end" sx={{ mt: 3 }}>
+      <Box display="flex" justifyContent="space-between" sx={{ mt: 3 }}>
         <Button variant="outlined" onClick={onClose}>
           Cerrar
         </Button>
+        {!isRoutineComplete && onStart && (
+          <Button
+            variant="contained"
+            onClick={onStart}
+            disabled={isActiveRoutine}
+            startIcon={isActiveRoutine ? <StopIcon /> : <PlayIcon />}
+            sx={{
+              backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',
+              '&:hover': {
+                backgroundColor: isActiveRoutine ? 'warning.light' : 'primary.light'
+              }
+            }}
+          >
+            {isActiveRoutine ? 'Parar' : 'Iniciar'}
+          </Button>
+        )}
       </Box>
     </Box>
   )
