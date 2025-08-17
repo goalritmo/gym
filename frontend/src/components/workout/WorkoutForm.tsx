@@ -315,17 +315,13 @@ export default function WorkoutForm({
                 sx={{ 
                   fontWeight: 'bold',
                   cursor: 'pointer',
-                  textDecoration: 'underline',
                   '&:hover': {
                     opacity: 0.8
                   }
                 }}
                 onClick={() => {
-                  // Emitir evento para cambiar a la tab de rutinas y abrir el modal
-                  const event = new CustomEvent('viewRoutine', { 
-                    detail: { routine: activeRoutine } 
-                  })
-                  window.dispatchEvent(event)
+                  // Expandir/contraer la lista de ejercicios
+                  setShowRoutineExercises(!showRoutineExercises)
                 }}
               >
                 {isRoutinePaused ? 'Elegir rutina' : 'Ver rutina'}

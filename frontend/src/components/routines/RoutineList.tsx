@@ -444,14 +444,14 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       })
                       window.dispatchEvent(event)
                     } else {
-                      // Obtener la rutina completa y abrir el modal
+                      // Obtener la rutina completa, abrir el modal E iniciar la rutina
                       try {
                         const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
                         setSelectedRoutine(fullRoutine)
                         setOpenDetailDialog(true)
                         
-                        // También iniciar la rutina automáticamente
-                        const event = new CustomEvent('startRoutine', { 
+                        // Iniciar la rutina automáticamente sin cambiar de tab
+                        const event = new CustomEvent('startRoutineFromModal', { 
                           detail: { routine: fullRoutine } 
                         })
                         window.dispatchEvent(event)

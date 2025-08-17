@@ -148,7 +148,7 @@ function AuthenticatedAppContent() {
   const [isRoutinePaused, setIsRoutinePaused] = useState(false)
   const [preloadedExercise, setPreloadedExercise] = useState<any>(null)
 
-  // Función para manejar el inicio de una rutina
+  // Función para manejar el inicio de una rutina (navega al registro)
   const handleStartRoutine = (routine: any) => {
     // Cambiar a la tab de registrar
     setActiveTab(TABS.WORKOUT)
@@ -177,6 +177,24 @@ function AuthenticatedAppContent() {
       setPreloadedExercise(null)
       console.log('Iniciando rutina sin ejercicios:', routine.name)
     }
+  }
+
+  // Función para iniciar rutina sin cambiar de tab (solo para modal)
+  const handleStartRoutineFromModal = (routine: any) => {
+    // Establecer la rutina activa sin cambiar de tab
+    setActiveRoutine(routine)
+    setRoutineProgress(0)
+    setIsRoutinePaused(false)
+    
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('activeRoutine', JSON.stringify({
+      routine: routine,
+      progress: 0,
+      isPaused: false,
+      timestamp: Date.now()
+    }))
+    
+    console.log('Rutina iniciada desde modal:', routine.name)
   }
 
   // Función para manejar el inicio de una rutina con ejercicio pre-cargado
@@ -279,6 +297,10 @@ function AuthenticatedAppContent() {
       handleStartRoutine(event.detail.routine)
     }
 
+    const handleStartRoutineFromModalEvent = (event: CustomEvent) => {
+      handleStartRoutineFromModal(event.detail.routine)
+    }
+
     const handleStartRoutineWithExerciseEvent = (event: CustomEvent) => {
       handleStartRoutineWithExercise(event.detail.routine, event.detail.exercise)
     }
@@ -297,12 +319,14 @@ function AuthenticatedAppContent() {
     }
 
     window.addEventListener('startRoutine', handleRoutineStart as EventListener)
+    window.addEventListener('startRoutineFromModal', handleStartRoutineFromModalEvent as EventListener)
     window.addEventListener('startRoutineWithExercise', handleStartRoutineWithExerciseEvent as EventListener)
     window.addEventListener('viewRoutine', handleViewRoutine as EventListener)
     window.addEventListener('stopRoutine', handleStopRoutine as EventListener)
     
     return () => {
       window.removeEventListener('startRoutine', handleRoutineStart as EventListener)
+      window.removeEventListener('startRoutineFromModal', handleStartRoutineFromModalEvent as EventListener)
       window.removeEventListener('startRoutineWithExercise', handleStartRoutineWithExerciseEvent as EventListener)
       window.removeEventListener('viewRoutine', handleViewRoutine as EventListener)
       window.removeEventListener('stopRoutine', handleStopRoutine as EventListener)
