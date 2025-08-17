@@ -171,67 +171,45 @@ export default function TimerComponent({
       width: '100%'
     }}>
       {/* Display del tiempo */}
-      <Typography 
-        variant="h4" 
-        component="div" 
-        sx={{ 
-          fontFamily: 'monospace',
-          color: isRestRunning ? 'primary.main' : isSeriesRunning ? 'warning.main' : (isRestCaptured || isSeriesCaptured) ? 'success.main' : 'text.primary',
-          textAlign: 'center',
-          fontSize: '2.5rem',
-          fontWeight: 'bold',
-          minWidth: '140px'
-        }}
-      >
+              <Typography 
+          variant="h4" 
+          component="div" 
+          sx={{ 
+            fontFamily: 'monospace',
+            color: timerMode === 'rest' ? 'primary.main' : 'warning.main',
+            textAlign: 'center',
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            minWidth: '140px'
+          }}
+        >
         {formatTime(timerMode === 'rest' ? restTime : seriesTime)}
       </Typography>
       
-      {/* Botones para cada modo */}
-      <Box sx={{ display: 'flex', gap: 2 }}>
-        {/* Botón Descansando */}
-        <Button 
-          variant="contained" 
-          onClick={handleRestTimer}
-          disabled={disabled}
-          size="large"
-          sx={{ 
-            minWidth: 120,
-            py: 1.5,
-            px: 3,
-            borderRadius: 1.5,
-            fontSize: '1rem',
-            fontWeight: 'bold',
-            backgroundColor: isRestCaptured ? 'success.main' : 'primary.main',
-            '&:hover': {
-              backgroundColor: isRestCaptured ? 'success.dark' : 'primary.dark'
-            }
-          }}
-        >
-          {!isRestRunning ? 'Iniciar' : 'Parar'}
-        </Button>
-
-        {/* Botón Entrenando */}
-        <Button 
-          variant="contained" 
-          onClick={handleSeriesTimer}
-          disabled={disabled}
-          size="large"
-          sx={{ 
-            minWidth: 120,
-            py: 1.5,
-            px: 3,
-            borderRadius: 1.5,
-            fontSize: '1rem',
-            fontWeight: 'bold',
-            backgroundColor: isSeriesCaptured ? 'success.main' : 'warning.main',
-            '&:hover': {
-              backgroundColor: isSeriesCaptured ? 'success.dark' : 'warning.dark'
-            }
-          }}
-        >
-          {!isSeriesRunning ? 'Iniciar' : 'Parar'}
-        </Button>
-      </Box>
+      {/* Botón único */}
+      <Button 
+        variant="contained" 
+        onClick={timerMode === 'rest' ? handleRestTimer : handleSeriesTimer}
+        disabled={disabled}
+        size="large"
+        sx={{ 
+          minWidth: 140,
+          py: 1.5,
+          px: 3,
+          borderRadius: 1.5,
+          fontSize: '1.1rem',
+          fontWeight: 'bold',
+          backgroundColor: timerMode === 'rest' ? 'primary.main' : 'warning.main',
+          '&:hover': {
+            backgroundColor: timerMode === 'rest' ? 'primary.dark' : 'warning.dark'
+          }
+        }}
+      >
+        {timerMode === 'rest' 
+          ? (!isRestRunning ? 'Reiniciar' : 'Parar')
+          : (!isSeriesRunning ? 'Reiniciar' : 'Parar')
+        }
+      </Button>
     </Box>
   )
 }

@@ -519,7 +519,7 @@ export default function WorkoutForm({
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, textAlign: 'left' }}>
-              🏋️ No hay ninguna rutina activa
+              🏋️ Ninguna rutina activa
             </Typography>
           </Box>
           
