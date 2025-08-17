@@ -27,6 +27,13 @@ export default function TimerComponent({
   const restIntervalRef = useRef<number | null>(null)
   const seriesIntervalRef = useRef<number | null>(null)
 
+  // Auto-start inicial para el modo descanso
+  useEffect(() => {
+    if (timerMode === 'rest' && !isRestRunning && !isRestCaptured) {
+      setIsRestRunning(true)
+    }
+  }, [])
+
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
@@ -91,6 +98,15 @@ export default function TimerComponent({
     }
   }, [isSeriesRunning, onTimeUpdate, timerMode, seriesTime])
 
+  // Auto-start cuando cambie el modo
+  useEffect(() => {
+    if (timerMode === 'rest' && !isRestRunning && !isRestCaptured) {
+      setIsRestRunning(true)
+    } else if (timerMode === 'series' && !isSeriesRunning && !isSeriesCaptured) {
+      setIsSeriesRunning(true)
+    }
+  }, [timerMode, isRestRunning, isRestCaptured, isSeriesRunning, isSeriesCaptured])
+
   const handleRestTimer = () => {
     if (!isRestRunning) {
       if (isRestCaptured) {
@@ -148,47 +164,31 @@ export default function TimerComponent({
   return (
     <Box sx={{ 
       display: 'flex', 
-      flexDirection: 'column',
+      flexDirection: 'row',
       alignItems: 'center', 
       justifyContent: 'center',
       gap: 3,
       width: '100%'
     }}>
-      {/* Cronómetro de Descanso */}
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column',
-        alignItems: 'center', 
-        gap: 2,
-        p: 2,
-        borderRadius: 2,
-        backgroundColor: timerMode === 'rest' ? 'primary.50' : 'grey.50',
-        border: '2px solid',
-        borderColor: timerMode === 'rest' ? 'primary.main' : 'grey.300',
-        width: '100%'
-      }}>
-        <Typography variant="h5" sx={{ 
-          fontWeight: 600, 
-          color: timerMode === 'rest' ? 'primary.main' : 'text.secondary'
-        }}>
-          Descansando
-        </Typography>
-        
-        <Typography 
-          variant="h3" 
-          component="div" 
-          sx={{ 
-            fontFamily: 'monospace',
-            color: isRestRunning ? 'primary.main' : isRestCaptured ? 'success.main' : 'text.primary',
-            textAlign: 'center',
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-            minWidth: '140px'
-          }}
-        >
-          {formatTime(restTime)}
-        </Typography>
-        
+      {/* Display del tiempo */}
+      <Typography 
+        variant="h4" 
+        component="div" 
+        sx={{ 
+          fontFamily: 'monospace',
+          color: isRestRunning ? 'primary.main' : isSeriesRunning ? 'warning.main' : (isRestCaptured || isSeriesCaptured) ? 'success.main' : 'text.primary',
+          textAlign: 'center',
+          fontSize: '2.5rem',
+          fontWeight: 'bold',
+          minWidth: '140px'
+        }}
+      >
+        {formatTime(timerMode === 'rest' ? restTime : seriesTime)}
+      </Typography>
+      
+      {/* Botones para cada modo */}
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        {/* Botón Descansando */}
         <Button 
           variant="contained" 
           onClick={handleRestTimer}
@@ -209,43 +209,8 @@ export default function TimerComponent({
         >
           {!isRestRunning ? 'Iniciar' : 'Parar'}
         </Button>
-      </Box>
 
-      {/* Cronómetro de Entrenamiento */}
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column',
-        alignItems: 'center', 
-        gap: 2,
-        p: 2,
-        borderRadius: 2,
-        backgroundColor: timerMode === 'series' ? 'warning.50' : 'grey.50',
-        border: '2px solid',
-        borderColor: timerMode === 'series' ? 'warning.main' : 'grey.300',
-        width: '100%'
-      }}>
-        <Typography variant="h5" sx={{ 
-          fontWeight: 600, 
-          color: timerMode === 'series' ? 'warning.main' : 'text.secondary'
-        }}>
-          Entrenando
-        </Typography>
-        
-        <Typography 
-          variant="h3" 
-          component="div" 
-          sx={{ 
-            fontFamily: 'monospace',
-            color: isSeriesRunning ? 'warning.main' : isSeriesCaptured ? 'success.main' : 'text.primary',
-            textAlign: 'center',
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-            minWidth: '140px'
-          }}
-        >
-          {formatTime(seriesTime)}
-        </Typography>
-        
+        {/* Botón Entrenando */}
         <Button 
           variant="contained" 
           onClick={handleSeriesTimer}

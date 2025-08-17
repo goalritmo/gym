@@ -517,9 +517,45 @@ export default function WorkoutForm({
         }}
         onClick={onNavigateToRoutines}
         >
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, textAlign: 'left' }}>
               🏋️ No hay ninguna rutina activa
+            </Typography>
+          </Box>
+          
+          <Box sx={{ 
+            width: '100%', 
+            backgroundColor: 'rgba(0,0,0,0.1)', 
+            borderRadius: 1,
+            height: 8,
+            mb: 1
+          }}>
+            <Box sx={{ 
+              width: '0%', 
+              backgroundColor: 'grey.500', 
+              borderRadius: 1,
+              height: '100%',
+              transition: 'width 0.3s ease'
+            }} />
+          </Box>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center'
+          }}>
+            <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500 }}>
+              0% completa
+            </Typography>
+            
+            <Typography variant="body2" sx={{ 
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.8
+              }
+            }}>
+              Ir a Mis Rutinas
             </Typography>
           </Box>
         </Box>
