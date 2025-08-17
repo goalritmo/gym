@@ -324,49 +324,31 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 
                 {/* Información del ejercicio */}
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      fontWeight: 700,
-                      mb: 1,
-                      color: isActiveRoutine ? 'text.primary' : 'text.secondary'
-                    }}
-                  >
-                    {exercise.exercise_name}
-                  </Typography>
-                  
-                  {/* Chips de información */}
                   <Box sx={{ 
                     display: 'flex', 
-                    gap: 1, 
-                    flexWrap: 'wrap',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    gap: 2,
+                    flexWrap: 'wrap'
                   }}>
-                    <Chip
-                      label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
-                      size="small"
-                      color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
-                      variant="filled"
+                    <Typography 
+                      variant="h6" 
                       sx={{ 
-                        fontWeight: 600,
-                        backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                        color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                        fontWeight: 700,
+                        color: isActiveRoutine ? 'text.primary' : 'text.secondary'
                       }}
-                    />
-                    <Chip
-                      label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
-                      size="small"
-                      color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
-                      variant="filled"
-                      sx={{ 
-                        fontWeight: 600,
-                        backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                        color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
-                      }}
-                    />
-                    {exercise.weight && exercise.weight > 0 && (
+                    >
+                      {exercise.exercise_name}
+                    </Typography>
+                    
+                    {/* Chips de información */}
+                    <Box sx={{ 
+                      display: 'flex', 
+                      gap: 1, 
+                      flexWrap: 'wrap',
+                      alignItems: 'center'
+                    }}>
                       <Chip
-                        label={`${exercise.weight} kg`}
+                        label={`${exercise.sets} ${exercise.sets === 1 ? 'serie' : 'series'}`}
                         size="small"
                         color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
                         variant="filled"
@@ -376,19 +358,43 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                           color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
                         }}
                       />
-                    )}
-                    <Chip
-                      label={`${formatTime(exercise.rest_time_seconds)} descanso`}
-                      size="small"
-                      color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
-                      variant="filled"
-                      icon={<TimerIcon />}
-                      sx={{ 
-                        fontWeight: 600,
-                        backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                        color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
-                      }}
-                    />
+                      <Chip
+                        label={`${exercise.reps} ${exercise.reps === 1 ? 'rep' : 'reps'}`}
+                        size="small"
+                        color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
+                        variant="filled"
+                        sx={{ 
+                          fontWeight: 600,
+                          backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
+                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                        }}
+                      />
+                      {exercise.weight && exercise.weight > 0 && (
+                        <Chip
+                          label={`${exercise.weight} kg`}
+                          size="small"
+                          color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
+                          variant="filled"
+                          sx={{ 
+                            fontWeight: 600,
+                            backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
+                            color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                          }}
+                        />
+                      )}
+                      <Chip
+                        label={`${formatTime(exercise.rest_time_seconds)} descanso`}
+                        size="small"
+                        color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
+                        variant="filled"
+                        icon={<TimerIcon />}
+                        sx={{ 
+                          fontWeight: 600,
+                          backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
+                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                        }}
+                      />
+                    </Box>
                   </Box>
                 </Box>
               </Box>
