@@ -5,11 +5,21 @@ type TimerComponentProps = {
   onTimeComplete?: (seconds: number) => void
   onTimeUpdate?: (seconds: number, isRunning: boolean) => void
   disabled?: boolean
+  autoStart?: boolean
+  timerMode?: 'rest' | 'series'
+  onTimerModeChange?: (mode: 'rest' | 'series') => void
 }
 
-export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled = false }: TimerComponentProps) {
+export default function TimerComponent({ 
+  onTimeComplete, 
+  onTimeUpdate, 
+  disabled = false,
+  autoStart = false,
+  timerMode = 'rest',
+  onTimerModeChange
+}: TimerComponentProps) {
   const [time, setTime] = useState(0)
-  const [isRunning, setIsRunning] = useState(false)
+  const [isRunning, setIsRunning] = useState(autoStart)
   const [isCaptured, setIsCaptured] = useState(false)
   const intervalRef = useRef<number | null>(null)
 
@@ -59,6 +69,10 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
       } else {
         // Iniciar el cronómetro por primera vez
         setIsRunning(true)
+        // Cambiar a modo serie cuando se inicia
+        if (timerMode === 'rest' && onTimerModeChange) {
+          onTimerModeChange('series')
+        }
       }
     } else {
       // Parar y registrar los segundos
@@ -85,7 +99,7 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
         component="div" 
         sx={{ 
           fontFamily: 'monospace',
-          color: isRunning ? 'primary.main' : isCaptured ? 'warning.main' : 'text.primary',
+          color: isRunning ? (timerMode === 'series' ? 'warning.main' : 'primary.main') : isCaptured ? 'success.main' : 'text.primary',
           textAlign: 'center',
           fontSize: '2.5rem',
           fontWeight: 'bold',
@@ -108,9 +122,9 @@ export default function TimerComponent({ onTimeComplete, onTimeUpdate, disabled 
           borderRadius: 1.5,
           fontSize: '1.1rem',
           fontWeight: 'bold',
-          backgroundColor: isCaptured ? 'warning.main' : 'primary.main',
+          backgroundColor: isCaptured ? 'success.main' : (timerMode === 'rest' ? 'warning.main' : 'warning.main'),
           '&:hover': {
-            backgroundColor: isCaptured ? 'warning.dark' : 'primary.dark'
+            backgroundColor: isCaptured ? 'success.dark' : (timerMode === 'rest' ? 'warning.dark' : 'warning.dark')
           }
         }}
       >

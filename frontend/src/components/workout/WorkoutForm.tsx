@@ -97,6 +97,7 @@ export default function WorkoutForm({
   const [currentTimerTime, setCurrentTimerTime] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [showTimeTip, setShowTimeTip] = useState(false)
+  const [timerMode, setTimerMode] = useState<'rest' | 'series'>('rest') // 'rest' = descanso, 'series' = serie
   
   // Estado para controlar la expansión de la box de rutina
   const [showRoutineExercises, setShowRoutineExercises] = useState(false)
@@ -609,27 +610,35 @@ export default function WorkoutForm({
           </FormControl>
         </Box>
 
-        {/* Tiempo de la serie */}
+        {/* Tiempo de descanso/serie */}
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: showTimeTip ? 1 : 1 }}>
-            <AccessTimeIcon sx={{ color: 'primary.main', fontSize: 20 }} />
-            <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
-              Tiempo de la serie
+            <AccessTimeIcon sx={{ 
+              color: timerMode === 'series' ? 'warning.main' : 'warning.main', 
+              fontSize: 20 
+            }} />
+            <Typography variant="h6" sx={{ 
+              fontWeight: 600, 
+              color: timerMode === 'series' ? 'warning.main' : 'warning.main' 
+            }}>
+              {timerMode === 'series' ? 'Tiempo de la serie' : 'Tiempo de descanso'}
             </Typography>
-            <IconButton
-              size="small"
-              onClick={() => setShowTimeTip(!showTimeTip)}
-              sx={{ 
-                color: 'primary.main',
-                transform: showTimeTip ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'transform 0.2s ease'
-              }}
-            >
-              <KeyboardArrowDown />
-            </IconButton>
+            {timerMode === 'series' && (
+              <IconButton
+                size="small"
+                onClick={() => setShowTimeTip(!showTimeTip)}
+                sx={{ 
+                  color: 'warning.main',
+                  transform: showTimeTip ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease'
+                }}
+              >
+                <KeyboardArrowDown />
+              </IconButton>
+            )}
           </Box>
           
-          {showTimeTip && (
+          {showTimeTip && timerMode === 'series' && (
             <Alert severity="info" sx={{ mb: 2 }}>
               <Typography variant="body2" sx={{ textAlign: 'left' }}>
                 <strong>💡 Tip:</strong> Usa el cronómetro para medir el tiempo de descanso entre series. 
@@ -645,6 +654,9 @@ export default function WorkoutForm({
               setIsTimerRunning(isRunning)
             }}
             disabled={isLoading}
+            autoStart={timerMode === 'rest'}
+            timerMode={timerMode}
+            onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
           />
         </Box>
 
