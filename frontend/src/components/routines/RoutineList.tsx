@@ -155,15 +155,14 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
     }
   }
 
-  const handleViewRoutine = async (routine: RoutineWithExercises) => {
+  const handleViewRoutine = (routine: RoutineWithExercises) => {
     try {
-      // Obtener la rutina completa con ejercicios
-      const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
-      setSelectedRoutine(fullRoutine)
+      // Usar la rutina que ya tenemos cargada
+      setSelectedRoutine(routine)
       setOpenDetailDialog(true)
     } catch (error) {
-      console.error('Error obteniendo detalles de la rutina:', error)
-      setError('Error al cargar los detalles de la rutina')
+      console.error('Error abriendo detalles de la rutina:', error)
+      setError('Error al abrir los detalles de la rutina')
     }
   }
 
@@ -426,14 +425,14 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   >
                     🏋️ {routine.name}
                   </Typography>
-                  {activeRoutine?.id !== routine.id && (
+                  {(activeRoutine?.id !== routine.id || isRoutineComplete(routine)) && (
                     <IconButton
                       size="small"
                       onClick={() => handleEditNameClick(routine)}
                       sx={{ 
-                        color: 'primary.main',
+                        color: isRoutineComplete(routine) ? 'success.main' : 'primary.main',
                         '&:hover': {
-                          backgroundColor: 'primary.light',
+                          backgroundColor: isRoutineComplete(routine) ? 'success.light' : 'primary.light',
                           color: 'white'
                         }
                       }}
