@@ -18,8 +18,7 @@ import {
   PlayArrow as PlayIcon,
   Stop as StopIcon,
   Notes as NotesIcon,
-  Delete as DeleteIcon,
-  Close as CloseIcon
+  Delete as DeleteIcon
 } from '@mui/icons-material'
 import type { RoutineWithExercises } from '../../types/routine'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
@@ -103,36 +102,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       width: '100%',
       boxSizing: 'border-box'
     }}>
-      {/* Header del modal con botón de cerrar */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        mb: 2
-      }}>
-        <Typography 
-          variant="h5" 
-          component="h1" 
-          sx={{ 
-            fontWeight: 700,
-            color: 'text.primary'
-          }}
-        >
-          Detalles de la Rutina
-        </Typography>
-        <IconButton
-          onClick={onClose}
-          sx={{
-            color: 'text.secondary',
-            '&:hover': {
-              backgroundColor: 'rgba(0,0,0,0.04)',
-              color: 'text.primary'
-            }
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Box>
+
 
       {/* Header de la rutina */}
       <Card 
@@ -302,9 +272,6 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       )}
 
       {/* Lista de ejercicios */}
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-        Ejercicios de la rutina
-      </Typography>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {Array.isArray(routine.exercises) && routine.exercises.length > 0 ? (

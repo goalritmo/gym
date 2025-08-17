@@ -23,7 +23,8 @@ import {
   PlayArrow as PlayIcon,
   Stop as StopIcon,
   FitnessCenter as FitnessCenterIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  Close as CloseIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import type { RoutineWithExercises, CreateRoutineRequest } from '../../types/routine'
@@ -557,7 +558,28 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>Detalles de la Rutina</DialogTitle>
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          pb: 1
+        }}>
+          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+            Detalles de la Rutina
+          </Typography>
+          <IconButton
+            onClick={() => setOpenDetailDialog(false)}
+            sx={{
+              color: 'text.secondary',
+              '&:hover': {
+                backgroundColor: 'rgba(0,0,0,0.04)',
+                color: 'text.primary'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
         <DialogContent>
           {selectedRoutine && (
             <RoutineDetail
