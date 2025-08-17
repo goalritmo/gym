@@ -59,16 +59,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
-  // Funciones para calcular el resumen basado en ejercicios completados manualmente
-  const getTotalSets = () => {
-    if (!routine.exercises || routine.exercises.length === 0) return 0
-    return routine.exercises.reduce((total, exercise) => total + exercise.sets, 0)
-  }
 
-  const getTotalReps = () => {
-    if (!routine.exercises || routine.exercises.length === 0) return 0
-    return routine.exercises.reduce((total, exercise) => total + (exercise.reps * exercise.sets), 0)
-  }
 
   // Funciones para calcular el progreso real basado en checkboxes
   const getCompletedExercises = () => {
