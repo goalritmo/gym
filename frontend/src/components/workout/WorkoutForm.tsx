@@ -26,7 +26,8 @@ import {
   FitnessCenter as FitnessCenterIcon,
   KeyboardArrowDown,
   KeyboardArrowUp,
-  Stop as StopIcon
+  Stop as StopIcon,
+  Close as CloseIcon
 } from '@mui/icons-material'
 import { useState, useEffect } from 'react'
 
@@ -112,6 +113,9 @@ export default function WorkoutForm({
   const realRoutineProgress = activeRoutine 
     ? getRoutineProgress(today, activeRoutine.id, activeRoutine)
     : 0
+  
+  // Detectar si la rutina está completa
+  const isRoutineComplete = realRoutineProgress === 100
 
   // Detectar si el ejercicio seleccionado es Running (ID: 18)
   const selectedExerciseId = watch('exercise_id')
@@ -271,7 +275,7 @@ export default function WorkoutForm({
         <Box sx={{ 
           mb: 3, 
           p: 2, 
-          backgroundColor: isRoutinePaused ? 'primary.main' : 'warning.main', 
+          backgroundColor: isRoutineComplete ? 'success.main' : (isRoutinePaused ? 'primary.main' : 'warning.main'), 
           borderRadius: 2,
           color: 'white',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -295,7 +299,7 @@ export default function WorkoutForm({
                 }
               }}
             >
-              <StopIcon />
+              {isRoutineComplete ? <CloseIcon /> : <StopIcon />}
             </IconButton>
           </Box>
           
@@ -340,7 +344,7 @@ export default function WorkoutForm({
                     setShowRoutineExercises(!showRoutineExercises)
                   }}
                 >
-                  {isRoutinePaused ? 'Elegir rutina' : 'Ver rutina'}
+                  {isRoutineComplete ? '¡Felicitaciones!' : (isRoutinePaused ? 'Elegir rutina' : 'Ver rutina')}
                 </Typography>
               )}
               
