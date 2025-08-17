@@ -392,14 +392,17 @@ function AuthenticatedAppContent() {
 
     const handleStopRoutine = (_event: CustomEvent) => {
       console.log('🛑 Parando rutina desde modal - NO navegando al registro')
+      console.log('📍 Tab actual antes de parar:', activeTab)
       setActiveRoutine(null)
       setIsRoutinePaused(false)
       setRoutineProgress(0)
       localStorage.removeItem('activeRoutine')
       console.log('✅ Rutina parada exitosamente')
+      console.log('📍 Tab actual después de parar:', activeTab)
     }
 
     const handleNavigateToWorkout = (_event: CustomEvent) => {
+      console.log('🚀 Navegando al registro desde handleNavigateToWorkout')
       setActiveTab(TABS.WORKOUT)
     }
 

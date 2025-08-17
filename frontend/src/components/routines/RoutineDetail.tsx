@@ -176,6 +176,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                       sx={{ 
                         backgroundColor: 'transparent',
                         color: 'error.main',
+                        ml: { xs: -1, sm: 0 },
                         '&:hover': {
                           backgroundColor: 'error.main',
                           color: 'white'
@@ -494,7 +495,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             <Box sx={{ 
               display: 'flex',
               alignItems: 'center',
-              justifyContent: { xs: 'space-between', sm: 'center' },
+              justifyContent: 'center',
               p: 2,
               borderRadius: '12px',
               backgroundColor: 'white',
@@ -504,10 +505,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               width: { xs: '100%', sm: 'auto' },
               flex: { xs: 1, sm: 'none' }
             }}>
-              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800 }}>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mr: 2 }}>
                 {getCompletedExercises()}
               </Typography>
-              <Box sx={{ textAlign: { xs: 'right', sm: 'center' } }}>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
                   🏋️ {(getCompletedExercises() === 1 ? 'Ejercicio' : 'Ejercicios')}
                 </Typography>
@@ -519,7 +520,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             <Box sx={{ 
               display: 'flex',
               alignItems: 'center',
-              justifyContent: { xs: 'space-between', sm: 'center' },
+              justifyContent: 'center',
               p: 2,
               borderRadius: '12px',
               backgroundColor: 'white',
@@ -529,10 +530,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               width: { xs: '100%', sm: 'auto' },
               flex: { xs: 1, sm: 'none' }
             }}>
-              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800 }}>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mr: 2 }}>
                 {getCompletedSets()}
               </Typography>
-              <Box sx={{ textAlign: { xs: 'right', sm: 'center' } }}>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
                   🔄 {(getCompletedSets() === 1 ? 'Serie' : 'Series')}
                 </Typography>
@@ -544,7 +545,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             <Box sx={{ 
               display: 'flex',
               alignItems: 'center',
-              justifyContent: { xs: 'space-between', sm: 'center' },
+              justifyContent: 'center',
               p: 2,
               borderRadius: '12px',
               backgroundColor: 'white',
@@ -554,10 +555,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               width: { xs: '100%', sm: 'auto' },
               flex: { xs: 1, sm: 'none' }
             }}>
-              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800 }}>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mr: 2 }}>
                 {getCompletedReps()}
               </Typography>
-              <Box sx={{ textAlign: { xs: 'right', sm: 'center' } }}>
+              <Box sx={{ textAlign: 'center' }}>
                 <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
                   🔄 {(getCompletedReps() === 1 ? 'Rep' : 'Reps')}
                 </Typography>
