@@ -632,11 +632,11 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 } else {
                   // Solo iniciar la rutina sin cerrar el modal ni cambiar de tab
                   console.log('▶️ Click en iniciar rutina desde modal')
-                  const event = new CustomEvent('startRoutine', { 
+                  const event = new CustomEvent('startRoutineFromModal', { 
                     detail: { routine: selectedRoutine } 
                   })
                   window.dispatchEvent(event)
-                  console.log('✅ Evento startRoutine disparado')
+                  console.log('✅ Evento startRoutineFromModal disparado')
                 }
               }}
               onDelete={() => {

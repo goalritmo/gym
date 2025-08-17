@@ -124,34 +124,24 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-between',
             alignItems: { xs: 'flex-start', sm: 'center' },
-            gap: 2
+            gap: { xs: 1, sm: 2 }
           }}>
             <Box sx={{ flex: 1 }}>
-              <Box sx={{ 
-                display: 'flex', 
-                flexDirection: { xs: 'column', sm: 'row' },
-                alignItems: { xs: 'flex-start', sm: 'center' },
-                gap: { xs: 2, sm: 2 },
-                mb: { xs: 2, sm: 0 }
-              }}>
-                <Typography 
-                  variant="h5" 
-                  component="h2" 
-                  sx={{ 
-                    fontWeight: 800,
-                    color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
-                    textShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    flex: 1
-                  }}
-                >
-                  🏋️ {routine.name.length > 24 ? `${routine.name.substring(0, 24)}...` : routine.name}
-                </Typography>
-                
-
-              </Box>
+              <Typography 
+                variant="h5" 
+                component="h2" 
+                sx={{ 
+                  fontWeight: 800,
+                  color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
+                  textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  mb: { xs: 1, sm: 0 }
+                }}
+              >
+                🏋️ {routine.name.length > 24 ? `${routine.name.substring(0, 24)}...` : routine.name}
+              </Typography>
               
               {routine.description && (
                 <Typography 
@@ -173,7 +163,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               gap: 1,
               flexShrink: 0,
               flexWrap: 'wrap',
-              justifyContent: { xs: 'space-between', sm: 'flex-start' },
+              justifyContent: { xs: 'flex-start', sm: 'flex-start' },
               alignItems: 'center',
               width: { xs: '100%', sm: 'auto' }
             }}>
@@ -497,70 +487,84 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             📊 Resumen de la rutina
           </Typography>
           <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', 
-            gap: 3,
-            '@media (max-width: 600px)': {
-              gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-              gap: 2
-            }
+            display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 2, sm: 3 }
           }}>
             <Box sx={{ 
-              textAlign: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'space-between', sm: 'center' },
               p: 2,
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
               borderColor: isRoutineComplete ? 'success.light' : (isActiveRoutine ? 'warning.light' : 'grey.300'),
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              width: { xs: '100%', sm: 'auto' },
+              flex: { xs: 1, sm: 'none' }
             }}>
-                          <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mb: 1 }}>
-              {getCompletedExercises()}
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-              🏋️ {(getCompletedExercises() === 1 ? 'Ejercicio' : 'Ejercicios')}
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-              completados
-            </Typography>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800 }}>
+                {getCompletedExercises()}
+              </Typography>
+              <Box sx={{ textAlign: { xs: 'right', sm: 'center' } }}>
+                <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  🏋️ {(getCompletedExercises() === 1 ? 'Ejercicio' : 'Ejercicios')}
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  completados
+                </Typography>
+              </Box>
             </Box>
             <Box sx={{ 
-              textAlign: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'space-between', sm: 'center' },
               p: 2,
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
               borderColor: isRoutineComplete ? 'success.light' : (isActiveRoutine ? 'warning.light' : 'grey.300'),
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              width: { xs: '100%', sm: 'auto' },
+              flex: { xs: 1, sm: 'none' }
             }}>
-              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800 }}>
                 {getCompletedSets()}
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🔄 {(getCompletedSets() === 1 ? 'Serie' : 'Series')}
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                completadas
-              </Typography>
+              <Box sx={{ textAlign: { xs: 'right', sm: 'center' } }}>
+                <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  🔄 {(getCompletedSets() === 1 ? 'Serie' : 'Series')}
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  completadas
+                </Typography>
+              </Box>
             </Box>
             <Box sx={{ 
-              textAlign: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'space-between', sm: 'center' },
               p: 2,
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
               borderColor: isRoutineComplete ? 'success.light' : (isActiveRoutine ? 'warning.light' : 'grey.300'),
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              width: { xs: '100%', sm: 'auto' },
+              flex: { xs: 1, sm: 'none' }
             }}>
-              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800 }}>
                 {getCompletedReps()}
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                🔄 {(getCompletedReps() === 1 ? 'Rep' : 'Reps')}
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                completadas
-              </Typography>
+              <Box sx={{ textAlign: { xs: 'right', sm: 'center' } }}>
+                <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  🔄 {(getCompletedReps() === 1 ? 'Rep' : 'Reps')}
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  completadas
+                </Typography>
+              </Box>
             </Box>
           </Box>
         </CardContent>

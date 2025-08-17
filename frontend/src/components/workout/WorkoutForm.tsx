@@ -415,7 +415,7 @@ export default function WorkoutForm({
                       }}
                     >
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'white', flex: 1, textAlign: 'left', pl: 2 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'white', flex: 1, textAlign: 'center' }}>
                           {exercise.exercise_name}
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 0.5 }}>
