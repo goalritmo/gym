@@ -185,59 +185,65 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             <Box sx={{ 
               display: 'flex', 
               gap: 1,
-              flexShrink: 0
+              flexShrink: 0,
+              flexWrap: 'wrap',
+              justifyContent: { xs: 'space-between', sm: 'flex-start' },
+              alignItems: 'center',
+              width: '100%'
             }}>
-          {onDelete && (!isActiveRoutine || isRoutineComplete) && (
-            <Tooltip title="Eliminar rutina">
-              <IconButton
-                color="error"
-                onClick={onDelete}
-                sx={{ 
-                  backgroundColor: 'transparent',
-                  color: 'error.main',
-                  '&:hover': {
-                    backgroundColor: 'error.main',
-                    color: 'white'
-                  }
-                }}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-          {onEdit && (!isActiveRoutine || isRoutineComplete) && (
-            <Tooltip title="Editar rutina">
-              <IconButton
-                color={isRoutineComplete ? "success" : "primary"}
-                onClick={onEdit}
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-          {onStart && !isRoutineComplete && (
-            <Tooltip title={isActiveRoutine ? "Rutina en progreso" : "Comenzar rutina"}>
-              <IconButton
-                color={isActiveRoutine ? "warning" : "primary"}
-                onClick={onStart}
-                disabled={isActiveRoutine}
-                sx={{ 
-                  backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: isActiveRoutine ? 'warning.dark' : 'primary.dark'
-                  },
-                  '&.Mui-disabled': {
-                    backgroundColor: 'warning.main',
-                    color: 'white'
-                  }
-                }}
-              >
-                {isActiveRoutine ? <StopIcon /> : <PlayIcon />}
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {onDelete && (!isActiveRoutine || isRoutineComplete) && (
+                  <Tooltip title="Eliminar rutina">
+                    <IconButton
+                      color="error"
+                      onClick={onDelete}
+                      sx={{ 
+                        backgroundColor: 'transparent',
+                        color: 'error.main',
+                        '&:hover': {
+                          backgroundColor: 'error.main',
+                          color: 'white'
+                        }
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {onEdit && (!isActiveRoutine || isRoutineComplete) && (
+                  <Tooltip title="Editar rutina">
+                    <IconButton
+                      color={isRoutineComplete ? "success" : "primary"}
+                      onClick={onEdit}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
+              {onStart && !isRoutineComplete && (
+                <Tooltip title={isActiveRoutine ? "Rutina en progreso" : "Comenzar rutina"}>
+                  <IconButton
+                    color={isActiveRoutine ? "warning" : "primary"}
+                    onClick={onStart}
+                    disabled={isActiveRoutine}
+                    sx={{ 
+                      backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: isActiveRoutine ? 'warning.dark' : 'primary.dark'
+                      },
+                      '&.Mui-disabled': {
+                        backgroundColor: 'warning.main',
+                        color: 'white'
+                      }
+                    }}
+                  >
+                    {isActiveRoutine ? <StopIcon /> : <PlayIcon />}
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Box>
           </Box>
         </CardContent>
       </Card>

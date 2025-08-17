@@ -403,7 +403,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
                 </IconButton>
               )}
-              <CardContent sx={{ p: 3 }}>
+              <CardContent sx={{ p: 3, pb: 2 }}>
                 <Box sx={{ 
                   display: 'flex', 
                   alignItems: 'center', 
@@ -480,7 +480,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               <CardActions sx={{ 
                 justifyContent: 'flex-start', 
                 px: 3, 
-                pb: 3,
+                pb: 2,
                 pt: 0
               }}>
                 <Button
