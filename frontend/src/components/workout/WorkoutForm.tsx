@@ -57,6 +57,7 @@ type WorkoutFormProps = {
   isRoutinePaused?: boolean
   onStopRoutine?: () => void
   preloadedExercise?: any
+  onNavigateToRoutines?: () => void
 }
 
 export default function WorkoutForm({ 
@@ -66,7 +67,8 @@ export default function WorkoutForm({
   activeRoutine,
   isRoutinePaused = false,
   onStopRoutine,
-  preloadedExercise
+  preloadedExercise,
+  onNavigateToRoutines
 }: WorkoutFormProps) {
   const { 
     settings, 
@@ -97,6 +99,7 @@ export default function WorkoutForm({
   // Estado para trackear el tiempo del cronómetro
   const [currentTimerTime, setCurrentTimerTime] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
+  const [isTimerCaptured, setIsTimerCaptured] = useState(false)
   const [showTimeTip, setShowTimeTip] = useState(false)
   const [timerMode, setTimerMode] = useState<'rest' | 'series'>('rest') // 'rest' = descanso, 'series' = serie
   const [timerResetKey, setTimerResetKey] = useState(0)
@@ -274,8 +277,8 @@ export default function WorkoutForm({
         Registrar
       </Typography>
       
-      {/* Barra de progreso de rutina activa */}
-      {activeRoutine && (
+      {/* Box de rutina activa o mensaje de no rutina */}
+      {activeRoutine ? (
         <Box sx={{ 
           mb: 3, 
           p: 2, 
@@ -496,6 +499,51 @@ export default function WorkoutForm({
             </Box>
           )}
         </Box>
+      ) : (
+        // Box cuando no hay rutina activa
+        <Box 
+          sx={{ 
+            mb: 3, 
+            p: 3, 
+            backgroundColor: 'grey.100', 
+            borderRadius: 2,
+            border: '2px dashed',
+            borderColor: 'grey.300',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              backgroundColor: 'grey.200',
+              borderColor: 'grey.400',
+              transform: 'translateY(-1px)'
+            }
+          }}
+          onClick={onNavigateToRoutines}
+        >
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            gap: 2 
+          }}>
+            <FitnessCenterIcon sx={{ 
+              fontSize: 48, 
+              color: 'grey.500' 
+            }} />
+            <Typography variant="h6" sx={{ 
+              color: 'grey.700', 
+              fontWeight: 600,
+              textAlign: 'center'
+            }}>
+              No hay rutina activa
+            </Typography>
+            <Typography variant="body2" sx={{ 
+              color: 'grey.600',
+              textAlign: 'center'
+            }}>
+              Haz click aquí para ir a Mis Rutinas y seleccionar una
+            </Typography>
+          </Box>
+        </Box>
       )}
       
       <form role="form" onSubmit={submit}>
@@ -617,28 +665,15 @@ export default function WorkoutForm({
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: showTimeTip ? 1 : 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <AccessTimeIcon sx={{ 
-                color: timerMode === 'series' ? 'warning.main' : 'primary.main', 
+                color: isTimerCaptured ? 'success.main' : (timerMode === 'series' ? 'warning.main' : 'primary.main'), 
                 fontSize: 20 
               }} />
               <Typography variant="h6" sx={{ 
                 fontWeight: 600, 
-                color: timerMode === 'series' ? 'warning.main' : 'primary.main' 
+                color: isTimerCaptured ? 'success.main' : (timerMode === 'series' ? 'warning.main' : 'primary.main') 
               }}>
                 {timerMode === 'series' ? 'Entrenando...' : 'Descansando...'}
               </Typography>
-              {timerMode === 'series' && (
-                <IconButton
-                  size="small"
-                  onClick={() => setShowTimeTip(!showTimeTip)}
-                  sx={{ 
-                    color: 'warning.main',
-                    transform: showTimeTip ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.2s ease'
-                  }}
-                >
-                  <KeyboardArrowDown />
-                </IconButton>
-              )}
             </Box>
             
             <Switch
@@ -687,6 +722,7 @@ export default function WorkoutForm({
               setCurrentTimerTime(seconds)
               setIsTimerRunning(isRunning)
             }}
+            onCapturedChange={(isCaptured) => setIsTimerCaptured(isCaptured)}
             disabled={isLoading}
             autoStart={timerMode === 'rest'}
             timerMode={timerMode}

@@ -4,6 +4,7 @@ import { Button, Box, Typography } from '@mui/material'
 type TimerComponentProps = {
   onTimeComplete?: (seconds: number) => void
   onTimeUpdate?: (seconds: number, isRunning: boolean) => void
+  onCapturedChange?: (isCaptured: boolean) => void
   disabled?: boolean
   autoStart?: boolean
   timerMode?: 'rest' | 'series'
@@ -14,6 +15,7 @@ type TimerComponentProps = {
 export default function TimerComponent({ 
   onTimeComplete, 
   onTimeUpdate, 
+  onCapturedChange,
   disabled = false,
   autoStart = false,
   timerMode = 'rest',
@@ -25,16 +27,20 @@ export default function TimerComponent({
   const [isCaptured, setIsCaptured] = useState(false)
   const intervalRef = useRef<number | null>(null)
 
-  // Resetear el cronómetro cuando cambie el resetKey
+  // Resetear el cronómetro cuando cambie el resetKey e iniciar automáticamente
   useEffect(() => {
     setTime(0)
-    setIsRunning(false)
     setIsCaptured(false)
+    if (onCapturedChange) {
+      onCapturedChange(false)
+    }
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
       intervalRef.current = null
     }
-  }, [resetKey])
+    // Iniciar automáticamente después del reset
+    setIsRunning(true)
+  }, [resetKey, onCapturedChange])
 
   useEffect(() => {
     if (isRunning) {
@@ -91,6 +97,9 @@ export default function TimerComponent({
       // Parar y registrar los segundos
       setIsRunning(false)
       setIsCaptured(true)
+      if (onCapturedChange) {
+        onCapturedChange(true)
+      }
       if (onTimeComplete) {
         onTimeComplete(time)
       }
