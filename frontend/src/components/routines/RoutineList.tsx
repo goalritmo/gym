@@ -39,6 +39,12 @@ interface RoutineListProps {
 const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgress = 0 }) => {
   const { getRoutineProgress } = useUserSettings()
   const [routines, setRoutines] = useState<RoutineWithExercises[]>([])
+  
+  // Función para detectar si una rutina está completa
+  const isRoutineComplete = (routine: any) => {
+    const today = new Date().toISOString().split('T')[0]
+    return getRoutineProgress(today, routine.id, routine) === 100
+  }
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [openCreateDialog, setOpenCreateDialog] = useState(false)
@@ -314,7 +320,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 height: 'fit-content',
                 width: '100%',
                 border: '2px solid',
-                borderColor: 'grey.300',
+                borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'grey.300'),
                 borderRadius: '16px',
                 overflow: 'hidden',
                 transition: 'all 0.3s ease',
@@ -325,76 +331,76 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 }
               }}
             >
-              {/* Porcentaje de progreso y botón play/stop alineados */}
-              <Box sx={{
-                position: 'absolute',
-                top: 20,
-                right: 16,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                zIndex: 1
-              }}>
-                {activeRoutine?.id === routine.id && (
-                  <Box sx={{
-                    backgroundColor: 'warning.main',
-                    color: 'white',
-                    borderRadius: '12px',
-                    px: 1.5,
-                    py: 0.5,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                  }}>
-                    <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
-                      {(() => {
-                        const today = new Date().toISOString().split('T')[0]
-                        return getRoutineProgress(today, routine.id, routine)
-                      })()}%
-                    </Typography>
-                  </Box>
-                )}
-                <IconButton
-                  size="small"
-                  onClick={async () => {
-                    if (activeRoutine?.id === routine.id) {
-                      // Detener la rutina activa
-                      const event = new CustomEvent('stopRoutine', { 
-                        detail: { routine: routine } 
+              {/* Porcentaje de progreso en esquina superior derecha */}
+              {activeRoutine?.id === routine.id && (
+                <Box sx={{
+                  position: 'absolute',
+                  top: 20,
+                  right: 16,
+                  backgroundColor: isRoutineComplete(routine) ? 'success.main' : 'warning.main',
+                  color: 'white',
+                  borderRadius: '12px',
+                  px: 1.5,
+                  py: 0.5,
+                  zIndex: 1,
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
+                    {(() => {
+                      const today = new Date().toISOString().split('T')[0]
+                      return getRoutineProgress(today, routine.id, routine)
+                    })()}%
+                  </Typography>
+                </Box>
+              )}
+              
+              {/* Botón play/stop en esquina inferior derecha */}
+              <IconButton
+                size="small"
+                onClick={async () => {
+                  if (activeRoutine?.id === routine.id) {
+                    // Detener la rutina activa
+                    const event = new CustomEvent('stopRoutine', { 
+                      detail: { routine: routine } 
+                    })
+                    window.dispatchEvent(event)
+                  } else {
+                    // Obtener la rutina completa, abrir el modal E iniciar la rutina
+                    try {
+                      const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
+                      setSelectedRoutine(fullRoutine)
+                      setOpenDetailDialog(true)
+                      
+                      // Iniciar la rutina automáticamente sin cambiar de tab
+                      const event = new CustomEvent('startRoutineFromModal', { 
+                        detail: { routine: fullRoutine } 
                       })
                       window.dispatchEvent(event)
-                    } else {
-                      // Obtener la rutina completa, abrir el modal E iniciar la rutina
-                      try {
-                        const fullRoutine = await apiClient.getUserRoutine(routine.id) as RoutineWithExercises
-                        setSelectedRoutine(fullRoutine)
-                        setOpenDetailDialog(true)
-                        
-                        // Iniciar la rutina automáticamente sin cambiar de tab
-                        const event = new CustomEvent('startRoutineFromModal', { 
-                          detail: { routine: fullRoutine } 
-                        })
-                        window.dispatchEvent(event)
-                      } catch (error) {
-                        console.error('Error obteniendo detalles de la rutina:', error)
-                        setError('Error al cargar los detalles de la rutina')
-                      }
+                    } catch (error) {
+                      console.error('Error obteniendo detalles de la rutina:', error)
+                      setError('Error al cargar los detalles de la rutina')
                     }
-                  }}
-                  sx={{ 
-                    color: 'white',
-                    backgroundColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
-                    '&:hover': {
-                      backgroundColor: activeRoutine?.id === routine.id ? 'warning.light' : 'primary.light',
-                      color: 'white'
-                    },
-                    '&:focus': {
-                      outline: 'none'
-                    },
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                  }}
-                >
-                  {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
-                </IconButton>
-              </Box>
+                  }
+                }}
+                sx={{ 
+                  position: 'absolute',
+                  bottom: 16,
+                  right: 16,
+                  color: 'white',
+                  backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
+                  '&:hover': {
+                    backgroundColor: isRoutineComplete(routine) ? 'success.light' : (activeRoutine?.id === routine.id ? 'warning.light' : 'primary.light'),
+                    color: 'white'
+                  },
+                  '&:focus': {
+                    outline: 'none'
+                  },
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                  zIndex: 1
+                }}
+              >
+                {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
+              </IconButton>
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ 
                   display: 'flex', 
@@ -407,7 +413,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     component="h2" 
                     sx={{ 
                       fontWeight: 700,
-                      color: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
+                      color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
                       textShadow: '0 1px 2px rgba(0,0,0,0.1)',
                       cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
                       '&:hover': {
@@ -483,19 +489,19 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                     fontWeight: 600,
                     borderRadius: '8px',
                     textTransform: 'none',
-                    color: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
-                    borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
+                    color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
+                    borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
                     '&:hover': {
-                      backgroundColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main',
+                      backgroundColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
                       color: 'white'
                     },
                     '&:focus': {
                       outline: 'none',
-                      borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'
+                      borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main')
                     },
                     '&.Mui-focused': {
                       outline: 'none',
-                      borderColor: activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'
+                      borderColor: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main')
                     }
                   }}
                 >

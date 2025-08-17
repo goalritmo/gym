@@ -50,6 +50,9 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   const today = new Date().toISOString().split('T')[0]
   const completedExercisesForRoutine = getCompletedExercisesForRoutine(today, routine.id)
   const realRoutineProgress = getRoutineProgress(today, routine.id, routine)
+  
+  // Detectar si la rutina está completa
+  const isRoutineComplete = realRoutineProgress === 100
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
@@ -105,11 +108,13 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
         sx={{ 
           mb: 3,
           border: '2px solid',
-          borderColor: isActiveRoutine ? 'warning.main' : 'primary.main',
+          borderColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
           borderRadius: '16px',
-          background: isActiveRoutine 
-            ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
-            : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+          background: isRoutineComplete 
+            ? 'linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)'
+            : (isActiveRoutine 
+              ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
+              : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)')
         }}
       >
         <CardContent sx={{ p: 3 }}>
@@ -127,7 +132,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                 sx={{ 
                   fontWeight: 800, 
                   mb: 1,
-                  color: isActiveRoutine ? 'warning.main' : 'primary.main',
+                  color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
                   textShadow: '0 1px 2px rgba(0,0,0,0.1)'
                 }}
               >
@@ -154,7 +159,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               }}>
                 <Chip
                   label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
-                  color={isActiveRoutine ? "warning" : "primary"}
+                  color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
                   variant="filled"
                   size="medium"
                   sx={{ fontWeight: 700 }}
@@ -454,11 +459,13 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       {/* Resumen de la rutina */}
       <Card sx={{ 
         mt: 3, 
-        backgroundColor: isActiveRoutine 
-          ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
-          : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+        backgroundColor: isRoutineComplete 
+          ? 'linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)'
+          : (isActiveRoutine 
+            ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
+            : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'),
         border: '2px solid',
-        borderColor: isActiveRoutine ? 'warning.main' : 'grey.400',
+        borderColor: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'grey.400'),
         borderRadius: '16px',
         boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
         overflow: 'hidden'
@@ -469,7 +476,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             sx={{ 
               mb: 3, 
               fontWeight: 800,
-              color: isActiveRoutine ? 'warning.main' : 'text.secondary',
+              color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary'),
               textAlign: 'center',
               textShadow: '0 1px 2px rgba(0,0,0,0.1)'
             }}
@@ -491,10 +498,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
-              borderColor: isActiveRoutine ? 'warning.light' : 'grey.300',
+              borderColor: isRoutineComplete ? 'success.light' : (isActiveRoutine ? 'warning.light' : 'grey.300'),
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-                          <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'text.secondary'} sx={{ fontWeight: 800, mb: 1 }}>
+                          <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mb: 1 }}>
               {getCompletedExercises()}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
@@ -507,10 +514,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
-              borderColor: isActiveRoutine ? 'warning.light' : 'grey.300',
+              borderColor: isRoutineComplete ? 'success.light' : (isActiveRoutine ? 'warning.light' : 'grey.300'),
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-              <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'text.secondary'} sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mb: 1 }}>
                 {getCompletedSets()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
@@ -523,10 +530,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               borderRadius: '12px',
               backgroundColor: 'white',
               border: '2px solid',
-              borderColor: isActiveRoutine ? 'warning.light' : 'grey.300',
+              borderColor: isRoutineComplete ? 'success.light' : (isActiveRoutine ? 'warning.light' : 'grey.300'),
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-              <Typography variant="h3" color={isActiveRoutine ? 'warning.main' : 'text.secondary'} sx={{ fontWeight: 800, mb: 1 }}>
+              <Typography variant="h3" color={isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'text.secondary')} sx={{ fontWeight: 800, mb: 1 }}>
                 {getCompletedReps()}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
