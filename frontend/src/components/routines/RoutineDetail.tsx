@@ -150,13 +150,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   🏋️ {routine.name.length > 24 ? `${routine.name.substring(0, 24)}...` : routine.name}
                 </Typography>
                 
-                <Chip
-                  label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
-                  color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
-                  variant="filled"
-                  size="medium"
-                  sx={{ fontWeight: 700 }}
-                />
+
               </Box>
               
               {routine.description && (
@@ -202,6 +196,15 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     </IconButton>
                   </Tooltip>
                 )}
+                
+                <Chip
+                  label={`${routine.exercises?.length || 0} ${(routine.exercises?.length || 0) === 1 ? 'ejercicio' : 'ejercicios'}`}
+                  color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
+                  variant="filled"
+                  size="medium"
+                  sx={{ fontWeight: 700 }}
+                />
+                
                 {onEdit && (isRoutineComplete || !isActiveRoutine) && (
                   <Tooltip title="Editar rutina">
                     <IconButton
