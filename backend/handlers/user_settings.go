@@ -12,6 +12,7 @@ type UserSettings struct {
 	ShowOwnWorkoutsInSocial bool `json:"show_own_workouts_in_social"`
 	UncNotificationsEnabled bool `json:"unc_notifications_enabled"`
 	ShowRoutinesTab         bool `json:"show_routines_tab"`
+	HasConfiguredFavorites  bool `json:"has_configured_favorites"`
 }
 
 // GetUserSettingsHandler obtiene las configuraciones del usuario
@@ -27,7 +28,7 @@ func GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	// Intentar obtener configuraciones existentes
 	var settings UserSettings
 	query := `
-		SELECT show_own_workouts_in_social, unc_notifications_enabled, show_routines_tab
+		SELECT show_own_workouts_in_social, unc_notifications_enabled, show_routines_tab, has_configured_favorites
 		FROM user_settings
 		WHERE user_id = $1
 	`
@@ -36,6 +37,7 @@ func GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 		&settings.ShowOwnWorkoutsInSocial,
 		&settings.UncNotificationsEnabled,
 		&settings.ShowRoutinesTab,
+		&settings.HasConfiguredFavorites,
 	)
 
 	if err != nil {
@@ -45,13 +47,14 @@ func GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 				ShowOwnWorkoutsInSocial: true,
 				UncNotificationsEnabled: true,
 				ShowRoutinesTab:         true,
+				HasConfiguredFavorites:  false,
 			}
 			
 			insertQuery := `
-				INSERT INTO user_settings (user_id, show_own_workouts_in_social, unc_notifications_enabled, show_routines_tab)
-				VALUES ($1, $2, $3, $4)
+				INSERT INTO user_settings (user_id, show_own_workouts_in_social, unc_notifications_enabled, show_routines_tab, has_configured_favorites)
+				VALUES ($1, $2, $3, $4, $5)
 			`
-			_, err = database.DB.Exec(insertQuery, userID, settings.ShowOwnWorkoutsInSocial, settings.UncNotificationsEnabled, settings.ShowRoutinesTab)
+			_, err = database.DB.Exec(insertQuery, userID, settings.ShowOwnWorkoutsInSocial, settings.UncNotificationsEnabled, settings.ShowRoutinesTab, settings.HasConfiguredFavorites)
 			if err != nil {
 				fmt.Printf("Error creando configuraciones por defecto: %v\n", err)
 				http.Error(w, "Error creando configuraciones", http.StatusInternalServerError)
@@ -85,17 +88,18 @@ func UpdateUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Upsert: insertar si no existe, actualizar si existe
 	query := `
-		INSERT INTO user_settings (user_id, show_own_workouts_in_social, unc_notifications_enabled, show_routines_tab)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO user_settings (user_id, show_own_workouts_in_social, unc_notifications_enabled, show_routines_tab, has_configured_favorites)
+		VALUES ($1, $2, $3, $4, $5)
 		ON CONFLICT (user_id) 
 		DO UPDATE SET 
 			show_own_workouts_in_social = EXCLUDED.show_own_workouts_in_social,
 			unc_notifications_enabled = EXCLUDED.unc_notifications_enabled,
 			show_routines_tab = EXCLUDED.show_routines_tab,
+			has_configured_favorites = EXCLUDED.has_configured_favorites,
 			updated_at = NOW()
 	`
 
-	_, err := database.DB.Exec(query, userID, settings.ShowOwnWorkoutsInSocial, settings.UncNotificationsEnabled, settings.ShowRoutinesTab)
+	_, err := database.DB.Exec(query, userID, settings.ShowOwnWorkoutsInSocial, settings.UncNotificationsEnabled, settings.ShowRoutinesTab, settings.HasConfiguredFavorites)
 	if err != nil {
 		fmt.Printf("Error actualizando configuraciones: %v\n", err)
 		http.Error(w, "Error actualizando configuraciones", http.StatusInternalServerError)

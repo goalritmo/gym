@@ -35,6 +35,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const {
     settings,
     setFavoriteExercises,
+    setHasConfiguredFavorites,
     toggleUncNotifications,
     toggleShowOwnWorkoutsInSocial
   } = useUserSettings()
@@ -91,6 +92,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       }
       if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
         setFavoriteExercises(tempSettings.favoriteExercises)
+        // Marcar que el usuario ha configurado manualmente sus favoritos
+        setHasConfiguredFavorites(true)
       }
       setHasChanges(false)
       onClose()

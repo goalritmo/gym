@@ -6,12 +6,14 @@ interface ApiUserSettings {
   show_own_workouts_in_social: boolean
   unc_notifications_enabled: boolean
   show_routines_tab: boolean
+  has_configured_favorites: boolean
 }
 
 interface UserSettings {
   favoriteExercises: number[]
   uncNotificationsEnabled: boolean
   showOwnWorkoutsInSocial: boolean
+  hasConfiguredFavorites: boolean
 }
 
 interface CompletedExercises {
@@ -25,6 +27,7 @@ interface CompletedExercises {
 interface UserSettingsContextType {
   settings: UserSettings
   setFavoriteExercises: (exercises: number[]) => void
+  setHasConfiguredFavorites: (hasConfigured: boolean) => void
   toggleUncNotifications: () => void
   toggleShowOwnWorkoutsInSocial: () => void
   initializeAllExercisesAsFavorites: (exerciseIds: number[]) => void
@@ -43,7 +46,8 @@ const UserSettingsContext = createContext<UserSettingsContextType | undefined>(u
 const defaultSettings: UserSettings = {
   favoriteExercises: [], // Se llenará automáticamente con todos los ejercicios
   uncNotificationsEnabled: true, // Por defecto habilitadas para usuarios UNC
-  showOwnWorkoutsInSocial: true // Por defecto mostrar ejercicios propios en social
+  showOwnWorkoutsInSocial: true, // Por defecto mostrar ejercicios propios en social
+  hasConfiguredFavorites: false // Por defecto no ha configurado favoritos manualmente
 }
 
 export function UserSettingsProvider({ children }: { children: ReactNode }) {
@@ -73,6 +77,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
         ...defaultSettings, 
         showOwnWorkoutsInSocial: apiSettingsTyped.show_own_workouts_in_social,
         uncNotificationsEnabled: apiSettingsTyped.unc_notifications_enabled,
+        hasConfiguredFavorites: apiSettingsTyped.has_configured_favorites,
         favoriteExercises: localSettings.favoriteExercises || []
       })
     } catch (error) {
@@ -111,6 +116,19 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       ...prev, 
       favoriteExercises: exerciseIds
     }))
+  }, [])
+
+  const setHasConfiguredFavorites = useCallback(async (hasConfigured: boolean) => {
+    setSettings(prev => ({ 
+      ...prev, 
+      hasConfiguredFavorites: hasConfigured
+    }))
+    
+    try {
+      await apiClient.updateUserSettings({ has_configured_favorites: hasConfigured })
+    } catch (error) {
+      console.error('Error updating has_configured_favorites setting:', error)
+    }
   }, [])
 
   const toggleUncNotifications = useCallback(async () => {
@@ -242,6 +260,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
   const value: UserSettingsContextType = {
     settings, 
     setFavoriteExercises,
+    setHasConfiguredFavorites,
     toggleUncNotifications,
     toggleShowOwnWorkoutsInSocial,
     initializeAllExercisesAsFavorites,

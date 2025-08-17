@@ -245,7 +245,7 @@ class ApiClient {
     return this.request('/user-settings')
   }
 
-  async updateUserSettings(settings: { show_own_workouts_in_social?: boolean; unc_notifications_enabled?: boolean; show_routines_tab?: boolean }) {
+  async updateUserSettings(settings: { show_own_workouts_in_social?: boolean; unc_notifications_enabled?: boolean; show_routines_tab?: boolean; has_configured_favorites?: boolean }) {
     return this.request('/user-settings', {
       method: 'PUT',
       body: settings
