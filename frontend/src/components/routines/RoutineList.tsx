@@ -443,13 +443,17 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                       color: isRoutineComplete(routine) ? 'success.main' : (activeRoutine?.id === routine.id ? 'warning.main' : 'primary.main'),
                       textShadow: '0 1px 2px rgba(0,0,0,0.1)',
                       cursor: activeRoutine?.id === routine.id ? 'default' : 'pointer',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      flex: 1,
                       '&:hover': {
                         textDecoration: activeRoutine?.id === routine.id ? 'none' : 'underline'
                       }
                     }}
                     onClick={() => activeRoutine?.id !== routine.id && handleEditNameClick(routine)}
                   >
-                    🏋️ {routine.name}
+                    🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
                   </Typography>
                   {(activeRoutine?.id !== routine.id || isRoutineComplete(routine)) && (
                     <IconButton

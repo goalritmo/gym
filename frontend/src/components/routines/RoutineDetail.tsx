@@ -32,6 +32,7 @@ interface RoutineDetailProps {
   isActiveRoutine?: boolean
   routineProgress?: number
   onExerciseClick?: (exercise: any) => void
+  onNavigateToWorkout?: () => void
 }
 
 const RoutineDetail: React.FC<RoutineDetailProps> = ({ 
@@ -42,7 +43,8 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
   onDelete,
   isActiveRoutine = false,
   routineProgress,
-  onExerciseClick
+  onExerciseClick,
+  onNavigateToWorkout
 }) => {
   const { toggleExerciseCompleted, getCompletedExercisesForRoutine, getRoutineProgress } = useUserSettings()
   
@@ -132,10 +134,14 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                   sx={{ 
                     fontWeight: 800,
                     color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
-                    textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                    textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    flex: 1
                   }}
                 >
-                  🏋️ {routine.name}
+                  🏋️ {routine.name.length > 12 ? `${routine.name.substring(0, 12)}...` : routine.name}
                 </Typography>
                 
                 <Chip
@@ -172,7 +178,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
               width: { xs: '100%', sm: 'auto' }
             }}>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                {onDelete && (!isActiveRoutine || isRoutineComplete) && (
+                {onDelete && (isRoutineComplete || !isActiveRoutine) && (
                   <Tooltip title="Eliminar rutina">
                     <IconButton
                       color="error"
@@ -190,10 +196,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     </IconButton>
                   </Tooltip>
                 )}
-                {onEdit && (!isActiveRoutine || isRoutineComplete) && (
+                {onEdit && (isRoutineComplete || !isActiveRoutine) && (
                   <Tooltip title="Editar rutina">
                     <IconButton
-                      color={isRoutineComplete ? "success" : "primary"}
+                      color={isRoutineComplete ? "success" : (isActiveRoutine ? "warning" : "primary")}
                       onClick={onEdit}
                     >
                       <EditIcon />
@@ -571,12 +577,11 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
           <Button
             variant="contained"
             onClick={onStart}
-            disabled={isActiveRoutine}
             startIcon={isActiveRoutine ? <StopIcon /> : <PlayIcon />}
             sx={{
               backgroundColor: isActiveRoutine ? 'warning.main' : 'primary.main',
               '&:hover': {
-                backgroundColor: isActiveRoutine ? 'warning.light' : 'primary.light'
+                backgroundColor: isActiveRoutine ? 'warning.dark' : 'primary.dark'
               }
             }}
           >
