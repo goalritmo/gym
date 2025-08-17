@@ -603,11 +603,19 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 setOpenEditDialog(true)
               }}
               onStart={() => {
-                // Solo iniciar la rutina sin cerrar el modal ni cambiar de tab
-                const event = new CustomEvent('startRoutine', { 
-                  detail: { routine: selectedRoutine } 
-                })
-                window.dispatchEvent(event)
+                if (activeRoutine?.id === selectedRoutine?.id) {
+                  // Detener la rutina activa
+                  const event = new CustomEvent('stopRoutine', { 
+                    detail: { routine: selectedRoutine } 
+                  })
+                  window.dispatchEvent(event)
+                } else {
+                  // Solo iniciar la rutina sin cerrar el modal ni cambiar de tab
+                  const event = new CustomEvent('startRoutine', { 
+                    detail: { routine: selectedRoutine } 
+                  })
+                  window.dispatchEvent(event)
+                }
               }}
               onDelete={() => {
                 setOpenDetailDialog(false)

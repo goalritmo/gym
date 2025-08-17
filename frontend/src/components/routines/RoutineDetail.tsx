@@ -135,7 +135,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                     textShadow: '0 1px 2px rgba(0,0,0,0.1)'
                   }}
                 >
-                  {routine.name}
+                  🏋️ {routine.name}
                 </Typography>
                 
                 <Chip
@@ -357,7 +357,10 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         sx={{ 
                           fontWeight: 600,
                           backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined,
+                          '&:hover': {
+                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
+                          }
                         }}
                       />
                       <Chip
@@ -368,32 +371,41 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
                         sx={{ 
                           fontWeight: 600,
                           backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined,
+                          '&:hover': {
+                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
+                          }
                         }}
                       />
                       {exercise.weight && exercise.weight > 0 && (
                         <Chip
                           label={`${exercise.weight} kg`}
                           size="small"
-                          color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
+                          color={isRoutineComplete ? "success" : (isCompleted || isActiveRoutine ? "warning" : "default")}
                           variant="filled"
-                          sx={{ 
-                            fontWeight: 600,
-                            backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                            color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
-                          }}
+                                                  sx={{ 
+                          fontWeight: 600,
+                          backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
+                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined,
+                          '&:hover': {
+                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
+                          }
+                        }}
                         />
                       )}
                       <Chip
                         label={`${formatTime(exercise.rest_time_seconds)} descanso`}
                         size="small"
-                        color={isRoutineComplete ? "success" : (isCompleted ? "warning" : (isActiveRoutine ? "primary" : "default"))}
+                        color={isRoutineComplete ? "success" : (isCompleted || isActiveRoutine ? "warning" : "default")}
                         variant="filled"
                         icon={<TimerIcon />}
                         sx={{ 
                           fontWeight: 600,
                           backgroundColor: !isActiveRoutine && !isCompleted ? 'grey.300' : undefined,
-                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined
+                          color: !isActiveRoutine && !isCompleted ? 'grey.600' : undefined,
+                          '&:hover': {
+                            backgroundColor: isRoutineComplete ? 'success.dark' : (isActiveRoutine ? 'warning.dark' : 'grey.400')
+                          }
                         }}
                       />
                       

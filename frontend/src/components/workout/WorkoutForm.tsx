@@ -302,8 +302,7 @@ export default function WorkoutForm({
                 textAlign: 'left',
                 cursor: 'pointer',
                 '&:hover': {
-                  opacity: 0.8,
-                  textDecoration: 'underline'
+                  opacity: 0.8
                 }
               }}
               onClick={onNavigateToRoutines}
@@ -480,6 +479,12 @@ export default function WorkoutForm({
                             </Typography>
                           </>
                         )}
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          •
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          {Math.floor(exercise.rest_time_seconds / 60)}:{(exercise.rest_time_seconds % 60).toString().padStart(2, '0')} descanso
+                        </Typography>
                       </Box>
                       
                                               <Button
