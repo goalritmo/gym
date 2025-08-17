@@ -103,7 +103,38 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
       width: '100%',
       boxSizing: 'border-box'
     }}>
-            {/* Header de la rutina */}
+      {/* Header del modal con botón de cerrar */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        mb: 2
+      }}>
+        <Typography 
+          variant="h5" 
+          component="h1" 
+          sx={{ 
+            fontWeight: 700,
+            color: 'text.primary'
+          }}
+        >
+          Detalles de la Rutina
+        </Typography>
+        <IconButton
+          onClick={onClose}
+          sx={{
+            color: 'text.secondary',
+            '&:hover': {
+              backgroundColor: 'rgba(0,0,0,0.04)',
+              color: 'text.primary'
+            }
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
+
+      {/* Header de la rutina */}
       <Card 
         elevation={3}
         sx={{ 
@@ -127,36 +158,17 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
             gap: 2
           }}>
             <Box sx={{ flex: 1 }}>
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'flex-start',
-                mb: 1
-              }}>
-                <Typography 
-                  variant="h4" 
-                  component="h2" 
-                  sx={{ 
-                    fontWeight: 800,
-                    color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
-                    textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  {routine.name}
-                </Typography>
-                <IconButton
-                  onClick={onClose}
-                  sx={{
-                    color: 'text.secondary',
-                    '&:hover': {
-                      backgroundColor: 'rgba(0,0,0,0.04)',
-                      color: 'text.primary'
-                    }
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
+              <Typography 
+                variant="h4" 
+                component="h2" 
+                sx={{ 
+                  fontWeight: 800,
+                  color: isRoutineComplete ? 'success.main' : (isActiveRoutine ? 'warning.main' : 'primary.main'),
+                  textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                }}
+              >
+                {routine.name}
+              </Typography>
               {routine.description && (
                 <Typography 
                   variant="body1" 
@@ -226,7 +238,7 @@ const RoutineDetail: React.FC<RoutineDetailProps> = ({
           {onEdit && (!isActiveRoutine || isRoutineComplete) && (
             <Tooltip title="Editar rutina">
               <IconButton
-                color="primary"
+                color={isRoutineComplete ? "success" : "primary"}
                 onClick={onEdit}
               >
                 <EditIcon />
