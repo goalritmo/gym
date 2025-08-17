@@ -68,17 +68,13 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
   })
 
   const loadRoutines = useCallback(async () => {
-    console.log('🔄 RoutineList - loadRoutines ejecutándose')
     try {
       setLoading(true)
       setError(null)
-      console.log('📡 Llamando a getUserRoutines...')
       const data = await apiClient.getUserRoutines()
-      console.log('📡 Respuesta de getUserRoutines:', data)
       
       // Validar que data sea un array
       if (Array.isArray(data)) {
-        console.log('✅ RoutineList - Datos válidos recibidos:', data.length, 'rutinas')
         
         // Cargar las rutinas completas con ejercicios
         const fullRoutines = await Promise.all(
@@ -95,7 +91,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
         setRoutines(fullRoutines)
       } else if (data === null || data === undefined) {
         // Si no hay rutinas, establecer array vacío
-        console.log('ℹ️ RoutineList - No hay rutinas (null/undefined)')
         setRoutines([])
       } else {
         console.warn('⚠️ RoutineList - API devolvió datos no válidos:', data)
@@ -111,7 +106,6 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
   }, [])
 
   useEffect(() => {
-    console.log('🔄 RoutineList - useEffect ejecutándose, loadRoutines:', loadRoutines)
     loadRoutines()
   }, [loadRoutines])
 
@@ -342,8 +336,12 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                 transition: 'all 0.3s ease',
                 position: 'relative',
                 '&:hover': {
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                  transform: 'translateY(-4px)'
+                  backgroundColor: isRoutineComplete(routine) 
+                    ? '#f0f8f0'  // Verde muy claro para completadas
+                    : (activeRoutine?.id === routine.id 
+                        ? '#fff3e0'  // Naranja muy claro para activas
+                        : '#f0f8ff'  // Azul muy claro para inactivas
+                      )
                 }
               }}
             >
@@ -419,7 +417,7 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
                   {activeRoutine?.id === routine.id ? <StopIcon /> : <PlayIcon />}
                 </IconButton>
               )}
-              <CardContent sx={{ p: 3, pb: 2 }}>
+              <CardContent sx={{ p: 3, pb: 2, pr: 6 }}>
                 <Box sx={{ 
                   display: 'flex', 
                   alignItems: 'center', 

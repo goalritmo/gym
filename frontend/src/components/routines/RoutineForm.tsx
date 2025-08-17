@@ -21,6 +21,7 @@ import {
   DragIndicator as DragIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
+import { useUserSettings } from '../../contexts/UserSettingsContext'
 import type { RoutineWithExercises, CreateRoutineRequest, CreateRoutineExerciseRequest } from '../../types/routine'
 
 interface Exercise {
@@ -35,6 +36,7 @@ interface RoutineFormProps {
 }
 
 const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }) => {
+  const { settings } = useUserSettings()
   const [name, setName] = useState(routine?.name || '')
   const [description, setDescription] = useState(routine?.description || '')
   const [exercises, setExercises] = useState<CreateRoutineExerciseRequest[]>(
@@ -56,14 +58,20 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     try {
       setLoading(true)
       const data = await apiClient.getExercises() as Exercise[]
-      setAvailableExercises(data)
+      
+      // Filtrar solo los ejercicios favoritos si el usuario tiene favoritos configurados
+      const filteredExercises = settings.favoriteExercises.length > 0
+        ? data.filter(exercise => settings.favoriteExercises.includes(exercise.id))
+        : data
+      
+      setAvailableExercises(filteredExercises)
     } catch (err) {
       console.error('Error cargando ejercicios:', err)
       setError('Error al cargar los ejercicios disponibles')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [settings.favoriteExercises])
 
   useEffect(() => {
     loadExercises()
