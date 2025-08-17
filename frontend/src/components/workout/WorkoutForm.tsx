@@ -20,7 +20,9 @@ import {
   TextField, 
   Typography,
   Alert,
-  IconButton
+  IconButton,
+  Switch,
+  FormControlLabel
 } from '@mui/material'
 import { 
   FitnessCenter as FitnessCenterIcon,
@@ -612,30 +614,67 @@ export default function WorkoutForm({
 
         {/* Tiempo de descanso/serie */}
         <Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: showTimeTip ? 1 : 1 }}>
-            <AccessTimeIcon sx={{ 
-              color: timerMode === 'series' ? 'warning.main' : 'warning.main', 
-              fontSize: 20 
-            }} />
-            <Typography variant="h6" sx={{ 
-              fontWeight: 600, 
-              color: timerMode === 'series' ? 'warning.main' : 'warning.main' 
-            }}>
-              {timerMode === 'series' ? 'Tiempo de la serie' : 'Tiempo de descanso'}
-            </Typography>
-            {timerMode === 'series' && (
-              <IconButton
-                size="small"
-                onClick={() => setShowTimeTip(!showTimeTip)}
-                sx={{ 
-                  color: 'warning.main',
-                  transform: showTimeTip ? 'rotate(180deg)' : 'rotate(0deg)',
-                  transition: 'transform 0.2s ease'
-                }}
-              >
-                <KeyboardArrowDown />
-              </IconButton>
-            )}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: showTimeTip ? 1 : 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <AccessTimeIcon sx={{ 
+                color: timerMode === 'series' ? 'warning.main' : 'warning.main', 
+                fontSize: 20 
+              }} />
+              <Typography variant="h6" sx={{ 
+                fontWeight: 600, 
+                color: timerMode === 'series' ? 'warning.main' : 'warning.main' 
+              }}>
+                {timerMode === 'series' ? 'Entrenando...' : 'Descansando...'}
+              </Typography>
+              {timerMode === 'series' && (
+                <IconButton
+                  size="small"
+                  onClick={() => setShowTimeTip(!showTimeTip)}
+                  sx={{ 
+                    color: 'warning.main',
+                    transform: showTimeTip ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease'
+                  }}
+                >
+                  <KeyboardArrowDown />
+                </IconButton>
+              )}
+            </Box>
+            
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={timerMode === 'series'}
+                  onChange={(e) => {
+                    const newMode = e.target.checked ? 'series' : 'rest'
+                    setTimerMode(newMode)
+                    setShowTimeTip(false)
+                    // Resetear el cronómetro
+                    setCurrentTimerTime(0)
+                    setIsTimerRunning(false)
+                  }}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: 'warning.main',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 152, 0, 0.08)',
+                      },
+                    },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: 'warning.main',
+                    },
+                  }}
+                />
+              }
+              label={timerMode === 'series' ? 'Entrenando' : 'Descansando'}
+              sx={{
+                '& .MuiFormControlLabel-label': {
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  color: timerMode === 'series' ? 'warning.main' : 'text.secondary'
+                }
+              }}
+            />
           </Box>
           
           {showTimeTip && timerMode === 'series' && (

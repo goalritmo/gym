@@ -206,8 +206,25 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <CircularProgress />
+      <Box 
+        display="flex" 
+        flexDirection="column"
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="400px"
+        gap={3}
+      >
+        <CircularProgress size={60} thickness={4} sx={{ color: 'primary.main' }} />
+        <Typography 
+          variant="h6" 
+          color="text.secondary"
+          sx={{ 
+            fontWeight: 500,
+            textAlign: 'center'
+          }}
+        >
+          Cargando rutinas...
+        </Typography>
       </Box>
     )
   }
