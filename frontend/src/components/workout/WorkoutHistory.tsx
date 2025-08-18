@@ -686,11 +686,14 @@ export default function WorkoutHistory() {
                         <CircularProgress size={40} sx={{ color: 'primary.main' }} />
                       </Box>
                     )}
-                    <CardContent sx={{ p: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <CardContent sx={{ p: 2, py: 1.5 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                            Serie nº{workout.set}
+                            {workout.is_sport || workout.exercise_name.toLowerCase().includes('running') ? 
+                              getSportEmoji(workout.exercise_name) || `Serie nº${workout.set}` : 
+                              `Serie nº${workout.set}`
+                            }
                           </Typography>
                           
                           <Stack direction="row" spacing={1} alignItems="center">
