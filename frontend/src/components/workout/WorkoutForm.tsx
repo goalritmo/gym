@@ -645,7 +645,7 @@ export default function WorkoutForm({
             {filteredExercises.map((ex) => (
               <MenuItem key={ex.id} value={ex.id}>
                 {ex.name}
-                {ex.name.toLowerCase().includes('running') && ' ⭐'}
+                {ex.name.toLowerCase().includes('running') && ' 🏃‍♂️'}
                 {ex.name.toLowerCase().includes('fútbol') && ' ⚽'}
                 {ex.name.toLowerCase().includes('básquet') && ' 🏀'}
                 {ex.name.toLowerCase().includes('pádel') && ' 🎾'}

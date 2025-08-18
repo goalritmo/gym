@@ -78,7 +78,7 @@ export default function WorkoutHistory() {
     if (name.includes('fútbol')) return '⚽'
     if (name.includes('básquet') || name.includes('baloncesto')) return '🏀'
     if (name.includes('pádel')) return '🎾'
-    if (name.includes('running')) return '⭐'
+    if (name.includes('running')) return '🏃‍♂️'
     return null
   }
 
@@ -498,7 +498,8 @@ export default function WorkoutHistory() {
                             {group.exerciseName}
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.9rem' }}>
-                            {group.workouts.every(workout => workout.is_sport) ? 
+                            {(group.workouts.every(workout => workout.is_sport) || 
+                              group.exerciseName.toLowerCase().includes('running')) ? 
                               getSportEmoji(group.exerciseName) || group.workouts.length : 
                               group.workouts.length
                             }
