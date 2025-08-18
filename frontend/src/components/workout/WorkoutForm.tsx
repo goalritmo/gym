@@ -639,6 +639,14 @@ export default function WorkoutForm({
               <MenuItem key={ex.id} value={ex.id}>
                 {ex.name}
                 {ex.name.toLowerCase().includes('running') && ' ⭐'}
+                {ex.name.toLowerCase().includes('fútbol') && ' ⚽'}
+                {ex.name.toLowerCase().includes('futbol') && ' ⚽'}
+                {ex.name.toLowerCase().includes('baloncesto') && ' 🏀'}
+                {ex.name.toLowerCase().includes('basquet') && ' 🏀'}
+                {ex.name.toLowerCase().includes('basket') && ' 🏀'}
+                {ex.name.toLowerCase().includes('básquet') && ' 🏀'}
+                {ex.name.toLowerCase().includes('padel') && ' 🎾'}
+                {ex.name.toLowerCase().includes('pádel') && ' 🎾'}
               </MenuItem>
             ))}
           </Select>
@@ -652,7 +660,7 @@ export default function WorkoutForm({
             flexDirection: { xs: 'column', sm: 'row' }
           }}>
             <TextField
-              label="Tiempo de práctica (minutos)"
+              label="Tiempo (minutos)"
               type="number"
               disabled={isLoading}
               error={Boolean(errors.seconds)}
@@ -667,7 +675,7 @@ export default function WorkoutForm({
                 max: 480 // 8 horas máximo
               }}
               sx={{
-                flex: 1,
+                flex: 2, // 2/3 del espacio
                 '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
                   display: 'none'
                 },
@@ -681,7 +689,7 @@ export default function WorkoutForm({
               fullWidth 
               error={Boolean(errors.set)}
               disabled={true} // Siempre bloqueado en 1 para deportes
-              sx={{ flex: 1 }}
+              sx={{ flex: 1 }} // 1/3 del espacio
             >
               <InputLabel id="serie-select-label">Serie</InputLabel>
               <Select
