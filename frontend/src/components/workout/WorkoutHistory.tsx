@@ -690,7 +690,7 @@ export default function WorkoutHistory() {
                       p: 2, 
                       py: 1.5,
                       '&:last-child': {
-                        paddingBottom: 0
+                        paddingBottom: 1
                       }
                     }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
