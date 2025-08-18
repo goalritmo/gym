@@ -56,6 +56,7 @@ create table public.exercises (
   equipment_id bigint not null,
   video_url text null,
   observations text null,
+  is_sport boolean not null default false,
   created_at timestamp with time zone not null default now(),
   constraint exercises_pkey primary key (id),
   constraint exercises_name_key unique (name),

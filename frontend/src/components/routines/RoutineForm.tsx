@@ -27,6 +27,7 @@ import type { RoutineWithExercises, CreateRoutineRequest, CreateRoutineExerciseR
 interface Exercise {
   id: number
   name: string
+  is_sport?: boolean
 }
 
 interface RoutineFormProps {
@@ -59,10 +60,13 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
       setLoading(true)
       const data = await apiClient.getExercises() as Exercise[]
       
+      // Filtrar ejercicios: excluir deportes y aplicar filtros de favoritos
+      let filteredExercises = data.filter(exercise => !exercise.is_sport) // Excluir deportes
+      
       // Filtrar solo los ejercicios favoritos si el usuario ha configurado manualmente sus favoritos
-      const filteredExercises = settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0
-        ? data.filter(exercise => settings.favoriteExercises.includes(exercise.id))
-        : data
+      if (settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0) {
+        filteredExercises = filteredExercises.filter(exercise => settings.favoriteExercises.includes(exercise.id))
+      }
       
       setAvailableExercises(filteredExercises)
     } catch (err) {

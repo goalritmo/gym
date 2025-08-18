@@ -301,6 +301,7 @@ class ApiClient {
     equipment: string
     video_url?: string
     bodyweight?: boolean
+    is_sport?: boolean
   }) {
     return this.request('/admin/exercises', {
       method: 'POST',

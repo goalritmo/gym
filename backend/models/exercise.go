@@ -14,6 +14,7 @@ type Exercise struct {
 	Equipment        string   `json:"equipment" db:"equipment"`
 	VideoURL         *string  `json:"video_url" db:"video_url"`
 	Bodyweight       bool     `json:"bodyweight" db:"bodyweight"`
+	IsSport          bool     `json:"is_sport" db:"is_sport"`
 	CreatedAt        time.Time `json:"created_at" db:"created_at"`
 }
 
@@ -22,4 +23,5 @@ type ExerciseFilter struct {
 	MuscleGroup string `json:"muscle_group"`
 	Equipment   string `json:"equipment"`
 	Search      string `json:"search"`
+	IsSport     *bool  `json:"is_sport"`
 }

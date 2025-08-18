@@ -8,6 +8,7 @@ type Exercise = {
   id: number
   name: string
   bodyweight?: boolean
+  is_sport?: boolean
 }
 import { 
   Box, 
@@ -127,19 +128,23 @@ export default function WorkoutForm({
   
   const isRunningExercise = selectedExerciseId === 18
   
-  // Forzar modo "Entrenando..." cuando el ejercicio es Running
-  const effectiveTimerMode = isRunningExercise ? 'series' : timerMode
-  
   // Detectar ejercicios de peso corporal usando el campo bodyweight del ejercicio
   const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId)
   const isBodyweightExercise = selectedExercise?.bodyweight || false
+  
+  // Detectar si el ejercicio seleccionado es un deporte
+  const isSportExercise = selectedExercise?.is_sport || false
+  
+  // Forzar modo "Entrenando..." cuando el ejercicio es Running o un deporte
+  const effectiveTimerMode = (isRunningExercise || isSportExercise) ? 'series' : timerMode
 
-  // Establecer reps = 1 automáticamente cuando se selecciona Running
+  // Establecer reps = 1 automáticamente cuando se selecciona Running o un deporte
   useEffect(() => {
-    if (isRunningExercise) {
+    if (isRunningExercise || isSportExercise) {
       setValue('reps', 1)
+      setValue('set', 1) // Bloquear serie en 1 para deportes
     }
-  }, [isRunningExercise, setValue])
+  }, [isRunningExercise, isSportExercise, setValue])
 
   // Limpiar peso cuando se selecciona ejercicio de peso corporal
   useEffect(() => {
@@ -639,49 +644,27 @@ export default function WorkoutForm({
           </Select>
         </FormControl>
 
-        {/* Peso/Distancia, Reps y Serie en la misma fila */}
-        <Box sx={{ 
-          display: 'flex', 
-          gap: 2, 
-          flexDirection: { xs: 'row' }
-        }}>
-          <TextField
-            label={isRunningExercise ? "Distancia (km)" : (isBodyweightExercise ? "Peso (opcional)" : "Peso (kg)")}
-            type="number"
-            disabled={isLoading}
-            error={Boolean(errors.weight)}
-            value={watch('weight') === undefined || watch('weight') === null ? '' : watch('weight')}
-            onChange={(e) => handleNumberInput('weight', e.target.value)}
-            inputProps={{ 
-              step: 'any',
-              inputMode: 'decimal',
-              min: isRunningExercise ? 0.1 : 0.1,
-              max: isRunningExercise ? 100 : 1000
-            }}
-            sx={{
-              flex: isRunningExercise ? 2 : 1, // 2/3 del espacio para Running
-              '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                display: 'none'
-              },
-              '& input[type=number]': {
-                MozAppearance: 'textfield'
-              }
-            }}
-          />
-
-          {/* Ocultar campo Reps para Running */}
-          {!isRunningExercise && (
+        {/* Interfaz para deportes */}
+        {isSportExercise ? (
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            flexDirection: { xs: 'column', sm: 'row' }
+          }}>
             <TextField
-              label="Reps"
+              label="Tiempo de práctica (minutos)"
               type="number"
               disabled={isLoading}
-              error={Boolean(errors.reps)}
-              value={watch('reps') || ''}
-              onChange={(e) => handleNumberInput('reps', e.target.value)}
+              error={Boolean(errors.seconds)}
+              value={watch('seconds') ? Math.floor((watch('seconds') as number) / 60) : ''}
+              onChange={(e) => {
+                const minutes = parseInt(e.target.value) || 0
+                setValue('seconds', minutes * 60) // Convertir minutos a segundos
+              }}
               inputProps={{ 
                 inputMode: 'numeric',
                 min: 1,
-                max: 100
+                max: 480 // 8 horas máximo
               }}
               sx={{
                 flex: 1,
@@ -693,98 +676,174 @@ export default function WorkoutForm({
                 }
               }}
             />
-          )}
-
-          <FormControl 
-            fullWidth 
-            error={Boolean(errors.set)}
-            disabled={isLoading || isRunningExercise} // Bloquear para Running
-            sx={{ flex: 1 }}
-          >
-            <InputLabel id="serie-select-label">Serie</InputLabel>
-            <Select
-              labelId="serie-select-label"
-              label="Serie"
-              value={watch('set')}
-              {...register('set', { valueAsNumber: true })}
-            >
-              {[1, 2, 3, 4, 5].map((serie) => (
-                <MenuItem key={serie} value={serie}>
-                  {serie}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-
-        {/* Tiempo de descanso/serie */}
-        <Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: showTimeTip ? 1 : 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <AccessTimeIcon sx={{ 
-                color: effectiveTimerMode === 'series' ? 'warning.main' : 'primary.main', 
-                fontSize: 20 
-              }} />
-              <Typography variant="h6" sx={{ 
-                fontWeight: 600, 
-                color: effectiveTimerMode === 'series' ? 'warning.main' : 'primary.main' 
-              }}>
-                {effectiveTimerMode === 'series' ? 'Entrenando...' : 'Descansando...'}
-              </Typography>
-            </Box>
             
+            <FormControl 
+              fullWidth 
+              error={Boolean(errors.set)}
+              disabled={true} // Siempre bloqueado en 1 para deportes
+              sx={{ flex: 1 }}
+            >
+              <InputLabel id="serie-select-label">Serie</InputLabel>
+              <Select
+                labelId="serie-select-label"
+                label="Serie"
+                value={1}
+                {...register('set', { valueAsNumber: true })}
+              >
+                <MenuItem value={1}>1</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        ) : (
+          /* Interfaz normal para ejercicios no deportivos */
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            flexDirection: { xs: 'row' }
+          }}>
+            <TextField
+              label={isRunningExercise ? "Distancia (km)" : (isBodyweightExercise ? "Peso (opcional)" : "Peso (kg)")}
+              type="number"
+              disabled={isLoading}
+              error={Boolean(errors.weight)}
+              value={watch('weight') === undefined || watch('weight') === null ? '' : watch('weight')}
+              onChange={(e) => handleNumberInput('weight', e.target.value)}
+              inputProps={{ 
+                step: 'any',
+                inputMode: 'decimal',
+                min: isRunningExercise ? 0.1 : 0.1,
+                max: isRunningExercise ? 100 : 1000
+              }}
+              sx={{
+                flex: isRunningExercise ? 2 : 1, // 2/3 del espacio para Running
+                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                  display: 'none'
+                },
+                '& input[type=number]': {
+                  MozAppearance: 'textfield'
+                }
+              }}
+            />
+
+            {/* Ocultar campo Reps para Running */}
             {!isRunningExercise && (
-              <Switch
-                checked={timerMode === 'series'}
-                onChange={(e) => {
-                  const newMode = e.target.checked ? 'series' : 'rest'
-                  setTimerMode(newMode)
-                  setShowTimeTip(false)
-                  // Resetear el cronómetro completamente
-                  setCurrentTimerTime(0)
-                  setIsTimerRunning(false)
-                  // Resetear el campo del formulario
-                  setValue('seconds', '')
+              <TextField
+                label="Reps"
+                type="number"
+                disabled={isLoading}
+                error={Boolean(errors.reps)}
+                value={watch('reps') || ''}
+                onChange={(e) => handleNumberInput('reps', e.target.value)}
+                inputProps={{ 
+                  inputMode: 'numeric',
+                  min: 1,
+                  max: 100
                 }}
                 sx={{
-                  '& .MuiSwitch-switchBase': {
-                    color: 'grey.400',
-                    '&.Mui-checked': {
-                      color: 'grey.400',
-                    },
-                    '&.Mui-checked + .MuiSwitch-track': {
-                      backgroundColor: 'grey.400',
-                    },
+                  flex: 1,
+                  '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                    display: 'none'
                   },
-                  '& .MuiSwitch-track': {
-                    backgroundColor: 'grey.400',
-                  },
+                  '& input[type=number]': {
+                    MozAppearance: 'textfield'
+                  }
                 }}
               />
             )}
-          </Box>
-          
-          {showTimeTip && effectiveTimerMode === 'series' && (
-            <Alert severity="info" sx={{ mb: 2 }}>
-              <Typography variant="body2" sx={{ textAlign: 'left' }}>
-                <strong>💡 Tip:</strong> Usa el cronómetro para medir el tiempo de descanso entre series. 
-                El tiempo se guardará automáticamente cuando envíes el formulario.
-              </Typography>
-            </Alert>
-          )}
-          
-          <TimerComponent 
-            onTimeComplete={(seconds) => setValue('seconds', seconds)}
-            onTimeUpdate={(seconds, isRunning) => {
-              setCurrentTimerTime(seconds)
-              setIsTimerRunning(isRunning)
-            }}
 
-            disabled={isLoading}
-            timerMode={effectiveTimerMode}
-            onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
-          />
-        </Box>
+            <FormControl 
+              fullWidth 
+              error={Boolean(errors.set)}
+              disabled={isLoading || isRunningExercise} // Bloquear para Running
+              sx={{ flex: 1 }}
+            >
+              <InputLabel id="serie-select-label">Serie</InputLabel>
+              <Select
+                labelId="serie-select-label"
+                label="Serie"
+                value={watch('set')}
+                {...register('set', { valueAsNumber: true })}
+              >
+                {[1, 2, 3, 4, 5].map((serie) => (
+                  <MenuItem key={serie} value={serie}>
+                    {serie}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        )}
+
+        {/* Tiempo de descanso/serie - Oculto para deportes */}
+        {!isSportExercise && (
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: showTimeTip ? 1 : 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <AccessTimeIcon sx={{ 
+                  color: effectiveTimerMode === 'series' ? 'warning.main' : 'primary.main', 
+                  fontSize: 20 
+                }} />
+                <Typography variant="h6" sx={{ 
+                  fontWeight: 600, 
+                  color: effectiveTimerMode === 'series' ? 'warning.main' : 'primary.main' 
+                }}>
+                  {effectiveTimerMode === 'series' ? 'Entrenando...' : 'Descansando...'}
+                </Typography>
+              </Box>
+              
+              {!isRunningExercise && (
+                <Switch
+                  checked={timerMode === 'series'}
+                  onChange={(e) => {
+                    const newMode = e.target.checked ? 'series' : 'rest'
+                    setTimerMode(newMode)
+                    setShowTimeTip(false)
+                    // Resetear el cronómetro completamente
+                    setCurrentTimerTime(0)
+                    setIsTimerRunning(false)
+                    // Resetear el campo del formulario
+                    setValue('seconds', '')
+                  }}
+                  sx={{
+                    '& .MuiSwitch-switchBase': {
+                      color: 'grey.400',
+                      '&.Mui-checked': {
+                        color: 'grey.400',
+                      },
+                      '&.Mui-checked + .MuiSwitch-track': {
+                        backgroundColor: 'grey.400',
+                      },
+                    },
+                    '& .MuiSwitch-track': {
+                      backgroundColor: 'grey.400',
+                    },
+                  }}
+                />
+              )}
+            </Box>
+            
+            {showTimeTip && effectiveTimerMode === 'series' && (
+              <Alert severity="info" sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ textAlign: 'left' }}>
+                  <strong>💡 Tip:</strong> Usa el cronómetro para medir el tiempo de descanso entre series. 
+                  El tiempo se guardará automáticamente cuando envíes el formulario.
+                </Typography>
+              </Alert>
+            )}
+            
+            <TimerComponent 
+              onTimeComplete={(seconds) => setValue('seconds', seconds)}
+              onTimeUpdate={(seconds, isRunning) => {
+                setCurrentTimerTime(seconds)
+                setIsTimerRunning(isRunning)
+              }}
+
+              disabled={isLoading}
+              timerMode={effectiveTimerMode}
+              onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
+            />
+          </Box>
+        )}
 
         {/* Observaciones */}
         <TextField
