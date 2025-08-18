@@ -42,7 +42,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := `
 		SELECT w.id, w.user_id, w.workout_day_id, w.exercise_id, e.name as exercise_name, 
-			   w.weight, w.reps, w.set, w.seconds, w.observations, w.created_at
+			   w.weight, w.reps, w.set, w.seconds, w.observations, w.created_at, e.is_sport
 		FROM workouts w
 		JOIN exercises e ON w.exercise_id = e.id
 		WHERE w.user_id = $1
@@ -86,6 +86,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			&workout.Seconds,
 			&workout.Observations,
 			&workout.CreatedAt,
+			&workout.IsSport,
 		)
 		if err != nil {
 			fmt.Printf("Error escaneando workout: %v\n", err)

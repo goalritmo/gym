@@ -26,6 +26,7 @@ type Workout struct {
 	Set          int       `json:"set" db:"set"`
 	Seconds      *int      `json:"seconds" db:"seconds"`
 	Observations string    `json:"observations" db:"observations"`
+	IsSport      bool      `json:"is_sport" db:"is_sport"`
 	CreatedAt    time.Time `json:"created_at" db:"created_at"`
 }
 

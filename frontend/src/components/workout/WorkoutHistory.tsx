@@ -60,6 +60,18 @@ export default function WorkoutHistory() {
     }
   }
 
+  // Función para formatear tiempo de deportes en formato legible
+  const formatTimeForSport = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`
+    } else {
+      return `${minutes}m`
+    }
+  }
+
   // Agrupar workouts por día y crear días con ejercicios
   const workoutDaysWithExercises = useMemo(() => {
     const days: WorkoutDayWithExercises[] = [];
@@ -588,6 +600,11 @@ export default function WorkoutHistory() {
             onClose={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
             maxWidth="md"
             fullWidth
+            BackdropProps={{
+              sx: {
+                backgroundColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            }}
           >
             <DialogTitle sx={{ 
               pb: 1, 
@@ -651,54 +668,78 @@ export default function WorkoutHistory() {
                           </Typography>
                           
                           <Stack direction="row" spacing={1} alignItems="center">
-                            <Chip 
-                              label={workout.weight === 0 ? 'Peso corporal' : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') ? 'km' : 'kg'}`} 
-                              variant="outlined" 
-                              size="small"
-                              sx={{ 
-                                fontWeight: 'bold',
-                                borderColor: '#2196f3',
-                                color: '#2196f3',
-                                minWidth: workout.weight === 0 ? '100px' : '60px',
-                                '&:hover': {
-                                  backgroundColor: '#2196f3',
-                                  color: 'white'
-                                }
-                              }}
-                            />
-                            {!workout.exercise_name.toLowerCase().includes('running') && (
-                              <Chip 
-                                label={`${workout.reps} reps`} 
-                                variant="outlined" 
-                                size="small"
-                                sx={{ 
-                                  fontWeight: 'bold',
-                                  borderColor: '#4caf50',
-                                  color: '#4caf50',
-                                  minWidth: '60px',
-                                  '&:hover': {
-                                    backgroundColor: '#4caf50',
-                                    color: 'white'
-                                  }
-                                }}
-                              />
-                            )}
-                            {workout.seconds && workout.seconds > 0 && (
-                              <Chip 
-                                label={`${workout.seconds}s`} 
-                                variant="outlined" 
-                                size="small"
-                                sx={{ 
-                                  fontWeight: 'bold',
-                                  borderColor: '#4caf50',
-                                  color: '#4caf50',
-                                  minWidth: '50px',
-                                  '&:hover': {
-                                    backgroundColor: '#4caf50',
-                                    color: 'white'
-                                  }
-                                }}
-                              />
+                            {/* Para deportes, mostrar solo el tiempo formateado */}
+                            {workout.is_sport ? (
+                              workout.seconds && workout.seconds > 0 && (
+                                <Chip 
+                                  label={formatTimeForSport(workout.seconds)} 
+                                  variant="outlined" 
+                                  size="small"
+                                  sx={{ 
+                                    fontWeight: 'bold',
+                                    borderColor: '#ff9800',
+                                    color: '#ff9800',
+                                    minWidth: '80px',
+                                    '&:hover': {
+                                      backgroundColor: '#ff9800',
+                                      color: 'white'
+                                    }
+                                  }}
+                                />
+                              )
+                            ) : (
+                              /* Para ejercicios normales, mostrar peso, reps y tiempo */
+                              <>
+                                <Chip 
+                                  label={workout.weight === 0 ? 'Peso corporal' : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') ? 'km' : 'kg'}`} 
+                                  variant="outlined" 
+                                  size="small"
+                                  sx={{ 
+                                    fontWeight: 'bold',
+                                    borderColor: '#2196f3',
+                                    color: '#2196f3',
+                                    minWidth: workout.weight === 0 ? '100px' : '60px',
+                                    '&:hover': {
+                                      backgroundColor: '#2196f3',
+                                      color: 'white'
+                                    }
+                                  }}
+                                />
+                                {!workout.exercise_name.toLowerCase().includes('running') && (
+                                  <Chip 
+                                    label={`${workout.reps} reps`} 
+                                    variant="outlined" 
+                                    size="small"
+                                    sx={{ 
+                                      fontWeight: 'bold',
+                                      borderColor: '#4caf50',
+                                      color: '#4caf50',
+                                      minWidth: '60px',
+                                      '&:hover': {
+                                        backgroundColor: '#4caf50',
+                                        color: 'white'
+                                      }
+                                    }}
+                                  />
+                                )}
+                                {workout.seconds && workout.seconds > 0 && (
+                                  <Chip 
+                                    label={`${workout.seconds}s`} 
+                                    variant="outlined" 
+                                    size="small"
+                                    sx={{ 
+                                      fontWeight: 'bold',
+                                      borderColor: '#4caf50',
+                                      color: '#4caf50',
+                                      minWidth: '50px',
+                                      '&:hover': {
+                                        backgroundColor: '#4caf50',
+                                        color: 'white'
+                                      }
+                                    }}
+                                  />
+                                )}
+                              </>
                             )}
                           </Stack>
                         </Box>

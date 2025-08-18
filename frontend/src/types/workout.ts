@@ -23,6 +23,7 @@ export interface Workout {
   seconds?: number
   observations: string
   created_at: string
+  is_sport?: boolean
 }
 
 export interface CreateWorkoutRequest {
