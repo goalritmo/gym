@@ -22,7 +22,8 @@ import {
   Typography,
   Alert,
   IconButton,
-  Switch
+  Switch,
+  Snackbar
 } from '@mui/material'
 import { 
   FitnessCenter as FitnessCenterIcon,
@@ -233,12 +234,18 @@ export default function WorkoutForm({
 
   const submit = handleSubmit(async (data: WorkoutFormData) => {
     try {
-      // Solo usar el tiempo del cronómetro si está en modo "Entrenando..." (series)
-      if (effectiveTimerMode === 'series' && isTimerRunning && currentTimerTime > 0) {
-        data.seconds = currentTimerTime
-      } else if (effectiveTimerMode === 'rest') {
-        // En modo "Descansando...", los segundos deben ser 0
-        data.seconds = 0
+      // Para deportes, usar el valor del campo seconds directamente (ya convertido a segundos)
+      if (isSportExercise) {
+        // El valor ya está en segundos desde el onChange del campo
+        data.seconds = data.seconds || 0
+      } else {
+        // Para ejercicios normales, usar la lógica del cronómetro
+        if (effectiveTimerMode === 'series' && isTimerRunning && currentTimerTime > 0) {
+          data.seconds = currentTimerTime
+        } else if (effectiveTimerMode === 'rest') {
+          // En modo "Descansando...", los segundos deben ser 0
+          data.seconds = 0
+        }
       }
       
       // Crear objeto de datos sin el campo weight si está vacío
@@ -887,27 +894,51 @@ export default function WorkoutForm({
       </Stack>
       </form>
 
-      {/* Mensaje de éxito */}
-      {showSuccess && (
+      {/* Snackbar de éxito */}
+      <Snackbar
+        open={showSuccess}
+        autoHideDuration={4000}
+        onClose={() => setShowSuccess(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{
+          '& .MuiSnackbarContent-root': {
+            backgroundColor: 'success.main',
+            fontWeight: 600,
+            fontSize: '1rem'
+          }
+        }}
+      >
         <Alert 
           severity="success" 
-          sx={{ mt: 2 }}
           onClose={() => setShowSuccess(false)}
+          sx={{ width: '100%' }}
         >
           ¡Entrenamiento guardado exitosamente! 🎉
         </Alert>
-      )}
+      </Snackbar>
 
-      {/* Mensaje de error */}
-      {errorMessage && (
+      {/* Snackbar de error */}
+      <Snackbar
+        open={!!errorMessage}
+        autoHideDuration={6000}
+        onClose={() => setErrorMessage('')}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{
+          '& .MuiSnackbarContent-root': {
+            backgroundColor: 'error.main',
+            fontWeight: 600,
+            fontSize: '1rem'
+          }
+        }}
+      >
         <Alert 
           severity="error" 
-          sx={{ mt: 2 }}
           onClose={() => setErrorMessage('')}
+          sx={{ width: '100%' }}
         >
           {errorMessage}
         </Alert>
-      )}
+      </Snackbar>
     </Box>
   )
 }

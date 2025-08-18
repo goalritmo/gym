@@ -602,7 +602,22 @@ export default function WorkoutHistory() {
             fullWidth
             BackdropProps={{
               sx: {
-                backgroundColor: 'rgba(0, 0, 0, 0.5)'
+                backgroundColor: 'rgba(0, 0, 0, 0.5) !important'
+              }
+            }}
+            slotProps={{
+              backdrop: {
+                sx: {
+                  backgroundColor: 'rgba(0, 0, 0, 0.5) !important'
+                }
+              }
+            }}
+            sx={{
+              '& .MuiBackdrop-root': {
+                backgroundColor: 'rgba(0, 0, 0, 0.5) !important'
+              },
+              '& .MuiDialog-backdrop': {
+                backgroundColor: 'rgba(0, 0, 0, 0.5) !important'
               }
             }}
           >
