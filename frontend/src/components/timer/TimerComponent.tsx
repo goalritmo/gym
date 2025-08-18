@@ -122,12 +122,25 @@ export default function TimerComponent({
 
   // Auto-start cuando cambie el modo
   useEffect(() => {
-    if (timerMode === 'rest' && !isRestRunning && !isRestCaptured) {
+    // Parar ambos cronómetros cuando cambie el modo
+    setIsRestRunning(false)
+    setIsSeriesRunning(false)
+    
+    // Resetear tiempos cuando cambie el modo
+    setRestTime(0)
+    setSeriesTime(0)
+    
+    // Resetear estado de captura
+    setIsRestCaptured(false)
+    setIsSeriesCaptured(false)
+    
+    // Iniciar el cronómetro correspondiente al nuevo modo
+    if (timerMode === 'rest') {
       setIsRestRunning(true)
-    } else if (timerMode === 'series' && !isSeriesRunning && !isSeriesCaptured) {
+    } else if (timerMode === 'series') {
       setIsSeriesRunning(true)
     }
-  }, [timerMode, isRestRunning, isRestCaptured, isSeriesRunning, isSeriesCaptured])
+  }, [timerMode])
 
   const handleRestTimer = () => {
     if (!isRestRunning) {

@@ -72,6 +72,16 @@ export default function WorkoutHistory() {
     }
   }
 
+  // Función para obtener el emoji del deporte
+  const getSportEmoji = (exerciseName: string) => {
+    const name = exerciseName.toLowerCase()
+    if (name.includes('fútbol')) return '⚽'
+    if (name.includes('básquet') || name.includes('baloncesto')) return '🏀'
+    if (name.includes('pádel')) return '🎾'
+    if (name.includes('running')) return '⭐'
+    return null
+  }
+
   // Agrupar workouts por día y crear días con ejercicios
   const workoutDaysWithExercises = useMemo(() => {
     const days: WorkoutDayWithExercises[] = [];
@@ -488,7 +498,10 @@ export default function WorkoutHistory() {
                             {group.exerciseName}
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.9rem' }}>
-                            {group.workouts.length}
+                            {group.workouts.every(workout => workout.is_sport) ? 
+                              getSportEmoji(group.exerciseName) || group.workouts.length : 
+                              group.workouts.length
+                            }
                           </Typography>
                         </Box>
                       </CardContent>
@@ -600,24 +613,21 @@ export default function WorkoutHistory() {
             onClose={() => setExerciseModal({ show: false, exerciseGroup: null, workoutDay: null })}
             maxWidth="md"
             fullWidth
+
             BackdropProps={{
               sx: {
-                backgroundColor: 'rgba(0, 0, 0, 0.5) !important'
-              }
-            }}
-            slotProps={{
-              backdrop: {
-                sx: {
-                  backgroundColor: 'rgba(0, 0, 0, 0.5) !important'
-                }
+                backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
               }
             }}
             sx={{
               '& .MuiBackdrop-root': {
-                backgroundColor: 'rgba(0, 0, 0, 0.5) !important'
+                backgroundColor: 'rgba(0, 0, 0, 0.1) !important'
               },
-              '& .MuiDialog-backdrop': {
-                backgroundColor: 'rgba(0, 0, 0, 0.5) !important'
+              '& .MuiDialog-paper': {
+                backgroundColor: 'background.paper',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                border: '1px solid',
+                borderColor: 'divider'
               }
             }}
           >
@@ -829,8 +839,8 @@ export default function WorkoutHistory() {
           onClose={() => setSuccessMessage('')}
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
           sx={{ 
-            mt: 6,
-            width: { xs: '95%', sm: '90%', md: '70%' },
+            mt: 12,
+            width: { xs: '98%', sm: '95%', md: '85%' },
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 99998
