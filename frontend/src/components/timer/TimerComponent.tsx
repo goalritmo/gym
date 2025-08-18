@@ -34,6 +34,28 @@ export default function TimerComponent({
     }
   }, [])
 
+  // Escuchar evento para resetear el cronómetro cuando se pare la rutina
+  useEffect(() => {
+    const handleResetTimer = () => {
+      console.log('🔄 Reseteando cronómetros desde TimerComponent')
+      // Parar ambos cronómetros
+      setIsRestRunning(false)
+      setIsSeriesRunning(false)
+      // Resetear tiempos
+      setRestTime(0)
+      setSeriesTime(0)
+      // Resetear estado de captura
+      setIsRestCaptured(false)
+      setIsSeriesCaptured(false)
+    }
+
+    window.addEventListener('resetTimer', handleResetTimer)
+    
+    return () => {
+      window.removeEventListener('resetTimer', handleResetTimer)
+    }
+  }, [])
+
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
@@ -132,6 +154,10 @@ export default function TimerComponent({
         onTimeComplete(restTime)
       }
     }
+    // Quitar el focus del botón
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
   }
 
   const handleSeriesTimer = () => {
@@ -158,6 +184,10 @@ export default function TimerComponent({
       if (onTimeComplete) {
         onTimeComplete(seriesTime)
       }
+    }
+    // Quitar el focus del botón
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
     }
   }
 

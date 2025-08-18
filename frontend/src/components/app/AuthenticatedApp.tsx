@@ -397,6 +397,11 @@ function AuthenticatedAppContent() {
       setIsRoutinePaused(false)
       setRoutineProgress(0)
       localStorage.removeItem('activeRoutine')
+      
+      // Disparar evento para resetear el cronómetro
+      const resetTimerEvent = new CustomEvent('resetTimer', {})
+      window.dispatchEvent(resetTimerEvent)
+      
       console.log('✅ Rutina parada exitosamente')
       console.log('📍 Tab actual después de parar:', activeTab)
     }
