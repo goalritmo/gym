@@ -686,7 +686,7 @@ export default function WorkoutHistory() {
                         <CircularProgress size={40} sx={{ color: 'primary.main' }} />
                       </Box>
                     )}
-                    <CardContent sx={{ p: 2, py: 1.5 }}>
+                    <CardContent sx={{ p: 2, py: 1.5, pb: 0 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
