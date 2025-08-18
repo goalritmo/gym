@@ -44,7 +44,7 @@ const workoutFormSchema = z.object({
   }).refine((val) => val === undefined || (val > 0 && val <= 1000), ' ').optional(), // Máximo 1000 kg, opcional
   reps: z.coerce.number().int().refine(val => val > 0 && val <= 100, ' ').optional(), // Máximo 100 reps, opcional para Running
   set: z.coerce.number().int().min(1, ' '),
-  seconds: z.coerce.number().min(0).max(3600).optional(), // Máximo 1 hora (3600 segundos)
+  seconds: z.coerce.number().min(0).max(28800).optional(), // Máximo 8 horas (28800 segundos) para deportes
   observations: z.string().default('')
 })
 
@@ -640,12 +640,7 @@ export default function WorkoutForm({
                 {ex.name}
                 {ex.name.toLowerCase().includes('running') && ' ⭐'}
                 {ex.name.toLowerCase().includes('fútbol') && ' ⚽'}
-                {ex.name.toLowerCase().includes('futbol') && ' ⚽'}
-                {ex.name.toLowerCase().includes('baloncesto') && ' 🏀'}
-                {ex.name.toLowerCase().includes('basquet') && ' 🏀'}
-                {ex.name.toLowerCase().includes('basket') && ' 🏀'}
                 {ex.name.toLowerCase().includes('básquet') && ' 🏀'}
-                {ex.name.toLowerCase().includes('padel') && ' 🎾'}
                 {ex.name.toLowerCase().includes('pádel') && ' 🎾'}
               </MenuItem>
             ))}
@@ -672,7 +667,7 @@ export default function WorkoutForm({
               inputProps={{ 
                 inputMode: 'numeric',
                 min: 1,
-                max: 480 // 8 horas máximo
+                max: 480 // 8 horas máximo (480 minutos)
               }}
               sx={{
                 flex: 2, // 2/3 del espacio
