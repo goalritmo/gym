@@ -275,14 +275,14 @@ export default function WorkoutForm({
       const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
       
       await onSubmit(workoutData)
-      setMessageInObservations(`✅ ¡${exerciseName} guardado exitosamente! 🎉`)
+      setMessageInObservations(`✅ Has podido registrar '${exerciseName}' con éxito`)
       reset({
         exercise_id: '',
         weight: '',
         reps: '',
         set: 1,
         seconds: '',
-        observations: `✅ ¡${exerciseName} guardado exitosamente! 🎉`
+        observations: `✅ Has podido registrar '${exerciseName}' con éxito`
       })
       
       // Resetear el cronómetro
@@ -298,8 +298,8 @@ export default function WorkoutForm({
       console.error('Error al guardar el workout:', error)
       const selectedExercise = exercises.find(ex => ex.id === watch('exercise_id'))
       const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
-      setMessageInObservations(`❌ Error al guardar ${exerciseName}. Por favor, intenta de nuevo.`)
-      setValue('observations', `❌ Error al guardar ${exerciseName}. Por favor, intenta de nuevo.`)
+      setMessageInObservations(`❌ Error al registrar '${exerciseName}'. Por favor, intenta de nuevo.`)
+      setValue('observations', `❌ Error al registrar '${exerciseName}'. Por favor, intenta de nuevo.`)
     }
   })
 
@@ -801,7 +801,7 @@ export default function WorkoutForm({
         )}
 
         {/* Tiempo de descanso/serie - Oculto para deportes */}
-        {!isSportExercise && (
+        {!isSportExercise && !messageInObservations && (
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: showTimeTip ? 1 : 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -848,7 +848,7 @@ export default function WorkoutForm({
               )}
             </Box>
             
-            {!messageInObservations && showTimeTip && effectiveTimerMode === 'series' && (
+            {showTimeTip && effectiveTimerMode === 'series' && (
               <Box sx={{ 
                 mb: 2, 
                 p: 2, 
@@ -864,19 +864,17 @@ export default function WorkoutForm({
               </Box>
             )}
             
-            {!messageInObservations && (
-              <TimerComponent 
-                onTimeComplete={(seconds) => setValue('seconds', seconds)}
-                onTimeUpdate={(seconds, isRunning) => {
-                  setCurrentTimerTime(seconds)
-                  setIsTimerRunning(isRunning)
-                }}
+            <TimerComponent 
+              onTimeComplete={(seconds) => setValue('seconds', seconds)}
+              onTimeUpdate={(seconds, isRunning) => {
+                setCurrentTimerTime(seconds)
+                setIsTimerRunning(isRunning)
+              }}
 
-                disabled={isLoading}
-                timerMode={effectiveTimerMode}
-                onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
-              />
-            )}
+              disabled={isLoading}
+              timerMode={effectiveTimerMode}
+              onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
+            />
           </Box>
         )}
 
