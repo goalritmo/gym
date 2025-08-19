@@ -21,7 +21,8 @@ import {
   ExpandMore as ExpandMoreIcon, 
   ExpandLess as ExpandLessIcon,
   Delete as DeleteIcon,
-  ModeEdit as ModeEditIcon
+  ModeEdit as ModeEditIcon,
+  Close as CloseIcon
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import type { Workout, WorkoutDay, ExerciseGroup, WorkoutDayWithExercises } from '../../types/workout'
@@ -842,7 +843,7 @@ export default function WorkoutHistory() {
           </Box>
         )}
 
-        {/* Snackbar personalizado para mensajes de éxito */}
+        {/* Alerta de éxito completamente personalizada */}
         {successMessage && (
           <Box
             sx={{
@@ -851,30 +852,46 @@ export default function WorkoutHistory() {
               left: '50%',
               transform: 'translateX(-50%)',
               width: '95%',
-              maxWidth: '600px',
+              maxWidth: '800px',
               zIndex: 99998,
               animation: 'slideUp 0.3s ease-out'
             }}
           >
-            <Alert 
-              severity="success" 
-              onClose={() => setSuccessMessage('')}
-              sx={{ 
-                width: '100%',
-                fontSize: '0.95rem',
-                fontWeight: 500,
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
                 backgroundColor: '#e8f5e8',
                 color: '#2e7d32',
                 border: '1px solid #4caf50',
                 borderRadius: 2,
+                padding: '12px 16px',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                '& .MuiAlert-icon': {
-                  color: '#2e7d32'
-                }
+                fontSize: '0.95rem',
+                fontWeight: 500,
+                width: '100%'
               }}
             >
-              ✅ {successMessage}
-            </Alert>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ fontSize: '1.2rem' }}>✅</Box>
+                <Typography sx={{ color: '#2e7d32', fontWeight: 500 }}>
+                  {successMessage}
+                </Typography>
+              </Box>
+              <IconButton
+                size="small"
+                onClick={() => setSuccessMessage('')}
+                sx={{
+                  color: '#2e7d32',
+                  '&:hover': {
+                    backgroundColor: 'rgba(46, 125, 50, 0.1)'
+                  }
+                }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Box>
           </Box>
         )}
 

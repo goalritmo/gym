@@ -20,10 +20,8 @@ import {
   Stack, 
   TextField, 
   Typography,
-  Alert,
   IconButton,
-  Switch,
-  Snackbar
+  Switch
 } from '@mui/material'
 import { 
   FitnessCenter as FitnessCenterIcon,
@@ -95,8 +93,7 @@ export default function WorkoutForm({
     }
   })
   
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
+  const [messageInObservations, setMessageInObservations] = useState('')
   
   // Estado para trackear el tiempo del cronómetro
   const [currentTimerTime, setCurrentTimerTime] = useState(0)
@@ -274,27 +271,29 @@ export default function WorkoutForm({
       }
       
       await onSubmit(workoutData)
-      setShowSuccess(true)
+      setMessageInObservations('✅ ¡Entrenamiento guardado exitosamente! 🎉')
       reset({
         exercise_id: '',
         weight: '',
         reps: '',
         set: 1,
         seconds: '',
-        observations: ''
+        observations: '✅ ¡Entrenamiento guardado exitosamente! 🎉'
       })
       
       // Resetear el cronómetro
       setCurrentTimerTime(0)
       setIsTimerRunning(false)
       
-      // Ocultar el mensaje de éxito después de 3 segundos
+      // Limpiar el mensaje de éxito después de 3 segundos
       setTimeout(() => {
-        setShowSuccess(false)
+        setMessageInObservations('')
+        setValue('observations', '')
       }, 3000)
     } catch (error) {
       console.error('Error al guardar el workout:', error)
-      setErrorMessage('Error al guardar el entrenamiento. Por favor, intenta de nuevo.')
+      setMessageInObservations('❌ Error al guardar el entrenamiento. Por favor, intenta de nuevo.')
+      setValue('observations', '❌ Error al guardar el entrenamiento. Por favor, intenta de nuevo.')
     }
   })
 
@@ -844,12 +843,19 @@ export default function WorkoutForm({
             </Box>
             
             {showTimeTip && effectiveTimerMode === 'series' && (
-              <Alert severity="info" sx={{ mb: 2 }}>
+              <Box sx={{ 
+                mb: 2, 
+                p: 2, 
+                backgroundColor: '#e3f2fd', 
+                border: '1px solid #2196f3', 
+                borderRadius: 1,
+                color: '#1976d2'
+              }}>
                 <Typography variant="body2" sx={{ textAlign: 'left' }}>
                   <strong>💡 Tip:</strong> Usa el cronómetro para medir el tiempo de descanso entre series. 
                   El tiempo se guardará automáticamente cuando envíes el formulario.
                 </Typography>
-              </Alert>
+              </Box>
             )}
             
             <TimerComponent 
@@ -866,20 +872,38 @@ export default function WorkoutForm({
           </Box>
         )}
 
-        {/* Observaciones */}
-        <TextField
-          label="Observaciones (opcional)"
-          multiline
-          rows={3}
-          disabled={isLoading}
-          error={Boolean(errors.observations)}
-          {...register('observations')}
-          sx={{
-            '& .MuiInputLabel-root': {
-              color: 'text.primary'
-            }
-          }}
-        />
+        {/* Mensaje de éxito/error o campo de observaciones */}
+        {messageInObservations ? (
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              backgroundColor: messageInObservations.includes('✅') ? '#e8f5e8' : '#ffebee',
+              color: messageInObservations.includes('✅') ? '#2e7d32' : '#c62828',
+              border: '1px solid',
+              borderColor: messageInObservations.includes('✅') ? '#4caf50' : '#f44336',
+              fontSize: '0.95rem',
+              fontWeight: 500,
+              textAlign: 'center'
+            }}
+          >
+            {messageInObservations}
+          </Box>
+        ) : (
+          <TextField
+            label="Observaciones (opcional)"
+            multiline
+            rows={3}
+            disabled={isLoading}
+            error={Boolean(errors.observations)}
+            {...register('observations')}
+            sx={{
+              '& .MuiInputLabel-root': {
+                color: 'text.primary'
+              }
+            }}
+          />
+        )}
 
         {/* Botón de envío */}
         <Button
@@ -905,51 +929,7 @@ export default function WorkoutForm({
       </Stack>
       </form>
 
-      {/* Snackbar de éxito */}
-      <Snackbar
-        open={showSuccess}
-        autoHideDuration={4000}
-        onClose={() => setShowSuccess(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{
-          '& .MuiSnackbarContent-root': {
-            backgroundColor: 'success.main',
-            fontWeight: 600,
-            fontSize: '1rem'
-          }
-        }}
-      >
-        <Alert 
-          severity="success" 
-          onClose={() => setShowSuccess(false)}
-          sx={{ width: '100%' }}
-        >
-          ¡Entrenamiento guardado exitosamente! 🎉
-        </Alert>
-      </Snackbar>
 
-      {/* Snackbar de error */}
-      <Snackbar
-        open={!!errorMessage}
-        autoHideDuration={6000}
-        onClose={() => setErrorMessage('')}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{
-          '& .MuiSnackbarContent-root': {
-            backgroundColor: 'error.main',
-            fontWeight: 600,
-            fontSize: '1rem'
-          }
-        }}
-      >
-        <Alert 
-          severity="error" 
-          onClose={() => setErrorMessage('')}
-          sx={{ width: '100%' }}
-        >
-          {errorMessage}
-        </Alert>
-      </Snackbar>
     </Box>
   )
 }
