@@ -850,7 +850,7 @@ export default function WorkoutHistory() {
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
           sx={{ 
             mb: 4,
-            width: '94%',
+            width: '88%',
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 99998
@@ -860,7 +860,7 @@ export default function WorkoutHistory() {
             severity="success" 
             sx={{ 
               width: '100%',
-              minWidth: '300px',
+              minWidth: 'auto',
               fontSize: '0.95rem',
               fontWeight: 500,
               backgroundColor: '#e8f5e8',
