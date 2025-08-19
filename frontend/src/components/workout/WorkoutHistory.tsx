@@ -847,10 +847,10 @@ export default function WorkoutHistory() {
           open={!!successMessage}
           autoHideDuration={3000}
           onClose={() => setSuccessMessage('')}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
           sx={{ 
-            mt: 12,
-            width: { xs: '98%', sm: '95%', md: '85%' },
+            mb: 4,
+            width: '94%',
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 99998
