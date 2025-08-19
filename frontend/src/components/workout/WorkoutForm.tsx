@@ -160,12 +160,23 @@ export default function WorkoutForm({
       console.log('Pre-cargando ejercicio:', preloadedExercise)
       console.log('exercise_id a establecer:', preloadedExercise.exercise_id)
       setValue('exercise_id', preloadedExercise.exercise_id)
-      setValue('weight', preloadedExercise.weight?.toString() || '')
-      setValue('reps', preloadedExercise.reps || '')
-      // Si hay currentSet (auto-completado), usar ese valor, sino usar 1
-      setValue('set', preloadedExercise.currentSet || 1)
-      setValue('seconds', preloadedExercise.rest_time_seconds?.toString() || '')
-      setValue('observations', preloadedExercise.notes || '')
+      
+      // Para deportes, establecer valores específicos
+      if (preloadedExercise.is_sport) {
+        setValue('weight', '')
+        setValue('reps', '1')
+        setValue('set', '1')
+        setValue('seconds', '')
+        setValue('observations', preloadedExercise.notes || '')
+      } else {
+        // Para ejercicios normales
+        setValue('weight', preloadedExercise.weight?.toString() || '')
+        setValue('reps', preloadedExercise.reps || '')
+        // Si hay currentSet (auto-completado), usar ese valor, sino usar 1
+        setValue('set', preloadedExercise.currentSet || 1)
+        setValue('seconds', preloadedExercise.rest_time_seconds?.toString() || '')
+        setValue('observations', preloadedExercise.notes || '')
+      }
       
       // Debug adicional después de establecer valores
       setTimeout(() => {

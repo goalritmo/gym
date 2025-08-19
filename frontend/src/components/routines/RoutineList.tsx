@@ -638,15 +638,13 @@ const RoutineList: React.FC<RoutineListProps> = ({ activeRoutine, routineProgres
               }}
               isActiveRoutine={activeRoutine?.id === selectedRoutine?.id}
               routineProgress={routineProgress}
-              onExerciseClick={(_exercise) => {
-                // Solo activar la rutina si no está activa, sin cerrar el modal ni navegar
-                if (activeRoutine?.id !== selectedRoutine?.id) {
-                  const event = new CustomEvent('startRoutineFromModal', { 
-                    detail: { routine: selectedRoutine } 
-                  })
-                  window.dispatchEvent(event)
-                }
-                // Si ya está activa, no hacer nada - solo permitir ver los cambios de color
+              onExerciseClick={(exercise) => {
+                // Navegar al registro y autocompletar con el ejercicio clickeado
+                const event = new CustomEvent('startRoutineWithExercise', { 
+                  detail: { routine: selectedRoutine, exercise: exercise } 
+                })
+                window.dispatchEvent(event)
+                setOpenDetailDialog(false)
               }}
               onNavigateToWorkout={() => {
                 setOpenDetailDialog(false)
