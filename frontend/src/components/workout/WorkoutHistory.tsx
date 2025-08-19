@@ -842,38 +842,41 @@ export default function WorkoutHistory() {
           </Box>
         )}
 
-        {/* Snackbar para mensajes de éxito */}
-        <Snackbar
-          open={!!successMessage}
-          autoHideDuration={3000}
-          onClose={() => setSuccessMessage('')}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          sx={{ 
-            mb: 4,
-            width: '88%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 99998
-          }}
-        >
-          <Alert 
-            severity="success" 
-            sx={{ 
-              width: '100%',
-              minWidth: 'auto',
-              fontSize: '0.95rem',
-              fontWeight: 500,
-              backgroundColor: '#e8f5e8',
-              color: '#2e7d32',
-              border: '1px solid #4caf50',
-              '& .MuiAlert-icon': {
-                color: '#2e7d32'
-              }
+        {/* Snackbar personalizado para mensajes de éxito */}
+        {successMessage && (
+          <Box
+            sx={{
+              position: 'fixed',
+              bottom: 32,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '95%',
+              maxWidth: '600px',
+              zIndex: 99998,
+              animation: 'slideUp 0.3s ease-out'
             }}
           >
-            ✅ {successMessage}
-          </Alert>
-        </Snackbar>
+            <Alert 
+              severity="success" 
+              onClose={() => setSuccessMessage('')}
+              sx={{ 
+                width: '100%',
+                fontSize: '0.95rem',
+                fontWeight: 500,
+                backgroundColor: '#e8f5e8',
+                color: '#2e7d32',
+                border: '1px solid #4caf50',
+                borderRadius: 2,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                '& .MuiAlert-icon': {
+                  color: '#2e7d32'
+                }
+              }}
+            >
+              ✅ {successMessage}
+            </Alert>
+          </Box>
+        )}
 
         {/* Modal de edición de nombre */}
         <Dialog
