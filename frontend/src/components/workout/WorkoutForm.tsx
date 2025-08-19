@@ -270,15 +270,19 @@ export default function WorkoutForm({
         workoutData.weight = data.weight
       }
       
+      // Obtener el nombre del ejercicio seleccionado
+      const selectedExercise = exercises.find(ex => ex.id === data.exercise_id)
+      const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
+      
       await onSubmit(workoutData)
-      setMessageInObservations('✅ ¡Entrenamiento guardado exitosamente! 🎉')
+      setMessageInObservations(`✅ ¡${exerciseName} guardado exitosamente! 🎉`)
       reset({
         exercise_id: '',
         weight: '',
         reps: '',
         set: 1,
         seconds: '',
-        observations: '✅ ¡Entrenamiento guardado exitosamente! 🎉'
+        observations: `✅ ¡${exerciseName} guardado exitosamente! 🎉`
       })
       
       // Resetear el cronómetro
@@ -292,8 +296,10 @@ export default function WorkoutForm({
       }, 3000)
     } catch (error) {
       console.error('Error al guardar el workout:', error)
-      setMessageInObservations('❌ Error al guardar el entrenamiento. Por favor, intenta de nuevo.')
-      setValue('observations', '❌ Error al guardar el entrenamiento. Por favor, intenta de nuevo.')
+      const selectedExercise = exercises.find(ex => ex.id === watch('exercise_id'))
+      const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
+      setMessageInObservations(`❌ Error al guardar ${exerciseName}. Por favor, intenta de nuevo.`)
+      setValue('observations', `❌ Error al guardar ${exerciseName}. Por favor, intenta de nuevo.`)
     }
   })
 
@@ -842,7 +848,7 @@ export default function WorkoutForm({
               )}
             </Box>
             
-            {showTimeTip && effectiveTimerMode === 'series' && (
+            {!messageInObservations && showTimeTip && effectiveTimerMode === 'series' && (
               <Box sx={{ 
                 mb: 2, 
                 p: 2, 
@@ -858,17 +864,19 @@ export default function WorkoutForm({
               </Box>
             )}
             
-            <TimerComponent 
-              onTimeComplete={(seconds) => setValue('seconds', seconds)}
-              onTimeUpdate={(seconds, isRunning) => {
-                setCurrentTimerTime(seconds)
-                setIsTimerRunning(isRunning)
-              }}
+            {!messageInObservations && (
+              <TimerComponent 
+                onTimeComplete={(seconds) => setValue('seconds', seconds)}
+                onTimeUpdate={(seconds, isRunning) => {
+                  setCurrentTimerTime(seconds)
+                  setIsTimerRunning(isRunning)
+                }}
 
-              disabled={isLoading}
-              timerMode={effectiveTimerMode}
-              onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
-            />
+                disabled={isLoading}
+                timerMode={effectiveTimerMode}
+                onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
+              />
+            )}
           </Box>
         )}
 
