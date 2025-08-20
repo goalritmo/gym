@@ -499,7 +499,10 @@ export default function WorkoutHistory() {
                     >
                       <CardContent sx={{ 
                         p: 2,
-                        pb: 1.5
+                        pb: 1.5,
+                        '&:last-child': {
+                          paddingBottom: '16px !important'
+                        }
                       }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <Typography variant="body1" sx={{ fontWeight: 600, color: 'primary.main', textAlign: 'left', fontSize: '0.88rem' }}>
