@@ -800,7 +800,7 @@ export default function WorkoutForm({
                 value={watch('set')}
                 {...register('set', { valueAsNumber: true })}
               >
-                {[1, 2, 3, 4, 5].map((serie) => (
+                {(isRunningExercise ? [1, 2, 3, 4, 5, 6, 7, 8] : [1, 2, 3, 4, 5]).map((serie) => (
                   <MenuItem key={serie} value={serie}>
                     {serie}
                   </MenuItem>
