@@ -704,7 +704,7 @@ export default function WorkoutForm({
         {/* Interfaz para deportes */}
         {isSportExercise ? (
           <TextField
-            label="Tiempo (minutos)"
+            label="Tiempo en cancha (minutos)"
             type="number"
             disabled={isLoading}
             error={Boolean(errors.seconds)}
@@ -788,7 +788,7 @@ export default function WorkoutForm({
             <FormControl 
               fullWidth 
               error={Boolean(errors.set)}
-              disabled={isLoading || isRunningExercise} // Bloquear para Running
+              disabled={isLoading || isRunningExercise || isSportExercise} // Bloquear para Running y deportes
               sx={{ flex: 1 }}
             >
               <InputLabel id="serie-select-label">Serie</InputLabel>
