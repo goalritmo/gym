@@ -40,7 +40,7 @@ const workoutFormSchema = z.object({
     const num = parseFloat(val)
     return isNaN(num) ? undefined : num
   }).refine((val) => val === undefined || (val > 0 && val <= 1000), ' ').optional(), // Máximo 1000 kg, opcional
-  reps: z.coerce.number().int().refine(val => val > 0 && val <= 100, ' ').optional(), // Máximo 100 reps, opcional
+  reps: z.coerce.number().int().refine(val => val === 0 || (val > 0 && val <= 100), ' ').optional(), // Máximo 100 reps, opcional
   set: z.coerce.number().int().min(1, ' '),
   seconds: z.coerce.number().min(0).max(28800).optional(), // Máximo 8 horas (28800 segundos) para deportes
   observations: z.string().default('')
