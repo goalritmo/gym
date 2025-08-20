@@ -682,6 +682,10 @@ export default function WorkoutForm({
                 {ex.name.toLowerCase().includes('fútbol') && ' ⚽'}
                 {ex.name.toLowerCase().includes('básquet') && ' 🏀'}
                 {ex.name.toLowerCase().includes('pádel') && ' 🎾'}
+                {ex.name.toLowerCase().includes('voley') && ' 🏐'}
+                {ex.name.toLowerCase().includes('handball') && ' ⚾'}
+                {ex.name.toLowerCase().includes('hockey') && ' 🏑'}
+                {ex.name.toLowerCase().includes('natación') && ' 🏊‍♂️'}
               </MenuItem>
             ))}
           </Select>
