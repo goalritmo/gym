@@ -724,7 +724,7 @@ export default function WorkoutHistory() {
                                 />
                               )
                             ) : (
-                              /* Para ejercicios normales, mostrar peso, reps y tiempo */
+                              /* Para ejercicios normales, mostrar solo peso y reps */
                               <>
                                 <Chip 
                                   label={workout.weight === 0 ? 'Peso corporal' : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') ? 'km' : 'kg'}`} 
@@ -751,23 +751,6 @@ export default function WorkoutHistory() {
                                       borderColor: '#4caf50',
                                       color: '#4caf50',
                                       minWidth: '60px',
-                                      '&:hover': {
-                                        backgroundColor: '#4caf50',
-                                        color: 'white'
-                                      }
-                                    }}
-                                  />
-                                )}
-                                {workout.seconds && workout.seconds > 0 && (
-                                  <Chip 
-                                    label={`${workout.seconds}s`} 
-                                    variant="outlined" 
-                                    size="small"
-                                    sx={{ 
-                                      fontWeight: 'bold',
-                                      borderColor: '#4caf50',
-                                      color: '#4caf50',
-                                      minWidth: '50px',
                                       '&:hover': {
                                         backgroundColor: '#4caf50',
                                         color: 'white'
