@@ -79,6 +79,10 @@ export default function WorkoutHistory() {
     if (name.includes('fútbol')) return '⚽'
     if (name.includes('básquet') || name.includes('baloncesto')) return '🏀'
     if (name.includes('pádel')) return '🎾'
+    if (name.includes('voley')) return '🏐'
+    if (name.includes('handball')) return '⚾'
+    if (name.includes('hockey')) return '🏑'
+    if (name.includes('natación')) return '🏊‍♂️'
     if (name.includes('running')) return '🏃‍♂️'
     return null
   }

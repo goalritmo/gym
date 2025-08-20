@@ -255,10 +255,14 @@ export default function WorkoutForm({
 
   const submit = handleSubmit(async (data: WorkoutFormData) => {
     try {
-      // Para deportes, usar el valor del campo seconds directamente (ya convertido a segundos)
+      // Para deportes, validar que el tiempo sea requerido
       if (isSportExercise) {
+        if (!data.seconds || data.seconds <= 0) {
+          setMessageInObservations('❌ El tiempo de entrenamiento es obligatorio para deportes')
+          setValue('observations', '❌ El tiempo de entrenamiento es obligatorio para deportes')
+          return
+        }
         // El valor ya está en segundos desde el onChange del campo
-        data.seconds = data.seconds || 0
       } else {
         // Para ejercicios normales, usar la lógica del cronómetro
         // Removed timer-related logic as TimerComponent is removed
@@ -685,54 +689,31 @@ export default function WorkoutForm({
 
         {/* Interfaz para deportes */}
         {isSportExercise ? (
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            flexDirection: { xs: 'column', sm: 'row' }
-          }}>
-            <TextField
-              label="Tiempo (minutos)"
-              type="number"
-              disabled={isLoading}
-              error={Boolean(errors.seconds)}
-              value={watch('seconds') ? Math.floor((watch('seconds') as number) / 60) : ''}
-              onChange={(e) => {
-                const minutes = parseInt(e.target.value) || 0
-                setValue('seconds', minutes * 60) // Convertir minutos a segundos
-              }}
-              inputProps={{ 
-                inputMode: 'numeric',
-                min: 1,
-                max: 480 // 8 horas máximo (480 minutos)
-              }}
-              sx={{
-                flex: 2, // 2/3 del espacio
-                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-                  display: 'none'
-                },
-                '& input[type=number]': {
-                  MozAppearance: 'textfield'
-                }
-              }}
-            />
-            
-            <FormControl 
-              fullWidth 
-              error={Boolean(errors.set)}
-              disabled={true} // Siempre bloqueado en 1 para deportes
-              sx={{ flex: 1 }} // 1/3 del espacio
-            >
-              <InputLabel id="serie-select-label">Serie</InputLabel>
-              <Select
-                labelId="serie-select-label"
-                label="Serie"
-                value={1}
-                {...register('set', { valueAsNumber: true })}
-              >
-                <MenuItem value={1}>1</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
+          <TextField
+            label="Tiempo (minutos)"
+            type="number"
+            disabled={isLoading}
+            error={Boolean(errors.seconds)}
+            value={watch('seconds') ? Math.floor((watch('seconds') as number) / 60) : ''}
+            onChange={(e) => {
+              const minutes = parseInt(e.target.value) || 0
+              setValue('seconds', minutes * 60) // Convertir minutos a segundos
+            }}
+            inputProps={{ 
+              inputMode: 'numeric',
+              min: 1,
+              max: 480 // 8 horas máximo (480 minutos)
+            }}
+            required
+            sx={{
+              '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                display: 'none'
+              },
+              '& input[type=number]': {
+                MozAppearance: 'textfield'
+              }
+            }}
+          />
         ) : (
           /* Interfaz normal para ejercicios no deportivos */
           <Box sx={{ 
@@ -816,7 +797,7 @@ export default function WorkoutForm({
         {/* Campo de descanso en segundos - Oculto para deportes */}
         {!isSportExercise && (
           <TextField
-            label="Descanso (segundos)"
+            label="Descanso posterior (opcional)"
             type="number"
             disabled={isLoading}
             error={Boolean(errors.seconds)}

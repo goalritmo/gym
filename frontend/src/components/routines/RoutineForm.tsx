@@ -237,21 +237,21 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
               <Box display="flex" gap={2} sx={{ mb: 2 }}>
                 <TextField
                   fullWidth
-                  label="Series"
-                  type="number"
-                  value={exercise.sets}
-                  onChange={(e) => handleExerciseChange(index, 'sets', parseInt(e.target.value))}
-                  inputProps={{ min: 1, max: 20 }}
-                  required
-                />
-
-                <TextField
-                  fullWidth
                   label="Repeticiones"
                   type="number"
                   value={exercise.reps}
                   onChange={(e) => handleExerciseChange(index, 'reps', parseInt(e.target.value))}
                   inputProps={{ min: 1, max: 100 }}
+                  required
+                />
+
+                <TextField
+                  fullWidth
+                  label="Series"
+                  type="number"
+                  value={exercise.sets}
+                  onChange={(e) => handleExerciseChange(index, 'sets', parseInt(e.target.value))}
+                  inputProps={{ min: 1, max: 20 }}
                   required
                 />
               </Box>
@@ -274,12 +274,11 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
               />
 
               <TextField
-                label="Descanso (segundos)"
+                label="Descanso entre series (segundos)"
                 type="number"
                 value={exercise.rest_time_seconds}
                 onChange={(e) => handleExerciseChange(index, 'rest_time_seconds', parseInt(e.target.value))}
                 inputProps={{ min: 0, max: 3600 }}
-                required
                 sx={{ flex: 1 }}
               />
             </Box>
