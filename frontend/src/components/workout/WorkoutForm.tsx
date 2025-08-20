@@ -34,13 +34,13 @@ import { useState, useEffect } from 'react'
 
 // Esquema de validación con Zod
 const workoutFormSchema = z.object({
-  exercise_id: z.coerce.number().refine(val => val > 0, ' ').optional(),
+  exercise_id: z.coerce.number().refine(val => val > 0, 'Debe seleccionar un ejercicio'),
   weight: z.string().transform((val) => {
     if (val === '' || val === '0') return undefined
     const num = parseFloat(val)
     return isNaN(num) ? undefined : num
   }).refine((val) => val === undefined || (val > 0 && val <= 1000), ' ').optional(), // Máximo 1000 kg, opcional
-  reps: z.coerce.number().int().refine(val => val > 0 && val <= 100, ' ').optional(), // Máximo 100 reps, opcional para Running
+  reps: z.coerce.number().int().refine(val => val > 0 && val <= 100, ' ').optional(), // Máximo 100 reps, opcional
   set: z.coerce.number().int().min(1, ' '),
   seconds: z.coerce.number().min(0).max(28800).optional(), // Máximo 8 horas (28800 segundos) para deportes
   observations: z.string().default('')
