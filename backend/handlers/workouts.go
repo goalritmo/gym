@@ -191,8 +191,8 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Validaciones
-	if req.Reps <= 0 {
-		http.Error(w, "Repeticiones deben ser mayores a 0", http.StatusBadRequest)
+	if req.Reps != nil && *req.Reps <= 0 {
+		http.Error(w, "Repeticiones deben ser mayores a 0 si se proporcionan", http.StatusBadRequest)
 		return
 	}
 	
@@ -273,7 +273,12 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		workout.Weight = 0 // Valor por defecto cuando no se proporciona peso
 	}
-	workout.Reps = req.Reps
+	// Manejar reps opcional
+	if req.Reps != nil {
+		workout.Reps = *req.Reps
+	} else {
+		workout.Reps = 0 // Valor por defecto cuando no se proporcionan reps
+	}
 	workout.Observations = req.Observations
 
 	// Obtener valores de los punteros de forma segura
@@ -288,10 +293,16 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		weightValue = *req.Weight
 	}
 	
-	fmt.Printf("Insertando workout con workoutDayID: %d, weight: %f\n", workoutDayID, weightValue)
+	// Obtener valor de reps de forma segura
+	var repsValue int = 0
+	if req.Reps != nil {
+		repsValue = *req.Reps
+	}
+	
+	fmt.Printf("Insertando workout con workoutDayID: %d, weight: %f, reps: %d\n", workoutDayID, weightValue, repsValue)
 	err = database.DB.QueryRow(
 		query,
-		userID, workoutDayID, req.ExerciseID, weightValue, req.Reps,
+		userID, workoutDayID, req.ExerciseID, weightValue, repsValue,
 		setValue, req.Seconds, req.Observations,
 	).Scan(&workout.ID, &workout.WorkoutDayID, &workout.CreatedAt)
 
@@ -334,8 +345,8 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validaciones
-	if req.Reps <= 0 {
-		http.Error(w, "Repeticiones deben ser mayores a 0", http.StatusBadRequest)
+	if req.Reps != nil && *req.Reps <= 0 {
+		http.Error(w, "Repeticiones deben ser mayores a 0 si se proporcionan", http.StatusBadRequest)
 		return
 	}
 	
@@ -362,11 +373,17 @@ func UpdateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	if req.Weight != nil {
 		weightValue = *req.Weight
 	}
+	
+	// Obtener valor de reps de forma segura
+	var repsValue int = 0
+	if req.Reps != nil {
+		repsValue = *req.Reps
+	}
 
 	var workout models.Workout
 	err = database.DB.QueryRow(
 		query,
-		weightValue, req.Reps, setValue, req.Seconds, req.Observations,
+		weightValue, repsValue, setValue, req.Seconds, req.Observations,
 		id, userID,
 	).Scan(
 		&workout.ID, &workout.ExerciseID, &workout.Weight, &workout.Reps,
