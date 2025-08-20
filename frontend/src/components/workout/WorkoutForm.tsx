@@ -279,10 +279,17 @@ export default function WorkoutForm({
       // Crear objeto de datos sin el campo weight si está vacío
       const workoutData: any = {
         exercise_id: data.exercise_id,
-        reps: isRunningExercise ? 1 : data.reps, // Para Running, enviar 1 como valor mínimo
         set: data.set,
         seconds: data.seconds,
         observations: data.observations
+      }
+      
+      // Solo incluir reps si tiene un valor válido mayor a 0
+      if (data.reps !== undefined && data.reps !== null && data.reps > 0) {
+        workoutData.reps = data.reps
+      } else if (isRunningExercise) {
+        // Para Running, enviar 1 como valor mínimo
+        workoutData.reps = 1
       }
       
       // Solo incluir weight si tiene un valor válido mayor a 0
