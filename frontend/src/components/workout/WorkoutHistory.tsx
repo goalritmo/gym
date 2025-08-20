@@ -692,11 +692,7 @@ export default function WorkoutHistory() {
                       </Box>
                     )}
                     <CardContent sx={{ 
-                      p: 2, 
-                      py: 1.5,
-                      '&:last-child': {
-                        paddingBottom: '16px !important'
-                      }
+                      p: 2
                     }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
