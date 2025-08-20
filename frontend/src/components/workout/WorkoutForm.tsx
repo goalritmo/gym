@@ -788,13 +788,15 @@ export default function WorkoutForm({
             <FormControl 
               fullWidth 
               error={Boolean(errors.set)}
-              disabled={isLoading || isRunningExercise || isSportExercise} // Bloquear para Running y deportes
+              disabled={isLoading || isSportExercise} // Bloquear solo para deportes
               sx={{ flex: 1 }}
             >
-              <InputLabel id="serie-select-label">Serie</InputLabel>
+              <InputLabel id="serie-select-label">
+                {isRunningExercise ? 'Vuelta' : 'Serie'}
+              </InputLabel>
               <Select
                 labelId="serie-select-label"
-                label="Serie"
+                label={isRunningExercise ? 'Vuelta' : 'Serie'}
                 value={watch('set')}
                 {...register('set', { valueAsNumber: true })}
               >
