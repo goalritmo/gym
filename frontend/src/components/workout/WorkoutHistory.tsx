@@ -478,7 +478,7 @@ export default function WorkoutHistory() {
 
               {/* Resumen de ejercicios */}
               {expandedDays.has(day.workoutDay.date) && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
                   {day.exerciseGroups.map((group, index) => (
                     <Card
                       key={index}
