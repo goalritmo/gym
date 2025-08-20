@@ -762,7 +762,7 @@ export default function WorkoutForm({
             {/* Ocultar campo Reps para Running */}
             {!isRunningExercise && (
               <TextField
-                label="Reps"
+                label="Reps (opcional)"
                 type="number"
                 disabled={isLoading}
                 error={Boolean(errors.reps)}
