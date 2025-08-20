@@ -27,7 +27,7 @@ import {
   FitnessCenter as FitnessCenterIcon,
   KeyboardArrowDown,
   KeyboardArrowUp,
-  Stop as StopIcon,
+  PlayArrow as PlayArrowIcon,
   Close as CloseIcon
 } from '@mui/icons-material'
 import { useState, useEffect } from 'react'
@@ -376,7 +376,7 @@ export default function WorkoutForm({
                 }
               }}
             >
-              {isRoutineComplete ? <CloseIcon /> : <StopIcon />}
+              {isRoutineComplete ? <CloseIcon /> : <PlayArrowIcon />}
             </IconButton>
           </Box>
           
@@ -907,7 +907,7 @@ export default function WorkoutForm({
             Descansando luego de hacer
           </Typography>
           
-          <Typography variant="h5" sx={{ mb: 4, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
+          <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
             {lastRegisteredExercise}
           </Typography>
           
@@ -931,7 +931,7 @@ export default function WorkoutForm({
                 }
               }}
             >
-              <StopIcon />
+              <PlayArrowIcon />
             </IconButton>
           </Box>
         </DialogContent>
