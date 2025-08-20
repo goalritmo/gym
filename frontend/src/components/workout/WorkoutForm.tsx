@@ -28,6 +28,7 @@ import {
   KeyboardArrowDown,
   KeyboardArrowUp,
   PlayArrow as PlayArrowIcon,
+  Stop as StopIcon,
   Close as CloseIcon
 } from '@mui/icons-material'
 import { useState, useEffect } from 'react'
@@ -377,13 +378,12 @@ export default function WorkoutForm({
               onClick={onStopRoutine}
               sx={{ 
                 color: 'white',
-                backgroundColor: 'rgba(255,255,255,0.1)',
                 '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.2)'
+                  backgroundColor: 'rgba(255,255,255,0.1)'
                 }
               }}
             >
-              {isRoutineComplete ? <CloseIcon /> : <PlayArrowIcon />}
+              {isRoutineComplete ? <CloseIcon /> : <StopIcon />}
             </IconButton>
           </Box>
           
