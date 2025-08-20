@@ -184,7 +184,15 @@ export default function WorkoutForm({
     
     if (showRestModal && isRestRunning) {
       interval = setInterval(() => {
-        setRestTime(prev => prev + 1)
+        setRestTime(prev => {
+          if (prev <= 1) {
+            // Detener el timer y cerrar el modal cuando llegue a 0
+            setIsRestRunning(false)
+            setShowRestModal(false)
+            return 0
+          }
+          return prev - 1
+        })
       }, 1000)
     }
     
@@ -290,7 +298,9 @@ export default function WorkoutForm({
       
       // Guardar el nombre del ejercicio y abrir el modal de descanso
       setLastRegisteredExercise(exerciseName)
-      setRestTime(0)
+      // Usar el tiempo de descanso configurado (si existe) o 60 segundos por defecto
+      const configuredRestTime = data.seconds && data.seconds > 0 ? data.seconds : 60
+      setRestTime(configuredRestTime)
       setIsRestRunning(true)
       setShowRestModal(true)
       
@@ -890,7 +900,7 @@ export default function WorkoutForm({
           }
         }}
       >
-        <DialogContent sx={{ textAlign: 'center', py: 4 }}>
+        <DialogContent sx={{ textAlign: 'center', py: 3 }}>
           <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
             Descansando luego de hacer {lastRegisteredExercise}
           </Typography>
@@ -899,8 +909,7 @@ export default function WorkoutForm({
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
-            gap: 3,
-            mb: 3
+            gap: 3
           }}>
             <Typography variant="h2" sx={{ fontWeight: 800, fontFamily: 'monospace' }}>
               {Math.floor(restTime / 60)}:{(restTime % 60).toString().padStart(2, '0')}
