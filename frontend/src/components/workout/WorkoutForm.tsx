@@ -903,8 +903,12 @@ export default function WorkoutForm({
         }}
       >
         <DialogContent sx={{ textAlign: 'center', py: 3 }}>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-            Descansando luego de hacer {lastRegisteredExercise}
+          <Typography variant="h5" sx={{ mb: 1, fontWeight: 600 }}>
+            Descansando luego de hacer
+          </Typography>
+          
+          <Typography variant="h5" sx={{ mb: 4, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
+            {lastRegisteredExercise}
           </Typography>
           
           <Box sx={{ 
