@@ -2,7 +2,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
-import TimerComponent from '../timer/TimerComponent'
 
 type Exercise = {
   id: number
@@ -21,15 +20,15 @@ import {
   TextField, 
   Typography,
   IconButton,
-  Switch
+  Dialog,
+  DialogContent
 } from '@mui/material'
 import { 
   FitnessCenter as FitnessCenterIcon,
   KeyboardArrowDown,
   KeyboardArrowUp,
   Stop as StopIcon,
-  Close as CloseIcon,
-  AccessTime as AccessTimeIcon
+  Close as CloseIcon
 } from '@mui/icons-material'
 import { useState, useEffect } from 'react'
 
@@ -95,11 +94,11 @@ export default function WorkoutForm({
   
   const [messageInObservations, setMessageInObservations] = useState('')
   
-  // Estado para trackear el tiempo del cronómetro
-  const [currentTimerTime, setCurrentTimerTime] = useState(0)
-  const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [showTimeTip, setShowTimeTip] = useState(false)
-  const [timerMode, setTimerMode] = useState<'rest' | 'series'>('rest') // 'rest' = descanso, 'series' = serie
+  // Estado para el modal de descanso
+  const [showRestModal, setShowRestModal] = useState(false)
+  const [restTime, setRestTime] = useState(0)
+  const [isRestRunning, setIsRestRunning] = useState(false)
+  const [lastRegisteredExercise, setLastRegisteredExercise] = useState('')
   
   // Estado para controlar la expansión de la box de rutina
   const [showRoutineExercises, setShowRoutineExercises] = useState(false)
@@ -133,9 +132,6 @@ export default function WorkoutForm({
   // Detectar si el ejercicio seleccionado es un deporte
   const isSportExercise = selectedExercise?.is_sport || false
   
-  // Forzar modo "Entrenando..." cuando el ejercicio es Running o un deporte
-  const effectiveTimerMode = (isRunningExercise || isSportExercise) ? 'series' : timerMode
-
   // Establecer reps = 1 automáticamente cuando se selecciona Running o un deporte
   useEffect(() => {
     if (isRunningExercise || isSportExercise) {
@@ -181,6 +177,23 @@ export default function WorkoutForm({
       }, 100)
     }
   }, [preloadedExercise, setValue, watch])
+
+  // Timer para el modal de descanso
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null
+    
+    if (showRestModal && isRestRunning) {
+      interval = setInterval(() => {
+        setRestTime(prev => prev + 1)
+      }, 1000)
+    }
+    
+    return () => {
+      if (interval) {
+        clearInterval(interval)
+      }
+    }
+  }, [showRestModal, isRestRunning])
 
   // Función para validar y limitar valores en tiempo real
   const handleNumberInput = (field: 'weight' | 'reps' | 'seconds', value: string) => {
@@ -248,12 +261,7 @@ export default function WorkoutForm({
         data.seconds = data.seconds || 0
       } else {
         // Para ejercicios normales, usar la lógica del cronómetro
-        if (effectiveTimerMode === 'series' && isTimerRunning && currentTimerTime > 0) {
-          data.seconds = currentTimerTime
-        } else if (effectiveTimerMode === 'rest') {
-          // En modo "Descansando...", los segundos deben ser 0
-          data.seconds = 0
-        }
+        // Removed timer-related logic as TimerComponent is removed
       }
       
       // Crear objeto de datos sin el campo weight si está vacío
@@ -275,19 +283,24 @@ export default function WorkoutForm({
       const exerciseName = selectedExercise ? selectedExercise.name : 'ejercicio'
       
       await onSubmit(workoutData)
-      setMessageInObservations(`✅ Has podido registrar '${exerciseName}' con éxito`)
+      
+      // Guardar el nombre del ejercicio y abrir el modal de descanso
+      setLastRegisteredExercise(exerciseName)
+      setRestTime(0)
+      setIsRestRunning(true)
+      setShowRestModal(true)
+      
       reset({
         exercise_id: '',
         weight: '',
         reps: '',
         set: 1,
         seconds: '',
-        observations: `✅ Has podido registrar '${exerciseName}' con éxito`
+        observations: ''
       })
       
       // Resetear el cronómetro
-      setCurrentTimerTime(0)
-      setIsTimerRunning(false)
+      // Removed timer-related reset
       
       // Limpiar el mensaje de éxito después de 3 segundos
       setTimeout(() => {
@@ -800,82 +813,25 @@ export default function WorkoutForm({
           </Box>
         )}
 
-        {/* Tiempo de descanso/serie - Oculto para deportes */}
-        {!isSportExercise && !messageInObservations && (
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: showTimeTip ? 1 : 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <AccessTimeIcon sx={{ 
-                  color: effectiveTimerMode === 'series' ? 'warning.main' : 'primary.main', 
-                  fontSize: 20 
-                }} />
-                <Typography variant="h6" sx={{ 
-                  fontWeight: 600, 
-                  color: effectiveTimerMode === 'series' ? 'warning.main' : 'primary.main' 
-                }}>
-                  {effectiveTimerMode === 'series' ? 'Entrenando...' : 'Descansando...'}
-                </Typography>
-              </Box>
-              
-              {!isRunningExercise && (
-                <Switch
-                  checked={timerMode === 'series'}
-                  onChange={(e) => {
-                    const newMode = e.target.checked ? 'series' : 'rest'
-                    setTimerMode(newMode)
-                    setShowTimeTip(false)
-                    // Resetear el cronómetro completamente
-                    setCurrentTimerTime(0)
-                    setIsTimerRunning(false)
-                    // Resetear el campo del formulario
-                    setValue('seconds', '')
-                  }}
-                  sx={{
-                    '& .MuiSwitch-switchBase': {
-                      color: 'grey.400',
-                      '&.Mui-checked': {
-                        color: 'grey.400',
-                      },
-                      '&.Mui-checked + .MuiSwitch-track': {
-                        backgroundColor: 'grey.400',
-                      },
-                    },
-                    '& .MuiSwitch-track': {
-                      backgroundColor: 'grey.400',
-                    },
-                  }}
-                />
-              )}
-            </Box>
-            
-            {showTimeTip && effectiveTimerMode === 'series' && (
-              <Box sx={{ 
-                mb: 2, 
-                p: 2, 
-                backgroundColor: '#e3f2fd', 
-                border: '1px solid #2196f3', 
-                borderRadius: 1,
-                color: '#1976d2'
-              }}>
-                <Typography variant="body2" sx={{ textAlign: 'left' }}>
-                  <strong>💡 Tip:</strong> Usa el cronómetro para medir el tiempo de descanso entre series. 
-                  El tiempo se guardará automáticamente cuando envíes el formulario.
-                </Typography>
-              </Box>
-            )}
-            
-            <TimerComponent 
-              onTimeComplete={(seconds) => setValue('seconds', seconds)}
-              onTimeUpdate={(seconds, isRunning) => {
-                setCurrentTimerTime(seconds)
-                setIsTimerRunning(isRunning)
-              }}
-
-              disabled={isLoading}
-              timerMode={effectiveTimerMode}
-              onTimerModeChange={(mode: 'rest' | 'series') => setTimerMode(mode)}
-            />
-          </Box>
+        {/* Campo de descanso en segundos - Oculto para deportes */}
+        {!isSportExercise && (
+          <TextField
+            label="Descanso (segundos)"
+            type="number"
+            disabled={isLoading}
+            error={Boolean(errors.seconds)}
+            {...register('seconds')}
+            inputProps={{ 
+              inputMode: 'numeric',
+              min: 0,
+              max: 3600 // 1 hora máximo
+            }}
+            sx={{ 
+              '& .MuiInputLabel-root': { 
+                color: 'text.primary' 
+              } 
+            }}
+          />
         )}
 
         {/* Mensaje de éxito/error o campo de observaciones */}
@@ -935,6 +891,51 @@ export default function WorkoutForm({
       </Stack>
       </form>
 
+      {/* Modal de descanso */}
+      <Dialog 
+        open={showRestModal} 
+        onClose={() => setShowRestModal(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            backgroundColor: 'primary.main',
+            color: 'white'
+          }
+        }}
+      >
+        <DialogContent sx={{ textAlign: 'center', py: 4 }}>
+          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+            Descansando luego de hacer {lastRegisteredExercise}
+          </Typography>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: 3,
+            mb: 3
+          }}>
+            <Typography variant="h2" sx={{ fontWeight: 800, fontFamily: 'monospace' }}>
+              {Math.floor(restTime / 60)}:{(restTime % 60).toString().padStart(2, '0')}
+            </Typography>
+            
+            <IconButton
+              onClick={() => setShowRestModal(false)}
+              sx={{ 
+                color: 'white',
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.2)'
+                }
+              }}
+            >
+              <StopIcon />
+            </IconButton>
+          </Box>
+        </DialogContent>
+      </Dialog>
 
     </Box>
   )
