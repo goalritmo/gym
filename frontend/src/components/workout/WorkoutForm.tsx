@@ -44,6 +44,7 @@ const workoutFormSchema = z.object({
   reps: z.coerce.number().int().refine(val => val === 0 || (val > 0 && val <= 100), ' ').optional(), // Máximo 100 reps, opcional
   set: z.coerce.number().int().min(1, ' '),
   seconds: z.coerce.number().min(0).max(28800).optional(), // Máximo 8 horas (28800 segundos) para deportes
+  restSeconds: z.coerce.number().min(0).max(3600).optional(), // Máximo 1 hora de descanso
   observations: z.string().default('')
 })
 
@@ -89,6 +90,7 @@ export default function WorkoutForm({
       reps: '',
       set: 1,
       seconds: '',
+      restSeconds: '',
       observations: ''
     }
   })
@@ -304,13 +306,13 @@ export default function WorkoutForm({
       
       await onSubmit(workoutData)
       
-      // Guardar el nombre del ejercicio y abrir el modal de descanso
-      setLastRegisteredExercise(exerciseName)
-      // Usar el tiempo de descanso configurado (si existe) o 60 segundos por defecto
-      const configuredRestTime = data.seconds && data.seconds > 0 ? data.seconds : 60
-      setRestTime(configuredRestTime)
-      setIsRestRunning(true)
-      setShowRestModal(true)
+      // Solo abrir el modal de descanso si hay un tiempo de descanso configurado
+      if (data.restSeconds && data.restSeconds > 0) {
+        setLastRegisteredExercise(exerciseName)
+        setRestTime(data.restSeconds)
+        setIsRestRunning(true)
+        setShowRestModal(true)
+      }
       
       reset({
         exercise_id: '',
@@ -318,6 +320,7 @@ export default function WorkoutForm({
         reps: '',
         set: 1,
         seconds: '',
+        restSeconds: '',
         observations: ''
       })
       
@@ -823,8 +826,8 @@ export default function WorkoutForm({
             label="Descanso posterior (segundos)"
             type="number"
             disabled={isLoading}
-            error={Boolean(errors.seconds)}
-            {...register('seconds')}
+            error={Boolean(errors.restSeconds)}
+            {...register('restSeconds')}
             inputProps={{ 
               inputMode: 'numeric',
               min: 0,
