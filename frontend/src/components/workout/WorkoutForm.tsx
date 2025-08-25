@@ -306,6 +306,10 @@ export default function WorkoutForm({
       
       await onSubmit(workoutData)
       
+      // Mostrar mensaje de éxito
+      setMessageInObservations(`✅ '${exerciseName}' registrado exitosamente`)
+      setValue('observations', `✅ '${exerciseName}' registrado exitosamente`)
+      
       // Solo abrir el modal de descanso si hay un tiempo de descanso configurado
       if (data.restSeconds && data.restSeconds > 0) {
         setLastRegisteredExercise(exerciseName)
