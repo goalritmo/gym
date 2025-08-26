@@ -533,53 +533,10 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 2. Obtener todos los usuarios activos
-	usersQuery := `SELECT id FROM auth.users WHERE email_confirmed_at IS NOT NULL`
-	userRows, err := tx.Query(usersQuery)
-	if err != nil {
-		http.Error(w, "Error obteniendo usuarios", http.StatusInternalServerError)
+	// Confirmar transacción (solo admin_notification + notification_history)
+	if err := tx.Commit(); err != nil {
+		http.Error(w, "Error confirmando transacción", http.StatusInternalServerError)
 		return
-	}
-	defer userRows.Close()
-
-	var userIDs []string
-	for userRows.Next() {
-		var userID string
-		if err := userRows.Scan(&userID); err != nil {
-			continue
-		}
-		userIDs = append(userIDs, userID)
-	}
-
-	// 3. Crear notificaciones individuales para cada usuario
-	if len(userIDs) > 0 {
-		// Preparar datos para la notificación
-		notificationData := map[string]interface{}{
-			"admin_notification_id": notification.ID,
-			"type":                  req.Type,
-		}
-		dataJSON, _ := json.Marshal(notificationData)
-
-		// Crear notificaciones en lote
-		userNotificationsQuery := `
-			INSERT INTO notifications (user_id, type, title, message, data, is_read)
-			VALUES ($1, $2, $3, $4, $5, false)
-		`
-
-		stmt, err := tx.Prepare(userNotificationsQuery)
-		if err != nil {
-			http.Error(w, "Error preparando notificaciones de usuarios", http.StatusInternalServerError)
-			return
-		}
-		defer stmt.Close()
-
-		for _, userID := range userIDs {
-			_, err = stmt.Exec(userID, "announcement", req.Title, req.Message, string(dataJSON))
-			if err != nil {
-				fmt.Printf("Error creando notificación para usuario %s: %v\n", userID, err)
-				// Continuar con otros usuarios aunque falle uno
-			}
-		}
 	}
 
 	// Confirmar transacción
@@ -592,7 +549,7 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	notification.Message = req.Message
 	notification.Type = req.Type
 
-	fmt.Printf("Notificación del sistema creada con ID %d para %d usuarios\n", notification.ID, len(userIDs))
+	fmt.Printf("Notificación del sistema creada con ID %d. Las notificaciones individuales se crearán cuando los usuarios inicien sesión.\n", notification.ID)
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(notification)
