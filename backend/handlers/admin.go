@@ -539,12 +539,6 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Confirmar transacción
-	if err := tx.Commit(); err != nil {
-		http.Error(w, "Error confirmando transacción", http.StatusInternalServerError)
-		return
-	}
-
 	notification.Title = req.Title
 	notification.Message = req.Message
 	notification.Type = req.Type

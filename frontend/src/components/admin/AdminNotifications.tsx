@@ -81,6 +81,7 @@ export function AdminNotifications() {
   const [notifications, setNotifications] = useState<AdminNotification[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
   const [creating, setCreating] = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
@@ -124,6 +125,9 @@ export function AdminNotifications() {
 
     try {
       setCreating(true)
+      setError('') // Limpiar errores anteriores
+      setSuccess('') // Limpiar mensajes de éxito anteriores
+      
       await apiClient.createAdminNotification(form)
       setForm({
         title: '',
@@ -131,10 +135,12 @@ export function AdminNotifications() {
         type: 'info'
       })
       setOpenDialog(false)
+      setSuccess('Notificación creada exitosamente')
       await loadNotifications() // Recargar lista
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creando notificación:', error)
-      setError('Error al crear la notificación')
+      const errorMessage = error?.response?.data?.message || error?.message || 'Error al crear la notificación'
+      setError(errorMessage)
     } finally {
       setCreating(false)
     }
@@ -301,8 +307,15 @@ export function AdminNotifications() {
 
       {/* Error Alert */}
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
           {error}
+        </Alert>
+      )}
+
+      {/* Success Alert */}
+      {success && (
+        <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess('')}>
+          {success}
         </Alert>
       )}
 
