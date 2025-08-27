@@ -27,10 +27,13 @@ func UpdateLastSignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Crear notificaciones individuales para el usuario si no existen
+	fmt.Printf("Debug: Iniciando creación de notificaciones para usuario %s\n", userID)
 	err = createUserNotifications(userID)
 	if err != nil {
 		// No fallar si hay error creando notificaciones, solo log
 		fmt.Printf("Error creando notificaciones para usuario %s: %v\n", userID, err)
+	} else {
+		fmt.Printf("Debug: Proceso de creación de notificaciones completado para usuario %s\n", userID)
 	}
 
 	json.NewEncoder(w).Encode(map[string]string{"message": "Last sign in updated"})
@@ -38,6 +41,8 @@ func UpdateLastSignInHandler(w http.ResponseWriter, r *http.Request) {
 
 // createUserNotifications crea notificaciones individuales para el usuario basadas en admin_notifications de los últimos 10 días
 func createUserNotifications(userID string) error {
+	fmt.Printf("Debug: Buscando admin_notifications para usuario %s\n", userID)
+	
 	// Obtener admin_notifications de los últimos 10 días que no tienen notificaciones individuales para este usuario
 	query := `
 		SELECT an.id, an.title, an.message, an.type
@@ -51,6 +56,7 @@ func createUserNotifications(userID string) error {
 		ORDER BY an.created_at DESC
 	`
 
+	fmt.Printf("Debug: Ejecutando query: %s\n", query)
 	rows, err := database.DB.Query(query, userID)
 	if err != nil {
 		return fmt.Errorf("error consultando admin_notifications: %v", err)
@@ -58,7 +64,9 @@ func createUserNotifications(userID string) error {
 	defer rows.Close()
 
 	var createdCount int
+	var foundCount int
 	for rows.Next() {
+		foundCount++
 		var adminID int
 		var title, message, notificationType string
 
@@ -67,6 +75,8 @@ func createUserNotifications(userID string) error {
 			fmt.Printf("Error escaneando admin_notification: %v\n", err)
 			continue
 		}
+		
+		fmt.Printf("Debug: Procesando admin_notification ID %d: %s\n", adminID, title)
 
 		// Preparar datos para la notificación
 		notificationData := map[string]interface{}{
@@ -88,9 +98,7 @@ func createUserNotifications(userID string) error {
 		}
 	}
 
-	if createdCount > 0 {
-		fmt.Printf("Creadas %d notificaciones individuales para usuario %s\n", createdCount, userID)
-	}
+	fmt.Printf("Debug: Encontradas %d admin_notifications, creadas %d notificaciones individuales para usuario %s\n", foundCount, createdCount, userID)
 
 	return nil
 }
