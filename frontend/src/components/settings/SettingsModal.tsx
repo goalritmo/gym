@@ -48,23 +48,29 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     setTempSettings(settings)
   }, [settings])
 
+  // Verificar si hay cambios solo en ejercicios favoritos
+  useEffect(() => {
+    const hasFavoriteChanges = JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)
+    setHasChanges(hasFavoriteChanges)
+  }, [tempSettings.favoriteExercises, settings.favoriteExercises])
 
 
-  const handleToggleUncNotifications = () => {
-    setTempSettings(prev => ({
-      ...prev,
-      uncNotificationsEnabled: !prev.uncNotificationsEnabled
-    }))
-    setHasChanges(true)
-  }
 
-  const handleToggleShowOwnWorkoutsInSocial = () => {
-    setTempSettings(prev => ({
-      ...prev,
-      showOwnWorkoutsInSocial: !prev.showOwnWorkoutsInSocial
-    }))
-    setHasChanges(true)
-  }
+  // const handleToggleUncNotifications = () => {
+  //   setTempSettings(prev => ({
+  //     ...prev,
+  //     uncNotificationsEnabled: !prev.uncNotificationsEnabled
+  //   }))
+  //   setHasChanges(true)
+  // }
+
+  // const handleToggleShowOwnWorkoutsInSocial = () => {
+  //   setTempSettings(prev => ({
+  //     ...prev,
+  //     showOwnWorkoutsInSocial: !prev.showOwnWorkoutsInSocial
+  //   }))
+  //   setHasChanges(true)
+  // }
 
 
 
@@ -84,12 +90,12 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const handleSave = async () => {
     try {
       // Aplicar cambios
-      if (tempSettings.uncNotificationsEnabled !== settings.uncNotificationsEnabled) {
-        await toggleUncNotifications()
-      }
-      if (tempSettings.showOwnWorkoutsInSocial !== settings.showOwnWorkoutsInSocial) {
-        await toggleShowOwnWorkoutsInSocial()
-      }
+      // if (tempSettings.uncNotificationsEnabled !== settings.uncNotificationsEnabled) {
+      //   await toggleUncNotifications()
+      // }
+      // if (tempSettings.showOwnWorkoutsInSocial !== settings.showOwnWorkoutsInSocial) {
+      //   await toggleShowOwnWorkoutsInSocial()
+      // }
       if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
         setFavoriteExercises(tempSettings.favoriteExercises)
         // Marcar que el usuario ha configurado manualmente sus favoritos
@@ -114,7 +120,10 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   }, [exercises, exerciseSearchTerm])
 
   const handleCancel = () => {
-    setTempSettings(settings)
+    setTempSettings(prev => ({
+      ...prev,
+      favoriteExercises: settings.favoriteExercises
+    }))
     setHasChanges(false)
     setExerciseSearchTerm('')
     onClose()
@@ -163,8 +172,8 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       </DialogTitle>
 
       <DialogContent sx={{ pt: 2 }}>
-        {/* Sección NOTIFICACIONES UNC */}
-        <Box sx={{ mb: 3 }}>
+        {/* Sección NOTIFICACIONES UNC - OCULTA */}
+        {/* <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
             NOTIFICACIONES
           </Typography>
@@ -206,12 +215,10 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           />
         </Box>
 
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ my: 2 }} /> */}
 
-
-
-        {/* Sección FEED SOCIAL */}
-        <Box sx={{ mb: 3 }}>
+        {/* Sección FEED SOCIAL - OCULTA */}
+        {/* <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
             FEED SOCIAL
           </Typography>
@@ -253,7 +260,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           />
         </Box>
 
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ my: 2 }} /> */}
 
 
 
@@ -266,7 +273,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Selecciona los ejercicios que quieres que aparezcan en el selector
+            Selecciona los ejercicios que quieres que aparezcan en el selector del registro de entrenamiento
           </Typography>
 
           {/* Buscador de ejercicios */}
