@@ -296,7 +296,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                   </Box>
 
                   {/* Mensaje */}
-                  <Typography variant="body1" sx={{ px: 1.25 }}>
+                  <Typography variant="body1" sx={{ px: 1.875, mb: 0.875 }}>
                     {notification.message}
                   </Typography>
 
