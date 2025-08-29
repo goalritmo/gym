@@ -139,39 +139,7 @@ func main() {
 		AllowCredentials: true,
 	})
 
-	// Crear un handler personalizado que fuerce los headers CORS
-	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Forzar headers CORS antes de cualquier otra cosa
-		origin := r.Header.Get("Origin")
-		if origin != "" {
-			allowedOrigins := []string{
-				"http://localhost:3210",
-				"http://localhost:5173", 
-				"https://entrenar.app",
-				"https://gym.goalritmo.com",
-			}
-			
-			for _, allowedOrigin := range allowedOrigins {
-				if origin == allowedOrigin {
-					w.Header().Set("Access-Control-Allow-Origin", origin)
-					break
-				}
-			}
-		}
-		
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept, Origin")
-		
-		// Manejar preflight OPTIONS
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		
-		// Pasar al handler de CORS normal
-		c.Handler(r).ServeHTTP(w, r)
-	})
+	handler := c.Handler(r)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -179,5 +147,5 @@ func main() {
 	}
 
 	log.Printf("Servidor iniciado en puerto %s", port)
-	log.Fatal(http.ListenAndServe(":"+port, corsHandler))
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
