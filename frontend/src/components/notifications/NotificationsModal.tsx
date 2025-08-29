@@ -153,30 +153,17 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
   const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
       case 'welcome':
-        return <Celebration sx={{ color: 'primary.main' }} />
+        return <Celebration sx={{ color: 'primary.main', fontSize: 28 }} />
       case 'announcement':
-        return <Announcement sx={{ color: '#ff9800' }} />
-
+        return <Announcement sx={{ color: '#ff9800', fontSize: 28 }} />
       case 'kudos':
-        return <ThumbUp sx={{ color: 'success.main' }} />
-
+        return <ThumbUp sx={{ color: 'success.main', fontSize: 28 }} />
       default:
-        return <Notifications />
+        return <Notifications sx={{ fontSize: 28 }} />
     }
   }
 
-  const getNotificationColor = (type: NotificationType) => {
-    switch (type) {
-      case 'welcome':
-        return 'primary'
-      case 'announcement':
-        return 'warning'
-      case 'kudos':
-        return 'success'
-      default:
-        return 'default'
-    }
-  }
+
 
   const unreadCount = notifications?.filter(n => !n.is_read)?.length || 0
 
@@ -201,7 +188,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
         pb: 1
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Notifications sx={{ color: 'primary.main' }} />
+          <Notifications sx={{ color: 'grey.600' }} />
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
             Notificaciones
           </Typography>
@@ -285,10 +272,12 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center',
-                      width: 40, 
-                      height: 40, 
+                      width: 48, 
+                      height: 48, 
                       borderRadius: '50%',
-                      backgroundColor: `${getNotificationColor(notification.type)}.light`,
+                      backgroundColor: notification.type === 'welcome' ? 'primary.50' : 
+                                      notification.type === 'announcement' ? 'warning.50' : 
+                                      notification.type === 'kudos' ? 'success.50' : 'grey.50',
                       mr: 2,
                       flexShrink: 0
                     }}>
