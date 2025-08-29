@@ -153,13 +153,13 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
   const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
       case 'welcome':
-        return <Celebration sx={{ color: 'primary.main', fontSize: 28 }} />
+        return <Celebration sx={{ color: 'primary.main', fontSize: 36 }} />
       case 'announcement':
-        return <Announcement sx={{ color: '#ff9800', fontSize: 28 }} />
+        return <Announcement sx={{ color: '#ff9800', fontSize: 36 }} />
       case 'kudos':
-        return <ThumbUp sx={{ color: 'success.main', fontSize: 28 }} />
+        return <ThumbUp sx={{ color: 'success.main', fontSize: 36 }} />
       default:
-        return <Notifications sx={{ fontSize: 28 }} />
+        return <Notifications sx={{ fontSize: 36 }} />
     }
   }
 
@@ -272,13 +272,12 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center',
-                      width: 48, 
-                      height: 48, 
+                      width: 63, 
+                      height: 63, 
                       borderRadius: '50%',
                       backgroundColor: notification.type === 'welcome' ? 'primary.50' : 
                                       notification.type === 'announcement' ? 'warning.50' : 
                                       notification.type === 'kudos' ? 'success.50' : 'grey.50',
-                      mr: 2,
                       flexShrink: 0
                     }}>
                       {getNotificationIcon(notification.type)}
@@ -297,7 +296,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                   </Box>
 
                   {/* Mensaje */}
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ py: 1.25 }}>
                     {notification.message}
                   </Typography>
 
