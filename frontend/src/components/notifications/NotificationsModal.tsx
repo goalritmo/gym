@@ -77,10 +77,6 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
         if (notif.type === 'kudos' && !settings.showOwnWorkoutsInSocial) {
           return false
         }
-        // Ocultar notificaciones del sistema si están deshabilitadas
-        if (notif.type === 'announcement' && !settings.uncNotificationsEnabled) {
-          return false
-        }
         return true
       })
       
