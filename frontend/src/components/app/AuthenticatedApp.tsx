@@ -51,6 +51,16 @@ function AuthenticatedAppContent() {
     }
   }, [])
 
+  // Función para cargar notificaciones automáticamente al ingresar
+  const loadNotificationsOnLogin = useCallback(async () => {
+    try {
+      // Cargar contador de notificaciones no leídas
+      await loadUnreadNotificationsCount()
+    } catch (error) {
+      console.error('Error cargando notificaciones al ingresar:', error)
+    }
+  }, [loadUnreadNotificationsCount])
+
   // Función para cargar datos desde el backend
   const loadData = useCallback(async () => {
     setIsLoading(true)
@@ -112,6 +122,11 @@ function AuthenticatedAppContent() {
   useEffect(() => {
     loadUnreadNotificationsCount()
   }, [loadUnreadNotificationsCount])
+
+  // Cargar notificaciones automáticamente al ingresar
+  useEffect(() => {
+    loadNotificationsOnLogin()
+  }, [loadNotificationsOnLogin])
 
   // Guardar workouts cuando cambien
   useEffect(() => {
