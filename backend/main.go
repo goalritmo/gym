@@ -118,7 +118,7 @@ func main() {
 	// Configurar CORS
 	corsOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
 	if corsOrigins == "" {
-		corsOrigins = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://gym.goalritmo.com"
+		corsOrigins = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://www.entrenar.app,https://gym.goalritmo.com"
 	}
 	
 	allowedOrigins := strings.Split(corsOrigins, ",")
