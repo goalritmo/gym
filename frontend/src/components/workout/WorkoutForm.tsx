@@ -690,7 +690,7 @@ export default function WorkoutForm({
             return label
           }}
           value={filteredExercises.find(ex => ex.id === watch('exercise_id')) || null}
-          onChange={(event, newValue) => {
+          onChange={(_, newValue) => {
             setValue('exercise_id', newValue ? newValue.id : undefined)
           }}
           renderInput={(params) => (
