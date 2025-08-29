@@ -18,13 +18,11 @@ import {
 } from '@mui/material'
 import { 
   Notifications, 
-  Info, 
   ThumbUp, 
   Announcement,
   Close,
   CheckCircleOutline,
-  Celebration,
-  ChatBubble
+  Celebration
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
@@ -156,16 +154,16 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     })
   }
 
-  const getNotificationIcon = (type: NotificationType, priority?: string) => {
+  const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
       case 'welcome':
         return <Celebration sx={{ color: 'primary.main' }} />
       case 'announcement':
-        return <Announcement sx={{ color: priority === 'high' ? 'error.main' : 'warning.main' }} />
+        return <Announcement sx={{ color: '#ff9800' }} />
       case 'kudos':
         return <ThumbUp sx={{ color: 'success.main' }} />
       case 'general':
-        return <Info sx={{ color: 'info.main' }} />
+        return <Announcement sx={{ color: '#ff9800' }} />
       default:
         return <Notifications />
     }
@@ -209,7 +207,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
         pb: 1
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ChatBubble sx={{ color: '#ff9800' }} />
+          <Notifications sx={{ color: 'primary.main' }} />
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
             Notificaciones
           </Typography>
@@ -300,7 +298,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                       mr: 2,
                       flexShrink: 0
                     }}>
-                      {getNotificationIcon(notification.type, notification.priority)}
+                      {getNotificationIcon(notification.type)}
                     </Box>
                     
                     <Box sx={{ flex: 1 }}>
