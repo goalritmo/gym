@@ -1,4 +1,4 @@
-import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography, Button } from '@mui/material'
+import { Box, Snackbar, Alert, Backdrop, CircularProgress, Typography } from '@mui/material'
 import { useState, useEffect, useCallback } from 'react'
 import WorkoutForm from '../workout/WorkoutForm'
 import WorkoutHistory from '../workout/WorkoutHistory'
@@ -39,27 +39,17 @@ function AuthenticatedAppContent() {
   const [notificationsModalOpen, setNotificationsModalOpen] = useState(false)
   const [adminPanelOpen, setAdminPanelOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
-  const [showNotificationAlert, setShowNotificationAlert] = useState(false)
 
   // Función para cargar el contador de notificaciones no leídas
   const loadUnreadNotificationsCount = useCallback(async () => {
     try {
       const response = await apiClient.getUnreadNotificationsCount() as { unread_count: number }
-      const newCount = response.unread_count || 0
-      
-      // Mostrar alerta si hay notificaciones nuevas y antes no había ninguna
-      if (newCount > 0 && unreadNotifications === 0) {
-        setShowNotificationAlert(true)
-        // Ocultar la alerta después de 5 segundos
-        setTimeout(() => setShowNotificationAlert(false), 5000)
-      }
-      
-      setUnreadNotifications(newCount)
+      setUnreadNotifications(response.unread_count || 0)
     } catch (error) {
       console.error('Error cargando contador de notificaciones:', error)
       setUnreadNotifications(0)
     }
-  }, [unreadNotifications])
+  }, [])
 
   // Función para cargar notificaciones automáticamente al ingresar
   const loadNotificationsOnLogin = useCallback(async () => {
@@ -819,46 +809,7 @@ function AuthenticatedAppContent() {
         exercises={exercises}
       />
 
-      {/* Alerta de notificaciones nuevas */}
-      <Snackbar
-        open={showNotificationAlert}
-        autoHideDuration={5000}
-        onClose={() => setShowNotificationAlert(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{
-          zIndex: 99999
-        }}
-      >
-        <Alert 
-          severity="info" 
-          action={
-            <Button 
-              color="inherit" 
-              size="small" 
-              onClick={() => {
-                setShowNotificationAlert(false)
-                handleOpenNotifications()
-              }}
-            >
-              Ver
-            </Button>
-          }
-          sx={{ 
-            width: '100%',
-            minWidth: '300px',
-            fontSize: '0.95rem',
-            fontWeight: 500,
-            backgroundColor: '#e3f2fd',
-            color: '#1976d2',
-            border: '1px solid #2196f3',
-            '& .MuiAlert-icon': {
-              color: '#1976d2'
-            }
-          }}
-        >
-          🔔 Tienes {unreadNotifications} notificación{unreadNotifications > 1 ? 'es' : ''} nueva{unreadNotifications > 1 ? 's' : ''}
-        </Alert>
-      </Snackbar>
+
 
       {/* Modal de notificaciones */}
       <NotificationsModal 
