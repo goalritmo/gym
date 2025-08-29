@@ -11,7 +11,7 @@ import {
   IconButton,
   Badge
 } from '@mui/material'
-import { Logout as LogoutIcon, Settings as SettingsIcon, AdminPanelSettings as AdminIcon, ChatBubble as ChatBubbleIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon, Settings as SettingsIcon, AdminPanelSettings as AdminIcon, Notifications as NotificationsIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 // import { useUserSettings } from '../../contexts/UserSettingsContext' // Ya no se usa
 
@@ -198,27 +198,30 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
         {/* Opción de notificaciones - siempre visible */}
         <MenuItem onClick={handleOpenNotifications}>
           <ListItemIcon>
-            <Badge 
-              badgeContent={unreadNotifications} 
-              sx={{
-                '& .MuiBadge-badge': {
-                  fontSize: '0.6rem',
-                  minWidth: '16px',
-                  height: '16px',
-                  backgroundColor: '#ff9800',
-                  color: 'white'
-                },
-                backgroundColor: '#ff9800',
-                borderRadius: '50%',
-                padding: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              invisible={unreadNotifications === 0}
-            >
-              <ChatBubbleIcon fontSize="small" sx={{ color: '#ff9800' }} />
-            </Badge>
+            <Box sx={{ position: 'relative' }}>
+              <NotificationsIcon fontSize="small" />
+              {unreadNotifications > 0 && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: -8,
+                    right: -8,
+                    backgroundColor: '#ff9800',
+                    color: 'white',
+                    borderRadius: '50%',
+                    minWidth: '16px',
+                    height: '16px',
+                    fontSize: '0.6rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {unreadNotifications}
+                </Box>
+              )}
+            </Box>
           </ListItemIcon>
           <ListItemText>
             Notificaciones

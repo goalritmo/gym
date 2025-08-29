@@ -23,7 +23,8 @@ import {
   Announcement,
   Close,
   CheckCircleOutline,
-  Celebration
+  Celebration,
+  ChatBubble
 } from '@mui/icons-material'
 import { apiClient } from '../../lib/api'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
@@ -208,7 +209,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
         pb: 1
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Notifications sx={{ color: 'primary.main' }} />
+          <ChatBubble sx={{ color: '#ff9800' }} />
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
             Notificaciones
           </Typography>
