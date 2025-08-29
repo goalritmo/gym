@@ -78,10 +78,19 @@ export default function WorkoutForm({
     getRoutineProgress 
   } = useUserSettings()
   
+  const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
+  
   // Filtrar ejercicios favoritos si están configurados
-  const filteredExercises = settings.favoriteExercises.length > 0 
+  const baseFilteredExercises = settings.favoriteExercises.length > 0 
     ? exercises.filter(exercise => settings.favoriteExercises.includes(exercise.id))
     : exercises
+
+  // Filtrar ejercicios por término de búsqueda
+  const filteredExercises = exerciseSearchTerm.trim() === '' 
+    ? baseFilteredExercises
+    : baseFilteredExercises.filter(exercise =>
+        exercise.name.toLowerCase().includes(exerciseSearchTerm.toLowerCase())
+      )
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
@@ -674,46 +683,58 @@ export default function WorkoutForm({
       
       <form role="form" onSubmit={submit}>
         <Stack spacing={3}>
-        <FormControl fullWidth error={Boolean(errors.exercise_id)} disabled={isLoading || filteredExercises.length === 0}>
-          <InputLabel id="exercise-select-label">Ejercicio</InputLabel>
-          <Select
-            labelId="exercise-select-label"
-            label="Ejercicio"
-            value={watch('exercise_id') || ''}
-            {...register('exercise_id', { valueAsNumber: true })}
-            sx={{
-              '& .MuiInputLabel-root': {
-                transform: 'translate(14px, -9px) scale(0.75)',
-                backgroundColor: 'white',
-                px: 1,
-                color: 'primary.main'
-              },
-              '& .MuiInputLabel-shrink': {
-                transform: 'translate(14px, -9px) scale(0.75)',
-                backgroundColor: 'white',
-                px: 1,
-                color: 'primary.main'
-              }
-            }}
-          >
-            <MenuItem value="" disabled>
-              {filteredExercises.length === 0 ? 'Cargando ejercicios...' : 'Seleccionar ejercicio...'}
-            </MenuItem>
-            {filteredExercises.map((ex) => (
-              <MenuItem key={ex.id} value={ex.id}>
-                {ex.name}
-                {ex.name.toLowerCase().includes('running') && ' 🏃‍♂️'}
-                {ex.name.toLowerCase().includes('fútbol') && ' ⚽'}
-                {ex.name.toLowerCase().includes('básquet') && ' 🏀'}
-                {ex.name.toLowerCase().includes('pádel') && ' 🎾'}
-                {ex.name.toLowerCase().includes('voley') && ' 🏐'}
-                {ex.name.toLowerCase().includes('handball') && ' ⚾'}
-                {ex.name.toLowerCase().includes('hockey') && ' 🏑'}
-                {ex.name.toLowerCase().includes('natación') && ' 🏊‍♂️'}
+        <Box>
+          <TextField
+            label="Buscar ejercicio"
+            value={exerciseSearchTerm}
+            onChange={(e) => setExerciseSearchTerm(e.target.value)}
+            fullWidth
+            size="small"
+            sx={{ mb: 1 }}
+            placeholder="Escribe para buscar ejercicios..."
+          />
+          
+          <FormControl fullWidth error={Boolean(errors.exercise_id)} disabled={isLoading || filteredExercises.length === 0}>
+            <InputLabel id="exercise-select-label">Ejercicio</InputLabel>
+            <Select
+              labelId="exercise-select-label"
+              label="Ejercicio"
+              value={watch('exercise_id') || ''}
+              {...register('exercise_id', { valueAsNumber: true })}
+              sx={{
+                '& .MuiInputLabel-root': {
+                  transform: 'translate(14px, -9px) scale(0.75)',
+                  backgroundColor: 'white',
+                  px: 1,
+                  color: 'primary.main'
+                },
+                '& .MuiInputLabel-shrink': {
+                  transform: 'translate(14px, -9px) scale(0.75)',
+                  backgroundColor: 'white',
+                  px: 1,
+                  color: 'primary.main'
+                }
+              }}
+            >
+              <MenuItem value="" disabled>
+                {filteredExercises.length === 0 ? 'Cargando ejercicios...' : 'Seleccionar ejercicio...'}
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              {filteredExercises.map((ex) => (
+                <MenuItem key={ex.id} value={ex.id}>
+                  {ex.name}
+                  {ex.name.toLowerCase().includes('running') && ' 🏃‍♂️'}
+                  {ex.name.toLowerCase().includes('fútbol') && ' ⚽'}
+                  {ex.name.toLowerCase().includes('básquet') && ' 🏀'}
+                  {ex.name.toLowerCase().includes('pádel') && ' 🎾'}
+                  {ex.name.toLowerCase().includes('voley') && ' 🏐'}
+                  {ex.name.toLowerCase().includes('handball') && ' ⚾'}
+                  {ex.name.toLowerCase().includes('hockey') && ' 🏑'}
+                  {ex.name.toLowerCase().includes('natación') && ' 🏊‍♂️'}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
 
         {/* Interfaz para deportes */}
         {isSportExercise ? (
