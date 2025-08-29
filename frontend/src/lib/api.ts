@@ -2,11 +2,7 @@ import { supabase } from './supabase'
 
 const getApiBaseUrl = () => {
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3210'
-  // Si estamos usando el proxy, no agregar /api
-  if (baseUrl === '/api/proxy') {
-    return baseUrl
-  }
-  // Para desarrollo local, asegurar que termine con /api
+  // Asegurar que siempre termine con /api
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`
 }
 
