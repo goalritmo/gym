@@ -56,17 +56,22 @@ func createUserNotifications(userID string) error {
 		ORDER BY an.created_at DESC
 	`
 
-	fmt.Printf("Debug: Ejecutando query: %s\n", query)
+	fmt.Printf("Debug: Ejecutando query con userID: %s\n", userID)
 	rows, err := database.DB.Query(query, userID)
 	if err != nil {
+		fmt.Printf("Debug: Error en Query: %v\n", err)
 		return fmt.Errorf("error consultando admin_notifications: %v", err)
 	}
 	defer rows.Close()
 
+	fmt.Printf("Debug: Query ejecutada exitosamente, procesando resultados...\n")
+	
 	var createdCount int
 	var foundCount int
 	for rows.Next() {
 		foundCount++
+		fmt.Printf("Debug: Procesando fila %d\n", foundCount)
+		
 		var adminID int
 		var title, message, notificationType string
 
@@ -83,8 +88,14 @@ func createUserNotifications(userID string) error {
 			"admin_notification_id": adminID,
 			"type":                  notificationType,
 		}
-		dataJSON, _ := json.Marshal(notificationData)
+		dataJSON, err := json.Marshal(notificationData)
+		if err != nil {
+			fmt.Printf("Error marshaling notification data: %v\n", err)
+			continue
+		}
 
+		fmt.Printf("Debug: Intentando insertar notificación para admin_notification %d\n", adminID)
+		
 		// Crear notificación individual
 		_, err = database.DB.Exec(`
 			INSERT INTO notifications (user_id, type, title, message, data, is_read)
@@ -95,7 +106,14 @@ func createUserNotifications(userID string) error {
 			fmt.Printf("Error creando notificación individual para admin_notification %d: %v\n", adminID, err)
 		} else {
 			createdCount++
+			fmt.Printf("Debug: Notificación creada exitosamente para admin_notification %d\n", adminID)
 		}
+	}
+
+	fmt.Printf("Debug: Bucle completado. Verificando si hubo error en rows.Err()...\n")
+	if err := rows.Err(); err != nil {
+		fmt.Printf("Debug: Error en rows.Err(): %v\n", err)
+		return fmt.Errorf("error iterando admin_notifications: %v", err)
 	}
 
 	fmt.Printf("Debug: Encontradas %d admin_notifications, creadas %d notificaciones individuales para usuario %s\n", foundCount, createdCount, userID)
