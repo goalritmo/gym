@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import { Logout as LogoutIcon, Settings as SettingsIcon, Notifications as NotificationsIcon, AdminPanelSettings as AdminIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
-import { useUserSettings } from '../../contexts/UserSettingsContext'
+// import { useUserSettings } from '../../contexts/UserSettingsContext' // Ya no se usa
 
 type UserAvatarProps = {
   onOpenSettings?: () => void
@@ -24,7 +24,7 @@ type UserAvatarProps = {
 
 export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpenAdminPanel, unreadNotifications = 0 }: UserAvatarProps) {
   const { user, logout, isAdmin, userRole } = useAuth()
-  const { settings } = useUserSettings()
+  // const { settings } = useUserSettings() // Ya no se usa
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 
@@ -102,7 +102,7 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
               color: 'white'
             }
           }}
-          invisible={unreadNotifications === 0 || !settings.uncNotificationsEnabled}
+          invisible={unreadNotifications === 0}
         >
           <Avatar
             sx={{ 
