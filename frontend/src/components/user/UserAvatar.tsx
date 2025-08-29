@@ -11,7 +11,7 @@ import {
   IconButton,
   Badge
 } from '@mui/material'
-import { Logout as LogoutIcon, Settings as SettingsIcon, Notifications as NotificationsIcon, AdminPanelSettings as AdminIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon, Settings as SettingsIcon, AdminPanelSettings as AdminIcon, ChatBubble as ChatBubbleIcon } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 // import { useUserSettings } from '../../contexts/UserSettingsContext' // Ya no se usa
 
@@ -207,11 +207,17 @@ export default function UserAvatar({ onOpenSettings, onOpenNotifications, onOpen
                   height: '16px',
                   backgroundColor: '#ff9800',
                   color: 'white'
-                }
+                },
+                backgroundColor: '#ff9800',
+                borderRadius: '50%',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
               invisible={unreadNotifications === 0}
             >
-              <NotificationsIcon fontSize="small" />
+              <ChatBubbleIcon fontSize="small" sx={{ color: '#ff9800' }} />
             </Badge>
           </ListItemIcon>
           <ListItemText>
