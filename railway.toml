@@ -17,6 +17,6 @@ CORS_ALLOWED_ORIGINS = "http://localhost:3210,http://localhost:5173,https://entr
 # Healthcheck
 [services.healthcheck]
 path = "/api/health"
-port = 3210
+port = 80
 intervalSeconds = 30
 timeoutSeconds = 10
