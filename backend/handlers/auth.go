@@ -51,7 +51,7 @@ func createUserNotifications(userID string) error {
 		AND NOT EXISTS (
 			SELECT 1 FROM notifications n 
 			WHERE n.user_id = $1 
-			AND n.type = 'admin_notification'
+			AND n.type = 'announcement'
 			AND n.data::jsonb->>'admin_notification_id' = an.id::text
 		)
 		ORDER BY an.created_at DESC
@@ -101,7 +101,7 @@ func createUserNotifications(userID string) error {
 		_, err = database.DB.Exec(`
 			INSERT INTO notifications (user_id, type, title, message, data, is_read)
 			VALUES ($1, $2, $3, $4, $5, false)
-		`, userID, "admin_notification", title, message, string(dataJSON))
+		`, userID, "announcement", title, message, string(dataJSON))
 
 		if err != nil {
 			fmt.Printf("Error creando notificación individual para admin_notification %d: %v\n", adminID, err)

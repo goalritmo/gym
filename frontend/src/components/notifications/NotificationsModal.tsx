@@ -27,7 +27,7 @@ import {
 import { apiClient } from '../../lib/api'
 import { useUserSettings } from '../../contexts/UserSettingsContext'
 
-type NotificationType = 'general' | 'kudos' | 'announcement' | 'workout_created' | 'welcome'
+type NotificationType = 'kudos' | 'announcement' | 'workout_created' | 'welcome'
 
 type Notification = {
   id: number
@@ -160,25 +160,23 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
         return <Celebration sx={{ color: 'primary.main' }} />
       case 'announcement':
         return <Announcement sx={{ color: '#ff9800' }} />
+
       case 'kudos':
         return <ThumbUp sx={{ color: 'success.main' }} />
-      case 'general':
-        return <Announcement sx={{ color: '#ff9800' }} />
+
       default:
         return <Notifications />
     }
   }
 
-  const getNotificationColor = (type: NotificationType, priority?: string) => {
+  const getNotificationColor = (type: NotificationType) => {
     switch (type) {
       case 'welcome':
         return 'primary'
       case 'announcement':
-        return priority === 'high' ? 'error' : 'warning'
+        return 'warning'
       case 'kudos':
         return 'success'
-      case 'general':
-        return 'info'
       default:
         return 'default'
     }
@@ -294,7 +292,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                       width: 40, 
                       height: 40, 
                       borderRadius: '50%',
-                      backgroundColor: `${getNotificationColor(notification.type, notification.priority)}.light`,
+                      backgroundColor: `${getNotificationColor(notification.type)}.light`,
                       mr: 2,
                       flexShrink: 0
                     }}>
