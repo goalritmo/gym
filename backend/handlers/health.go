@@ -22,7 +22,7 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := HealthResponse{
 		Status:    "ok",
-		Message:   "Gym API funcionando correctamente",
+		    Message:   "Entrenar API funcionando correctamente",
 		Timestamp: time.Now(),
 		Database:  "disconnected",
 	}

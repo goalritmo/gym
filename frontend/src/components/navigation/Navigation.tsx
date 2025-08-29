@@ -320,7 +320,7 @@ export default function Navigation({ activeTab, onTabChange, onOpenSettings, onO
                 animation: 'slideInFromTop 0.3s ease-out'
               }}
             >
-              Gym App
+              entrenar.app
             </Typography>
           )}
           

@@ -1,4 +1,4 @@
-# Actualizaciones de Base de Datos - Gym App
+# Actualizaciones de Base de Datos - Entrenar App
 
 ## Cambios Recientes (2024)
 

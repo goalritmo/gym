@@ -1,5 +1,5 @@
 // Script para obtener detalles específicos del error de registro
-// Ejecutar en la consola del navegador en https://gym.goalritmo.com
+// Ejecutar en la consola del navegador en https://entrenar.app
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 

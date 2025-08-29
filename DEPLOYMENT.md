@@ -1,4 +1,4 @@
-# 🚀 Deployment Guide - Gym App
+# 🚀 Deployment Guide - Entrenar App
 
 Esta guía te ayudará a desplegar tanto el frontend como el backend en producción.
 
@@ -187,9 +187,9 @@ railway variables
 ## 🎯 URLs de Ejemplo
 
 ```
-Frontend: https://gym-app-frontend.vercel.app
-Backend:  https://gym-backend.railway.app  
-API:      https://gym-backend.railway.app/api/health
+Frontend: https://entrenar.app
+Backend:  https://entrenar-backend.railway.app
+API:      https://entrenar-backend.railway.app/api/health
 ```
 
-¡Con esto tendrás tu app gym completamente desplegada en producción! 🚀
+¡Con esto tendrás tu app entrenar completamente desplegada en producción! 🚀

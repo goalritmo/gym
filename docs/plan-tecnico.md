@@ -1,4 +1,4 @@
-# Plan Técnico - Gym App
+# Plan Técnico - Entrenar App
 
 ## Arquitectura General
 

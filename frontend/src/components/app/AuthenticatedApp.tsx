@@ -92,8 +92,8 @@ function AuthenticatedAppContent() {
       console.error('Error cargando datos del backend:', error)
       
       // Fallback a localStorage si el backend falla
-      const savedWorkouts = localStorage.getItem('gym-workouts')
-      const savedWorkoutDays = localStorage.getItem('gym-workout-days')
+          const savedWorkouts = localStorage.getItem('entrenar-workouts')
+    const savedWorkoutDays = localStorage.getItem('entrenar-workout-days')
       
       if (savedWorkouts) {
         setWorkouts(JSON.parse(savedWorkouts))
@@ -131,14 +131,14 @@ function AuthenticatedAppContent() {
   // Guardar workouts cuando cambien
   useEffect(() => {
     if (workouts.length > 0) {
-      localStorage.setItem('gym-workouts', JSON.stringify(workouts))
+              localStorage.setItem('entrenar-workouts', JSON.stringify(workouts))
     }
   }, [workouts])
 
   // Guardar workout days cuando cambien
   useEffect(() => {
     if (workoutDays.length > 0) {
-      localStorage.setItem('gym-workout-days', JSON.stringify(workoutDays))
+              localStorage.setItem('entrenar-workout-days', JSON.stringify(workoutDays))
     }
   }, [workoutDays])
 

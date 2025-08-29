@@ -119,7 +119,7 @@ func main() {
 		AllowedOrigins: []string{
 			"http://localhost:3210",      // Backend desarrollo
 			"http://localhost:5173",      // Frontend desarrollo
-			"https://gym.goalritmo.com",  // Frontend producción
+			"https://entrenar.app",       // Frontend producción
 		},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{

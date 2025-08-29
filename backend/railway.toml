@@ -6,7 +6,7 @@ restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
 
 [[services]]
-name = "gym-backend"
+name = "entrenar-backend"
 source = "backend"
 
 [services.variables]

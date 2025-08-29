@@ -1,4 +1,4 @@
-# Testing Guide - Gym API Backend
+# Testing Guide - Entrenar API Backend
 
 ## 📋 Tipos de Tests Implementados
 

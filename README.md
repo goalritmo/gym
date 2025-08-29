@@ -1,4 +1,4 @@
-# Gym App — Registro de Entrenamientos
+# Entrenar App — Registro de Entrenamientos
 
 Aplicación web para registrar entrenamientos (peso, repeticiones, series, tiempo) con soporte de cronómetro, visualización de ejercicios/equipos y enfoque TDD.
 

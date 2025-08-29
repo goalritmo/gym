@@ -1,4 +1,4 @@
-# Gym App Backend
+# Entrenar App Backend
 
 API REST en Go para la aplicación de registro de entrenamientos de gimnasio.
 

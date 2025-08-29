@@ -54,7 +54,7 @@ export default function LoginComponent() {
             color: '#FFB732' 
           }}
         >
-          Gym App
+          entrenar.app
         </Typography>
         
         {/* Google OAuth Login */}
