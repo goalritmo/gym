@@ -2,7 +2,6 @@
 
 Aplicación web para registrar entrenamientos (peso, repeticiones, series, tiempo) con soporte de cronómetro, visualización de ejercicios/equipos y enfoque TDD.
 
-> Este proyecto se está construyendo en colaboración con ChatGPT‑5 (asistencia de desarrollo, TDD y documentación).
 
 ## 🚀 Versión 1.2.3 - Completada
 
@@ -112,11 +111,10 @@ Ver definiciones SQL en `especificaciones.md`.
 
 ## Próximas versiones
 - **v1.3.0**: Mejoras de UX y performance
-- **v1.4.0**: Funcionalidades sociales (compartir entrenamientos)
+- **v1.4.0**: Funcionalidades sociales
 - **v2.0.0**: App móvil nativa
 
 ## Notas
-- Node 18 puede mostrar advertencias con Vite 7; usa Node 20+ para evitar errores.
 - Autenticación implementada con Supabase Auth y Google OAuth.
 - Deployment automatizado con CI/CD en GitHub.
 - CORS configurado para dominios de producción.
