@@ -153,13 +153,13 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
   const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
       case 'welcome':
-        return <Celebration sx={{ color: 'primary.main', fontSize: 36 }} />
+        return <Celebration sx={{ color: 'primary.main', fontSize: 28 }} />
       case 'announcement':
-        return <Announcement sx={{ color: '#ff9800', fontSize: 36 }} />
+        return <Announcement sx={{ color: '#ff9800', fontSize: 28 }} />
       case 'kudos':
-        return <ThumbUp sx={{ color: 'success.main', fontSize: 36 }} />
+        return <ThumbUp sx={{ color: 'success.main', fontSize: 28 }} />
       default:
-        return <Notifications sx={{ fontSize: 36 }} />
+        return <Notifications sx={{ fontSize: 28 }} />
     }
   }
 
@@ -296,7 +296,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
                   </Box>
 
                   {/* Mensaje */}
-                  <Typography variant="body1" sx={{ py: 1.25 }}>
+                  <Typography variant="body1" sx={{ px: 1.25 }}>
                     {notification.message}
                   </Typography>
 
