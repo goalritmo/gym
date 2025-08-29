@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -115,13 +116,18 @@ func main() {
 	api.HandleFunc("/routines/{id}", handlers.DeleteUserRoutineHandler).Methods("DELETE")
 
 	// Configurar CORS
+	corsOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
+	if corsOrigins == "" {
+		corsOrigins = "http://localhost:3210,http://localhost:5173,https://entrenar.app,https://gym.goalritmo.com"
+	}
+	
+	allowedOrigins := strings.Split(corsOrigins, ",")
+	for i, origin := range allowedOrigins {
+		allowedOrigins[i] = strings.TrimSpace(origin)
+	}
+	
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{
-			"http://localhost:3210",      // Backend desarrollo
-			"http://localhost:5173",      // Frontend desarrollo
-			"https://entrenar.app",       // Frontend producción
-			"https://gym.goalritmo.com",  // Frontend producción (temporal)
-		},
+		AllowedOrigins: allowedOrigins,
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{
 			"Content-Type", 
