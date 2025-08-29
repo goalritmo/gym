@@ -27,23 +27,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log(`Proxying request to: ${backendUrl}`);
 
-    // Preparar headers
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
+    // Preparar headers básicos
+    const headers: Record<string, string> = {};
 
     // Copiar headers importantes
     if (req.headers.authorization) {
       headers['Authorization'] = req.headers.authorization;
-    }
-    if (req.headers['x-requested-with']) {
-      headers['X-Requested-With'] = req.headers['x-requested-with'] as string;
     }
 
     // Preparar body para métodos que no sean GET
     let body: string | undefined;
     if (req.method !== 'GET' && req.body) {
       body = JSON.stringify(req.body);
+      headers['Content-Type'] = 'application/json';
     }
 
     // Hacer la petición al backend

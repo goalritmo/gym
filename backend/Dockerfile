@@ -14,26 +14,16 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
 # Final stage
-FROM nginx:alpine
+FROM alpine:latest
 
 # Install ca-certificates for HTTPS requests
 RUN apk --no-cache add ca-certificates
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-
 # Copy the binary from builder stage
-COPY --from=builder /app/main /root/main
-
-# Create startup script
-RUN echo '#!/bin/sh' > /start.sh && \
-    echo 'nginx &' >> /start.sh && \
-    echo 'sleep 2' >> /start.sh && \
-    echo 'cd /root && ./main' >> /start.sh && \
-    chmod +x /start.sh
+COPY --from=builder /app/main /app/main
 
 # Expose port
-EXPOSE 80
+EXPOSE 3210
 
 # Command to run
-CMD ["/start.sh"]
+CMD ["/app/main"]

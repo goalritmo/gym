@@ -7,7 +7,7 @@ restartPolicyMaxRetries = 10
 
 [[services]]
 name = "entrenar-backend"
-source = "backend"
+source = "."
 
 [services.variables]
 PORT = "3210"
