@@ -151,7 +151,7 @@ export function AdminExercises() {
       maxWidth: '900px', 
       mx: 'auto',
       px: { xs: 2, sm: 3, md: 4 },
-      height: 'calc(100vh - 200px)',
+      height: 'calc(100vh - 300px)',
       display: 'flex',
       flexDirection: 'column'
     }}>
@@ -216,7 +216,7 @@ export function AdminExercises() {
           },
         },
       }}>
-        <Stack spacing={2}>
+        <Stack spacing={2} sx={{ pb: 3 }}>
           {filteredExercises.length === 0 ? (
             <Card>
               <CardContent sx={{ textAlign: 'center', py: 4 }}>
