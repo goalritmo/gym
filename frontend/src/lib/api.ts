@@ -2,11 +2,7 @@ import { supabase } from './supabase'
 
 const getApiBaseUrl = () => {
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3210'
-  // Si estamos en desarrollo, usar localhost, si no, usar el proxy
-  if (baseUrl === '/api/proxy') {
-    return baseUrl
-  }
-  // Asegurar que siempre termine con /api para desarrollo local
+  // Asegurar que siempre termine con /api
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`
 }
 
@@ -47,16 +43,7 @@ class ApiClient {
       requireAuth = true
     } = config
 
-    // Construir la URL correctamente para el proxy
-    let url: string
-    if (this.baseUrl === '/api/proxy') {
-      // Para el proxy, necesitamos pasar el endpoint como query parameter
-      const path = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint
-      url = `${this.baseUrl}?path=${encodeURIComponent(path)}`
-    } else {
-      // Para desarrollo local, usar la URL completa
-      url = `${this.baseUrl}${endpoint}`
-    }
+    const url = `${this.baseUrl}${endpoint}`
     
     let requestHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
