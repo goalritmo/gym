@@ -10,7 +10,7 @@ Aplicación web para registrar entrenamientos (peso, repeticiones, series, tiemp
 
 ### Características implementadas:
 - ✅ **Registro de entrenamientos** con formulario completo
-- ✅ **Cronómetro** con guía 40-50s y pausas
+- ✅ **Cronómetro** para descanso entre series
 - ✅ **Listado de ejercicios y equipos** con filtros
 - ✅ **Sistema de notificaciones** (manual y automático)
 - ✅ **API REST completa** en Go con autenticación
@@ -100,7 +100,7 @@ Ver definiciones SQL en `especificaciones.md`.
 
 ## Roadmap (Completado ✅)
 - [x] **Registro de entrenamientos** (form + persistencia)
-- [x] **Cronómetro** con guía 40–50s
+- [x] **Cronómetro** para descanso entre series
 - [x] **Listado/buscador** de ejercicios y equipos
 - [x] **Notificaciones** (manual y automático)
 - [x] **API REST completa** en Go
