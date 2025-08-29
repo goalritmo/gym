@@ -35,9 +35,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const {
     settings,
     setFavoriteExercises,
-    setHasConfiguredFavorites,
-    toggleUncNotifications,
-    toggleShowOwnWorkoutsInSocial
+    setHasConfiguredFavorites
   } = useUserSettings()
   const [hasChanges, setHasChanges] = useState(false)
   const [tempSettings, setTempSettings] = useState(settings)
