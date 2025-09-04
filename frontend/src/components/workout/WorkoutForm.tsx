@@ -311,6 +311,10 @@ export default function WorkoutForm({
       setMessageInObservations(`✅ '${exerciseName}' registrado exitosamente`)
       setValue('observations', `✅ '${exerciseName}' registrado exitosamente`)
       
+      // Disparar evento para actualizar el feed social
+      console.log('🔄 Disparando evento de actualización del feed social')
+      window.dispatchEvent(new CustomEvent('socialFeedRefresh'))
+      
       // Solo abrir el modal de descanso si hay un tiempo de descanso configurado
       if (data.restSeconds && data.restSeconds > 0) {
         setLastRegisteredExercise(exerciseName)

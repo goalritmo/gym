@@ -257,6 +257,10 @@ export default function WorkoutHistory() {
       await loadData()
       console.log('🔍 Datos recargados')
       setSuccessMessage('Ejercicio eliminado exitosamente')
+      
+      // Disparar evento para actualizar el feed social
+      console.log('🔄 Disparando evento de actualización del feed social después de eliminar')
+      window.dispatchEvent(new CustomEvent('socialFeedRefresh'))
     } catch (error) {
       console.error('❌ Error eliminando workout:', error)
       setError('Error al eliminar el ejercicio. Inténtalo de nuevo.')

@@ -49,6 +49,9 @@ export default function SocialList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [loadingKudos, setLoadingKudos] = useState<Set<number>>(new Set())
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [currentOffset, setCurrentOffset] = useState(0)
 
   
 
@@ -95,13 +98,22 @@ export default function SocialList() {
     }
   }
 
-  const loadSocialWorkouts = useCallback(async () => {
+  const loadSocialWorkouts = useCallback(async (reset = false) => {
     try {
-      setLoading(true)
-      const workouts = await apiClient.getSocialWorkouts(10, 0)
+      if (reset) {
+        setLoading(true)
+        setCurrentOffset(0)
+        setHasMore(true)
+      } else {
+        setLoadingMore(true)
+      }
+
+      const offset = reset ? 0 : currentOffset
+      const workouts = await apiClient.getSocialWorkouts(10, offset)
       console.log('🔍 Workouts cargados desde API:', workouts)
       console.log('🔍 Tipo de respuesta:', typeof workouts)
       console.log('🔍 Es array?', Array.isArray(workouts))
+      console.log('🔍 Offset actual:', offset)
       
       if (Array.isArray(workouts) && workouts.length > 0) {
         console.log('🔍 Primer workout detalle:', {
@@ -114,21 +126,47 @@ export default function SocialList() {
       
       if (workouts === null || workouts === undefined) {
         console.log('🔍 API devolvió null/undefined, estableciendo array vacío')
-        setSocialWorkouts([])
+        if (reset) {
+          setSocialWorkouts([])
+        }
+        setHasMore(false)
       } else if (Array.isArray(workouts)) {
         console.log('🔍 Estableciendo workouts:', workouts.length)
-        setSocialWorkouts(workouts)
+        
+        if (reset) {
+          setSocialWorkouts(workouts)
+        } else {
+          setSocialWorkouts(prev => [...prev, ...workouts])
+        }
+        
+        // Si recibimos menos de 10 workouts, no hay más datos
+        if (workouts.length < 10) {
+          setHasMore(false)
+        } else {
+          setCurrentOffset(prev => prev + 10)
+        }
       } else {
         console.log('🔍 Respuesta no es array, estableciendo array vacío')
-        setSocialWorkouts([])
+        if (reset) {
+          setSocialWorkouts([])
+        }
+        setHasMore(false)
       }
     } catch (error) {
       console.error('Error cargando entrenamientos sociales:', error)
       setError('Error al cargar el feed social')
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
-  }, []) // Dependencies for useCallback
+  }, [currentOffset]) // Dependencies for useCallback
+
+  const loadMoreWorkouts = useCallback(() => {
+    if (!loadingMore && hasMore) {
+      console.log('🔄 Cargando más entrenamientos...')
+      loadSocialWorkouts(false)
+    }
+  }, [loadingMore, hasMore, loadSocialWorkouts])
 
   const handleKudos = async (workoutId: number) => {
     if (!user) return
@@ -212,18 +250,61 @@ export default function SocialList() {
   }, [socialWorkouts])
 
   useEffect(() => {
-    loadSocialWorkouts()
+    loadSocialWorkouts(true) // Reset para cargar desde el inicio
   }, [loadSocialWorkouts])
 
   // Registrar callback para recargar cuando cambien las configuraciones sociales
   useEffect(() => {
-    setOnSocialSettingsChange(() => loadSocialWorkouts)
+    setOnSocialSettingsChange(() => () => loadSocialWorkouts(true))
     
     // Cleanup: remover callback cuando se desmonte el componente
     return () => {
       setOnSocialSettingsChange(() => {})
     }
   }, [setOnSocialSettingsChange, loadSocialWorkouts])
+
+  // Escuchar eventos de actualización del feed social
+  useEffect(() => {
+    const handleSocialRefresh = () => {
+      console.log('🔄 Evento de actualización del feed social recibido')
+      loadSocialWorkouts(true) // Reset para cargar desde el inicio
+    }
+
+    // Escuchar eventos personalizados para actualizar el feed social
+    window.addEventListener('socialFeedRefresh', handleSocialRefresh)
+    
+    // Cleanup: remover listener cuando se desmonte el componente
+    return () => {
+      window.removeEventListener('socialFeedRefresh', handleSocialRefresh)
+    }
+  }, [loadSocialWorkouts])
+
+  // Actualizar el feed social cuando el componente se monta (cuando se cambia al tab social)
+  useEffect(() => {
+    console.log('🔄 SocialList montado, recargando datos del feed social')
+    loadSocialWorkouts(true) // Reset para cargar desde el inicio
+  }, []) // Solo ejecutar una vez cuando se monta el componente
+
+  // Hook para detectar scroll al final de la página
+  useEffect(() => {
+    const handleScroll = () => {
+      // Verificar si el usuario llegó al final de la página
+      if (
+        window.innerHeight + document.documentElement.scrollTop >= 
+        document.documentElement.offsetHeight - 1000 // 1000px antes del final
+      ) {
+        loadMoreWorkouts()
+      }
+    }
+
+    // Agregar listener de scroll
+    window.addEventListener('scroll', handleScroll)
+    
+    // Cleanup: remover listener cuando se desmonte el componente
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [loadMoreWorkouts])
 
   if (loading) {
     return (
@@ -356,6 +437,32 @@ export default function SocialList() {
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="h6" color="text.secondary">
               No hay entrenamientos registrados
+            </Typography>
+          </Box>
+        )}
+
+        {/* Indicador de carga para más entrenamientos */}
+        {loadingMore && (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            py: 3,
+            flexDirection: 'column',
+            gap: 2
+          }}>
+            <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+              Cargando más entrenamientos...
+            </Typography>
+          </Box>
+        )}
+
+        {/* Mensaje cuando no hay más entrenamientos */}
+        {!hasMore && socialWorkouts.length > 0 && (
+          <Box sx={{ textAlign: 'center', py: 3 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+              No hay más entrenamientos para mostrar
             </Typography>
           </Box>
         )}
