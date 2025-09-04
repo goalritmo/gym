@@ -9,7 +9,6 @@ import (
 )
 
 type UserSettings struct {
-	ShowOwnWorkoutsInSocial bool    `json:"show_own_workouts_in_social"`
 	HasConfiguredFavorites  bool    `json:"has_configured_favorites"`
 	FavoriteExercises       []int   `json:"favorite_exercises"`
 }
@@ -29,13 +28,12 @@ func GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	// Intentar obtener configuraciones existentes
 	var settings UserSettings
 	query := `
-		SELECT show_own_workouts_in_social, has_configured_favorites, favorite_exercises
+		SELECT has_configured_favorites, favorite_exercises
 		FROM user_settings
 		WHERE user_id = $1
 	`
 	
 	err := database.DB.QueryRow(query, userID).Scan(
-		&settings.ShowOwnWorkoutsInSocial,
 		&settings.HasConfiguredFavorites,
 		&settings.FavoriteExercises,
 	)
@@ -45,16 +43,15 @@ func GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 			// Si no existen configuraciones, crear con valores por defecto
 			fmt.Printf("🔍 No existing settings found for user %s, creating defaults\n", userID)
 			settings = UserSettings{
-				ShowOwnWorkoutsInSocial: true,
 				HasConfiguredFavorites:  false,
 				FavoriteExercises:       []int{},
 			}
 			
 			insertQuery := `
-				INSERT INTO user_settings (user_id, show_own_workouts_in_social, has_configured_favorites, favorite_exercises)
-				VALUES ($1, $2, $3, $4)
+				INSERT INTO user_settings (user_id, has_configured_favorites, favorite_exercises)
+				VALUES ($1, $2, $3)
 			`
-			_, err = database.DB.Exec(insertQuery, userID, settings.ShowOwnWorkoutsInSocial, settings.HasConfiguredFavorites, settings.FavoriteExercises)
+			_, err = database.DB.Exec(insertQuery, userID, settings.HasConfiguredFavorites, settings.FavoriteExercises)
 			if err != nil {
 				fmt.Printf("Error creando configuraciones por defecto: %v\n", err)
 				http.Error(w, "Error creando configuraciones", http.StatusInternalServerError)
@@ -95,17 +92,16 @@ func UpdateUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Upsert: insertar si no existe, actualizar si existe
 	query := `
-		INSERT INTO user_settings (user_id, show_own_workouts_in_social, has_configured_favorites, favorite_exercises)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO user_settings (user_id, has_configured_favorites, favorite_exercises)
+		VALUES ($1, $2, $3)
 		ON CONFLICT (user_id) 
 		DO UPDATE SET 
-			show_own_workouts_in_social = EXCLUDED.show_own_workouts_in_social,
 			has_configured_favorites = EXCLUDED.has_configured_favorites,
 			favorite_exercises = EXCLUDED.favorite_exercises,
 			updated_at = NOW()
 	`
 
-	_, err := database.DB.Exec(query, userID, settings.ShowOwnWorkoutsInSocial, settings.HasConfiguredFavorites, settings.FavoriteExercises)
+	_, err := database.DB.Exec(query, userID, settings.HasConfiguredFavorites, settings.FavoriteExercises)
 	if err != nil {
 		fmt.Printf("Error actualizando configuraciones: %v\n", err)
 		http.Error(w, "Error actualizando configuraciones", http.StatusInternalServerError)

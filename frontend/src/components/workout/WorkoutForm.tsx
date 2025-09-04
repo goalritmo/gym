@@ -693,7 +693,7 @@ export default function WorkoutForm({
           options={filteredExercises}
           getOptionLabel={(option) => {
             let label = option.name
-                        
+
             // Agregar emojis a la derecha
             if (option.name.toLowerCase().includes('running')) label += ' 🏃‍♂️'
             if (option.name.toLowerCase().includes('bici')) label += ' 🚴'
@@ -844,7 +844,7 @@ export default function WorkoutForm({
         {/* Campo de descanso en segundos - Oculto para deportes */}
         {!isSportExercise && (
           <TextField
-            label="Descanso entre series (segundos)"
+            label="Descanso luego de la serie (segs)"
             type="number"
             disabled={isLoading}
             error={Boolean(errors.restSeconds)}
