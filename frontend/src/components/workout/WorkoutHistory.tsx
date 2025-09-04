@@ -670,7 +670,9 @@ export default function WorkoutHistory() {
               </Box>
 
               <Stack spacing={2}>
-                {exerciseModal.exerciseGroup?.workouts.map((workout, workoutIndex) => (
+                {exerciseModal.exerciseGroup?.workouts
+                  .sort((a, b) => a.set - b.set) // Ordenar por número de serie ascendente
+                  .map((workout, workoutIndex) => (
                   <Card key={workoutIndex} sx={{ 
                     boxShadow: 1, 
                     border: '1px solid',

@@ -57,7 +57,7 @@ func GetWorkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		argIndex++
 	}
 
-	query += " ORDER BY w.created_at DESC"
+	query += " ORDER BY w.created_at DESC, w.set ASC"
 
 	fmt.Printf("Ejecutando query con %d parámetros\n", len(args))
 
@@ -256,6 +256,102 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		workoutDayID = existingID
 	}
 
+	// Obtener valores de los punteros de forma segura
+	var setValue int = 1
+	if req.Set != nil {
+		setValue = *req.Set
+	}
+
+	// Obtener valor de peso de forma segura
+	var weightValue float64 = 0
+	if req.Weight != nil {
+		weightValue = *req.Weight
+	}
+	
+	// Obtener valor de reps de forma segura
+	var repsValue int = 0
+	if req.Reps != nil {
+		repsValue = *req.Reps
+	}
+
+	// Verificar si necesitamos crear series automáticamente
+	// Solo si la serie es > 1 y no hay otras series del mismo ejercicio ese día
+	if setValue > 1 {
+		// Validar que setValue no sea excesivamente grande (límite de seguridad)
+		if setValue > 20 {
+			fmt.Printf("Número de serie demasiado alto: %d\n", setValue)
+			http.Error(w, "Número de serie no puede ser mayor a 20", http.StatusBadRequest)
+			return
+		}
+
+		// Verificar si ya existen series del mismo ejercicio en el día de entrenamiento
+		var existingSetsCount int
+		checkQuery := `
+			SELECT COUNT(*) 
+			FROM workouts 
+			WHERE user_id = $1 AND workout_day_id = $2 AND exercise_id = $3
+		`
+		err = database.DB.QueryRow(checkQuery, userID, workoutDayID, req.ExerciseID).Scan(&existingSetsCount)
+		if err != nil {
+			fmt.Printf("Error verificando series existentes: %v\n", err)
+			http.Error(w, "Error verificando series existentes", http.StatusInternalServerError)
+			return
+		}
+
+		// Si no hay series existentes, crear automáticamente las series faltantes (1 hasta setValue-1)
+		if existingSetsCount == 0 {
+			fmt.Printf("Creando automáticamente %d series faltantes para ejercicio %d\n", setValue-1, req.ExerciseID)
+			
+			// Crear las series faltantes en una transacción
+			tx, err := database.DB.Begin()
+			if err != nil {
+				fmt.Printf("Error iniciando transacción: %v\n", err)
+				http.Error(w, "Error iniciando transacción", http.StatusInternalServerError)
+				return
+			}
+			defer tx.Rollback()
+
+			// Insertar las series faltantes (1 hasta setValue-1)
+			for i := 1; i < setValue; i++ {
+				_, err = tx.Exec(`
+					INSERT INTO workouts (user_id, workout_day_id, exercise_id, weight, reps, set, seconds, observations)
+					VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+				`, userID, workoutDayID, req.ExerciseID, weightValue, repsValue, i, req.Seconds, req.Observations)
+				
+				if err != nil {
+					fmt.Printf("Error creando serie automática %d: %v\n", i, err)
+					http.Error(w, "Error creando series automáticas", http.StatusInternalServerError)
+					return
+				}
+			}
+
+			// Confirmar la transacción
+			if err = tx.Commit(); err != nil {
+				fmt.Printf("Error confirmando transacción: %v\n", err)
+				http.Error(w, "Error confirmando transacción", http.StatusInternalServerError)
+				return
+			}
+			
+			fmt.Printf("Series automáticas creadas exitosamente\n")
+		} else {
+			// Si ya existen series, verificar que no haya conflicto con la serie que se está insertando
+			var existingSetNumber int
+			conflictQuery := `
+				SELECT set 
+				FROM workouts 
+				WHERE user_id = $1 AND workout_day_id = $2 AND exercise_id = $3 AND set = $4
+			`
+			err = database.DB.QueryRow(conflictQuery, userID, workoutDayID, req.ExerciseID, setValue).Scan(&existingSetNumber)
+			if err == nil {
+				// La serie ya existe
+				fmt.Printf("Serie %d ya existe para ejercicio %d\n", setValue, req.ExerciseID)
+				http.Error(w, fmt.Sprintf("La serie %d ya existe para este ejercicio", setValue), http.StatusConflict)
+				return
+			}
+			// Si err != nil, significa que no existe conflicto, continuar normalmente
+		}
+	}
+
 	// Insertar workout asociado al día de entrenamiento
 	query := `
 		INSERT INTO workouts (user_id, workout_day_id, exercise_id, weight, reps, set, seconds, observations)
@@ -280,26 +376,8 @@ func CreateWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		workout.Reps = 0 // Valor por defecto cuando no se proporcionan reps
 	}
 	workout.Observations = req.Observations
-
-	// Obtener valores de los punteros de forma segura
-	var setValue int = 1
-	if req.Set != nil {
-		setValue = *req.Set
-	}
-
-	// Obtener valor de peso de forma segura
-	var weightValue float64 = 0
-	if req.Weight != nil {
-		weightValue = *req.Weight
-	}
 	
-	// Obtener valor de reps de forma segura
-	var repsValue int = 0
-	if req.Reps != nil {
-		repsValue = *req.Reps
-	}
-	
-	fmt.Printf("Insertando workout con workoutDayID: %d, weight: %f, reps: %d\n", workoutDayID, weightValue, repsValue)
+	fmt.Printf("Insertando workout con workoutDayID: %d, weight: %f, reps: %d, set: %d\n", workoutDayID, weightValue, repsValue, setValue)
 	err = database.DB.QueryRow(
 		query,
 		userID, workoutDayID, req.ExerciseID, weightValue, repsValue,
