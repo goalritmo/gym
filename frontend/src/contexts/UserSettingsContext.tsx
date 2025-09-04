@@ -79,16 +79,20 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
         apiSettings: apiSettingsTyped,
         localSettings,
         hasConfiguredFavorites: apiSettingsTyped.has_configured_favorites,
+        favoriteExercisesFromAPI: apiSettingsTyped.favorite_exercises,
         favoriteExercisesFromLocal: localSettings.favoriteExercises
       })
       
-      setSettings({ 
+      const finalSettings = { 
         ...defaultSettings, 
         showOwnWorkoutsInSocial: apiSettingsTyped.show_own_workouts_in_social,
         uncNotificationsEnabled: apiSettingsTyped.unc_notifications_enabled,
         hasConfiguredFavorites: apiSettingsTyped.has_configured_favorites,
         favoriteExercises: apiSettingsTyped.favorite_exercises ?? []
-      })
+      }
+      
+      console.log('🔍 Final settings being set:', finalSettings)
+      setSettings(finalSettings)
     } catch (error) {
       console.error('Error loading user settings from API:', error)
       // Fallback a localStorage
@@ -205,13 +209,12 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
         ...prev, 
         favoriteExercises: exerciseIds
       }))
-    } else if (settings.hasConfiguredFavorites && settings.favoriteExercises.length === 0 && exerciseIds.length > 0) {
-      // Caso especial: usuario configuró favoritos pero se perdieron del localStorage
-      console.log('🔍 User had configured favorites but they were lost, reinitializing with all exercises')
-      setSettings(prev => ({ 
-        ...prev, 
-        favoriteExercises: exerciseIds
-      }))
+    } else {
+      console.log('🔍 Skipping initialization:', {
+        favoriteExercisesLength: settings.favoriteExercises.length,
+        hasConfiguredFavorites: settings.hasConfiguredFavorites,
+        exerciseIdsLength: exerciseIds.length
+      })
     }
   }, [settings.favoriteExercises.length, settings.hasConfiguredFavorites])
 

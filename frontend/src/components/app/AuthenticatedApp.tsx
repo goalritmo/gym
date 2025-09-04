@@ -84,9 +84,13 @@ function AuthenticatedAppContent() {
       setExercises(Array.isArray(exercisesData) ? exercisesData : [])
       
       // Inicializar todos los ejercicios como favoritos si no hay configuración previa
+      // Usar setTimeout para asegurar que las configuraciones se hayan cargado primero
       if (Array.isArray(exercisesData) && exercisesData.length > 0) {
         const exerciseIds = exercisesData.map(ex => ex.id)
-        initializeAllExercisesAsFavorites(exerciseIds)
+        setTimeout(() => {
+          console.log('🔍 AuthenticatedApp: About to initialize exercises as favorites')
+          initializeAllExercisesAsFavorites(exerciseIds)
+        }, 100) // Pequeño delay para que las configuraciones se carguen primero
       }
     } catch (error) {
       console.error('Error cargando datos del backend:', error)
