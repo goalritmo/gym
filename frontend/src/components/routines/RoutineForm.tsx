@@ -85,7 +85,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
   const isRunningExercise = (exerciseId: number) => exerciseId === 18
   const isBiciExercise = (exerciseId: number) => {
     const exercise = availableExercises.find(ex => ex.id === exerciseId)
-    return exercise?.name?.toLowerCase().includes('bici') || false
+    return exercise?.name?.toLowerCase().includes('bici') || exerciseId === 30 || false
   }
   const isRunningOrBiciExercise = (exerciseId: number) => isRunningExercise(exerciseId) || isBiciExercise(exerciseId)
 

@@ -80,6 +80,7 @@ export default function WorkoutHistory() {
     if (name.includes('básquet') || name.includes('baloncesto')) return '🏀'
     if (name.includes('pádel')) return '🎾'
     if (name.includes('voley')) return '🏐'
+    if (name.includes('bici')) return '🚴'
     if (name.includes('handball')) return '⚾'
     if (name.includes('hockey')) return '🏑'
     if (name.includes('natación')) return '🏊‍♂️'
@@ -511,7 +512,8 @@ export default function WorkoutHistory() {
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.9rem' }}>
                             {(group.workouts.every(workout => workout.is_sport) || 
-                              group.exerciseName.toLowerCase().includes('running')) ? 
+                              group.exerciseName.toLowerCase().includes('running') ||
+                              group.exerciseName.toLowerCase().includes('bici')) ? 
                               getSportEmoji(group.exerciseName) || group.workouts.length : 
                               group.workouts.length
                             }
@@ -706,7 +708,7 @@ export default function WorkoutHistory() {
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                            {workout.is_sport || workout.exercise_name.toLowerCase().includes('running') ? 
+                            {workout.is_sport || workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ? 
                               getSportEmoji(workout.exercise_name) || `Serie nº${workout.set}` : 
                               `Serie nº${workout.set}`
                             }
@@ -736,7 +738,7 @@ export default function WorkoutHistory() {
                               /* Para ejercicios normales, mostrar solo peso y reps */
                               <>
                                 <Chip 
-                                  label={workout.weight === 0 ? 'Peso corporal' : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') ? 'km' : 'kg'}`} 
+                                  label={workout.weight === 0 ? 'Peso corporal' : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ? 'km' : 'kg'}`} 
                                   variant="outlined" 
                                   size="small"
                                   sx={{ 
@@ -750,7 +752,7 @@ export default function WorkoutHistory() {
                                     }
                                   }}
                                 />
-                                {!workout.exercise_name.toLowerCase().includes('running') && (
+                                {!workout.exercise_name.toLowerCase().includes('running') && !workout.exercise_name.toLowerCase().includes('bici') && (
                                   <Chip 
                                     label={`${workout.reps} reps`} 
                                     variant="outlined" 

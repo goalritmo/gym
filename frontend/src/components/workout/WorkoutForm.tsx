@@ -147,7 +147,7 @@ export default function WorkoutForm({
   const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId)
   
   const isRunningExercise = selectedExerciseId === 18
-  const isBiciExercise = selectedExercise?.name?.toLowerCase().includes('bici') || false
+  const isBiciExercise = selectedExercise?.name?.toLowerCase().includes('bici') || selectedExercise?.id === 30 || false
   const isRunningOrBiciExercise = isRunningExercise || isBiciExercise
   
   // Debug: verificar detección de ejercicios
