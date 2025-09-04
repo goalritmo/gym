@@ -289,24 +289,49 @@ export default function SocialList() {
     }
   }, [])
 
-  // Hook para detectar scroll al final de la página
+  // Hook para detectar scroll al final usando IntersectionObserver
   useEffect(() => {
-    const handleScroll = () => {
-      // Verificar si el usuario llegó al final de la página
-      if (
-        window.innerHeight + document.documentElement.scrollTop >= 
-        document.documentElement.offsetHeight - 1000 // 1000px antes del final
-      ) {
-        loadMoreWorkouts()
-      }
-    }
-
-    // Agregar listener de scroll
-    window.addEventListener('scroll', handleScroll)
+    // Crear un elemento invisible al final del contenido para detectar cuando es visible
+    const sentinel = document.createElement('div')
+    sentinel.style.height = '1px'
+    sentinel.style.width = '100%'
+    sentinel.id = 'scroll-sentinel'
     
-    // Cleanup: remover listener cuando se desmonte el componente
+    // Agregar el sentinel al final del contenido
+    const contentContainer = document.querySelector('[data-testid="social-feed-container"]') || document.body
+    contentContainer.appendChild(sentinel)
+    
+    // Crear IntersectionObserver
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        console.log('🔍 IntersectionObserver triggered:', {
+          isIntersecting: entry.isIntersecting,
+          hasMore: hasMoreRef.current,
+          loadingMore: loadingMoreRef.current
+        })
+        
+        if (entry.isIntersecting && hasMoreRef.current && !loadingMoreRef.current) {
+          console.log('🔄 Activando carga de más entrenamientos por IntersectionObserver')
+          loadMoreWorkouts()
+        }
+      },
+      {
+        root: null, // Usar viewport como root
+        rootMargin: '100px', // Activar 100px antes de que sea visible
+        threshold: 0
+      }
+    )
+    
+    // Observar el sentinel
+    observer.observe(sentinel)
+    
+    // Cleanup
     return () => {
-      window.removeEventListener('scroll', handleScroll)
+      observer.disconnect()
+      if (sentinel.parentNode) {
+        sentinel.parentNode.removeChild(sentinel)
+      }
     }
   }, []) // Sin dependencias para evitar bucles
 
@@ -337,7 +362,7 @@ export default function SocialList() {
   }
 
   return (
-          <Box sx={{ p: 1 }}>
+          <Box sx={{ p: 1 }} data-testid="social-feed-container">
         <Typography variant="h4" component="h1" sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center', color: 'primary.main' }}>
           Feed Social
         </Typography>
