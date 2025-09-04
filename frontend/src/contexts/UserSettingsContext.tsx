@@ -189,14 +189,22 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
 
 
   const initializeAllExercisesAsFavorites = useCallback((exerciseIds: number[]) => {
-    // Solo inicializar si no hay ejercicios favoritos configurados
-    if (settings.favoriteExercises.length === 0 && exerciseIds.length > 0) {
+    // Solo inicializar si no hay ejercicios favoritos configurados Y no ha configurado manualmente
+    if (settings.favoriteExercises.length === 0 && !settings.hasConfiguredFavorites && exerciseIds.length > 0) {
+      console.log('🔍 Initializing all exercises as favorites:', exerciseIds)
+      setSettings(prev => ({ 
+        ...prev, 
+        favoriteExercises: exerciseIds
+      }))
+    } else if (settings.hasConfiguredFavorites && settings.favoriteExercises.length === 0 && exerciseIds.length > 0) {
+      // Caso especial: usuario configuró favoritos pero se perdieron del localStorage
+      console.log('🔍 User had configured favorites but they were lost, reinitializing with all exercises')
       setSettings(prev => ({ 
         ...prev, 
         favoriteExercises: exerciseIds
       }))
     }
-  }, [settings.favoriteExercises.length])
+  }, [settings.favoriteExercises.length, settings.hasConfiguredFavorites])
 
   // Función para alternar el estado de completado de un ejercicio
   const toggleExerciseCompleted = useCallback((date: string, routineId: number, exerciseId: number, setNumber: number) => {
