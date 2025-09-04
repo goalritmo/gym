@@ -89,6 +89,7 @@ func main() {
 
 	// Debug endpoint (temporal)
 	api.HandleFunc("/debug", handlers.DebugHandler).Methods("GET")
+	api.HandleFunc("/debug-simple", handlers.DebugSimpleHandler).Methods("GET")
 	
 	// Fix triggers endpoint (temporal)
 	api.HandleFunc("/fix-triggers", handlers.FixTriggersHandler).Methods("POST")
