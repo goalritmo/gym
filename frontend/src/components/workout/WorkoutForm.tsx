@@ -89,15 +89,6 @@ export default function WorkoutForm({
       filtered = filtered.filter(exercise => settings.favoriteExercises.includes(exercise.id))
     }
     
-    // Debug: verificar el filtrado de ejercicios
-    console.log('🔍 WorkoutForm Debug:', {
-      totalExercises: exercises.length,
-      exercisesWithoutSports: exercises.filter(ex => !ex.is_sport).length,
-      hasConfiguredFavorites: settings.hasConfiguredFavorites,
-      favoriteExercisesCount: settings.favoriteExercises.length,
-      filteredExercisesCount: filtered.length,
-      favoriteExercises: settings.favoriteExercises
-    })
     
     return filtered
   }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises])
@@ -150,14 +141,6 @@ export default function WorkoutForm({
   const isBiciExercise = selectedExercise?.name?.toLowerCase().includes('bici') || selectedExercise?.id === 30 || false
   const isRunningOrBiciExercise = isRunningExercise || isBiciExercise
   
-  // Debug: verificar detección de ejercicios
-  console.log('🔍 WorkoutForm Exercise Detection:', {
-    selectedExerciseId,
-    isRunningExercise,
-    isBiciExercise,
-    isRunningOrBiciExercise,
-    selectedExercise
-  })
   const isBodyweightExercise = selectedExercise?.bodyweight || false
   
   // Detectar si el ejercicio seleccionado es un deporte
