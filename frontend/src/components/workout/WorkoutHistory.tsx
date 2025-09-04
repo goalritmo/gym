@@ -149,7 +149,7 @@ export default function WorkoutHistory() {
         days.push({
           workoutDay: day,
           exerciseGroups,
-          totalWorkouts: dayWorkouts.length
+          totalWorkouts: exerciseGroups.length // Usar número de grupos de ejercicios únicos, no total de series
         });
       }
     });
@@ -431,25 +431,7 @@ export default function WorkoutHistory() {
                     <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'left', fontSize: '1rem' }}>
                       {formatDate(day.workoutDay.date)}
                     </Typography>
-                    <Box 
-                      sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        mt: 0.5,
-                        cursor: 'pointer',
-                        borderRadius: 1,
-                        p: 0.5,
-                        mx: -0.5,
-                        transition: 'background-color 0.2s',
-                        '&:hover': { 
-                          backgroundColor: 'rgba(0, 0, 0, 0.04)' 
-                        }
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditSessionName(day.workoutDay.id, day.workoutDay.name);
-                      }}
-                    >
+                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
                       <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
                         {day.workoutDay.name}
                       </Typography>
@@ -459,12 +441,27 @@ export default function WorkoutHistory() {
                           fontSize: '1rem',
                           color: 'text.secondary',
                           opacity: 0.6,
+                          cursor: 'pointer',
+                          borderRadius: 1,
+                          p: 0.5,
+                          transition: 'background-color 0.2s',
+                          '&:hover': { 
+                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                            opacity: 1
+                          }
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditSessionName(day.workoutDay.id, day.workoutDay.name);
                         }}
                       />
                     </Box>
                     {!expandedDays.has(day.workoutDay.date) && (
                       <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
-                        {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'}
+                        {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'} 
+                        {day.exerciseGroups.length > 0 && (
+                          <span> ({day.exerciseGroups.reduce((total, group) => total + group.workouts.length, 0)} series en total)</span>
+                        )}
                       </Typography>
                     )}
                   </Box>
