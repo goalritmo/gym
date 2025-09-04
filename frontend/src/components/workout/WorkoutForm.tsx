@@ -844,7 +844,7 @@ export default function WorkoutForm({
         {/* Campo de descanso en segundos - Oculto para deportes */}
         {!isSportExercise && (
           <TextField
-            label="Descanso luego de la serie (segs)"
+            label="Pausa luego de la serie (segs)"
             type="number"
             disabled={isLoading}
             error={Boolean(errors.restSeconds)}

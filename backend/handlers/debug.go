@@ -47,10 +47,10 @@ func DebugUserRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Probar inserción en user_settings
 	_, err = tx.Exec(`
-		INSERT INTO user_settings (user_id, show_own_workouts_in_social, unc_notifications_enabled)
+		INSERT INTO user_settings (user_id, has_configured_favorites, favorite_exercises)
 		VALUES ($1, $2, $3)
 		ON CONFLICT (user_id) DO NOTHING
-	`, testUserID, true, true)
+	`, testUserID, false, []int{})
 
 	if err != nil {
 		json.NewEncoder(w).Encode(map[string]interface{}{
