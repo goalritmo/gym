@@ -12,7 +12,8 @@ import {
   Divider,
   Alert,
   IconButton,
-  TextField
+  TextField,
+  CircularProgress
 } from '@mui/material'
 import {
   Settings,
@@ -40,6 +41,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
   const [hasChanges, setHasChanges] = useState(false)
   const [tempSettings, setTempSettings] = useState(settings)
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('')
+  const [saving, setSaving] = useState(false)
 
   // Actualizar configuraciones temporales cuando cambien las reales
   useEffect(() => {
@@ -87,6 +89,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
   const handleSave = async () => {
     try {
+      setSaving(true)
       // Aplicar cambios
       // if (tempSettings.uncNotificationsEnabled !== settings.uncNotificationsEnabled) {
       //   await toggleUncNotifications()
@@ -97,13 +100,15 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
         setFavoriteExercises(tempSettings.favoriteExercises)
         // Marcar que el usuario ha configurado manualmente sus favoritos
-        setHasConfiguredFavorites(true)
+        await setHasConfiguredFavorites(true)
       }
       setHasChanges(false)
       onClose()
     } catch (error) {
       console.error('Error saving settings:', error)
       // Aquí podrías mostrar un mensaje de error al usuario
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -344,10 +349,17 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
         <Button
           onClick={handleSave}
           variant="contained"
-          disabled={!hasChanges}
+          disabled={!hasChanges || saving}
           sx={{ minWidth: 100 }}
         >
-          Guardar
+          {saving ? (
+            <>
+              <CircularProgress size={16} sx={{ mr: 1 }} />
+              Guardando...
+            </>
+          ) : (
+            'Guardar'
+          )}
         </Button>
       </DialogActions>
     </Dialog>
