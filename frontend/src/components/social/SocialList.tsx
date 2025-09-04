@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import {
   Box,
   Typography,
@@ -51,7 +51,7 @@ export default function SocialList() {
   const [loadingKudos, setLoadingKudos] = useState<Set<number>>(new Set())
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(true)
-  const [currentOffset, setCurrentOffset] = useState(0)
+  const currentOffsetRef = useRef(0)
 
   
 
@@ -102,13 +102,13 @@ export default function SocialList() {
     try {
       if (reset) {
         setLoading(true)
-        setCurrentOffset(0)
+        currentOffsetRef.current = 0
         setHasMore(true)
       } else {
         setLoadingMore(true)
       }
 
-      const offset = reset ? 0 : currentOffset
+      const offset = reset ? 0 : currentOffsetRef.current
       const workouts = await apiClient.getSocialWorkouts(10, offset)
       console.log('🔍 Workouts cargados desde API:', workouts)
       console.log('🔍 Tipo de respuesta:', typeof workouts)
@@ -143,7 +143,7 @@ export default function SocialList() {
         if (workouts.length < 10) {
           setHasMore(false)
         } else {
-          setCurrentOffset(prev => prev + 10)
+          currentOffsetRef.current = currentOffsetRef.current + 10
         }
       } else {
         console.log('🔍 Respuesta no es array, estableciendo array vacío')
@@ -159,7 +159,7 @@ export default function SocialList() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [currentOffset]) // Dependencies for useCallback
+  }, []) // Sin dependencias para evitar bucles infinitos
 
   const loadMoreWorkouts = useCallback(() => {
     if (!loadingMore && hasMore) {
@@ -249,9 +249,11 @@ export default function SocialList() {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Ordenar grupos por fecha
   }, [socialWorkouts])
 
+  // Cargar datos iniciales cuando se monta el componente
   useEffect(() => {
-    loadSocialWorkouts(true) // Reset para cargar desde el inicio
-  }, [loadSocialWorkouts])
+    console.log('🔄 SocialList montado, cargando datos iniciales')
+    loadSocialWorkouts(true)
+  }, []) // Solo ejecutar una vez cuando se monta el componente
 
   // Registrar callback para recargar cuando cambien las configuraciones sociales
   useEffect(() => {
@@ -261,13 +263,13 @@ export default function SocialList() {
     return () => {
       setOnSocialSettingsChange(() => {})
     }
-  }, [setOnSocialSettingsChange, loadSocialWorkouts])
+  }, [setOnSocialSettingsChange])
 
   // Escuchar eventos de actualización del feed social
   useEffect(() => {
     const handleSocialRefresh = () => {
       console.log('🔄 Evento de actualización del feed social recibido')
-      loadSocialWorkouts(true) // Reset para cargar desde el inicio
+      loadSocialWorkouts(true)
     }
 
     // Escuchar eventos personalizados para actualizar el feed social
@@ -277,13 +279,7 @@ export default function SocialList() {
     return () => {
       window.removeEventListener('socialFeedRefresh', handleSocialRefresh)
     }
-  }, [loadSocialWorkouts])
-
-  // Actualizar el feed social cuando el componente se monta (cuando se cambia al tab social)
-  useEffect(() => {
-    console.log('🔄 SocialList montado, recargando datos del feed social')
-    loadSocialWorkouts(true) // Reset para cargar desde el inicio
-  }, []) // Solo ejecutar una vez cuando se monta el componente
+  }, [])
 
   // Hook para detectar scroll al final de la página
   useEffect(() => {
