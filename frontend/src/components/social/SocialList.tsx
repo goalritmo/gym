@@ -141,7 +141,17 @@ export default function SocialList() {
         if (reset) {
           setSocialWorkouts(workouts)
         } else {
-          setSocialWorkouts(prev => [...prev, ...workouts])
+          setSocialWorkouts(prev => {
+            // Evitar duplicados comparando session_id
+            const existingIds = new Set(prev.map(w => w.session_id))
+            const newWorkouts = workouts.filter(w => !existingIds.has(w.session_id))
+            console.log('🔍 Evitando duplicados:', {
+              existingCount: prev.length,
+              newCount: workouts.length,
+              filteredCount: newWorkouts.length
+            })
+            return [...prev, ...newWorkouts]
+          })
         }
         
         // Si recibimos menos de 10 workouts, no hay más datos
@@ -291,6 +301,11 @@ export default function SocialList() {
 
   // Hook para detectar scroll al final usando IntersectionObserver
   useEffect(() => {
+    // Solo crear el observer si hay entrenamientos y hay más para cargar
+    if (socialWorkouts.length === 0 || !hasMoreRef.current) {
+      return
+    }
+
     // Crear un elemento invisible al final del contenido para detectar cuando es visible
     const sentinel = document.createElement('div')
     sentinel.style.height = '1px'
@@ -298,7 +313,11 @@ export default function SocialList() {
     sentinel.id = 'scroll-sentinel'
     
     // Agregar el sentinel al final del contenido
-    const contentContainer = document.querySelector('[data-testid="social-feed-container"]') || document.body
+    const contentContainer = document.querySelector('[data-testid="social-feed-container"]')
+    if (!contentContainer) {
+      console.log('🔍 No se encontró el contenedor del feed social')
+      return
+    }
     contentContainer.appendChild(sentinel)
     
     // Crear IntersectionObserver
@@ -308,7 +327,8 @@ export default function SocialList() {
         console.log('🔍 IntersectionObserver triggered:', {
           isIntersecting: entry.isIntersecting,
           hasMore: hasMoreRef.current,
-          loadingMore: loadingMoreRef.current
+          loadingMore: loadingMoreRef.current,
+          currentWorkouts: socialWorkouts.length
         })
         
         if (entry.isIntersecting && hasMoreRef.current && !loadingMoreRef.current) {
@@ -318,7 +338,7 @@ export default function SocialList() {
       },
       {
         root: null, // Usar viewport como root
-        rootMargin: '100px', // Activar 100px antes de que sea visible
+        rootMargin: '200px', // Activar 200px antes de que sea visible
         threshold: 0
       }
     )
@@ -333,7 +353,7 @@ export default function SocialList() {
         sentinel.parentNode.removeChild(sentinel)
       }
     }
-  }, []) // Sin dependencias para evitar bucles
+  }, [socialWorkouts.length, hasMoreRef.current]) // Dependencias para recrear cuando cambie el contenido
 
   if (loading) {
     return (
@@ -484,6 +504,27 @@ export default function SocialList() {
             <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
               Cargando más entrenamientos...
             </Typography>
+          </Box>
+        )}
+
+        {/* Botón para cargar más entrenamientos manualmente */}
+        {hasMore && socialWorkouts.length > 0 && !loadingMore && (
+          <Box sx={{ textAlign: 'center', py: 3 }}>
+            <button
+              onClick={loadMoreWorkouts}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#1976d2',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}
+            >
+              Cargar más entrenamientos
+            </button>
           </Box>
         )}
 
