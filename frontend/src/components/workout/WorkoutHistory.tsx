@@ -88,6 +88,22 @@ export default function WorkoutHistory() {
     return null
   }
 
+  // Función para limpiar el nombre del ejercicio (quitar emojis)
+  const cleanExerciseName = (exerciseName: string) => {
+    // Remover emojis comunes de ejercicios
+    return exerciseName
+      .replace(/🚴\s*/g, '') // Bici
+      .replace(/🏃‍♂️\s*/g, '') // Running
+      .replace(/⚽\s*/g, '') // Fútbol
+      .replace(/🏀\s*/g, '') // Básquet
+      .replace(/🎾\s*/g, '') // Pádel
+      .replace(/🏐\s*/g, '') // Voley
+      .replace(/⚾\s*/g, '') // Handball
+      .replace(/🏑\s*/g, '') // Hockey
+      .replace(/🏊‍♂️\s*/g, '') // Natación
+      .trim()
+  }
+
   // Agrupar workouts por día y crear días con ejercicios
   const workoutDaysWithExercises = useMemo(() => {
     const days: WorkoutDayWithExercises[] = [];
@@ -508,7 +524,7 @@ export default function WorkoutHistory() {
                       }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <Typography variant="body1" sx={{ fontWeight: 600, color: 'primary.main', textAlign: 'left', fontSize: '0.88rem' }}>
-                            {group.exerciseName}
+                            {cleanExerciseName(group.exerciseName)}
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.9rem' }}>
                             {(group.workouts.every(workout => workout.is_sport) || 
@@ -738,7 +754,7 @@ export default function WorkoutHistory() {
                               /* Para ejercicios normales, mostrar solo peso y reps */
                               <>
                                 <Chip 
-                                  label={workout.weight === 0 ? 'Peso corporal' : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ? 'km' : 'kg'}`} 
+                                  label={workout.weight === 0 ? 'Peso corporal' : `${workout.weight}${workout.exercise_name.toLowerCase().includes('running') || workout.exercise_name.toLowerCase().includes('bici') ? 'km' : 'kg'}`}
                                   variant="outlined" 
                                   size="small"
                                   sx={{ 
