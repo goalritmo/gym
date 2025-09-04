@@ -98,7 +98,7 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
       //   await toggleShowOwnWorkoutsInSocial()
       // }
       if (JSON.stringify(tempSettings.favoriteExercises) !== JSON.stringify(settings.favoriteExercises)) {
-        setFavoriteExercises(tempSettings.favoriteExercises)
+        await setFavoriteExercises(tempSettings.favoriteExercises)
         // Marcar que el usuario ha configurado manualmente sus favoritos
         await setHasConfiguredFavorites(true)
       }

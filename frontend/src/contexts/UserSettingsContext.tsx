@@ -7,6 +7,7 @@ interface ApiUserSettings {
   unc_notifications_enabled: boolean
   show_routines_tab: boolean
   has_configured_favorites: boolean
+  favorite_exercises: number[]
 }
 
 interface UserSettings {
@@ -86,7 +87,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
         showOwnWorkoutsInSocial: apiSettingsTyped.show_own_workouts_in_social,
         uncNotificationsEnabled: apiSettingsTyped.unc_notifications_enabled,
         hasConfiguredFavorites: apiSettingsTyped.has_configured_favorites,
-        favoriteExercises: localSettings.favoriteExercises ?? []
+        favoriteExercises: apiSettingsTyped.favorite_exercises ?? []
       })
     } catch (error) {
       console.error('Error loading user settings from API:', error)
@@ -122,7 +123,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     console.log('🔍 Saving to localStorage:', settingsToSave)
   }, [settings.favoriteExercises, settings.hasConfiguredFavorites])
 
-  const setFavoriteExercises = useCallback((exerciseIds: number[]) => {
+  const setFavoriteExercises = useCallback(async (exerciseIds: number[]) => {
     console.log('🔍 setFavoriteExercises called with:', exerciseIds)
     setSettings(prev => {
       const newSettings = { 
@@ -132,6 +133,14 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       console.log('🔍 New settings after setFavoriteExercises:', newSettings)
       return newSettings
     })
+    
+    try {
+      console.log('🔍 Calling API to update favorite_exercises:', exerciseIds)
+      await apiClient.updateUserSettings({ favorite_exercises: exerciseIds })
+      console.log('🔍 API call successful')
+    } catch (error) {
+      console.error('Error updating favorite_exercises setting:', error)
+    }
   }, [])
 
   const setHasConfiguredFavorites = useCallback(async (hasConfigured: boolean) => {
