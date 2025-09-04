@@ -190,8 +190,8 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 		
 		// Agregar configuraciones
 		user.Settings = &UserSettings{
-			ShowOwnWorkoutsInSocial: showOwnWorkoutsInSocial,
-			UncNotificationsEnabled: uncNotificationsEnabled,
+			HasConfiguredFavorites: false,
+			FavoriteExercises: []int{},
 		}
 		
 		users = append(users, user)
