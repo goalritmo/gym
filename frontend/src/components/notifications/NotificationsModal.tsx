@@ -87,7 +87,7 @@ export default function NotificationsModal({ open, onClose, onMarkAsRead }: Noti
     } finally {
       setIsLoading(false)
     }
-  }, [settings.showOwnWorkoutsInSocial, settings.uncNotificationsEnabled])
+  }, [settings.showOwnWorkoutsInSocial])
 
   useEffect(() => {
     if (open) {

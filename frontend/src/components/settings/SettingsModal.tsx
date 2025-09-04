@@ -56,13 +56,6 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
 
 
 
-  // const handleToggleUncNotifications = () => {
-  //   setTempSettings(prev => ({
-  //     ...prev,
-  //     uncNotificationsEnabled: !prev.uncNotificationsEnabled
-  //   }))
-  //   setHasChanges(true)
-  // }
 
   // const handleToggleShowOwnWorkoutsInSocial = () => {
   //   setTempSettings(prev => ({
@@ -91,9 +84,6 @@ export default function SettingsModal({ open, onClose, exercises = [] }: Setting
     try {
       setSaving(true)
       // Aplicar cambios
-      // if (tempSettings.uncNotificationsEnabled !== settings.uncNotificationsEnabled) {
-      //   await toggleUncNotifications()
-      // }
       // if (tempSettings.showOwnWorkoutsInSocial !== settings.showOwnWorkoutsInSocial) {
       //   await toggleShowOwnWorkoutsInSocial()
       // }

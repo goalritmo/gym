@@ -97,12 +97,6 @@ export default function NotificationsList() {
             read: notif.read || false,
             priority: notif.priority || 'medium'
           }
-        }).filter((notif: Notification) => {
-          // Ocultar notificaciones del sistema si están deshabilitadas
-          if (notif.type === 'announcement' && !settings.uncNotificationsEnabled) {
-            return false
-          }
-          return true
         })
       ]
       
@@ -117,7 +111,7 @@ export default function NotificationsList() {
     } finally {
       setIsLoading(false)
     }
-  }, [settings.showOwnWorkoutsInSocial, settings.uncNotificationsEnabled])
+  }, [settings.showOwnWorkoutsInSocial])
 
   useEffect(() => {
     loadNotifications()
