@@ -81,8 +81,10 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     loadExercises()
   }, [loadExercises])
 
-  // Detectar si el ejercicio seleccionado es Running (ID: 18)
+  // Detectar si el ejercicio seleccionado es Running (ID: 18) o Bici (ID: 30)
   const isRunningExercise = (exerciseId: number) => exerciseId === 18
+  const isBiciExercise = (exerciseId: number) => exerciseId === 30
+  const isRunningOrBiciExercise = (exerciseId: number) => isRunningExercise(exerciseId) || isBiciExercise(exerciseId)
 
   const handleAddExercise = () => {
     const newExercise: CreateRoutineExerciseRequest = {
@@ -114,8 +116,8 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
       [field]: value
     }
     
-    // Si se cambia el ejercicio a Running, establecer reps = 1 y sets = 1 automáticamente
-    if (field === 'exercise_id' && value === 18) {
+    // Si se cambia el ejercicio a Running o Bici, establecer reps = 1 y sets = 1 automáticamente
+    if (field === 'exercise_id' && (value === 18 || value === 30)) {
       newExercises[index].reps = 1
       newExercises[index].sets = 1
     }
@@ -232,8 +234,8 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
               </FormControl>
             </Box>
 
-            {/* Ocultar campos Series y Repeticiones para Running */}
-            {!isRunningExercise(exercise.exercise_id) && (
+            {/* Ocultar campos Series y Repeticiones para Running y Bici */}
+            {!isRunningOrBiciExercise(exercise.exercise_id) && (
               <Box display="flex" gap={2} sx={{ mb: 2 }}>
                 <TextField
                   fullWidth
@@ -259,22 +261,22 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
 
             <Box display="flex" gap={2} sx={{ mb: 2 }}>
               <TextField
-                label={isRunningExercise(exercise.exercise_id) ? "Distancia (km) - opcional" : "Peso (kg) - opcional"}
+                label={isRunningOrBiciExercise(exercise.exercise_id) ? "Distancia (km) - opcional" : "Peso (kg) - opcional"}
                 type="number"
                 value={exercise.weight || ''}
                 onChange={(e) => handleExerciseChange(index, 'weight', e.target.value ? parseFloat(e.target.value) : undefined)}
                 inputProps={{ 
                   min: 0, 
-                  step: isRunningExercise(exercise.exercise_id) ? 0.1 : 0.5,
-                  max: isRunningExercise(exercise.exercise_id) ? 100 : 1000
+                  step: isRunningOrBiciExercise(exercise.exercise_id) ? 0.1 : 0.5,
+                  max: isRunningOrBiciExercise(exercise.exercise_id) ? 100 : 1000
                 }}
                 sx={{
-                  flex: isRunningExercise(exercise.exercise_id) ? 2 : 1 // 2/3 del espacio para Running
+                  flex: isRunningOrBiciExercise(exercise.exercise_id) ? 2 : 1 // 2/3 del espacio para Running y Bici
                 }}
               />
 
               <TextField
-                label="Descanso entre series (segundos)"
+                label="Pausa entre series (segundos)"
                 type="number"
                 value={exercise.rest_time_seconds}
                 onChange={(e) => handleExerciseChange(index, 'rest_time_seconds', parseInt(e.target.value))}

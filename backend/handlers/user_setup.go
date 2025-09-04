@@ -116,7 +116,7 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 			SELECT 1 FROM notifications 
 			WHERE user_id = $1 AND type = 'welcome'
 		)
-	`, req.UserID, "¡Te damos la bienvenida! 🎉", "¡Estamos emocionados de que te unas a nuestra comunidad fitness! Aquí podrás registrar tus entrenamientos, ver tu progreso y conectar con otros usuarios de la UNC. Te recomendamos explorar las Configuraciones. ¡Buen entrenamiento!", "welcome", time.Now())
+	`, req.UserID, "¡Te damos la bienvenida! 🎉", "¡Estamos emocionados de que te unas a nuestra comunidad fitness! Aquí podrás registrar tus entrenamientos, ver tu progreso y conectar con otros usuarios de la UNC. ¡Buen entrenamiento!", "welcome", time.Now())
 
 	if err != nil {
 		fmt.Printf("Error creando notificación: %v\n", err)

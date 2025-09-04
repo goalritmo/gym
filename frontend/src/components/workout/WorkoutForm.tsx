@@ -79,15 +79,20 @@ export default function WorkoutForm({
     getRoutineProgress 
   } = useUserSettings()
   
-  // Filtrar ejercicios favoritos si están configurados manualmente
+  // Filtrar ejercicios favoritos si están configurados manualmente y excluir deportes
   const filteredExercises = useMemo(() => {
-    const filtered = settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0 
-      ? exercises.filter(exercise => settings.favoriteExercises.includes(exercise.id))
-      : exercises
+    // Primero excluir deportes
+    let filtered = exercises.filter(exercise => !exercise.is_sport)
+    
+    // Luego aplicar filtro de favoritos si está configurado
+    if (settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0) {
+      filtered = filtered.filter(exercise => settings.favoriteExercises.includes(exercise.id))
+    }
     
     // Debug: verificar el filtrado de ejercicios
     console.log('🔍 WorkoutForm Debug:', {
       totalExercises: exercises.length,
+      exercisesWithoutSports: exercises.filter(ex => !ex.is_sport).length,
       hasConfiguredFavorites: settings.hasConfiguredFavorites,
       favoriteExercisesCount: settings.favoriteExercises.length,
       filteredExercisesCount: filtered.length,
@@ -137,10 +142,12 @@ export default function WorkoutForm({
   // Detectar si la rutina está completa
   const isRoutineComplete = realRoutineProgress === 100
 
-  // Detectar si el ejercicio seleccionado es Running (ID: 18)
+  // Detectar si el ejercicio seleccionado es Running (ID: 18) o Bici (ID: 30)
   const selectedExerciseId = watch('exercise_id')
   
   const isRunningExercise = selectedExerciseId === 18
+  const isBiciExercise = selectedExerciseId === 30
+  const isRunningOrBiciExercise = isRunningExercise || isBiciExercise
   
   // Detectar ejercicios de peso corporal usando el campo bodyweight del ejercicio
   const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId)
@@ -149,13 +156,13 @@ export default function WorkoutForm({
   // Detectar si el ejercicio seleccionado es un deporte
   const isSportExercise = selectedExercise?.is_sport || false
   
-  // Establecer reps = 1 automáticamente cuando se selecciona Running o un deporte
+  // Establecer reps = 1 automáticamente cuando se selecciona Running, Bici o un deporte
   useEffect(() => {
-    if (isRunningExercise || isSportExercise) {
+    if (isRunningOrBiciExercise || isSportExercise) {
       setValue('reps', 1)
       setValue('set', 1) // Bloquear serie en 1 para deportes
     }
-  }, [isRunningExercise, isSportExercise, setValue])
+  }, [isRunningOrBiciExercise, isSportExercise, setValue])
 
   // Limpiar peso cuando se selecciona ejercicio de peso corporal
   useEffect(() => {
@@ -242,8 +249,8 @@ export default function WorkoutForm({
 
     switch (field) {
       case 'weight':
-        // Para Running, cambiar límites a distancia (km)
-        if (isRunningExercise) {
+        // Para Running y Bici, cambiar límites a distancia (km)
+        if (isRunningOrBiciExercise) {
           maxLimit = 100 // 100 km máximo
           minLimit = 0.1 // 100 metros mínimo
         } else {
@@ -304,8 +311,8 @@ export default function WorkoutForm({
       // Solo incluir reps si tiene un valor válido mayor a 0
       if (data.reps !== undefined && data.reps !== null && data.reps > 0) {
         workoutData.reps = data.reps
-      } else if (isRunningExercise) {
-        // Para Running, enviar 1 como valor mínimo
+      } else if (isRunningOrBiciExercise) {
+        // Para Running y Bici, enviar 1 como valor mínimo
         workoutData.reps = 1
       }
       
@@ -767,7 +774,7 @@ export default function WorkoutForm({
             flexDirection: { xs: 'row' }
           }}>
             <TextField
-              label={isRunningExercise ? "Distancia (km)" : (isBodyweightExercise ? "Peso (opcional)" : "Peso (kg)")}
+              label={isRunningOrBiciExercise ? "Distancia (km)" : (isBodyweightExercise ? "Peso (opcional)" : "Peso (kg)")}
               type="number"
               disabled={isLoading}
               error={Boolean(errors.weight)}
@@ -776,11 +783,11 @@ export default function WorkoutForm({
               inputProps={{ 
                 step: 'any',
                 inputMode: 'decimal',
-                min: isRunningExercise ? 0.1 : 0.1,
-                max: isRunningExercise ? 100 : 1000
+                min: isRunningOrBiciExercise ? 0.1 : 0.1,
+                max: isRunningOrBiciExercise ? 100 : 1000
               }}
               sx={{
-                flex: isRunningExercise ? 2 : 1, // 2/3 del espacio para Running
+                flex: isRunningOrBiciExercise ? 2 : 1, // 2/3 del espacio para Running y Bici
                 '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
                   display: 'none'
                 },
@@ -790,8 +797,8 @@ export default function WorkoutForm({
               }}
             />
 
-            {/* Ocultar campo Reps para Running */}
-            {!isRunningExercise && (
+            {/* Ocultar campo Reps para Running y Bici */}
+            {!isRunningOrBiciExercise && (
               <TextField
                 label="Reps"
                 type="number"
@@ -823,15 +830,15 @@ export default function WorkoutForm({
               sx={{ flex: 1 }}
             >
               <InputLabel id="serie-select-label">
-                {isRunningExercise ? 'Vuelta' : 'Serie'}
+                {isRunningOrBiciExercise ? 'Vuelta' : 'Serie'}
               </InputLabel>
               <Select
                 labelId="serie-select-label"
-                label={isRunningExercise ? 'Vuelta' : 'Serie'}
+                label={isRunningOrBiciExercise ? 'Vuelta' : 'Serie'}
                 value={watch('set')}
                 {...register('set', { valueAsNumber: true })}
               >
-                {(isRunningExercise ? [1, 2, 3, 4, 5, 6, 7, 8] : [1, 2, 3, 4, 5]).map((serie) => (
+                {(isRunningOrBiciExercise ? [1, 2, 3, 4, 5, 6, 7, 8] : [1, 2, 3, 4, 5]).map((serie) => (
                   <MenuItem key={serie} value={serie}>
                     {serie}
                   </MenuItem>
@@ -844,7 +851,7 @@ export default function WorkoutForm({
         {/* Campo de descanso en segundos - Oculto para deportes */}
         {!isSportExercise && (
           <TextField
-            label="Descanso posterior (segundos)"
+            label="Descanso entre series (segundos)"
             type="number"
             disabled={isLoading}
             error={Boolean(errors.restSeconds)}
