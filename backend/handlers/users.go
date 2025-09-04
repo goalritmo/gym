@@ -144,8 +144,8 @@ func GetAdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			COALESCE(up.role, 'user') as role,
 			u.created_at,
 			u.last_sign_in_at,
-			COALESCE(us.show_own_workouts_in_social, true) as show_own_workouts_in_social,
-			COALESCE(us.unc_notifications_enabled, true) as unc_notifications_enabled
+			true as show_own_workouts_in_social,
+			true as unc_notifications_enabled
 		FROM auth.users u
 		LEFT JOIN user_profiles up ON u.id = up.user_id
 		LEFT JOIN user_settings us ON u.id = us.user_id

@@ -693,9 +693,7 @@ export default function WorkoutForm({
           options={filteredExercises}
           getOptionLabel={(option) => {
             let label = option.name
-            // Limpiar emojis del nombre original
-            label = label.replace(/🚴\s*/g, '').replace(/🏃‍♂️\s*/g, '').replace(/⚽\s*/g, '').replace(/🏀\s*/g, '').replace(/🎾\s*/g, '').replace(/🏐\s*/g, '').replace(/⚾\s*/g, '').replace(/🏑\s*/g, '').replace(/🏊‍♂️\s*/g, '').trim()
-            
+                        
             // Agregar emojis a la derecha
             if (option.name.toLowerCase().includes('running')) label += ' 🏃‍♂️'
             if (option.name.toLowerCase().includes('bici')) label += ' 🚴'

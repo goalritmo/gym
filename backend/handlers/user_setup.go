@@ -95,12 +95,12 @@ func UserSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 2. Crear configuración de usuario
 	_, err = tx.Exec(`
-		INSERT INTO user_settings (user_id, show_own_workouts_in_social, unc_notifications_enabled)
+		INSERT INTO user_settings (user_id, has_configured_favorites, favorite_exercises)
 		VALUES ($1, $2, $3)
 		ON CONFLICT (user_id) DO UPDATE SET
-			show_own_workouts_in_social = EXCLUDED.show_own_workouts_in_social,
-			unc_notifications_enabled = EXCLUDED.unc_notifications_enabled
-	`, req.UserID, true, true)
+			has_configured_favorites = EXCLUDED.has_configured_favorites,
+			favorite_exercises = EXCLUDED.favorite_exercises
+	`, req.UserID, false, []int{})
 
 	if err != nil {
 		fmt.Printf("Error creando configuración: %v\n", err)
