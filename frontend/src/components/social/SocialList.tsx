@@ -52,6 +52,8 @@ export default function SocialList() {
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const currentOffsetRef = useRef(0)
+  const loadingMoreRef = useRef(false)
+  const hasMoreRef = useRef(true)
 
   
 
@@ -104,8 +106,10 @@ export default function SocialList() {
         setLoading(true)
         currentOffsetRef.current = 0
         setHasMore(true)
+        hasMoreRef.current = true
       } else {
         setLoadingMore(true)
+        loadingMoreRef.current = true
       }
 
       const offset = reset ? 0 : currentOffsetRef.current
@@ -130,6 +134,7 @@ export default function SocialList() {
           setSocialWorkouts([])
         }
         setHasMore(false)
+        hasMoreRef.current = false
       } else if (Array.isArray(workouts)) {
         console.log('🔍 Estableciendo workouts:', workouts.length)
         
@@ -142,6 +147,7 @@ export default function SocialList() {
         // Si recibimos menos de 10 workouts, no hay más datos
         if (workouts.length < 10) {
           setHasMore(false)
+          hasMoreRef.current = false
         } else {
           currentOffsetRef.current = currentOffsetRef.current + 10
         }
@@ -151,6 +157,7 @@ export default function SocialList() {
           setSocialWorkouts([])
         }
         setHasMore(false)
+        hasMoreRef.current = false
       }
     } catch (error) {
       console.error('Error cargando entrenamientos sociales:', error)
@@ -158,15 +165,16 @@ export default function SocialList() {
     } finally {
       setLoading(false)
       setLoadingMore(false)
+      loadingMoreRef.current = false
     }
   }, []) // Sin dependencias para evitar bucles infinitos
 
   const loadMoreWorkouts = useCallback(() => {
-    if (!loadingMore && hasMore) {
+    if (!loadingMoreRef.current && hasMoreRef.current) {
       console.log('🔄 Cargando más entrenamientos...')
       loadSocialWorkouts(false)
     }
-  }, [loadingMore, hasMore, loadSocialWorkouts])
+  }, []) // Sin dependencias para evitar bucles
 
   const handleKudos = async (workoutId: number) => {
     if (!user) return
@@ -300,7 +308,7 @@ export default function SocialList() {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [loadMoreWorkouts])
+  }, []) // Sin dependencias para evitar bucles
 
   if (loading) {
     return (

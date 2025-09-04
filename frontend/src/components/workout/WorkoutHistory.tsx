@@ -457,7 +457,7 @@ export default function WorkoutHistory() {
                       />
                     </Box>
                     {!expandedDays.has(day.workoutDay.date) && (
-                      <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left', mt: 0.5 }}>
                         {day.totalWorkouts} {day.totalWorkouts === 1 ? 'ejercicio' : 'ejercicios'} 
                         {day.exerciseGroups.length > 0 && (
                           <span> ({day.exerciseGroups.reduce((total, group) => total + group.workouts.length, 0)} series en total)</span>
