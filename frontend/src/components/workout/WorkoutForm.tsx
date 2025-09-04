@@ -79,10 +79,19 @@ export default function WorkoutForm({
     getRoutineProgress 
   } = useUserSettings()
   
-  // Filtrar ejercicios favoritos si están configurados
-  const filteredExercises = settings.favoriteExercises.length > 0 
+  // Filtrar ejercicios favoritos si están configurados manualmente
+  const filteredExercises = settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0 
     ? exercises.filter(exercise => settings.favoriteExercises.includes(exercise.id))
     : exercises
+  
+  // Debug: verificar el filtrado de ejercicios
+  console.log('🔍 WorkoutForm Debug:', {
+    totalExercises: exercises.length,
+    hasConfiguredFavorites: settings.hasConfiguredFavorites,
+    favoriteExercisesCount: settings.favoriteExercises.length,
+    filteredExercisesCount: filteredExercises.length,
+    favoriteExercises: settings.favoriteExercises
+  })
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
