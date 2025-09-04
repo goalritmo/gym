@@ -4,15 +4,12 @@ import { apiClient } from '../lib/api'
 
 interface ApiUserSettings {
   show_own_workouts_in_social: boolean
-  unc_notifications_enabled: boolean
-  show_routines_tab: boolean
   has_configured_favorites: boolean
   favorite_exercises: number[]
 }
 
 interface UserSettings {
   favoriteExercises: number[]
-  uncNotificationsEnabled: boolean
   showOwnWorkoutsInSocial: boolean
   hasConfiguredFavorites: boolean
 }
@@ -29,7 +26,6 @@ interface UserSettingsContextType {
   settings: UserSettings
   setFavoriteExercises: (exercises: number[]) => void
   setHasConfiguredFavorites: (hasConfigured: boolean) => void
-  toggleUncNotifications: () => void
   toggleShowOwnWorkoutsInSocial: () => void
   initializeAllExercisesAsFavorites: (exerciseIds: number[]) => void
   onSocialSettingsChange?: () => void
@@ -46,7 +42,6 @@ const UserSettingsContext = createContext<UserSettingsContextType | undefined>(u
 
 const defaultSettings: UserSettings = {
   favoriteExercises: [], // Se llenará automáticamente con todos los ejercicios
-  uncNotificationsEnabled: true, // Por defecto habilitadas para usuarios UNC
   showOwnWorkoutsInSocial: true, // Por defecto mostrar ejercicios propios en social
   hasConfiguredFavorites: false // Por defecto no ha configurado favoritos manualmente
 }
@@ -86,7 +81,6 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       const finalSettings = { 
         ...defaultSettings, 
         showOwnWorkoutsInSocial: apiSettingsTyped.show_own_workouts_in_social,
-        uncNotificationsEnabled: apiSettingsTyped.unc_notifications_enabled,
         hasConfiguredFavorites: apiSettingsTyped.has_configured_favorites,
         favoriteExercises: apiSettingsTyped.favorite_exercises ?? []
       }
@@ -167,19 +161,6 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const toggleUncNotifications = useCallback(async () => {
-    const newValue = !settings.uncNotificationsEnabled
-    setSettings(prev => ({ 
-      ...prev, 
-      uncNotificationsEnabled: newValue
-    }))
-    
-    try {
-      await apiClient.updateUserSettings({ unc_notifications_enabled: newValue })
-    } catch (error) {
-      console.error('Error updating UNC notifications setting:', error)
-    }
-  }, [settings.uncNotificationsEnabled])
 
   const toggleShowOwnWorkoutsInSocial = useCallback(async () => {
     const newValue = !settings.showOwnWorkoutsInSocial
@@ -304,7 +285,6 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     settings, 
     setFavoriteExercises,
     setHasConfiguredFavorites,
-    toggleUncNotifications,
     toggleShowOwnWorkoutsInSocial,
     initializeAllExercisesAsFavorites,
     onSocialSettingsChange,

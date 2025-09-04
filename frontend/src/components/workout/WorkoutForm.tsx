@@ -142,15 +142,22 @@ export default function WorkoutForm({
   // Detectar si la rutina está completa
   const isRoutineComplete = realRoutineProgress === 100
 
-  // Detectar si el ejercicio seleccionado es Running (ID: 18) o Bici (ID: 30)
+  // Detectar si el ejercicio seleccionado es Running (ID: 18) o Bici
   const selectedExerciseId = watch('exercise_id')
+  const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId)
   
   const isRunningExercise = selectedExerciseId === 18
-  const isBiciExercise = selectedExerciseId === 30
+  const isBiciExercise = selectedExercise?.name?.toLowerCase().includes('bici') || false
   const isRunningOrBiciExercise = isRunningExercise || isBiciExercise
   
-  // Detectar ejercicios de peso corporal usando el campo bodyweight del ejercicio
-  const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId)
+  // Debug: verificar detección de ejercicios
+  console.log('🔍 WorkoutForm Exercise Detection:', {
+    selectedExerciseId,
+    isRunningExercise,
+    isBiciExercise,
+    isRunningOrBiciExercise,
+    selectedExercise
+  })
   const isBodyweightExercise = selectedExercise?.bodyweight || false
   
   // Detectar si el ejercicio seleccionado es un deporte

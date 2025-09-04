@@ -81,9 +81,12 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     loadExercises()
   }, [loadExercises])
 
-  // Detectar si el ejercicio seleccionado es Running (ID: 18) o Bici (ID: 30)
+  // Detectar si el ejercicio seleccionado es Running (ID: 18) o Bici
   const isRunningExercise = (exerciseId: number) => exerciseId === 18
-  const isBiciExercise = (exerciseId: number) => exerciseId === 30
+  const isBiciExercise = (exerciseId: number) => {
+    const exercise = availableExercises.find(ex => ex.id === exerciseId)
+    return exercise?.name?.toLowerCase().includes('bici') || false
+  }
   const isRunningOrBiciExercise = (exerciseId: number) => isRunningExercise(exerciseId) || isBiciExercise(exerciseId)
 
   const handleAddExercise = () => {
@@ -117,7 +120,7 @@ const RoutineForm: React.FC<RoutineFormProps> = ({ routine, onSubmit, onCancel }
     }
     
     // Si se cambia el ejercicio a Running o Bici, establecer reps = 1 y sets = 1 automáticamente
-    if (field === 'exercise_id' && (value === 18 || value === 30)) {
+    if (field === 'exercise_id' && (value === 18 || isBiciExercise(value))) {
       newExercises[index].reps = 1
       newExercises[index].sets = 1
     }
