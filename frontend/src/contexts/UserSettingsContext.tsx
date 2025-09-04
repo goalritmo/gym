@@ -73,12 +73,20 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       }
       
       const apiSettingsTyped = apiSettings as ApiUserSettings
+      
+      console.log('🔍 UserSettingsContext Debug:', {
+        apiSettings: apiSettingsTyped,
+        localSettings,
+        hasConfiguredFavorites: apiSettingsTyped.has_configured_favorites,
+        favoriteExercisesFromLocal: localSettings.favoriteExercises
+      })
+      
       setSettings({ 
         ...defaultSettings, 
         showOwnWorkoutsInSocial: apiSettingsTyped.show_own_workouts_in_social,
         uncNotificationsEnabled: apiSettingsTyped.unc_notifications_enabled,
         hasConfiguredFavorites: apiSettingsTyped.has_configured_favorites,
-        favoriteExercises: localSettings.favoriteExercises || []
+        favoriteExercises: localSettings.favoriteExercises ?? []
       })
     } catch (error) {
       console.error('Error loading user settings from API:', error)
@@ -87,6 +95,7 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
       if (savedSettings) {
         try {
           const parsedSettings = JSON.parse(savedSettings)
+          console.log('🔍 Loading from localStorage fallback:', parsedSettings)
           setSettings({ ...defaultSettings, ...parsedSettings })
         } catch (error) {
           console.error('Error parsing user settings:', error)
@@ -103,29 +112,43 @@ export function UserSettingsProvider({ children }: { children: ReactNode }) {
     loadSettings()
   }, [loadSettings])
 
-  // Guardar configuraciones en localStorage (solo ejercicios favoritos)
+  // Guardar configuraciones en localStorage (ejercicios favoritos y configuración)
   useEffect(() => {
     const settingsToSave = {
-      favoriteExercises: settings.favoriteExercises
+      favoriteExercises: settings.favoriteExercises,
+      hasConfiguredFavorites: settings.hasConfiguredFavorites
     }
     localStorage.setItem('user-settings', JSON.stringify(settingsToSave))
-  }, [settings.favoriteExercises])
+    console.log('🔍 Saving to localStorage:', settingsToSave)
+  }, [settings.favoriteExercises, settings.hasConfiguredFavorites])
 
   const setFavoriteExercises = useCallback((exerciseIds: number[]) => {
-    setSettings(prev => ({ 
-      ...prev, 
-      favoriteExercises: exerciseIds
-    }))
+    console.log('🔍 setFavoriteExercises called with:', exerciseIds)
+    setSettings(prev => {
+      const newSettings = { 
+        ...prev, 
+        favoriteExercises: exerciseIds
+      }
+      console.log('🔍 New settings after setFavoriteExercises:', newSettings)
+      return newSettings
+    })
   }, [])
 
   const setHasConfiguredFavorites = useCallback(async (hasConfigured: boolean) => {
-    setSettings(prev => ({ 
-      ...prev, 
-      hasConfiguredFavorites: hasConfigured
-    }))
+    console.log('🔍 setHasConfiguredFavorites called with:', hasConfigured)
+    setSettings(prev => {
+      const newSettings = { 
+        ...prev, 
+        hasConfiguredFavorites: hasConfigured
+      }
+      console.log('🔍 New settings after setHasConfiguredFavorites:', newSettings)
+      return newSettings
+    })
     
     try {
+      console.log('🔍 Calling API to update has_configured_favorites:', hasConfigured)
       await apiClient.updateUserSettings({ has_configured_favorites: hasConfigured })
+      console.log('🔍 API call successful')
     } catch (error) {
       console.error('Error updating has_configured_favorites setting:', error)
     }

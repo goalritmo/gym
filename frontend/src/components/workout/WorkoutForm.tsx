@@ -32,7 +32,7 @@ import {
   Stop as StopIcon,
   Close as CloseIcon
 } from '@mui/icons-material'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 // Esquema de validación con Zod
 const workoutFormSchema = z.object({
@@ -80,18 +80,22 @@ export default function WorkoutForm({
   } = useUserSettings()
   
   // Filtrar ejercicios favoritos si están configurados manualmente
-  const filteredExercises = settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0 
-    ? exercises.filter(exercise => settings.favoriteExercises.includes(exercise.id))
-    : exercises
-  
-  // Debug: verificar el filtrado de ejercicios
-  console.log('🔍 WorkoutForm Debug:', {
-    totalExercises: exercises.length,
-    hasConfiguredFavorites: settings.hasConfiguredFavorites,
-    favoriteExercisesCount: settings.favoriteExercises.length,
-    filteredExercisesCount: filteredExercises.length,
-    favoriteExercises: settings.favoriteExercises
-  })
+  const filteredExercises = useMemo(() => {
+    const filtered = settings.hasConfiguredFavorites && settings.favoriteExercises.length > 0 
+      ? exercises.filter(exercise => settings.favoriteExercises.includes(exercise.id))
+      : exercises
+    
+    // Debug: verificar el filtrado de ejercicios
+    console.log('🔍 WorkoutForm Debug:', {
+      totalExercises: exercises.length,
+      hasConfiguredFavorites: settings.hasConfiguredFavorites,
+      favoriteExercisesCount: settings.favoriteExercises.length,
+      filteredExercisesCount: filtered.length,
+      favoriteExercises: settings.favoriteExercises
+    })
+    
+    return filtered
+  }, [exercises, settings.hasConfiguredFavorites, settings.favoriteExercises])
   const { register, handleSubmit, formState: { errors }, watch, setValue, reset } = useForm({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
