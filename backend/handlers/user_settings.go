@@ -27,6 +27,8 @@ func GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Intentar obtener configuraciones existentes
 	var settings UserSettings
+	
+	// Primero intentar con la estructura nueva
 	query := `
 		SELECT has_configured_favorites, favorite_exercises
 		FROM user_settings
@@ -37,6 +39,17 @@ func GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 		&settings.HasConfiguredFavorites,
 		&settings.FavoriteExercises,
 	)
+	
+	// Si hay error de columna inexistente, usar valores por defecto
+	if err != nil && (err.Error() == "pq: column \"has_configured_favorites\" does not exist" || 
+		err.Error() == "pq: column \"favorite_exercises\" does not exist") {
+		fmt.Printf("🔍 Columnas no existen, usando valores por defecto para user %s\n", userID)
+		settings = UserSettings{
+			HasConfiguredFavorites:  false,
+			FavoriteExercises:       []int{},
+		}
+		err = nil // Resetear error para continuar
+	}
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -103,9 +116,31 @@ func UpdateUserSettingsHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, err := database.DB.Exec(query, userID, settings.HasConfiguredFavorites, settings.FavoriteExercises)
 	if err != nil {
-		fmt.Printf("Error actualizando configuraciones: %v\n", err)
-		http.Error(w, "Error actualizando configuraciones", http.StatusInternalServerError)
-		return
+		// Si hay error de columna inexistente, intentar crear la tabla/columnas
+		if err.Error() == "pq: column \"has_configured_favorites\" does not exist" || 
+		   err.Error() == "pq: column \"favorite_exercises\" does not exist" {
+			fmt.Printf("🔍 Columnas no existen, intentando crear estructura para user %s\n", userID)
+			
+			// Intentar agregar las columnas
+			_, alterErr := database.DB.Exec(`
+				ALTER TABLE user_settings 
+				ADD COLUMN IF NOT EXISTS has_configured_favorites BOOLEAN DEFAULT false,
+				ADD COLUMN IF NOT EXISTS favorite_exercises INTEGER[] DEFAULT '{}'
+			`)
+			if alterErr != nil {
+				fmt.Printf("Error creando columnas: %v\n", alterErr)
+			} else {
+				fmt.Printf("✅ Columnas creadas, reintentando inserción\n")
+				// Reintentar la inserción
+				_, err = database.DB.Exec(query, userID, settings.HasConfiguredFavorites, settings.FavoriteExercises)
+			}
+		}
+		
+		if err != nil {
+			fmt.Printf("Error actualizando configuraciones: %v\n", err)
+			http.Error(w, "Error actualizando configuraciones", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)

@@ -928,7 +928,7 @@ export default function WorkoutHistory() {
             borderBottom: '1px solid',
             borderColor: 'divider'
           }}>
-            Editar nombre del entrenamiento
+            Editar nombre
           </DialogTitle>
           <DialogContent sx={{ pt: 3 }}>
             <TextField
